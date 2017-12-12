@@ -81,9 +81,9 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model listNameListActoin( @RequestParam Map<String, String> reqs ) {
+	public Model listNameListActoin( @RequestBody Map<String, String> modelMap ) {
 		Model model = new Model();
-		model.setPage( nameListService.listNameList( reqs ) );
+		model.setPage( nameListService.listNameList( modelMap ) );
 		return model;
 	}
 
@@ -170,10 +170,10 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/mod", method = RequestMethod.POST)
-	public Model updateNameListActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model updateNameListActoin( @RequestBody Map<String, String> modelMap, HttpServletRequest request ) {
 		Model model = new Model();
-		request.setAttribute( "rosterdesc", reqs.get( "rosterdesc_span" ) );
-		nameListService.updateOneNameList( reqs );
+		request.setAttribute( "rosterdesc", modelMap.get( "rosterdesc_span" ) );
+		nameListService.updateOneNameList( modelMap );
 		return model;
 	}
 
@@ -184,17 +184,17 @@ public class NameListController {
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/del", method = RequestMethod.POST)
-	public Model delNameListActoin( @RequestBody Map<String,List<Map<String,String>>> modelMap, HttpServletRequest request ) {
+	public Model delNameListActoin( @RequestBody Map<String, List<Map<String, String>>> modelMap, HttpServletRequest request ) {
 		Model model = new Model();
-	/*	String json = MapUtil.getString( modelMap, "postData" );
-		Map<String, List<Map<String, String>>> formList = null;
-		try {
-			formList = objectMapper.readValue( json, Map.class );
-		}
-		catch( Exception e ) {
-			e.printStackTrace();
-			throw new TmsMgrWebException( "删除名单Json数据解析异常" );
-		}*/
+		/*	String json = MapUtil.getString( modelMap, "postData" );
+			Map<String, List<Map<String, String>>> formList = null;
+			try {
+				formList = objectMapper.readValue( json, Map.class );
+			}
+			catch( Exception e ) {
+				e.printStackTrace();
+				throw new TmsMgrWebException( "删除名单Json数据解析异常" );
+			}*/
 
 		nameListService.deleteNameList( modelMap );
 
@@ -258,17 +258,17 @@ public class NameListController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/valueadd", method = RequestMethod.POST)
-	public Model addValueListActoin( @RequestParam Map<String, Object> reqs, HttpServletRequest request ) {
+	public Model addValueListActoin( @RequestBody ModelMap modelMap, HttpServletRequest request ) {
 		Model model = new Model();
 		try {
-			model.setRow( nameListService.createValueList( reqs ) );
+			model.setRow( nameListService.createValueList( (Map<String, Object>) modelMap ) );
 		}
 		catch( Exception e ) {
 			e.printStackTrace();
 			model.addError( "名单值新建失败" );
 		}
-		request.setAttribute( "rosterdesc", reqs.get( "rosterdesc" ) );
-		request.setAttribute( "rostervalue", reqs.get( "rostervalue" ) );
+		request.setAttribute( "rosterdesc", modelMap.get( "rosterdesc" ) );
+		request.setAttribute( "rostervalue", modelMap.get( "rostervalue" ) );
 		return model;
 	}
 
