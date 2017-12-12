@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+		xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:component-scan base-package="cn.com.higinet.tms35.core,cn.com.higinet.tms4.model"  />
+	<context:component-scan base-package="cn.com.higinet.tms35.manage">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	<context:component-scan base-package="cn.com.higinet.tmsreport.web">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="authPointcut" expression="(execution(* cn.com.higinet.tms35.manage.*.service.*.importIpLocation(..))) || (execution(* cn.com.higinet.tms35.manage.*.service.*.importRoster(..))) || (execution(* cn.com.higinet.tms35.manage.*.service.*.save*(..))) || (execution(* cn.com.higinet.tms35.manage.auth.service.impl.AuthServiceImpl.batchUpadteAuth(..))) || (execution(* cn.com.higinet.tms35.manage.*.service.*.update*(..))) || (execution(* cn.com.higinet.tms35.manage.*.service.*.create*(..))) || (execution(* cn.com.higinet.tms35.manage.*.service.*.delete*(..)))"/> 
+		<aop:aspect id="authAspect" ref="cacheAspect"> 
+			<aop:before pointcut-ref="authPointcut" method="runOnBefor" />
+			<aop:after-returning pointcut-ref="authPointcut"  method="runOnAfter" /> 
+		</aop:aspect>
+	</aop:config>
+	
+	<bean id="tmsMessages" class="cn.com.higinet.rapid.base.i18n.MessageSourcePart">
+		<property name="messageSource" ref="messageSource" />
+		<property name="basenames">
+			<value>classpath:/resources/i18n/tms-messages</value>
+		</property>
+	</bean>
+	
+	<bean id="objectMapper" class="org.codehaus.jackson.map.ObjectMapper" >
+	</bean>
+	<!-- sql 配置 -->
+	<!-- <bean id="tmsSqlMap" class="cn.com.higinet.rapid.base.dao.SqlMap" >
+		<property name="dbtype" value="oracle" />
+		<property name="basenames">
+			<list>
+				<value>classpath:/resources/db/tmsweb-sql</value>
+			</list>
+		</property>
+	</bean> -->
+	
+	<bean id="tmsSqlMap" class="cn.com.higinet.rapid.base.dao.SqlMap" >
+		<property name="dbtype" value="oracle" />
+		<property name="basenames">
+			<list>
+				<value>classpath:/resources/db/tmsweb-sql</value>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<bean id="refreshCacheTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor">
+		<property name="daemon" value="true" />
+		<property name="concurrencyLimit" value="100" />
+		<property name="threadNamePrefix" value="refreshCacheTaskExecutor" />
+	</bean>
+</beans>

@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>专家规则查看</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var expertruleid = jQuery.url.param("expertruleid");
+	//组装表格
+	var g_cond = $("#condboxdiv").grid({
+		title:'条件信息',
+		columns:[
+			{name:'条件名称', width: 80, dataIndex:'CONDNAME'},
+			{name:'条件对象', width: 40, dataIndex:'TARGETNAME'},
+			{name:'是否规则交易', width: 40, dataIndex:'ISRULETXN',render:'common.is'},
+			{name:'是否显示交易属性', width: 40, dataIndex:'FEATUREISPARAM',render:'common.is'},
+			{name:'分值', width: 20, dataIndex:'SCORE'},
+			{name:'权重', width: 20, dataIndex:'WEIGHT'},
+			{name:'命中次数', width: 30, dataIndex:'CONDRANGE'},
+			{name:'计分停止次数', width: 30, dataIndex:'CONDLIMIT'},
+			{name:'统计周期', width: 20, dataIndex:'COUNTROUND'},
+			{name:'统计单位', width: 20, dataIndex:'COUNTUNIT',render:'tms.mgr.rulecmapunit'},
+			{name:'关联关系', width: 20, dataIndex:'RELATION'}
+		],
+		ds:{
+			url:"/tms/expert/condlist",
+			params:{expertruleid:''+expertruleid}
+		},
+		pagebar: true
+
+	});
+	g_cond.goPage();
+
+	//组装表格
+	var g_action = $("#actionboxdiv").grid({
+		title:'动作信息',
+		columns:[
+			{name:'动作名称', width: 50, dataIndex:'ACTIONNAME'},
+			{name:'动作类型', width: 40, dataIndex:'FUNCNAME'},
+			{name:'创建时间', width: 40, dataIndex:'CREATETIME'}
+		],
+		ds:{
+			url:"/tms/expert/actionlist",
+			params:{expertruleid:''+expertruleid}
+		},
+		pagebar: true
+
+	});
+	g_action.goPage();
+
+	//组装表格
+	var g_param = $("#paramboxdiv").grid({
+		title:'参数信息',
+		columns:[
+			{name:'业务名称', width: 50, dataIndex:'BUSINESSNAME'},
+			//{name:'业务类型', width: 40, dataIndex:'BUSINESSTYPE'},
+			{name:'函数名称', width: 40, dataIndex:'FUNCNAME'},
+			{name:'参数标签', width: 40, dataIndex:'PARAMLABEL'},
+			{name:'数据类型', width: 20, dataIndex:'DATATYPE'},
+			{name:'数据来源类型', width: 40, dataIndex:'SOURCETYPE'},
+			{name:'数据来源标识', width: 40, dataIndex:'SOURCEID'},
+			{name:'默认值', width: 20, dataIndex:'DEFAULTVALUE'},
+			{name:'排序', width: 20, dataIndex:'ORDERBY'},
+			{name:'参数访问控制', width: 20, dataIndex:'RWCONTROL'}
+		],
+		ds:{
+			url:"/tms/expert/paramlist",
+			params:{expertruleid:''+expertruleid}
+		},
+		pagebar: true
+
+	});
+	g_param.goPage();
+	
+
+    // 返回
+  	$('#backBtn').click(function(){
+		jcl.go('/tms/expert/list');
+	});
+	
+});
+
+</script>
+
+</head>
+<body>
+
+<div id="condboxdiv" class="box"></div>
+
+<div id="actionboxdiv" class="box"></div>
+
+<div id="paramboxdiv" class="box"></div>
+
+<div class="button-box">
+	<input type="button" value="#springMessage('view.tms.pub.btn.banck')" class="btn" id="backBtn"/>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms35.rule.edit.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/draw_rule.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var p_win = window.dialogArguments; //得到window参数
+	var json=jQuery.url.param("json");
+	var jsonObj = json2Object(jQuery.url.param("json"));
+	var txnId = jQuery.url.param("txnId");
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms35.rule.edit.title")',
+		id:'editFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.tms.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+
+	// 初始化页面数据
+	//jcl.postJSON('/tms35/rule/getRule', "ruleId="+ruleId, function(data){
+			var rule_txn = jsonObj.RULE_TXN;
+			$('#RULE_ID').val(jsonObj.RULE_ID);
+			$('#RULE_NAME').val(jsonObj.RULE_NAME);
+			$('#RULE_DESC').val(jsonObj.RULE_DESC);
+			$('#RULE_TXN').val(rule_txn);
+			$('#RULE_COND').val(jsonObj.RULE_COND);
+			$('#RULE_SCORE').val(jsonObj.RULE_SCORE);
+			$('#RULE_TIMESTAMP').val(jsonObj.RULE_TIMESTAMP);
+			$('#RULE_ENABLE').val(jsonObj.RULE_ENABLE);
+			
+			if(jsonObj.RULE_ISTEST=='1') $("#RULE_ISTEST").attr("checked",true);
+			
+			// 继承的规则不能修改
+			if(rule_txn != txnId){
+				$('#RULE_DESC').attr('disabled',true);
+				$('#RULE_COND').attr('disabled',true);
+				$('#RULE_SCORE').attr('disabled',true);
+				$('#RULE_ISTEST').attr('disabled',true);
+				$('#updateBtn').attr('disabled',true);
+			}
+	//});
+		
+	// 保存
+	$("#updateBtn").click(function(){
+		// 校验
+		var ruleDescObject=$('input[name=RULE_DESC]');
+		var ruleDesc=ruleDescObject.val();
+		
+		var ruleCondObject=$('input[name=RULE_COND]');
+		var ruleCond=ruleCondObject.val();
+		
+		var ruleScoreObject=$('input[name=RULE_SCORE]');
+		var ruleScore=ruleScoreObject.val();
+		
+		
+		if(Trim(ruleDesc)==""){
+			alert('#springMessage("view.tms35.rule.ruleDesc")'+"不能为空");
+			ruleDescObject.focus();
+			return;
+		}else{
+			
+			if(!checkeLength(ruleDesc,50)){
+				alert('#springMessage("view.tms35.rule.ruleDesc")'+'不能超过50个字符');
+				ruleDescObject.focus();
+				return;
+			}
+			if(!checkeSpecialCode(ruleDesc)){
+				alert('#springMessage("view.tms35.rule.ruleDesc")'+'不能包含特殊字符');
+				ruleDescObject.focus();
+				return;
+			}
+			
+		}
+				
+		if(Trim(ruleCond)==""){
+			alert('#springMessage("view.tms35.rule.ruleDesc")'+"不能为空");
+			ruleCondObject.focus();
+			return;
+		}else{
+			
+			if(!checkeLength(ruleCond,50)){
+				alert('#springMessage("view.tms35.rule.ruleDesc")'+'不能超过50个字符');
+				ruleCondObject.focus();
+				return;
+			}
+		}
+		
+		if(Trim(ruleScore)==""){
+			alert('#springMessage("view.tms35.rule.ruleScore")'+"不能为空");
+			ruleScoreObject.focus();
+			return;
+		}else{
+			
+			if(!IsNumber(ruleScore,0)){
+				alert('#springMessage("view.tms35.rule.ruleScore")'+'不是整数');
+				ruleScoreObject.focus();
+				return;
+			}
+			
+		}
+		
+		// 保存
+		var params = $('#dataForm').serialize();
+		//jcl.postJSON('/tms35/rule/edit', params, function(data){
+		var istest=$('input[name=RULE_ISTEST]').attr('checked');
+		jsonObj.RULE_DESC=ruleDesc;
+		jsonObj.RULE_COND=ruleCond;
+		jsonObj.RULE_SCORE=ruleScore;
+		if(istest){
+			jsonObj.RULE_ISTEST=1;
+		}else{
+			jsonObj.RULE_ISTEST=0;
+		}
+		var _json = Obj2str(jsonObj);
+		p_win.editNode(_json);
+		dialog.show();
+		//});
+		
+	});
+	
+	// 取消
+	$('#cancelBtn').click(function(){
+		window.close();
+	});
+	
+	// 返回
+	$('#backBtn').click(function(){
+		window.close();
+	});
+	
+	// 条件框的双击事件，弹出条件编辑页面
+	$('#RULE_COND').dblclick(function(){
+		var stat_cond = $('#RULE_COND').val();
+		window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+''+"&stat_cond="+stat_cond+"&txnId="+txnId,window,'dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+	});
+	
+});
+
+// 条件页面回调
+function condCallBack(p){
+	$('#RULE_COND').val(p);
+}
+
+</script>
+
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.edit.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.sure")' class="btn" id="backBtn"/>
+	</div>
+</div>
+
+
+<form name="dataForm" id="dataForm" method="post">
+	
+<input type="hidden" id="RULE_ID" name="RULE_ID"/>
+<input type="hidden" id="RULE_NAME" name="RULE_NAME"/>
+<input type="hidden" id="RULE_TXN" name="RULE_TXN"/>
+<input type="hidden" id="RULE_TIMESTAMP" name="RULE_TIMESTAMP"/>
+<input type="hidden" id="RULE_ENABLE" name="RULE_ENABLE"/>
+
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.rule.ruleDesc")：</label> 
+		<span class="list-box-item-content"><input name="RULE_DESC" id="RULE_DESC" maxlength="50" type="text" class="itext"/><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.rule.ruleCond")：</label> 
+		<span class="list-box-item-content"><input name="RULE_COND" id="RULE_COND" maxlength="256" type="text" class="itext"/><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.rule.ruleScore")：</label> 
+		<span class="list-box-item-content"><input name="RULE_SCORE"  id="RULE_SCORE" maxlength="8" type="text" class="itext"/><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.rule.isTest")：</label> 
+		<span class="list-box-item-content">
+			<input type='checkbox' id='RULE_ISTEST' name='RULE_ISTEST'/>
+ 		</span>
+	</li>
+</ul>
+<div class="button-box">
+	<input type="button" value="#springMessage("view.tms.pub.btn.save")" class="btn" id="updateBtn"/>
+	<input type="button" value="#springMessage("view.tms.pub.btn.cancel")" class="btn" id="cancelBtn"/>
+</div>
+</form>
+
+</body>
+</html>

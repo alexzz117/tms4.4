@@ -1,0 +1,467 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.mgr.namelist.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript">
+var _rosterId="";
+var _rostername="";
+var g = "";
+var export_form = "";
+$(document).ready(function(){
+	
+	export_form = new jcl.ui.Form({
+		display: false,
+		items:[
+			{label:'应用ID', name:'rosterId', type:'hidden'},
+			{label:'应用名称', name:'rosterdesc', type:'hidden'}
+		]
+	});
+			
+	//组装表格     
+	g = new jcl.ui.Grid({
+		title:'#springMessage("view.tms.mgr.namelist.title")',
+		qform:{
+			display: false,
+			items:[
+				{label: '#springMessage("view.tms.mgr.namelist.rosterdesc")', name: 'ROSTERDESC'},
+				{label: '#springMessage("view.tms.mgr.namelist.datatype")', name: 'DATATYPE', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.model.datatype.roster'}
+				},
+				{label: '#springMessage("view.tms.mgr.namelist.rostertype")', name: 'ROSTERTYPE', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.mgr.rostertype'}
+				}
+			],btns:[
+				{id: 'quick_search_btn', text: '#springMessage("view.cmc.but.find")'}
+			]
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', action:'toggleQform'},
+			{id:"btn-add", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.new")'},
+			{id:"btn-edit", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.edit")', enable:'oneRowSelected'},
+			{id:"btn-del", icon:"icon-tb-del", text:'#springMessage("view.tms.pub.btn.del")', enable:'rowSelected'},
+			{id:"btn-valueMgr", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.valueMgr")', enable:'oneRowSelected'},
+			{id:"btn-import", icon:"icon-tb-edit", text:'#springMessage("view.tms.expert.rule.btn.import")', enable:'oneRowSelected'},
+			{id:"btn-export", icon:"icon-tb-add", text:'#springMessage("view.tms.expert.rule.btn.export")', enable:'oneRowSelected'}
+		],
+		table:{
+			columns:[
+			    {name:'#springMessage("view.tms.mgr.namelist.rostername")', width: 60, dataIndex:'ROSTERNAME'},
+				{name:'#springMessage("view.tms.mgr.namelist.rosterdesc")', width: 60, dataIndex:'ROSTERDESC'},
+				{name:'#springMessage("view.tms.mgr.namelist.datatype")', width: 40, dataIndex:'DATATYPE', render: 'tms.model.datatype.roster'},
+				{name:'#springMessage("view.tms.mgr.namelist.rostertype")', width: 30, dataIndex:'ROSTERTYPE', render:'tms.mgr.rostertype'},
+				{name:'#springMessage("view.tms.mgr.namelist.valuecount")', width: 25, dataIndex:'VALUECOUNT'},
+				{name:'#springMessage("view.tms.mgr.namelist.createtime")', width: 50, dataIndex:'CREATETIME', render:'datetime'},
+				{name:'#springMessage("view.tms.mgr.namelist.iscache")', width: 30, dataIndex:'ISCACHE', render:'tms.mgr.iscache'},
+				{name:'#springMessage("view.tms.mgr.namelist.remark")', width: 80, dataIndex:'REMARK'}
+			],
+			ds:{
+				url:"/tms/mgr/list",
+				params:{}
+			},
+			pagebar: true
+		
+		}
+	});
+	g.goPage();
+	
+	// 查询
+	$("#quick_search_btn").click(function(){
+		var params = g.qform.jqDom.serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+	
+	//对话框显示
+	var addDialog = new jcl.ui.Dialog({title:'#springMessage("view.tms.mgr.namelist.add.title")', draggable: true});
+	var editDialog = new jcl.ui.Dialog({title:'#springMessage("view.tms.mgr.namelist.edit.title")', draggable: true});
+	//添加表单
+	var addForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label: '#springMessage("view.tms.mgr.namelist.rostername")', name: 'rostername', required:true},
+			{label: '#springMessage("view.tms.mgr.namelist.rosterdesc")', name: 'rosterdesc', required:true},
+			{label: '#springMessage("view.tms.mgr.namelist.datatype")', name: 'datatype', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.model.datatype.roster'}
+			},
+			{label: '#springMessage("view.tms.mgr.namelist.rostertype")', name: 'rostertype', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.mgr.rostertype'}
+			},
+			{label: '#springMessage("view.tms.mgr.namelist.iscache")', name: 'iscache', type:'radio',value: '1', items:[
+				{text: '是', value: '1'},
+				{text: '否', value: '0'}
+			]},
+			{label: '#springMessage("view.tms.mgr.namelist.remark")', name:'remark', type: 'textarea'}
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'addBtn'},
+			{text: '#springMessage("view.tms.pub.btn.cancel")', cls: 'cancelBtn'}
+		]
+	});
+	addDialog.addDom(addForm.jqDom);
+	
+	addForm.getItem('datatype').component.onChange(function(item){
+		cacheProcessByDatatype(item.value, addForm);
+	});;
+	
+	addForm.jqDom.find('.addBtn').click(function(){
+		var rosterdesc = addForm.getItem('rosterdesc').val();
+		var rostertype = addForm.getItem('rostertype').val();
+		var datatype = addForm.getItem('datatype').val();
+		var remark = addForm.getItem('remark').val();
+		var rostername = addForm.getItem('rostername').val();
+		
+		if(Trim(rostername) == ""){
+			alert('#springMessage("view.tms.mgr.namelist.add.rostername.check")');
+			addForm.getItem('rostername').component.focus();
+			return;
+		}else{
+			if(!checkeLength(rostername,32)){
+				alert('#springMessage("view.tms.mgr.namelist.rostername")'+'不能超过32个字符');
+				addForm.getItem('rostername').component.focus();
+				return;
+			}
+			if(!checkSpecialCharacter(rostername,'1')){
+				alert('#springMessage("view.tms.mgr.namelist.check.rostername")');
+				addForm.getItem('rostername').component.focus();
+				return;
+			}
+		}
+		
+		if(Trim(rosterdesc)==""){
+			alert('#springMessage("view.tms.mgr.namelist.add.rosterdesc.check")');
+			addForm.getItem('rosterdesc').component.focus();
+			return;
+		}else{
+			if(!checkeLength(rosterdesc,64)){
+				alert('#springMessage("view.tms.mgr.namelist.rosterdesc")'+'不能超过64个字符');
+				addForm.getItem('rosterdesc').component.focus();
+				return;
+			}
+			if(!checkeSpecialCode(rosterdesc)){
+				alert('#springMessage("view.tms.mgr.namelist.check.rosterdesc")');
+				addForm.getItem('rosterdesc').component.focus();
+				return;
+			}
+		}
+		
+		if(datatype==""){
+			alert('#springMessage("view.tms.mgr.namelist.add.datatype.check")');
+			return;
+		}
+		
+		if(rostertype==""){
+			alert('#springMessage("view.tms.mgr.namelist.add.rostertype.check")');
+			return;
+		}
+		
+		if(remark != ""){
+			if(!checkeLength(remark,512)){
+				alert('#springMessage("view.tms.mgr.namelist.remark")'+'不能超过512个字符');
+				addForm.getItem('remark').component.focus();
+				return;
+			}
+			if(!checkeSpecialCode(remark)){
+				alert('#springMessage("view.tms.mgr.namelist.check.remark")');
+				addForm.getItem('remark').component.focus();
+				return;
+			}
+		}
+		
+		var params = $.param(addForm.data());;//addForm.jqDom.serialize();
+		jcl.postJSON('/tms/mgr/add', params, function(data){
+			addDialog.hide();
+			jcl.msg.info('#springMessage("view.cmc.pub.add.success")');
+			g.goPage();
+		});
+		
+	}).end().find('.cancelBtn').click(function(){
+		addDialog.hide();
+	});
+	
+	//显示添加form
+	g.toolbar.onClick('#btn-add', function(){
+		addForm.reset();
+		addDialog.show();
+	});
+	
+	var editForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label: 'rosterId', name: 'rosterId', type: 'hidden'},
+			{label: '#springMessage("view.tms.mgr.namelist.rostername")', name: 'rostername', required:true,type:'text'},
+			{label: '#springMessage("view.tms.mgr.namelist.rosterdesc")', name: 'rosterdesc_span', required:true,type:'hidden'},
+			{label: '#springMessage("view.tms.mgr.namelist.rosterdesc")', name: 'rosterdesc', required:true,type:'text'},
+			{label: '#springMessage("view.tms.mgr.namelist.datatype")', name: 'datatype', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.model.datatype.roster'}
+			},
+			{label: '#springMessage("view.tms.mgr.namelist.rostertype")', name: 'rostertype', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.mgr.rostertype'}
+			},
+			{label: '#springMessage("view.tms.mgr.namelist.iscache")', name: 'iscache', type:'radio',value: '1', items:[
+				{text: '是', value: '1'},
+				{text: '否', value: '0'}
+			]},
+			{label: '#springMessage("view.tms.mgr.namelist.remark")', name:'remark', type: 'textarea'}
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'updateBtn'},
+			{text: '#springMessage("view.tms.pub.btn.cancel")', cls: 'cancelBtn'}
+		]
+	});
+
+	editDialog.addDom(editForm.jqDom);
+	
+	//不可编辑
+	editForm.getItem('rostername').disable(true);
+	editForm.getItem('rosterdesc').disable(true);
+	editForm.getItem('datatype').disable(true);
+	editForm.getItem('rostertype').disable(true);
+	
+	editForm.jqDom.find('.cancelBtn').click(function(){
+		editDialog.hide();
+	}).end().find('.updateBtn').click(function(){
+		var remark = editForm.getItem('remark').val();
+		if(remark != ""){
+			if(!checkeLength(remark,512)){
+				alert('#springMessage("view.tms.mgr.namelist.remark")'+'不能超过512个字符');
+				editForm.getItem('remark').component.focus();
+				return;
+			}
+			if(!checkeSpecialCode(remark)){
+				alert('#springMessage("view.tms.mgr.namelist.check.remark")');
+				editForm.getItem('remark').component.focus();
+				return;
+			}
+		}
+		
+		var params = $.param(editForm.data());//editForm.jqDom.serialize();
+		jcl.postJSON('/tms/mgr/mod', params, function(data){
+			editDialog.hide();
+			jcl.msg.info('#springMessage("view.tms.pub.edit.success")');
+			g.goPage();
+		});
+	});
+	
+	g.toolbar.onClick('#btn-edit', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.cmc.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.cmc.pub.checkbox.msg1")!');
+			return;
+		}
+		
+		var rosterId = rows[0]["ROSTERID"];
+		var valuecount = rows[0]["VALUECOUNT"];
+		jcl.postJSON('/tms/mgr/get', 'rosterId='+rosterId, function(data){
+			editForm.set(data.row, {
+				'rosterId': 'ROSTERID',
+				'rostername': 'ROSTERNAME',
+				'rosterdesc': 'ROSTERDESC',
+				'datatype': 'DATATYPE',
+				'rostertype': 'ROSTERTYPE',
+				'rostername_span': 'ROSTERNAME',
+				'rosterdesc_span': 'ROSTERDESC',
+				'datatype_span': 'DATATYPE',
+				'rostertype_span': 'ROSTERTYPE',
+				'iscache': 'ISCACHE',
+				'remark': 'REMARK'
+			});
+			cacheProcessByDatatype(data.row['DATATYPE'], editForm);
+		});
+		editDialog.show();
+	});
+	
+	//检查字符串是否合法标识符
+	function isValidLetters(str){
+		var regx = /^\w+$/;
+		if(regx.test(str)){
+			return true;
+		}
+		return false;
+	}
+	// 值维护
+	g.toolbar.onClick('#btn-valueMgr', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")');
+			return;
+		}
+		var rosterId = '';
+		var dataType = [];
+		$.each(rows, function(i,row){
+			rosterId = row['ROSTERID'];
+			dataType.push('datatype=' + row['DATATYPE']);
+		});
+		var params = dataType[0] + "&rosterId=" + rosterId;
+		jcl.go('/tms/mgr/valuelist?'+params);
+	});
+	
+	
+	
+	// 名单数据类型下拉列表
+	jcl.code.selector('DATATYPE','tms.model.datatype.roster',{text:'--请选择--',value:''});
+	
+	// 名单类型下拉列表
+	jcl.code.selector('ROSTERTYPE','tms.mgr.rostertype',{text:'--请选择--',value:''});
+	
+	// 删除
+	g.toolbar.onClick('#btn-del', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")!');
+			return;
+		}
+		if(confirm('#springMessage("view.tms.pub.del.confirm")?')){
+			var list = [];
+			$.each(rows, function(i, row){
+				list.push(
+					$.extend({}, row)
+				);
+			});
+
+			var json_data = JSON.stringify({'del':list});
+			var json_data_encode = encodeURIComponent(json_data);
+			var url_para = "postData=" + json_data_encode;
+			
+			jcl.postJSON('/tms/mgr/del', url_para, function(data){
+				alert('#springMessage("view.tms.pub.del.success")');
+				g.goPage();
+			});
+		}else{
+			return ;
+		}
+	});
+	
+	var dialogExp;
+	//导出
+	g.toolbar.onClick('#btn-export', function(){
+	var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")');
+			return;
+		}
+		var rosterdesc='';
+		var rosterId = [];
+		
+		var row = rows[0];
+		
+		if(row.VALUECOUNT==0){
+			alert('#springMessage("view.tms.mgr.namelist.export.check")');
+			return;
+		}
+		//rosterId.push('rosterId=' + row['ROSTERID']);
+		rosterId.push('rosterId=' + row['ROSTERID'] + '&rosterdesc='+row['ROSTERDESC']);
+		_rostername = row['ROSTERDESC'];
+		
+		dialogExp = new jcl.ui.Dialog({
+			title:'#springMessage("view.tms.pub.btn.nameexport")'
+		});
+		dialogExp.addDom('exportUL');
+		dialogExp.show();
+			
+     	_rosterId = rosterId[0];
+     });
+     
+   
+     //导入
+	g.toolbar.onClick('#btn-import', function(){
+	   	var rows = g.selectedRows();
+	  	if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")');
+			return;
+		}
+		var rosterId;
+		var rosterdes;
+		var row = rows[0];
+		rosterId = row['ROSTERID'];
+		rosterdes = row['ROSTERDESC']
+		var url = '/tms/mgr/import?rosterId=' + rosterId+"&rosterdesc="+rosterdes;
+        //jcl.go('/tms/mgr/import?' + rosterId[0]);
+		jcl.go(url);
+	});  
+	
+	$('#txt,#csv,#xls,#xlsx').click(function(){
+		var flag = $(this).attr('id');
+		var params = g.qform.jqDom.serialize() + "&" + _rosterId + "&flag="+flag;
+		exportAction(dialogExp, params);
+	});
+});
+function search(){
+		var rostername = $('#ROSTERDESC').val();
+
+		if(Trim(rostername).length > 0 && !checkeSpecialCode(Trim(rostername))){
+			alert('#springMessage("view.tms.mgr.namelist.rostername")'+'不能包含特殊字符');
+			return $('#ROSTERDESC').focus();
+		}
+
+		var params = $('#qform').serialize();
+		g.setDsParams(params);
+		g.goPage();
+}
+
+function cacheProcessByDatatype(datatype, form){
+	/*var iscache = form.getItem('iscache');
+	if(datatype == 'ip'){
+		iscache.val('1');
+		iscache.disable(true);
+	}else{
+		iscache.enable();
+	}*/
+}
+
+function exportAction(dialog, params){
+	dialog.hide();	
+	var url = '$rc.contextPath/tms/mgr/export?' + params;
+ 	window.open(url);
+	
+	var rowData = g.table.selectedOneRow();
+	
+	export_form.set({rosterId:rowData.ROSTERID,rosterdesc:rowData.ROSTERDESC});
+	var export_params = export_form.serialize();
+ 	jcl.postJSON('/tms/mgr/exportLog', export_params, function(data){
+	});
+}
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<div style="display: none;">
+<ul style="list-style:none;" id="exportUL">
+	<li class="list-box-item"><a href="#"  id="txt">TXT</a></li>
+	<li class="list-box-item"><a href="#"  id="csv">CSV</a></li>
+	<li class="list-box-item"><a href="#"  id="xls">Excel2003及以下版本</a></li>
+	<li class="list-box-item"><a href="#"  id="xlsx">Excel2007及以上版本</a></li>
+</ul>
+</div>
+</body>
+</html>

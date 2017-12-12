@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>设备指纹</title>
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<link type="text/css" rel="stylesheet" href="$rc.contextPath/s/common/css/page.css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/query/jcq.js"></script>
+
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/model.ui.HandlerFunction.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/dfp/app_list.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/dfp/pro_list.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/dfp/appPro_list.js"></script>
+
+<style type="text/css">
+#right-box{float:left; overflow:auto;}
+</style>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var tabs = [
+	   	{title:'渠道定义', dom:'#appGridDiv', handler: model.dfpApp},
+		{title:'属性定义', dom:'#proGridDiv', handler: model.dfpPro},
+		{title:'渠道属性定义', dom:'#appProGridDiv', handler: model.dfpAppPro}
+	];
+	
+	var page = {};
+	
+	function getAcHandler(index){
+	 	var tab = tabs[index];
+	 	if(tab.handler.isInit){
+	 		tab.handler.load();
+	 	}else{
+	 		tab.handler.isInit = true;
+	 		tab.handler.init();
+	 	}
+		$(tab.dom).triggerHandler('resizes');
+	  }
+	  
+	//多页签面板
+    var tabPanel = page.tabPanel = new jcl.ui.TabPanel({tabsWrap:true}, $('#right-box'));
+	
+	$.each(tabs, function(i, tab){
+    	 tabPanel.addTab(tab.title, $(tab.dom), getAcHandler);
+    });
+	
+	var frame = page.frame = new jcl.ui.Frame({
+        title:'设备指纹'
+    });
+	
+	tabPanel.onTabClick(function(index){
+		frame.container.triggerHandler('resizes');
+    	return true;		
+	});
+
+		
+	tabPanel.activeTab(0); // 会调用 onTabClick	
+	
+	
+    frame.addDom('#right-box');
+	
+	frame.container.bind('resizes', function(){
+        tabPanel.height($(this).height());
+        $('#right-box').triggerHandler('resizes');
+       
+    }).triggerHandler('resizes');
+});
+
+</script>
+</head>
+  <body>
+  <div id="right-box" style="width:100%"></div> <!-- 页签-->
+  <div id="appGridDiv" class="grid-column" style="width:98.5%;height:98%"></div> <!-- 应用列表-->
+  <div id="proGridDiv" class="grid-column" style="width:98.5%;height:98%"></div> <!-- 属性列表-->
+  <div id="appProGridDiv" class="grid-column" style="width:98.5%;height:98%"></div> <!-- 应用属性列表-->
+  </body>
+</html>

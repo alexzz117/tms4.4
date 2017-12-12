@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>资金往来地域视图</title>
+    <!-- 引入 echarts.js -->
+	<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+	<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/report/echarts/echarts.min.js"></script>
+	<script type="text/javascript" src="$rc.contextPath/s/report/echarts/china.js"></script>
+	<style type="text/css">
+.chartsDiv{
+	height:600px;
+	width:98%;
+	border:0.5px solid;
+}
+</style>
+	 <script type="text/javascript">
+    var g = "";
+    $(document).ready(function(){
+    	chartBox = new jcl.ui.Box({
+    		title:'资金往来地域视图'
+    	});
+    	chartBox.title.css({cursor: 'pointer'});
+    	chartBox.container.parent().parent().css({borderBottomWidth:0});
+    	displayBoxContent(chartBox.title, chartBox.container);
+    	
+    	//快速查询表单
+    	charForm = new jcl.ui.Form({
+    		display: true,
+    		layout: 'list',
+    		items:[
+    			{label:'客户号',name:'ACCOUNTNO',  type:'text'},
+    			{label: '级别', name: 'LEVEL', type:'selector', ds:{type:'code', category:'tms.mgr.level'}},
+    			{label: '交易时间', name: 'TXNTIME',type: 'dateduration', duraSeparator:' 到  ', layout:'datetime',items:[{name:'startTime'},{name:'endTime'}]}
+    		],
+    		btns:[
+    			{id: 'chart_search_btn', text: '#springMessage("view.cmc.but.find")'}
+    		]
+    	}, chartBox.container);
+    	
+    	chartBox.addDom($('#chartdiv'));
+    	$("#chart_search_btn").click(function(){
+			showChart();
+		});
+    	
+    	charForm.getItem('LEVEL').val('1');
+    	showMap();
+    }); 
+       
+   
+    function showChart(){
+    	var charParam = charForm.serialize();//查询框中的信息
+    	var accountno = charForm.getItem('ACCOUNTNO').val();
+    	var startTime = charForm.jqDom.find('[name=startTime]').val();
+		var endTime =charForm.jqDom.find('[name=endTime]').val();
+		if( accountno==""){
+			alert('客户号不能为空');
+			return ;
+		}
+		if( startTime!="" && endTime!="" && startTime>endTime){
+			alert('#springMessage("view.cmc.log.list.msg.endTimeEarly")');
+			return ;
+		}
+		if( startTime=="" || endTime=="" ){
+			alert('交易时间不能为空');
+			return ;
+		}
+	
+    	
+    	jcl.postJSON('/tms35/dataanalysic/rechargeRegionpost', charParam, function(data){
+    		var regionData = [];
+    		var zzregionData = [];
+    		var skregionData = [];
+    		var allregionData = [];
+    		sourceregionData = [];
+    		var geoCoordMap = {};
+    		$.each(data.list, function(i,ps){
+    			
+    			if(regionData.indexOf([{name:ps['FROMCITY']},{name:ps['FROMCITY']}])==-1){
+    				regionData.push([{name:ps['FROMCITY']},{name:ps['FROMCITY'],txncode:ps['TXNCODE']}]);
+    			}
+    			if(ps['TXNTYPE']=='1')
+   				{
+   				zzregionData.push([{name:ps['FROMCITY']},{name:ps['TOCITY'],value:'txncode:'+ps['TXNCODE'],txncode:ps['TXNCODE']}]);
+   				}
+    			else if (ps['TXNTYPE']=='2')
+   				{
+   				skregionData.push([{name:ps['TOCITY']},{name:ps['FROMCITY'],value:'txncode:'+ps['TXNCODE'],txncode:ps['TXNCODE']}]);
+   				}
+    			//regionData.push([{name:ps['FROMCITY']},{name:ps['TOCITY'],value:'txncode:'+ps['TXNCODE']}]);
+    		});
+    		
+    		$.each(data.sourcemaplist, function(i,ps){
+    			sourceregionData.push([{name:ps['city']},{name:ps['city']}]);
+    		});
+	
+    		
+	    	if (zzregionData!='undefined'){
+	    		allregionData.push(['转账',zzregionData]);
+	    	};
+	    	if (skregionData!='undefined'){
+	    		allregionData.push(['收款',skregionData]);
+	    	};
+	    	if (regionData!='undefined'){
+	    		allregionData.push(['',regionData]);
+	    	};
+	    	if (sourceregionData!='undefined'){
+	    		allregionData.push(['源点',sourceregionData]);
+	    	};
+    		
+    		$.each(data.geocoordmaplist, function(i,ps){
+    			geoCoordMap[ps['city']]=[ps['longitude'],ps['latitude']];
+    		});
+    		
+    	
+    		
+    		//showChartRegion(regionData,geoCoordMap);
+    		showChartRegion(allregionData,geoCoordMap,sourceregionData);
+    	});
+    }
+    
+    
+  //隐藏/展开相应的层
+    function displayBoxContent(trigger, content){
+    	trigger.on('click', function(){
+    		if(content.is(':hidden')){
+    			content.parent().show();
+    		}else{
+    			content.parent().hide();
+    		}
+    	})
+    }
+
+
+  
+  function showChartRegion(regionData,geoCoordMap,sourceregionData){
+
+	    	var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z';
+
+	    	var convertData = function (data) {
+	    	    var res = [];
+	    	    for (var i = 0; i < data.length; i++) {
+	    	        var dataItem = data[i];
+	    	        var fromCoord = geoCoordMap[dataItem[0].name];
+	    	        var toCoord = geoCoordMap[dataItem[1].name];
+	    	        var txncode = dataItem[1].txncode;
+	    	        if (fromCoord && toCoord) {
+	    	        	if(txncode){
+	    	        		 res.push({
+	 	    	                fromName: dataItem[0].name,
+	 	    	                toName: dataItem[1].name,
+	 	    	                coords: [fromCoord, toCoord],
+	 	    	                txncode:txncode
+	 	    	            });
+	    	        	}else{
+	    	        		 res.push({
+	 	    	                fromName: dataItem[0].name,
+	 	    	                toName: dataItem[1].name,
+	 	    	                coords: [fromCoord, toCoord]
+	 	    	            });
+	    	        		}
+	    	           
+	    	        }
+	    	    }
+	    	    return res;
+	    	};
+
+	    	var color = ['#a6c84c', '#ffa022', '#46bee9'];
+	    	var series = [];
+	    	
+	    	if (regionData!='undefined'){
+	    		regionData.forEach(function (item, i) {
+	    	    series.push(
+	    	    {
+	    	        name: item[0],
+	    	        type: 'lines',
+	    	        zlevel: 2,
+	    	        effect: {
+	    	            show: true,
+	    	            period: 6,
+	    	            trailLength: 0,
+	    	            symbol: planePath,
+	    	            symbolSize: 15
+	    	        },
+	    	        lineStyle: {
+	    	            normal: {
+	    	                color: color[i],
+	    	                width: 1,
+	    	                opacity: 0.4,
+	    	                curveness: 0.2
+	    	            }
+	    	        },
+	    	        data: convertData(item[1])
+	    	    },
+	    	    {
+	    	        name: '',
+	    	        type: 'effectScatter',
+	    	        coordinateSystem: 'geo',
+	    	        zlevel: 1,
+	    	        rippleEffect: {
+	    	            brushType: 'stroke'
+	    	        },
+	    	        label: {
+	    	            normal: {
+	    	                show: true,
+	    	                position: 'right',
+	    	                formatter: '{b}'
+	    	            }
+	    	        },
+	    	        symbolSize: function (val) {
+	    	            return 5;
+	    	        },
+	    	        itemStyle: {
+	    	            normal: {
+	    	                color: color[i]
+	    	            }
+	    	        },
+	    	        data: item[1].map(function (dataItem) {
+	    	        	try{
+	    	            return {
+	    	                name: dataItem[1].name,
+	    	                value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value])
+	    	            };
+	    	        	}
+	    	        	catch(e){
+	    	        		return null;
+	    	        	}
+	    	        })
+	    	    });
+	    	});
+	    	};
+	    	
+	    
+	    	
+	    	var option = {
+	    	    backgroundColor: '#404a59',
+	    	    title : {
+	    	        text: '资金往来地域视图',
+	    	        subtext: '',
+	    	        left: 'center',
+	    	        textStyle : {
+	    	            color: '#fff'
+	    	        }
+	    	    },
+	    	    tooltip : {
+	    	        trigger: 'item'
+	    	    },
+	    	    legend: {
+	    	        orient: 'vertical',
+	    	        top: 'bottom',
+	    	        left: 'right',
+	    	        data:['北京 Top10', '上海 Top10', '广州 Top10'],
+	    	        textStyle: {
+	    	            color: '#fff'
+	    	        },
+	    	        selectedMode: 'single'
+	    	    },
+	    	    geo: {
+	    	        map: 'china',
+	    	        label: {
+	    	            emphasis: {
+	    	                show: false
+	    	            }
+	    	        },
+	    	        roam: true,
+	    	        itemStyle: {
+	    	            normal: {
+	    	                areaColor: '#323c48',
+	    	                borderColor: '#404a59'
+	    	            },
+	    	            emphasis: {
+	    	                areaColor: '#323c48'
+	    	            }
+	    	        }
+	    	    },
+	    	    series: series
+	    	};
+
+	        
+	        // 基于准备好的dom，初始化echarts实例
+	        var myChart = echarts.init(document.getElementById('chartdiv'));
+	        // 使用刚指定的配置项和数据显示图表。
+	        myChart.setOption(option);  
+	        
+	        // 处理点击事件并且跳转到相应的百度搜索页面
+	        myChart.on('click', function (params) {
+	        	if(params.data.txncode){
+	        		var iHeight = 600;
+                	var iWidth = 720;
+                	//获得窗口的垂直位置
+                	var iTop = (window.screen.availHeight - 30 - iHeight) / 2; 
+                    //获得窗口的水平位置 
+                    var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; 
+	        		var url = jcl.env.contextPath+'/dualaudit/tms35/query/show?queryId=264&txncode=' + encodeURIComponent(params.data.txncode);
+                    window.open (url, 'newwindow', 'height=800, width=1600, top='+iTop+', left='+iLeft+', toolbar=no, menubar=no, scrollbars=no,resizable=no,location=no, status=no');
+	        	}
+	        });
+  }
+  
+    function showMap(){
+    	var series = [];
+    	var option = {
+	    	    backgroundColor: '#404a59',
+	    	    title : {
+	    	        text: '资金往来地域视图',
+	    	        subtext: '',
+	    	        left: 'center',
+	    	        textStyle : {
+	    	            color: '#fff'
+	    	        }
+	    	    },
+	    	    tooltip : {
+	    	        trigger: 'item'
+	    	    },
+	    	    legend: {
+	    	        orient: 'vertical',
+	    	        top: 'bottom',
+	    	        left: 'right',
+	    	        data:[],
+	    	        textStyle: {
+	    	            color: '#fff'
+	    	        },
+	    	        selectedMode: 'single'
+	    	    },
+	    	    geo: {
+	    	        map: 'china',
+	    	        label: {
+	    	            emphasis: {
+	    	                show: false
+	    	            }
+	    	        },
+	    	        roam: true,
+	    	        itemStyle: {
+	    	            normal: {
+	    	                areaColor: '#323c48',
+	    	                borderColor: '#404a59'
+	    	            },
+	    	            emphasis: {
+	    	                areaColor: '#323c48'
+	    	            }
+	    	        }
+	    	    },
+	    	    series: series
+	    	};
+
+	        
+	        // 基于准备好的dom，初始化echarts实例
+	        var myChart = echarts.init(document.getElementById('chartdiv'));
+	        // 使用刚指定的配置项和数据显示图表。
+	        myChart.setOption(option); 
+    }
+   
+    </script>
+	</head>
+	<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->   
+  <div id="chartdiv" class="chartsDiv" align="center"></div>
+</body>
+</html>

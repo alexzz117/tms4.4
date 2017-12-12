@@ -1,0 +1,494 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("ui.view.tms35.stat.list.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat_pub.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat.js"></script>
+<script type="text/javascript">
+	var txnid ;
+$(document).ready(function (){
+	txnid = jQuery.url.param("txnId");
+	txnid = "T0102";
+	var param = "txnId="+txnid;
+	// 查询列表
+	jcl.postJSON("/tms/stat/list", param, function(data){
+		// var rulecmaptarget = data.rulecmaptarget;
+		var txnFeature = data.txnFeature;
+		var rulecmapunit = data.rulecmapunit;
+		var func = data.func;
+		
+		// 初始化查询条件的下拉列表
+		//jcl.code.selector('STAT_PARAM','tms.mgr.rulecmaptarget',{text:'--请选择--',value:''});
+		
+		// 初始化查询条件的下拉列表
+		$.each(txnFeature, function(i,txnFeature){
+			// 统计目标
+			$("select[name=STAT_DATAFD]").append("<option value='" + txnFeature['CODE_KEY'] + "'>" + txnFeature['CODE_VALUE'] + "</option>");  
+			// 统计引用对象
+			$("select[name=STAT_PARAM]").append("<option value='" + txnFeature['CODE_KEY'] + "'>" + txnFeature['CODE_VALUE'] + "</option>");  
+		}); 
+		
+		// 初始化查询条件的下拉列表-统计函数
+		$.each(func, function(i,func){
+			$("select[name=STAT_FN]").append("<option value='" + func['CODE_KEY'] + "'>" + func['CODE_VALUE'] + "</option>");  
+		}); 
+		
+		// 初始化列表
+		$.each(data.row, function(i,row){
+			var resultCond = row.RESULT_COND;
+			var continues = row.CONTINUES;
+			var stat_unresult = row.STAT_UNRESULT;
+			var result_cond = row.RESULT_COND;
+			var stat_valid = row.STAT_VALID;
+			var rowHtml = "<tr";
+			if (stat_valid == '0') {
+				rowHtml += " bgcolor='Silver'";
+			}
+			rowHtml += ">";
+			
+			rowHtml += "<input type='hidden' id='STAT_ID' value="+row.STAT_ID+" name='STAT_ID' />";
+			rowHtml += "<input type='hidden' id='STAT_VALID' value="+row.STAT_VALID+" name='STAT_VALID' />";
+			//rowHtml += "<input type='hidden' id='FN_PARAM' value="+row.FN_PARAM+" name='FN_PARAM' />";
+			rowHtml += "<td><div class='row-cell'><input type='checkbox'  name='statcheckbox'"+i+" id='statcheckbox'"+i+" onclick='changeBtn(this);' /></div></td>";
+			rowHtml += "<td><div class='row-cell'>";
+			rowHtml += row.STAT_NAME;// 统计名称，只读
+			rowHtml += "</div></td>";
+			rowHtml += "<td>";
+			rowHtml += appendTextDiv(row.STAT_DESC,'STAT_DESC');// 统计描述，读写
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendSelectDiv(txnFeature,row.STAT_PARAM,'STAT_PARAM');// 统计引用对象，读写，下拉
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendTextDiv(row.STAT_COND,'STAT_COND');// 统计条件，读写
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendSelectDiv(txnFeature,row.STAT_DATAFD,'STAT_DATAFD');// 统计目标（交易属性），下拉列表
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendSelectDiv(func,row.STAT_FN,'STAT_FN');// 统计函数，下拉列表
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendTextDiv(row.FN_PARAM,'FN_PARAM');// 函数参数，读写
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendTextDiv(row.COUNUNIT,'COUNUNIT');// 统计周期，读写
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendSelectDiv(rulecmapunit,row.COUNTROUND,'COUNTROUND');// 统计单位，下拉
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendCheckboxDiv(row.CONTINUES,'CONTINUES');// 连续，checkbox
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendCheckboxDiv(row.STAT_UNRESULT,'STAT_UNRESULT');// 事中，checkbox
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			var result_cond_succ = "";
+			if (result_cond == '1' || result_cond == '3' ) {
+				result_cond_succ = "1";
+			}
+			rowHtml += appendCheckboxDiv(result_cond_succ,'RESULT_COND_SUCC');// 成功统计，checkbox
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			var result_cond_fail = "";
+			if (result_cond == '2' || result_cond == '3' ) {
+				result_cond_fail = "1";
+			}
+			rowHtml += appendCheckboxDiv(result_cond_fail,'RESULT_COND_FAIL');
+			rowHtml += "</td>";
+			rowHtml += "</tr>";
+			$("#statTable").append(rowHtml);
+			
+		});
+	});
+		
+	// 控制列表的显示/隐藏
+	$("#openOperSpan").click(function(){
+		if($('#gridDiv').is(":hidden")){
+			$('#openOperSpan').text('+');
+			$('#gridDiv').show();
+		}else{
+			$('#openOperSpan').text('-');
+			$('#gridDiv').hide();
+		}
+	});
+	
+	// 增加按钮点击事件
+	$("#btn-add").click(function(){
+		window.showModalDialog("$rc.contextPath/tms/stat/add?txnId="+txnid,'增加','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		jcl.go('/tms/stat/list?txnId='+txnid);
+	});
+	
+	// 条件按钮点击事件
+	$("#btn-cond").click(function(){
+		 var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var statId = [];
+		 var stat_cond;
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+			 	stat_cond = $(this).parent().parent().next().next().next().next().text();
+			 } 
+		 }); 
+		
+		var rv = window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+stat_id+"&stat_cond="+stat_cond+"&txnId="+txnid+"&type=0",'条件','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		var params = "STAT_COND_VALUE="+rv+"&TXNID="+txnid+"&STAT_ID="+stat_id;
+		jcl.postJSON('/tms/stat/updateCond', params, function(data){
+				jcl.go('/tms/stat/list?txnId='+txnid);
+		});
+	});
+	
+	// 有效性按钮点击事件
+	$("#btn-valid").click(function(){
+		var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var count = 0;
+		 var stat_id = "";
+		 var stat_valid = "";
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+			 	stat_valid = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[1].value;
+				count ++;
+			 } 
+		 }); 
+		 if(count == 0){
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		 }
+		 if(count >1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")');
+			return;
+		 }
+		 var param = "stat_id="+stat_id+"&stat_status="+stat_valid
+		jcl.postJSON("/tms/stat/validStat",param,function(data){
+			jcl.go('/tms/stat/list?txnId='+txnid);
+		});
+	});
+
+	// 删除按钮点击事件
+	$("#btn-del").click(function(){
+		var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var count = 0;
+		 var statId = [];
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+				statId.push('stat_id=' + stat_id); 
+				count ++;
+			 } 
+		 }); 
+		 if(count == 0){
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		 }
+		 
+		 if (confirm('#springMessage("view.tms.pub.del.confirm")')) {
+		 	var param = statId.join('&');
+		 	jcl.postJSON("/tms/stat/delStat", param, function(data){
+		 		jcl.go('/tms/stat/list?txnId=' + txnid);
+		 	});
+		 }
+	});
+		
+	// 编辑按钮点击事件
+	$("#btn-edit").click(function(){
+		 var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var count = 0;
+		 var statId = [];
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	var stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+				statId.push('STAT_ID=' + stat_id); 
+				count ++;
+			 } 
+		 }); 
+		 if(count == 0){
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		 }
+		 if(count >1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")');
+			return;
+		 }
+		
+		window.showModalDialog("$rc.contextPath/tms/stat/edit?"+statId+"&txnId="+txnid,'编辑','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		jcl.go('/tms/stat/list?txnId='+txnid);
+		//jcl.go("/tms/stat/edit?"+statId+"&txnId="+txnid);
+	});
+	
+	// 筛选按钮点击事件
+	$("#btn-find").click(function(){
+		// 显示查询条件DIV
+		$('#qform').show();
+	});
+	
+	// 取消筛选按钮点击事件
+	$("#btn-cancelfind").click(function(){
+		// 隐藏查询条件DIV
+		$('#qform').hide();
+		
+		// 数据全部显示
+		document.qform.STAT_DESC.value = "";
+		document.qform.STAT_PARAM.value = "";
+		document.qform.STAT_DATAFD.value = "";
+		document.qform.STAT_FN.value = "";
+		searchStatList();
+	});
+	
+	// 查询按钮点击事件
+	$("#quick_search_btn").click(function(){
+		// 过滤数据
+		searchStatList();
+	});
+	
+	// 引用点按钮点击事件
+	$("#btn-ref").click(function(){
+		var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var stat_name;
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	stat_name = $(this).parent().parent().next().text();
+//				jcl.go("/tms/stat/refTree?txnId="+txnid+"&statName="+stat_name);
+				window.showModalDialog("$rc.contextPath/tms/stat/refTree?txnId="+txnid+"&statName="+stat_name,'引用点','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+				return false;
+			 } 
+		 }); 
+	});
+	
+		// 条件框的双击事件，弹出条件编辑页面
+/*	$("input[name='STAT_COND']").live('dblclick',function(){
+		var stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+		var stat_cond = $(this).val();
+		var rv = window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+''+"&stat_cond="+stat_cond+"&txnId="+txnid,window,'dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		var params = "STAT_COND_VALUE="+rv+"&TXNID="+txnid+"&STAT_ID="+stat_id;
+		jcl.postJSON('/tms/stat/updateCond', params, function(data){
+			jcl.go('/tms/stat/list?txnId='+txnid);
+		});
+	});
+	*/
+	// 初始化按钮状态
+	btnStatus(0);
+});	
+
+
+	
+// 统计配置列表数据修改后异步保存修改后的数据
+function saveStatList(_this){
+	// 获取参数
+	var statId = _this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;// 主键
+	var _this_name = _this.name;// 修改的对象名
+	var _this_value = _this.value;// 修改的对象值
+	var _this_type = _this.type;// 修改的对象类型
+	if(_this_type == 'checkbox'){
+		 if(_this.checked == true){
+		 	_this_value = 'on';
+		 }else{
+		 	_this_value = "";
+		 }
+	}
+	
+	// 异步调用
+	var param = "STAT_ID="+statId+"&OBJECT_NAME="+_this_name+"&OBJECT_VALUE="+_this_value;
+	
+	jcl.postJSON("/tms/stat/updateStatList",param,function(data){
+		if (_this_name == 'STAT_PARAM') {
+			var paramObj = $(_this).parent().parent().parent().find('#FN_PARAM');
+			paramObj.val('');
+			paramObj.parent().prev('div').html('');
+		}
+	});
+}
+
+var func_params_dialog ;
+// 函数参数，选中函数如果是区间统计函数，弹出区间配置页面
+function funcParams(fn_param,param_type){
+	func_params_dialog = new jcl.ui.Dialog({
+		id:'func_params_dialog',
+		title:'参数配置',
+		closeable: false
+	});
+	var htmlStr = "";
+	htmlStr += "<table border='0' width='100%' id='fun_param_tab'>";
+	htmlStr += "<tr>";
+	htmlStr += "<td colspan='3' align='left'>";
+	htmlStr += "<input type='button' value='增加' class='btn' onclick='insertCond(null);'/>";
+	htmlStr += "<input type='button' value='删除' class='btn' onclick='dellCond();'/>";
+	htmlStr += "<input type='button' value='保存' class='btn' onclick='saveCond();'/>";
+	htmlStr += "<input type='button' value='返回' class='btn' onclick='back();'/></td>";
+	htmlStr += "</tr>";
+	htmlStr += "<tr style='font-weight: bold;FONT-SIZE: 11px'>";
+	htmlStr += "<td width='45%'>开始值</td>";
+	htmlStr += "<td width='45%'>结束值</td>";
+	htmlStr += "<td width='10%'><input type='hidden' value='"+param_type+"' id='param_type'/></td>";
+	htmlStr += "</tr>";	
+	htmlStr += "</table>";
+	func_params_dialog.addHtml(htmlStr);
+	func_params_dialog.show();
+	var ps = fn_param.split(func_para_spile);
+	$(ps).each(function (index){
+		var param = ps[index].split(',');
+		insertCond(param);// 插入一行
+	});
+	$('#func_params_dialog').unmiddle();
+}
+
+// 保存函数参数
+function saveCond(){
+	var param_value = "";
+	var tab = document.getElementById('fun_param_tab');
+	$(tab.rows).each(function(index){
+		if(index == 0||index == 1){
+			return true;// 第一行是按钮，第二行是标题行
+		}
+		
+		var cells = $(this).children();
+		$(cells).each(function(i){
+			var input_value = $(this).find('input').val();
+			if(i == 1) param_value += ",";
+			param_value += input_value;
+		});
+		
+		if(index != tab.rows.length-1) param_value += func_para_spile;
+		
+	});
+	
+	// 主键
+	var statId = _this_pub.parentNode.parentNode.getElementsByTagName('input')[0].value;
+	// 值回写
+	//_this_pub.parentNode.parentNode.getElementsByTagName('input')[2].value = param_value;
+	var _param = $(_this_pub).parent().parent().find('#FN_PARAM');
+	$(_param).val(param_value);// 值回写
+	$(_param).parent().prev('div').html(param_value);// 值回写
+	// 异步调用
+	var param = "STAT_ID="+statId+"&OBJECT_NAME=FN_PARAM&OBJECT_VALUE="+param_value;
+	jcl.postJSON("/tms/stat/updateStatList",param,function(data){
+			
+	});
+}
+// 返回
+function back(){
+	func_params_dialog.hide();// 对话框隐藏
+	_this_pub.style.display="none";// 当前只读DIV隐藏
+	_this_pub.nextSibling.style.display="";// 可写DIV显示
+	_this_pub.nextSibling.childNodes[0].focus();// 可写DIV的输入框获得焦点
+}
+
+
+</script>
+
+
+</head>
+  
+<body>
+<!--标题-->
+<div class="box-title">
+ 	<table border='1' style='border-collapse: collapse;width:100%'>
+ 	<tr>
+ 		<td width="1%"><span id="openOperSpan" style="cursor:hand">+</span></td>
+		<td width="99%">#springMessage("ui.view.tms35.stat.list.title")</td>
+ 	</tr>
+	</table>
+</div>
+	
+<div id="gridDiv" class="grid-column">
+	<!--筛选条件-->
+		<form id="qform" name="qform" style="display:none">
+			<table>
+	        <tr>
+	           <td width="10%">#springMessage("view.tms35.stat.statDesc")</td>
+	           <td width="15%">
+	               <input name="STAT_DESC" id="STAT_DESC" type="text" class="itext" value="" onkeyup="searchStatList();"/>
+	           </td>
+			   
+	       	   <td width="10%">#springMessage("ui.view.tms35.stat.statObject")</td>
+	           <td width="15%">
+	               <select name="STAT_PARAM" id="STAT_PARAM" onchange="searchStatList();">
+	               	<option value="">--请选择--</option>
+	               </select>
+	           </td>
+			   
+			   <td width="10%">#springMessage("ui.view.tms35.stat.statAim")</td>
+	           <td width="15%">
+	               <select name="STAT_DATAFD" id="STAT_DATAFD" onchange="searchStatList();">
+	               	<option value="">--请选择--</option>
+	               </select>
+	           </td>
+			   <td width="10%">#springMessage("ui.view.tms35.stat.statFun")</td>
+	           <td width="15%">
+	               <select name="STAT_FN" id="STAT_FN" onchange="searchStatList();">
+	               	<option value="">--请选择--</option>
+	               </select>
+	           </td>
+	        </tr>
+			</table>
+		</form>
+	<!--列表-->
+	<table id="statTable" border='1' style='border-collapse: collapse;width:100%'>
+	<tr>
+		<td colspan="13">
+			<input id="btn-add" type="button" value="#springMessage('view.tms35.stat.btn.newdialog')" class="btn" enablerule='0'/>
+			<input id="btn-edit" type="button" value="#springMessage('view.tms35.stat.btn.editdialog')" class="btn" enablerule='1'/>
+			<!--input id="btn-cond" type="button" value="#springMessage('view.tms35.stat.btn.cond')" class="btn" enablerule='1'/-->
+			<input id="btn-del" type="button" value="#springMessage('view.tms35.stat.btn.del')" class="btn" enablerule='2'/>
+			<input id="btn-valid" type="button" value="#springMessage('view.tms35.stat.btn.valid')" class="btn" enablerule='1'/>
+			<input id="btn-find" type="button" value="#springMessage('view.tms35.stat.btn.find')" class="btn" enablerule='0'/>
+			<input id="btn-cancelfind" type="button" value="#springMessage('view.tms35.stat.btn.cancelfind')" class="btn" enablerule='0'/>
+			<input id="btn-ref" type="button" value="#springMessage('view.tms35.stat.btn.ref')" class="btn" enablerule='1'/>
+		</td>
+	</tr>
+	<tr>
+		<td width="5%"><div class="column-cell"><input name="statcheckbox" id="statcheckbox" type="checkbox" onclick="selectAll(this);"/></div></td>
+		<td width="10%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statName')</div></td>
+		<td width="10%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statDesc')</div></td>
+		<td width="10%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statObject')</div></td>
+		<td width="15%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statCond')</div></td>
+		<td width="10%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statAim')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statFun')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.funParam')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.countUnit')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.countRound')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.continues')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.unResult')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.succes')</div></td>
+		<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.fail')</div></td>
+	</tr>
+ 	</table>
+ </div>
+</body>
+</html>

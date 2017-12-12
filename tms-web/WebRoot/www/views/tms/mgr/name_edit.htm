@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.mgr.namelist.edit.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/tms_mgr_roster.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	var rosterId = "rosterId="+jQuery.url.param("rosterId");
+	var valuecount = jQuery.url.param("valuecount");	//名单中，名单值的数量
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.mgr.namelist.edit.title")',
+		id:'editNameListFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = new jcl.ui.Dialog({
+		title:'#springMessage("view.tms.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	// 名单数据类型下拉列表
+	jcl.code.selector('datatype','tms.model.datatype.roster',{text:'--请选择--',value:''});
+	
+	// 名单类型下拉列表
+	jcl.code.selector('rostertype','tms.mgr.rostertype',{text:'--请选择--',value:''});
+	
+	// 初始化页面数据
+	jcl.postJSON('/tms/mgr/get', rosterId, function(data){
+			$('#rosterId').val(data.row.ROSTERID);
+			$('#rosterdesc').val(data.row.ROSTERDESC);
+			$('#remark').val(data.row.REMARK);
+			$('#rostername').val(data.row.ROSTERNAME);
+			
+			//radio设置value的值的项目为当前选中项
+			$("input[name=iscache][value=" + data.row.ISCACHE + "]").attr("checked",true);
+			
+			//select设置value的值的项目为当前选中项
+			//$("#rostertype").attr("value",data.row.ROSTERTYPE);
+			//$("#datatype").attr("value",data.row.DATATYPE);
+			$("#rostertype").val(data.row.ROSTERTYPE);
+			$("#datatype").val(data.row.DATATYPE);
+			
+			$("#rostertype").attr("disabled","disabled");
+			$("#datatype").attr("disabled","disabled");
+			$("#rostername").attr("disabled","disabled");
+			$("#rosterdesc").attr("disabled","disabled");
+	});
+	
+	// 修改
+	$("#updateBtn").click(function(){
+		var remarkObject=$('textarea[name=remark]');
+		var remark=remarkObject.val();
+		
+		if(remark != ""){
+			if(!checkeLength(remark,170)){
+				alert('#springMessage("view.tms.mgr.namelist.remark")'+'不能超过170个字符');
+				remarkObject.focus();
+				return;
+			}
+			if(!checkeSpecialCode(remark)){
+				alert('#springMessage("view.tms.mgr.namelist.remark")'+'不能包含特殊字符');
+				rosternameObject.focus();
+				return;
+			}
+		}
+		
+		var params = $('#dataForm').serialize();
+		jcl.postJSON('/tms/mgr/mod', params, function(data){
+			dialog.show();
+		});
+		
+	})
+	
+	// 取消
+	$('#cancelBtn').click(function(){
+		window.close();
+	});
+	
+	// 返回
+	$('#backBtn').click(function(){
+		window.close();
+	});
+});
+
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.edit.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.sure")' class="btn" id="backBtn"/>
+	</div>
+</div>
+
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.mgr.namelist.rostername")：</label> 
+		<span class="list-box-item-content"><input name="rostername" id = 'rostername' type="text" class="itext"/>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.mgr.namelist.rosterdesc")：</label> 
+		<span class="list-box-item-content"><input name="rosterdesc" id = 'rosterdesc' type="text" class="itext"/>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.mgr.namelist.datatype")：</label> 
+		<span class="list-box-item-content"> <select name="datatype" id = 'datatype'>
+                     <option value="">--请选择--</option>
+               </select>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.mgr.namelist.rostertype")：</label> 
+		<span class="list-box-item-content"> <select name="rostertype" id = 'rostertype'>
+                     <option value="">--请选择--</option>
+               </select>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.mgr.namelist.iscache")：</label> 
+		<span class="list-box-item-content">
+			<input type="radio" name="iscache" value="1" /> 是
+			<input type="radio" name="iscache" value="0" checked="checked" /> 否
+ 		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.mgr.namelist.remark")：</label> 
+		<span class="list-box-item-content"><textarea  name="remark"  maxlength="512" id = 'remark' rows="3"cols="20" class="ttext"></textarea>
+		</span>
+	</li>
+</ul>
+<div class="button-box">
+	<input type="button" value='#springMessage("view.tms.pub.btn.save")' class="btn" id="updateBtn"/>
+	<input type="button" value='#springMessage("view.tms.pub.btn.cancel")' class="btn" id="cancelBtn"/>
+	<input name="rosterId" id="rosterId" type="hidden" class="itext" />
+</div>
+</form>
+
+</body>
+</html>

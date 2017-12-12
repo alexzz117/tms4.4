@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.monitor.center.alertnumst")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionMaps/FusionMaps.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionWidgets/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/PowerCharts/FusionCharts.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	alertBox = new jcl.ui.Box({
+		title:'#springMessage("view.tms.monitor.center.alertnumst")'
+	});
+	alertBox.addDom($('#alert_monitor'));
+	
+	alertForm = new jcl.ui.Form({
+		display: true,
+		items:[
+			{label:'刷新频率', name:'alertRefresh', type:'selector', ds:{type:'code', category:'tms.monitor.refleshrate'}}
+		]
+	}, $('#alert_conds'));
+	alertForm.jqDom.find('.form-item-label').width(65);
+	
+	alertForm.getItem('alertRefresh').component.onChange(function(){
+		alertChange();
+	});
+	
+	//规则运行监控表格显示
+	alertGrid = new jcl.ui.Grid({
+		title: '#springMessage("view.tms.monitor.center.alertgrid")',
+		//width:1000,
+		height:50,
+		table:{
+			checkboxEnable:false,
+			columns:[
+				{name:'#springMessage("view.tms.monitor.center.numall")', width: 30, dataIndex:'NUMALL'},
+				{name:'#springMessage("view.tms.monitor.center.num0")', width: 30, dataIndex:'NUM0'},
+				{name:'#springMessage("view.tms.monitor.center.num2")', width: 30, dataIndex:'NUM2'},
+				{name:'#springMessage("view.tms.monitor.center.num5")', width: 30, dataIndex:'NUM5'},
+				{name:'#springMessage("view.tms.monitor.center.num7")', width: 30, dataIndex:'NUM7'},
+				{name:'#springMessage("view.tms.monitor.center.num9")', width: 30, dataIndex:'NUM9'}
+			],
+			ds:{},
+			pagebar: false
+		}
+	}, alertBox.container);
+	alertGrid.jqDom.children('.box-title-wrap').children('.box-title').css({textAlign:'center'});
+	
+	//报警数据填充
+	jcl.postJSON('/tms/monitor/grid/all/alert', "", function(data){
+		dataAlertModel = data;
+		alertGrid.renderPage(data.page);
+		changeAlarmNum();
+		//changeAlarm();
+	});
+	
+	// 取系统时间，之后进行后续的工作
+	jcl.postJSON('/tms/monitor/alarm/time','',function(data){
+		var currentTime = data.row.currentTime;//yyyy-MM-dd HH:mm:ss
+		// 根据服务器时间算出开始时间
+		alertstartTime = new Date(currentTime.substr(0,4),currentTime.substr(5,2)-1,currentTime.substr(8,2),currentTime.substr(11,2),currentTime.substr(14,2),currentTime.substr(17,2));
+		if(alertstartTime=='NaN')alertstartTime = new Date();
+		alertnowTime = alertstartTime.getTime();
+		var seconds = alertForm.getItem('alertRefresh').val();
+		if(seconds == undefined){
+			seconds = "1";
+		}
+        alertendTime=alertstartTime.getTime()+Number(seconds)*1000;
+		getAlertTime();
+	});
+	
+	$('#alert_monitor').width(alertGrid.jqDom.width());
+});
+
+//实时报警监控，当刷新时间结束时重新加载数据
+function alertmonitor(){
+	//报警数据填充
+	jcl.postJSON('/tms/monitor/grid/all/alert', "", function(data){
+		dataAlertModel = data;
+		alertGrid.renderPage(data.page);
+		changeAlarmNum();
+		//changeAlarm();
+	});
+}
+
+//刷新频率修改，倒计时结束时
+function alertChange(){
+	// 更新开始时间
+	alertstartTime.setTime(alertnowTime);
+	var seconds =  alertForm.getItem('alertRefresh').val();
+	if(seconds == undefined){
+		seconds = "1";
+	}
+    alertendTime=alertstartTime.getTime()+Number(seconds)*1000;
+    alertmonitor();
+}
+
+//获取更新时间
+function getAlertTime(){
+	// 差距时间
+	var nMS =alertendTime - alertnowTime;
+	var nM=Math.floor(nMS/(1000*60)) % 60;
+	var nS=Math.floor(nMS/1000) % 60;
+	if(nM==0&&nS==0&&nMS<1000) //当倒计时结束
+	{
+		window.focus();
+		alertChange();
+	}
+	if(nS < 10) nS = "0" + nS;
+	if(nMS >= 0){
+	    $('#realertTime').text("上次更新时间："+ alertstartTime.getHours()+"时"+alertstartTime.getMinutes()+"分"+alertstartTime.getSeconds() + "秒(" + nM + "分" + nS + "秒)");
+		// 当前时间加1秒
+	    alertnowTime = alertnowTime +1*1000;
+	    setTimeout("getAlertTime()",1000);
+	}
+}
+
+//按选择更新趋势图
+function updateChart(){
+	if (chartLoaded){
+		var chars = alermChartData.split("</categories>");
+		var begin = chars[0]+"</categories>";
+		var dataXml = (chars[1].split("</chart>"))[0];
+		dataXmlArr = dataXml.split("</dataset>");
+		var end = dataXmlArr.length-1>1?dataXmlArr[dataXmlArr.length-1]:"";
+		end += "</chart>";
+		
+		// 更新图表
+		var width = alertGrid.jqDom.width();
+		chart = new FusionCharts("$rc.contextPath/s/tms/chart/ScrollLine2D.swf", "ChartAlarmNum", width, "220", "0", "0");
+		chart.setDataXML(begin + generateXML()+end);
+		chart.render("chartdiv_rmtrend");
+		$("#choice").css("display","block");
+	}
+} 
+
+//告警数趋势图数据填充
+function changeAlarmNum(){
+	var alertData = dataAlertModel.row[0];
+	chartLoaded = true;
+	alermChartData = alertData;
+	updateChart();
+}
+
+//报警数据趋势图显示，按分值显示
+function generateXML(){
+	var strXML="";
+	strXML = $("input[name='total']").prop("checked")?(strXML + getAlertXML(0)):(strXML);
+	strXML = $("input[name='num0']").prop("checked")?(strXML + getAlertXML(1)):(strXML);
+	strXML = $("input[name='num2']").prop("checked")?(strXML + getAlertXML(2)):(strXML);
+	strXML = $("input[name='num5']").prop("checked")?(strXML + getAlertXML(3)):(strXML);		
+	strXML = $("input[name='num7']").prop("checked")?(strXML + getAlertXML(4)):(strXML);		
+	strXML = $("input[name='num9']").prop("checked")?(strXML + getAlertXML(5)):(strXML);
+	if(strXML=="")	strXML = "<dataset seriesName='无' color='CC9966' anchorBorderColor='CC9966'></dataset>"		
+	return strXML;	
+}
+
+// 获取第i个xml数据
+function getAlertXML(index){		
+	var alertXML="";
+	if(index < dataXmlArr.length){
+		alertXML = dataXmlArr[index]+"</dataset>";	
+	}	
+	return alertXML;			
+}
+
+</script>
+</head>
+<body>
+<div id="alert_monitor" style="margin-left:auto;margin-right:auto;">
+	<div id="alert_conds" style="float:left;width:60%;"></div>
+	<div id="realertTime" style="width:280px;font-size:13px;font-weight:bold;float:right;line-height:26px;text-align:right;"></div>
+	<div id="chartdiv_rmtrend" align="center"></div>
+	<div id=choice align="center">
+		<input onclick="JavaScript:updateChart();" checked="checked" type="checkbox" name="total" />&nbsp;总报警数&nbsp;&nbsp; 
+		<input onclick="JavaScript:updateChart();" checked="checked" type="checkbox" name="num0" />&nbsp;0-20分报警数&nbsp;&nbsp; 
+		<input onclick="JavaScript:updateChart();" checked="checked" type="checkbox" name="num2" />&nbsp;21-50分报警数&nbsp;&nbsp; 
+		<input onclick="JavaScript:updateChart();" checked="checked" type="checkbox" name="num5" />&nbsp;51-70分报警数&nbsp;&nbsp; 
+		<input onclick="JavaScript:updateChart();" checked="checked" type="checkbox" name="num7" />&nbsp;71-90分报警数&nbsp;&nbsp; 
+		<input onclick="JavaScript:updateChart();" checked="checked" type="checkbox" name="num9" />&nbsp;大于90分报警数&nbsp;&nbsp;
+	</div>
+</div>
+</body>
+</html>

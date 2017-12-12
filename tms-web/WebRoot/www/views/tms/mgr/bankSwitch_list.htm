@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>通道开关管理</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript">
+var g = "";
+$(document).ready(function(){
+	
+			
+	//组装表格     
+	g = new jcl.ui.Grid({
+		title:'通道开关信息列表',
+		qform:{
+			display: false,
+			layout: 'list',
+			items:[
+				{label: '选择银行', name: 'BANK_CODE', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.code'}
+				},
+				{label: '交易类型', name: 'TXNID', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.model.txnid'}
+				},
+				{label: '风险等级', name: 'RISK_LEVEL', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.risk.level'}
+				}
+			],btns:[
+				{id: 'quick_search_btn', text: '#springMessage("view.cmc.but.find")'}
+			]
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', action:'toggleQform'},
+			{id:"btn-add", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.new")'},
+			{id:"btn-del", icon:"icon-tb-del", text:'#springMessage("view.tms.pub.btn.del")', enable:'rowSelected'}
+			
+		],
+		table:{
+			columns:[
+				{name:'银行通道', width: 25, dataIndex:'BANK_CODE',render:'tms.bank.code'},
+				{name:'交易类型', width: 25, dataIndex:'TXNID',render:'tms.model.txnid'},
+				{name:'风险等级', width: 25, dataIndex:'RISK_LEVEL',render:'tms.risk.level'},
+				{name:'开关状态', width: 25, dataIndex:'STATUS'},
+				{name:'修改历史', width: 25, dataIndex:'OPER_HISTORY'}
+			],
+			ds:{
+				url:"/tms/bankSwitch/list",
+				params:{},
+				callback:function(list){
+					for(var i = 0; i < list.length; i++){
+						if(list[i]['STATUS']==0)
+							list[i]['STATUS']= '<span>关</span>&nbsp&nbsp<a href="#'+(new Date().getTime())+'" onclick="statusChange(\''+list[i]['ID']+'\')">打开</a>';
+						if(list[i]['STATUS']==1)
+							list[i]['STATUS']= '<span>开</span>&nbsp&nbsp<a href="#'+(new Date().getTime())+'" onclick="statusChange(\''+list[i]['ID']+'\')">关闭</a>';
+						list[i]['OPER_HISTORY']= '<a href="#'+(new Date().getTime())+'" onclick="historyDataList(\''+list[i]['ID']+'\')">历史记录</a>';
+					}
+				}
+			},
+			pagebar: true
+		
+		}
+	});
+	g.goPage();
+	
+	// 查询
+	$("#quick_search_btn").click(function(){
+		var params = g.qform.jqDom.serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+	
+	//对话框显示
+	var addDialog = new jcl.ui.Dialog({title:'通道开关信息增加', draggable: true});
+	
+	//添加表单
+	var addForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label: '选择银行', name: 'BANK_CODE', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.code'}
+			},
+			{label: '交易类型', name: 'TXNID', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.model.txnid'}
+			},
+			{label: '风险等级', name: 'RISK_LEVEL', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.risk.level'}
+			}
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'addBtn'},
+			{text: '#springMessage("view.tms.pub.btn.cancel")', cls: 'cancelBtn'}
+		]
+	});
+	addDialog.addDom(addForm.jqDom);
+	
+	addForm.jqDom.find('.addBtn').click(function(){
+		var bank_code = addForm.getItem('BANK_CODE').val();
+		var txnid = addForm.getItem('TXNID').val();
+		var risk_level = addForm.getItem('RISK_LEVEL').val();
+		if(bank_code==""){
+			alert('请选择一个银行编码！！');
+			addForm.getItem('BANK_CODE').component.focus();
+			return;
+		}
+		if(txnid==""){
+			alert('请选择一个交易类型！！');
+			addForm.getItem('TXNID').component.focus();
+			return;
+		}
+		if(risk_level==""){
+			alert('请选择一个风险等级！！');
+			addForm.getItem('RISK_LEVEL').component.focus();
+			return;
+		}
+		var params = $.param(addForm.data());;//addForm.jqDom.serialize();
+		jcl.postJSON('/tms/bankSwitch/add', params, function(data){
+			addDialog.hide();
+			jcl.msg.info('#springMessage("view.cmc.pub.add.success")');
+			g.goPage();
+		});
+		
+	}).end().find('.cancelBtn').click(function(){
+		addDialog.hide();
+	});
+	
+	//显示添加form
+	g.toolbar.onClick('#btn-add', function(){
+		addForm.reset();
+		addDialog.show();
+	});
+	
+	//检查字符串是否合法标识符
+	function isValidLetters(str){
+		var regx = /^\w+$/;
+		if(regx.test(str)){
+			return true;
+		}
+		return false;
+	}
+	
+	
+	// 删除
+	g.toolbar.onClick('#btn-del', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")!');
+			return;
+		}
+		if(confirm('#springMessage("view.tms.pub.del.confirm")?')){
+			var list = [];
+			$.each(rows, function(i, row){
+				list.push(
+					$.extend({}, row)
+				);
+			});
+
+			var json_data = JSON.stringify({'del':list});
+			var json_data_encode = encodeURIComponent(json_data);
+			var url_para = "postData=" + json_data_encode;
+			
+			jcl.postJSON('/tms/bankSwitch/del', url_para, function(data){
+				alert('#springMessage("view.tms.pub.del.success")');
+				g.goPage();
+			});
+		}else{
+			return ;
+		}
+	});
+});
+
+//跳转到待授权列表
+function statusChange(id){
+	if(confirm('确定修改当前状态？')){
+		var params = [];
+		params.push({name:'ID', value: id});
+		jcl.postJSON('/tms/bankSwitch/mod', params, function(data){
+			jcl.msg.info('修改成功');
+			g.goPage();
+		});
+	}
+}
+
+//跳转到待授权列表
+function historyDataList(id){
+	jcl.go('/tms/bankSwitch/hisList?id='+ id);
+}
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<div style="display: none;">
+<ul style="list-style:none;" id="exportUL">
+	<li class="list-box-item"><a href="#"  id="txt">TXT</a></li>
+	<li class="list-box-item"><a href="#"  id="csv">CSV</a></li>
+	<li class="list-box-item"><a href="#"  id="xls">Excel2003及以下版本</a></li>
+	<li class="list-box-item"><a href="#"  id="xlsx">Excel2007及以上版本</a></li>
+</ul>
+</div>
+</body>
+</html>

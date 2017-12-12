@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.report.center.alert")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionMaps/FusionMaps.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionWidgets/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/PowerCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+var regioncode;
+var chartLoaded = false;
+var alermChartData;
+var dataXmlArr = new Array();
+var chart;
+$(document).ready(function(){
+	regioncode = jQuery.url.param("regioncode");
+	initParams();
+	var region = document.getElementById("regioncode").value;
+	//var startTime = document.getElementById("operate_time").value;
+	//var end_time = document.getElementById("end_time").value;
+	
+	var g = $("#boxdiv_detailalarm").grid({
+		title:'#springMessage("view.tms.monitor.center.alertnumst")',
+		//width:1150,height:50,checkboxEnable:false,
+		width:document.body.clientWidth-30,height:250,
+		columns:[
+			//{name:'序号', width: 15, dataIndex:'PATTERNID'},
+			{name:'#springMessage("view.tms.report.center.city")', width: 80, dataIndex:'CITYNAME'},
+			{name:'#springMessage("view.tms.report.center.usernum")', width: 50, dataIndex:'NUMUSERS'},
+			{name:'#springMessage("view.tms.report.center.sessionnum")', width: 50, dataIndex:'NUMSESSIONS'},
+			{name:'#springMessage("view.tms.monitor.center.trafficnum")', width: 50, dataIndex:'NUMTXNS'},
+			{name:'#springMessage("view.tms.report.center.ruletrig")', width: 70, dataIndex:'NUMTRIGS'},
+			{name:'#springMessage("view.tms.report.center.rulehit")', width: 70, dataIndex:'NUMHITS'},
+			{name:'#springMessage("view.tms.monitor.center.alertnum")', width: 70, dataIndex:'NUMALERTS'},
+			{name:'#springMessage("view.tms.monitor.center.salertnum")', width: 30, dataIndex:'NUMALERTSERIOUS'},
+			{name:'#springMessage("view.tms.monitor.center.halertnum")', width: 30, dataIndex:'NUMALERTHIGN'},
+			{name:'#springMessage("view.tms.monitor.center.malertnum")', width: 30, dataIndex:'NUMALERTMID'},
+			{name:'#springMessage("view.tms.monitor.center.lalertnum")', width: 30, dataIndex:'NUMALERTLOW'},
+			{name:'#springMessage("view.tms.monitor.center.nalertnum")', width: 50, dataIndex:'NUMALERTNOR'},
+			{name:'#springMessage("view.tms.monitor.center.rulehitrate")', width: 70, dataIndex:'HIT'},
+			{name:'#springMessage("view.tms.monitor.center.trafficrate")', width: 70, dataIndex:'ALERT'}
+		],
+		ds:{
+		},
+		pagebar: false,
+		qform: {id:"qform", display:true}
+	});
+	
+	$("#boxdiv_contrast").click(function(){
+		//alert("OK");
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		}
+		
+		var citycode = [];
+		var key="" ;
+		$.each(rows, function(i,row){
+			key += row['CITYCODE']+",";
+		});  
+		citycode.push('citycode=' + key.substr(0,key.length-1));  
+		jcl.go('/tms/report/chart/contrast/list?'+citycode[0]+"&operate_time="+$('#operate_time').val()+"&end_time="+$('#end_time').val());
+	});
+	
+	$("#quick_search_btn").click(function(){
+		
+		var startTime = $('#operate_time').val();
+		var end_time = $('#end_time').val();
+		if(startTime==""){
+			alert('#springMessage("view.tms.report.center.msg.beginTime")');
+			return ;
+		}
+		if(end_time==""){
+			alert('#springMessage("view.tms.report.center.msg.endTime")');
+			return ;
+		}
+		if(startTime!="" && end_time!="" && startTime>end_time){
+			alert('#springMessage("view.cmc.log.list.msg.endTimeEarly")');
+			return ;
+		}
+		detailalarmgrid(g);
+		detailalarmthrend();
+	});
+	
+	// 取系统时间，之后进行后续的工作
+	jcl.postJSON('/tms/report/contrast/time','',function(data){
+		$('#operate_time').val(data.row.startTime);
+		$('#end_time').val(data.row.endTime);
+		detailalarmgrid(g);
+		detailalarmthrend();
+	});
+});
+
+function stalarmdata(){
+	//告警数据汇总展示
+	var region = document.getElementById("regioncode").value
+	var startTime = document.getElementById("operate_time").value
+	var end_time = document.getElementById("end_time").value
+	
+}
+
+function detailalarmthrend(){
+	//告警数据趋势图
+	var region = document.getElementById("regioncode").value
+	var startTime = document.getElementById("operate_time").value
+	var end_time = document.getElementById("end_time").value
+	jcl.postJSON('/tms/report/chart/detail/region', "regioncode="+region+"&operate_time="+startTime+"&end_time="+end_time, function(data){
+			
+		// 为处理返回值的串做准备 maxiao 2011-9-14
+		chartLoaded = true;
+		alermChartData = data.row;
+	
+		// 通过更新方法渲染，加入选择类型的区分
+		updateChart();
+		
+		//var chart = new FusionCharts("$rc.contextPath/s/tms/chart/MSSpline.swf", "ChartId",document.body.clientWidth-30, "270", "0", "0");
+		//chart.setDataXML(data.row);
+		//chart.render("chartdiv_detailalarmthrend");
+	});
+}
+
+function detailalarmgrid(g){
+	var region = document.getElementById("regioncode").value
+	var startTime = document.getElementById("operate_time").value
+	var end_time = document.getElementById("end_time").value
+	
+	jcl.postJSON('/tms/report/grid/detail/region', "regioncode="+region+"&operate_time="+startTime+"&end_time="+end_time, function(data){
+		//var chart = new FusionCharts("$rc.contextPath/s/tms/chart/FCMap_China2.swf", "ChartId","900", "700", "0", "0");
+		g.renderPage(data.page);
+		$('#boxdiv_usernum').text(data.row.NUMUSERS);
+		$('#boxdiv_sessionnum').text(data.row.NUMSESSIONS);
+		$('#boxdiv_trafficnum').text(data.row.NUMTXNS);
+		$('#boxdiv_ruletrignum').text(data.row.NUMTRIGS);
+		$('#boxdiv_rulehitnum').text(data.row.NUMHITS);
+		$('#boxdiv_alertnum').text(data.row.NUMALERTS);
+		$('#boxdiv_salertnum').text(data.row.NUMALERTSERIOUS);
+		$('#boxdiv_halertnum').text(data.row.NUMALERTHIGN);
+		$('#boxdiv_malertnum').text(data.row.NUMALERTMID);
+		$('#boxdiv_lalertnum').text(data.row.NUMALERTLOW);
+		$('#boxdiv_nalertnum').text(data.row.NUMALERTNOR);
+		$('#boxdiv_rulehit').text(data.row.HIT);
+		$('#boxdiv_txnalert').text(data.row.ALERT);
+		$('#boxdiv_regioncode').text(data.row.REGIONCODE);
+	});
+}
+
+function initParams(){
+	//var nowDate = new Date();
+	//var year = nowDate.getFullYear();
+	//var month = nowDate.getMonth()+1;//获取本月
+	//var lastDay = new Date(year, month, 0).getDate();//获取本年最后一天
+	//if(month < 10) month = "0" + month;
+	//$('#operate_time').val(year+"-"+month+"-01");
+	//$('#end_time').val(year+"-"+month+"-"+lastDay);
+	$('#regioncode').val(regioncode);
+}
+
+// 按选择更新趋势图
+function updateChart(){			
+	if (chartLoaded){
+		var chars = alermChartData.split("</categories>");
+		var begin = chars[0]+"</categories>";
+		var dataXml = (chars[1].split("</chart>"))[0];
+		dataXmlArr = dataXml.split("</dataset>");
+		var end = dataXmlArr.length-1>1?dataXmlArr[dataXmlArr.length-1]:"";
+		end += "</chart>";
+		
+		// 更新图表
+		chart = new FusionCharts("$rc.contextPath/s/tms/chart/MSSpline.swf", "ChartId",document.body.clientWidth-30, "270", "0", "0");
+		chart.setDataXML(begin + generateXML()+end);
+		chart.render("chartdiv_detailalarmthrend");
+		this.document.all.choice.style.display="block";
+	}
+}
+
+// 利用第一次初始化的全部数据，筛选需要显示的数据种类
+function generateXML(){	
+		
+	var strXML="";
+
+	strXML = (this.document.all.numU.checked==true)?(strXML + getAlertXML(0)):(strXML);
+	strXML = (this.document.all.numS.checked==true)?(strXML + getAlertXML(1)):(strXML);
+	strXML = (this.document.all.numT.checked==true)?(strXML + getAlertXML(2)):(strXML);
+	strXML = (this.document.all.numA.checked==true)?(strXML + getAlertXML(3)):(strXML);		
+		
+	if(strXML=="")	strXML = "<dataset seriesName='无' color='CC9966' anchorBorderColor='CC9966'></dataset>"		
+	return strXML;			
+}
+
+// 获取第i个xml数据类
+function getAlertXML(index){		
+	var alertXML="";
+	if(index < dataXmlArr.length){
+		// 从总集合中选取
+		alertXML = dataXmlArr[index]+"</dataset>";	
+	}	
+	return alertXML;			
+}
+
+</script>
+</head>
+  <body>
+    <table width="98%" border="0" cellspacing="0" cellpadding="1" align="center">
+    <form id="qformdate" name="qformdate" method="post">
+	  <tr>
+	    <td height="28" ><div id="al006" style="font-size:13px">#springMessage("view.tms.report.center.timescope")：
+	    	<input name="operate_time" id="operate_time" onfocus="jcl.datepicker(this)" readonly="readonly"  type="text" class="itext" value=""/>
+	    	-- <input name="end_time" id="end_time" onfocus="jcl.datepicker(this)" readonly="readonly"  type="text" class="itext" value=""/> 
+	    	<input id="quick_search_btn" type="button" value='#springMessage("view.tms.report.center.query")' class="btn"/>
+	    	<input id="regioncode" name="regioncode" type="hidden" value=""/>
+	    	<input id="type" name="type" type="hidden" value="regioncode"/>
+	    </div></td>
+	  </tr>
+	  </form>
+	  <tr>
+	    <td height="280"><div id="chartdiv_detailalarmthrend" align="center"></div>
+	    <div align="center" id="choice" name="choice" style="display:none;font-size:13px">
+	        	<INPUT TYPE='Checkbox' name='numU' onClick="JavaScript:updateChart();" checked>&nbsp;用户数&nbsp;&nbsp;
+				<INPUT TYPE='Checkbox' name='numS'  onClick="JavaScript:updateChart();" checked>&nbsp;会话数&nbsp;&nbsp;
+				<INPUT TYPE='Checkbox' name='numT'  onClick="JavaScript:updateChart();" checked>&nbsp;交易数&nbsp;&nbsp;
+				<INPUT TYPE='Checkbox' name='numA'  onClick="JavaScript:updateChart();" checked>&nbsp;告警数&nbsp;&nbsp;
+		</div></td>
+	  </tr>
+	  <tr>
+	    <td>
+		    <div id="qform" name="qform">
+			    <table width="98%" border="0" bgcolor="cccccc" cellspacing="1" cellpadding="3" >
+				  <tr bgcolor="ffffff">
+					  <td width="30"><div id="boxdiv_contrast"><input type="button" class="btn" value="#springMessage('view.tms.report.center.contrast')"/></div></td>
+					  <td width="50"><div class="button-box" id="boxdiv_regioncode" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.report.center.usernum"):<br><div id="boxdiv_usernum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.report.center.sessionnum"):<br><div id="boxdiv_sessionnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.trafficnum"):<br><div id="boxdiv_trafficnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.report.center.ruletrig"):<br><div id="boxdiv_ruletrignum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.report.center.rulehit"):<br><div id="boxdiv_rulehitnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.alertnum"):<br><div id="boxdiv_alertnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.salertnum"):<br><div id="boxdiv_salertnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.halertnum"):<br><div id="boxdiv_halertnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.malertnum"):<br><div id="boxdiv_malertnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.lalertnum"):<br><div id="boxdiv_lalertnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.nalertnum"):<br><div id="boxdiv_nalertnum" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.rulehitrate"):<br><div id="boxdiv_rulehit" style="font-weight:bold" ></div></td>
+					  <td width="50" style="font-weight:bold">#springMessage("view.tms.monitor.center.trafficrate"):<br><div id="boxdiv_txnalert" style="font-weight:bold" ></div></td>
+				  </tr>
+				</table>
+			</div>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td height="260"><div id="boxdiv_detailalarm" class="box"></div></td>
+	  </tr>
+	</table>
+  </body>
+</html>

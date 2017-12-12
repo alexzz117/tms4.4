@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.monitor.center.trafficnumst")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionMaps/FusionMaps.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionWidgets/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/PowerCharts/FusionCharts.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	txnBox = new jcl.ui.Box({
+		title:'#springMessage("view.tms.monitor.center.trafficnumst")'
+	});
+	txnBox.addDom($('#txn_monitor'));
+	
+	txnForm = new jcl.ui.Form({
+		display: true,
+		items:[
+		    {name:'trafficopt', type:'hidden', value:'trafficnum'},
+			{label:'刷新频率', name:'txnRefresh', type:'selector', ds:{type:'code', category:'tms.monitor.refleshrate'}},
+			{label:'统计范围', name:'scope', type:'selector', items:[
+				{text:'当前1小时', value:'currentTime'},
+				{text:'过去4小时', value:'4'},
+				{text:'过去12小时', value:'12'},
+				{text:'过去24小时', value:'24'}
+			]}
+		]
+	}, $('#txn_conds'));
+	txnForm.jqDom.find('.form-item-label').width(65);
+	
+	txnForm.getItem('txnRefresh').component.onChange(function(){
+		txnChange();
+	});
+	
+	txnForm.getItem('scope').component.onChange(function(){
+		changetrafficmonitor();
+	});
+	
+	//规则运行监控表格显示
+	txnGrid = new jcl.ui.Grid({
+		title: '#springMessage("view.tms.monitor.center.trafficgird")',
+		//width:1000,
+		//marginTop:15,
+		//height:200,
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', toggleQform:true}
+		],
+		qform:{
+			display: false,
+			items:[
+			    {name:'frm', type:'hidden', value:''},
+			    {name:'order', type:'hidden', value:''},
+				//{label:'#springMessage("view.tms.monitor.center.trafficname")', name:'txnName', type:'text'}
+			    {label:'#springMessage("view.tms.monitor.center.trafficname")',name:'txnIds',  type:'treeselector',rtNode:true, multiple:true, cascadeCheck:true, ds:{type:'remote', url:'/tms35/trandef/query', parser:{key:'list', text:'TAB_DESC', value:'TAB_NAME'}, lazyLoad:true}}
+			],
+			btns:[
+			      {text:'#springMessage("view.tms.pub.btn.find")', id:'traffic-btn-find'}
+			]
+		},
+		table:{
+			checkboxEnable:false,
+			columns:[
+				{name:'#springMessage("view.tms.monitor.center.trafficname")', width: 70, dataIndex:'TXNNAME'},
+				{name:'#springMessage("view.tms.monitor.center.trafficnum")', width: 30, dataIndex:'NUMTXNS'},
+				{name:'#springMessage("view.tms.monitor.center.trafficsuccessrate")', width: 40, dataIndex:'TXNSUCCESSRATE'},
+				{name:'#springMessage("view.tms.monitor.center.trafficriskrate")', width: 40, dataIndex:'TXNALERTRATE'},
+				{name:'#springMessage("view.tms.monitor.center.trafficavgtime")', width: 40, dataIndex:'AVGEXECTIMES'}
+			],
+			ds:{
+				url:'/tms/monitor/grid/all/txn'
+			},
+			pagebar: true
+		}
+	}, txnBox.container);
+	txnGrid.jqDom.children('.box-title-wrap').children('.box-title').css({textAlign:'center'});
+	
+	txnGrid.qform.jqDom.find('.form-btns > #traffic-btn-find').on('click', function(){
+		changetrafficmonitor();
+	});
+	
+	changetrafficmonitor();
+	
+	// 取系统时间，之后进行后续的工作
+	jcl.postJSON('/tms/monitor/alarm/time','',function(data){
+		var currentTime = data.row.currentTime;//yyyy-MM-dd HH:mm:ss
+		// 根据服务器时间算出开始时间
+		txnstartTime = new Date(currentTime.substr(0,4),currentTime.substr(5,2)-1,currentTime.substr(8,2),currentTime.substr(11,2),currentTime.substr(14,2),currentTime.substr(17,2));
+		if(txnstartTime=='NaN')txnstartTime = new Date();
+		txnnowTime = txnstartTime.getTime();
+		var seconds = txnForm.getItem('txnRefresh').val();
+		if(seconds == undefined){
+			seconds = "1";
+		}
+		txnendTime=txnstartTime.getTime()+Number(seconds)*1000;
+		getTxnTime();
+	});
+	
+	$('#txn_monitor').width(txnGrid.jqDom.width());
+});
+
+//计时器
+function getTxnTime(){
+	// 差距时间
+	var nMS =txnendTime - txnnowTime;
+	var nM=Math.floor(nMS/(1000*60)) % 60;
+	var nS=Math.floor(nMS/1000) % 60;
+	if(nM==0&&nS==0&&nMS<1000) //当倒计时结束
+	{
+		window.focus();
+		txnChange();
+	}
+	if(nS < 10) nS = "0" + nS;
+	if(nMS >= 0){
+	   	$('#retxnTime').text("上次更新时间："+ txnstartTime.getHours()+"时"+txnstartTime.getMinutes()+"分"+txnstartTime.getSeconds() + "秒(" + nM + "分" + nS + "秒)");
+		txnnowTime = txnnowTime +1*1000;
+	    setTimeout("getTxnTime()",1000);
+	}
+}
+
+//时间范围改变时
+function changetrafficmonitor(){
+	var txnvalue = txnForm.getItem('scope').val();
+    var order = "NUMTXNS";
+    txnGrid.qform.getItem('frm').val(txnvalue);
+    txnGrid.qform.getItem('order').val(order);
+    var param = txnGrid.qform.serialize();
+    txnGrid.table.opts.ds.params = param;
+    txnGrid.goPage();
+    jcl.postJSON('/tms/monitor/grid/all/txnChart', param, function(data){
+		dataTxnModel = data;
+		changetraffic();
+	});
+}
+
+//交易运行监控图标数据填充
+function changetraffic(){
+	var radioValue = txnForm.getItem('trafficopt').val();
+	var width = txnGrid.jqDom.width();
+	if(radioValue=="trafficnum"){
+		//交易运行监控--交易数
+		var chart = new FusionCharts("$rc.contextPath/s/tms/chart/Column2D.swf", "ChartId", width, "200", "0", "0");
+		chart.setDataXML(dataTxnModel.row[0]);
+		chart.render("chartdiv_rmtrafficnum");
+	}
+/* 	else if(radioValue=="trafficrestime"){
+		//交易运行监控--交易响应时间
+		var chart = new FusionCharts("$rc.contextPath/s/tms/chart/MSColumn2D.swf", "ChartId","1000", "200", "0", "0");
+		chart.setDataXML(dataTxnModel.row[1]);
+		chart.render("chartdiv_rmtrafficnum");
+	} */
+}
+
+//刷新频率改变时
+function txnChange(){
+	// 更新开始时间
+	txnstartTime.setTime(txnnowTime);
+	var seconds = txnForm.getItem('txnRefresh').val();
+	if(seconds == undefined){
+		seconds = "1";
+	}
+    txnendTime=txnstartTime.getTime()+Number(seconds)*1000;
+	//交易实时监控
+	changetrafficmonitor();
+}
+</script>
+</head>
+<body>
+<div id="txn_monitor" style="margin-left:auto;margin-right:auto;">
+	<div id="txn_conds" style="float:left;width:60%;"></div>
+	<div id="retxnTime" style="width:280px;font-size:13px;font-weight:bold;float:right;line-height:26px;text-align:right;"></div>
+	<div id="chartdiv_rmtrafficnum" align="center"></div>
+</div>
+</body>
+</html>

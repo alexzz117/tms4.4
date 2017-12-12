@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.dp.pattern.attrview.list.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+var g = "";
+$(document).ready(function(){
+	//加载信息
+	var patternId = jQuery.url.param("patternId");
+	var qtype = jQuery.url.param("qtype");
+	var url = '/tms/dp/patternView/attr/list';
+	if(qtype=='new'){
+		url = '/tms/dp/pattern/attr/list';
+	}
+	
+	$('#patternId').val(patternId);
+	//组装表格
+	 g = $("#boxdiv").grid({
+		title:'#springMessage("view.tms.dp.pattern.attrview.list.title")'+ "<div  style=\"display: inline\" id='addTitle'></div>",
+		checkboxEnable:true,
+		columns:[
+			{name:'#springMessage("view.tms.dp.pattern.attr.txnfid")', width: 80, dataIndex:'TXNPARAMNAME'},
+			{name:'#springMessage("view.tms.dp.pattern.attr.store")', width: 20, dataIndex:'STORECOLUMN'},
+			{name:'#springMessage("view.tms.pub.crdate")', width: 40, dataIndex:'CREATETIME'},
+			{name:'#springMessage("view.tms.pub.update")', width: 40, dataIndex:'MODIFYTIME'}
+		],
+		ds:{
+			url:''+url,
+				params:{patternId:''+patternId}
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', toggleQform:true},
+			{id:"btn-edit", icon:"icon-tb-edit", text:'#springMessage("view.tms.discern.viewbaseinfo")'},
+			{id:"btn-back", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.pub.btn.banck")'}
+		],
+		pagebar: true,
+		qform: {id:"qform", display:false}
+
+	});
+	g.goPage();
+	
+	//设置行为模式名称
+	var geturl = '/tms/dp/patternView/get';
+	if(qtype=='new'){
+		geturl = '/tms/dp/pattern/get';
+	}
+	jcl.postJSON(geturl, "patternId="+patternId, function(data){
+			$('#addTitle').html("--" + data.row["PATTERNNAME"]); 
+	});
+	
+	$("#btn-edit").click(function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")!');
+			return;
+		}
+		var patternPropId = [];
+		$.each(rows, function(i,row){
+			patternPropId.push('patternPropId='+row['PATTERNPROPID']);
+		});                  
+		var attrParams = patternPropId[0]+"&patternId=" + patternId+'&qtype='+qtype;
+		jcl.go('/tms/dp/patternView/attr/edit?'+attrParams);
+	});
+	
+	
+	$("#btn-back").click(function(){
+		jcl.go('/tms/dp/patternView/list?patternId='+patternId+'&qtype='+qtype);
+	});
+	
+	$("#quick_search_btn").click(searchDetail);
+	//交易属性
+	var param =  "patternId="+patternId;
+	jcl.postJSON('/tms/dp/pattern/attr/listFeats',param, function(data){
+			$.each(data.row, function(i,row){
+				if(row['TXNFEATUREID']==null || row['TXNFEATUREID']=="" || row['TXNFEATUREID']=="null" ){//如果是组或渠道，添加为optgroup属性，不能选择               
+					$("select[name=FLAG]").append("<optgroup label='"+row['PROPNAME']+"'> "+ row['PROPNAME'] + "</optgroup>");
+				}else{
+					$("select[name=FLAG]").append("<option datatype='" + row['DATATYPE'] + "' value='" + row['TXNFEATUREID'] + "'>" + row['PROPNAME'] + "</option>");
+				}
+				//$("select[name=FLAG]").append("<option datatype='" + row['DATATYPE'] + "' value='" + row['TXNFEATUREID'] + "'>" + row['PROPNAME'] + "</option>");  
+			}); 
+	});
+	if(qtype!=null && qtype!=''){
+		$("#btn-find").hide();
+	}
+});
+
+function searchDetail(){
+		var params = $('#qform').serialize();
+		g.setDsParams(params);
+		g.goPage();
+	}
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<form id="qform" name="qform">
+<input style="display:none" />
+ <input name="patternId" id="patternId" type="hidden" value=""/>
+   <table>
+       <tr>
+           <td width="80">交易属性</td>
+           <td width="215">
+              <select id="FLAG" name="FLAG">
+                     <option value="">--请选择--</option>
+               </select>
+           </td>
+           <td width="60">&nbsp;</td>
+           <td width="215">&nbsp;</td>
+           <td  align="center"><input style="visibility: " id="quick_search_btn" type="button" value="查询" class="btn"/></td>
+       </tr>
+       
+	</table>
+</form>
+
+</body>
+</html>

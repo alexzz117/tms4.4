@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>时间线分析图</title>
+    <link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+    <script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+    <script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+    <script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+    <script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+
+    <script type="text/javascript" src="$rc.contextPath/s/tms35/js/echarts.js"></script>
+    <script type="text/javascript" src="$rc.contextPath/s/tms35/js/scatter.js"></script>
+    <script type="text/javascript" src="$rc.contextPath/s/tms35/js/datepicker/WdatePicker.js"></script>
+    <script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+    <style type="text/css">
+        .chartsDiv {
+            height: 470px;
+            width: 98%;
+            border: 0.5px solid;
+        }
+    </style>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="chartdiv" class="chartsDiv" align="center"></div>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        chartBox = new jcl.ui.Box({
+            title: '时间分析视图'
+        });
+        chartBox.title.css({cursor: 'pointer'});
+        chartBox.container.parent().parent().css({borderBottomWidth: 0});
+        displayBoxContent(chartBox.title, chartBox.container);
+
+        /**
+         * @description
+         *
+         * 日期格式化函数
+         * 使用方式：
+         * var time1 = new Date().format("yyyy-MM-dd hh:mm:ss");
+         * var time2 = new Date().format("yyyy-MM-dd");
+         *
+         * @param {date} 日期类型.
+         * @returns {String} 日期格式化后的字符串格式，例如"2017-03-27 16:57:37"
+         */
+        Date.prototype.format = function (fmt) { 
+            var o = {
+                "M+": this.getMonth() + 1,                 //月份
+                "d+": this.getDate(),                    //日
+                "h+": this.getHours(),                   //小时
+                "m+": this.getMinutes(),                 //分
+                "s+": this.getSeconds(),                 //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds()             //毫秒
+            };
+            if (/(y+)/.test(fmt))
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
+
+        //快速查询表单
+        charForm = new jcl.ui.Form({
+            display: true,
+            layout: 'list',
+            items: [
+                {label: '用户账号', name: 'USERID', type: 'text'},
+                {label: '设备ID', name: 'DEVICEID', type: 'text'},
+                {
+                    label: '事件类型', name: 'THINGTYPE', type: 'selector', items: [
+                    {text: '交易事件', value: '01', selected: true},
+                    {text: '报警事件', value: '02'}
+                ]
+                },
+                {
+                    label: '交易时间',
+                    name: 'TXNTIME',
+                    type: 'dateduration',
+                    duraSeparator: ' 到  ',
+                    layout: 'datetime',
+                    items: [{name: 'startTime'}, {name: 'endTime'}]
+                }
+            ],
+            btns: [
+                {id: 'chart_search_btn', text: '#springMessage("view.cmc.but.find")'}
+            ]
+        }, chartBox.container);
+
+        chartBox.addDom($('#chartdiv'));
+
+        var endTime = new Date().format("yyyy-MM-dd hh:mm:ss");
+        var startTime = new Date(new Date().getTime() - 24 * 60 * 60000).format("yyyy-MM-dd hh:mm:ss");
+        console.log("startTime:" + new Date().getTime() + "  endTime:" + (new Date().getTime() - 24 * 60 * 60000));
+        charForm.getItem(3).val([startTime, endTime]);
+        $("#chart_search_btn").click(function () {
+            showChart();
+        });
+
+        showChart();
+
+    });
+    function showChart() {
+        var userId = charForm.getItem('USERID').val();
+        var deviceId = charForm.getItem('DEVICEID').val();
+        var thingType = charForm.getItem('THINGTYPE').val();
+        var transBeginTime = charForm.jqDom.find('[name=startTime]').val();
+        var transEndTime = charForm.jqDom.find('[name=endTime]').val();
+        
+
+        if (transBeginTime == "" || transEndTime == "") {
+            alert('时间不能为空');
+            return;
+        }
+
+        if (transBeginTime != "" && transEndTime != "" && transBeginTime > transEndTime) {
+            alert('#springMessage("view.cmc.log.list.msg.endTimeEarly")');
+            return;
+        }
+        
+        // 将开始时间和结束时间转换为毫秒数
+        var beginTime = new Date(transBeginTime.replace(/-/g,"/")).getTime();
+        var endTime = new Date(transEndTime.replace(/-/g,"/")).getTime();
+        
+        if (endTime > (beginTime + 7*24 * 60 * 60000)){
+        	alert('时间间隔不能超过7天');
+            return;
+        }
+
+        var params = 'userId=' + userId + '&deviceId=' + deviceId + '&thingType=' + thingType + '&transBeginTime=' + transBeginTime + '&transEndTime=' + transEndTime;
+        jcl.postJSON('/tms35/dataanalysic/dataValue', params, function (data) {
+
+            var dataArray = data['row'];
+            var trafficType = new Array();
+            var seriesArray = new Array();
+            for (var i = 0; i < dataArray.length; i++) {
+                var trafficData = dataArray[i];
+
+                //var txnId = trafficData['TXNID'];
+                var tabDesc = trafficData['TAB_DESC'];
+                var isHasType = false;
+                for (var t = 0; t < trafficType.length; t++) {
+                    if (trafficType[t] == tabDesc) {
+                        isHasType = true;
+                        break;
+                    }
+                }
+                if (!isHasType) {
+                    trafficType.push(tabDesc);
+                }
+
+            }
+            for (var i = 0; i < trafficType.length; i++) {
+                var dataTempArray = new Array();
+
+                for (var j = 0; j < dataArray.length; j++) {
+                    var trafficTempData = dataArray[j];
+                    var txnTempId = trafficTempData['TXNID'];
+                    var txnTime = trafficTempData['TXNTIME'];
+                    var userId = trafficTempData['USERID'];
+                    var tabDesc = trafficTempData['TAB_DESC'];
+                    var txnCode = trafficTempData['TXNCODE'];
+                    if (tabDesc == trafficType[i]) {
+
+                        var tempDate = new Date(txnTime);
+                        var data = [tempDate, i, txnTempId, userId, txnCode];
+                        dataTempArray.push(data);
+                    }
+
+                }
+
+                var seriesObject = new Object();
+                seriesObject.name = trafficType[i];
+                seriesObject.type = 'scatter';
+                seriesObject.data = dataTempArray;
+                seriesArray.push(seriesObject);
+            }
+
+            //alert(new Date(2014, 9, 1, 0, Math.round(Math.random()*10000)));
+            // 按需加载
+            // Step:3 为模块加载器配置echarts的路径，从当前页面链接到echarts.js，定义所需图表路径
+            require.config({
+                paths: {
+                    echarts: './build/dist' //echarts.js的路径
+                }
+            });
+            // Step:4 动态加载echarts然后在回调函数中开始使用，注意保持按需加载结构定义图表路径
+            require(
+                [
+                    'echarts',
+                    'echarts/chart/scatter'   // ** 散点图
+                ],
+                // 回调函数
+                DrawEChart
+            );
+
+            // 渲染ECharts图表
+            function DrawEChart(ec) {
+                // 图表渲染的容器对象
+                var chartContainer = document.getElementById("chartdiv");
+                // 加载图表
+                var myChart = ec.init(chartContainer);
+                myChart.on('click', function (params) {
+                    if (params.value.length > 1) {
+                        var txnCode = params.value[4];
+                        var iHeight = 600;
+                        var iWidth = 720;
+
+                        //获得窗口的垂直位置
+                        var iTop = (window.screen.availHeight - 30 - iHeight) / 2;
+                        //获得窗口的水平位置
+                        var iLeft = (window.screen.availWidth - 10 - iWidth) / 2;
+                        var url = '/tms-web/dualaudit/tms35/query/show?queryId=264&txncode=' + encodeURIComponent(txnCode);
+                        window.open(url, 'newwindow', 'height=400, width=800, top=' + iTop + ', left=' + iLeft + ', toolbar=no, menubar=no, scrollbars=no,resizable=no,location=no, status=no');
+                    }
+                });
+                myChart.setOption({
+
+                    tooltip: {
+                        trigger: 'axis',
+                        showDelay: 0,
+                        formatter: function (params) {
+                            if (params.value.length > 1) {
+
+                                var date = new Date(params.value[0]);
+                                var txnTime = date.getFullYear() + '-'
+                                    + (date.getMonth() + 1) + '-'
+                                    + date.getDate() + ' '
+                                    + date.getHours() + ':'
+                                    + date.getMinutes() + ':'
+                                    + date.getSeconds();
+                                var txnType = "";
+                                var txnCode = params.value[4];
+                                for (var i = 0; i < trafficType.length; i++) {
+                                    if (params.value[1] == i) {
+                                        txnType = trafficType[i];
+                                        break;
+                                    }
+                                }
+
+                                return params.value[2] + '<br/>'
+                                    + '用户标识：' + params.value[3] + ' <br/>'
+                                    + '交易类型：' + txnType + '<br/>'
+                                    + '交易时间：' + txnTime + '<br/>'
+                                    + '交易流水号：' + txnCode;
+                            }
+                        },
+                        axisPointer: {
+                            show: true,
+                            type: 'cross',
+                            lineStyle: {
+                                type: 'dashed',
+                                width: 1
+                            }
+                        }
+                    },
+                    legend: {
+                        data: trafficType/*['T020401','T010102',"T01020101"]*/
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            // mark: { show: true },
+                            // dataZoom: { show: true },
+                            //dataView: { show: true, readOnly: false },
+                            // restore: { show: true },
+                            // saveAsImage: { show: true }
+                        }
+                    },
+                    xAxis: [
+                        {
+                            name: "交易时间",
+                            type: 'time'
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            name: "交易类型",
+                            type: 'value',
+                            scale: true,
+                            splitNumber: trafficType.length,
+                            axisLabel: {
+                                formatter: function (params) {
+                                    for (var i = 0; i < trafficType.length; i++) {
+                                        if (params == i) {
+                                            return trafficType[i];
+
+                                        }
+                                    }
+                                    /*if (params == 1)
+                                     {
+                                     return "NPP101";
+                                     }else if (params == 2)
+                                     {
+                                     return "rate0001";
+                                     }else {
+                                     return "";
+                                     }*/
+                                }
+                            }
+                        }
+                    ],
+                    series: seriesArray/*test*/
+                });
+            }
+        });
+    }
+
+    //隐藏/展开相应的层
+    function displayBoxContent(trigger, content) {
+        trigger.on('click', function () {
+            if (content.is(':hidden')) {
+                content.parent().show();
+            } else {
+                content.parent().hide();
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

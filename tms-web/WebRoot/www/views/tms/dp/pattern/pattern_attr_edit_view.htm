@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.dp.pattern.attrview.edit.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+var funInvoke = new jcl_tms.util.FuncInvoke({ 
+		id:'funInvoke'
+	});
+$(document).ready(function(){
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.dp.pattern.attrview.edit.title")',
+		id:'editPatternAttrFormBox'
+	});
+	box.addDom('dataForm');
+	
+	$('#cancelBtn').click(function(){
+		jcl.go('/tms/dp/patternView/attr/list?patternId=' +　patternId);
+	});
+	
+	//初始化数据 
+	$('#func_0').change(function(){funChange(0);}); 
+	//jcl.postJSON('/tms/mgr/fun/getAll', "module=dp&feature=pattern", function(data){
+	//		$.each(data.row, function(i,row){
+	//			$("select[name=func_0]").append("<option value='" + row['FUNCID'] + "'>" + row['FUNCNAME'] + "</option>");  
+	//		}); 
+	//}); 
+	var patternId = jQuery.url.param("patternId");
+	var param = "patternId="+patternId;
+	//交易属性
+	jcl.postJSON('/tms/dp/pattern/attr/listFeats', param, function(data){
+			$.each(data.row, function(i,row){
+				if(row['TXNFEATUREID']==null || row['TXNFEATUREID']=="" || row['TXNFEATUREID']=="null" ){//如果是组或渠道，添加为optgroup属性，不能选择               
+					$("select[name=txnFeatureId]").append("<optgroup label='"+row['PROPNAME']+"'> "+ row['PROPNAME'] + "</optgroup>");
+				}else{
+					$("select[name=txnFeatureId]").append("<option datatype='" + row['DATATYPE'] + "' value='" + row['TXNFEATUREID'] + "'>" + row['PROPNAME'] + "</option>");
+				}
+				//$("select[name=txnFeatureId]").append("<option datatype='" + row['DATATYPE'] + "' value='" + row['TXNFEATUREID'] + "'>" + row['PROPNAME'] + "</option>");  
+			}); 
+	});
+	
+	jcl.postJSON('/tms/dp/pattern/attr/getColum', "datatype=", function(data){
+			$.each(data.row, function(i,row){
+				$("select[name=store]").append("<option value='" + row['PROPCODE'] + "'>" + row['PROPNAME'] + "</option>");  
+		}); 
+	});
+	
+	//初始化数据
+
+	var patternPropId = "patternPropId="+jQuery.url.param("patternPropId");
+	
+	var qtype = jQuery.url.param("qtype");
+	var geturl = '/tms/dp/patternView/attr/get';
+	if(qtype=='new'){
+		geturl = '/tms/dp/pattern/attr/get';
+	}
+	jcl.postJSON(''+geturl, patternPropId, function(data){
+			$('#patternPropId').val(data.row.PATTERNPROPID);
+			$('#desc').val(data.row.PATTERNPROPDESC);
+			$('#orderBy').val(data.row.ORDERBY);
+			//$('#store').val(data.row.STORECOLUMN);
+			
+			//jcl.postJSON('/tms/dp/pattern/attr/getColum', "datatype=" + datatype, function(data){
+			//$.each(data.row, function(i,row){
+			//	$("select[name=store]").append("<option value='" + row['PROPCODE'] + "'>" + row['PROPNAME'] + "</option>");  
+			//}); 
+			//});
+			
+			setTimeout(function() {
+				$("#store").attr("value",data.row.STORECOLUMN);
+			}, 500);
+			$('#patternXml').val(data.row.GENERALPARAM);
+			//radio设置value的值的项目为当前选中项
+			//$("input[@name=status][value=" + data.row.STATUS + "]").attr("checked",true);
+			var txnFeatureId = data.row.TXNFEATUREID;
+			//select设置value的值的项目为当前选中项
+			
+			setTimeout(function() {
+				$("#txnFeatureId").attr("value",txnFeatureId);
+			}, 500);
+			var func_0 = data.row.GENERALFUNCID;
+			//select设置value的值的项目为当前选中项
+			setTimeout(function() {
+				$("#func_0").attr("value",func_0);
+			}, 500);
+			
+			funInvoke.setJson(data.row.GENERALPARAM);
+		
+			jcl.postJSON('/tms/dp/pattern/attr/getDataType', 'txnFeatureId=' +txnFeatureId, function(data){
+				var datatype = data.row;
+				var condsStr = "model=dp&condition=pattern&functype="+datatype;
+				jcl.postJSON('/tms/mgr/fun/funcList', condsStr, function(data){
+					$.each(data.row, function(i,row){
+						$("select[name=func_0]").append("<option value='" + row['FUNCID'] + "'>" + row['FUNCNAME'] + "</option>");  
+					});
+					funInvoke.show('param_0', "view");
+				});
+			});
+		});
+});
+
+//
+</script>
+
+</head>
+<body>
+
+<div id="openDiv"></div>
+
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.attr.txnfid")：</label> 
+		<span class="list-box-item-content"> 
+				<select id="txnFeatureId" name="txnFeatureId" disabled="disabled">
+                     <option value="">--请选择--</option>
+               </select>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.attr.desc")：</label> 
+		<span class="list-box-item-content">
+		<textarea name="desc" class="ttext" id="desc" readonly="readonly"></textarea></span>
+	</li>
+	
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.attr.order")：</label> 
+		<span class="list-box-item-content">
+		<input id="orderBy" name="orderBy" type="text" class="itext" disabled="disabled"/>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.attr.store")：</label> 
+		<span class="list-box-item-content">
+			<select id="store" name="store"  disabled="disabled">
+                     <option value="">--请选择--</option>
+               </select>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.attr.patternfun")：<BR/>
+		<input type="hidden" value="添加一行" class="btn" id="addFuncBtn"/></label> 
+		<span id="addFuncSpan" class="list-box-item-content" style="display: inline;line-height: 26px">
+		 	<div id="f_0" style="display: inline">
+				<select id="func_0" name="func_0" index="0"  disabled="disabled>
+	                <option value="">--请选择--</option>
+	            </select>&nbsp;&nbsp;&nbsp;&nbsp;
+	            <div id="param_0" style="display: inline" disabled></div>
+	        </div>
+         </span>
+	</li>
+</ul>
+<div class="button-box">
+	<input type='button' value='#springMessage("view.tms.pub.btn.banck")' class='btn' id='cancelBtn'/>
+	<input type="hidden" id="patternPropId" name="patternPropId" value="" />
+	<input name="patternId" id="patternId" type="hidden" class="itext" />
+	<textarea id="patternXml" name="patternXml" style="visibility: hidden"></textarea>
+</div>
+</form>
+
+</body>
+</html>

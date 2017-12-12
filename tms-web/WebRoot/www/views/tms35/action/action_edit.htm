@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms35.action.edit.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var actionId = jQuery.url.param("AC_ID");
+	var txnId = jQuery.url.param("txnId");
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms35.action.edit.title")',
+		id:'editNameListFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.tms.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	// 名单
+	jcl.postJSON('/tms/stat/code', "category_id=tms.pub.roster", function(data){
+		operFuncData = data;
+		$.each(data.row, function(i,row){
+			$("select[name=AC_DST]").append("<option value='" + row['CODE_KEY'] + "'>" + row['CODE_VALUE'] + "</option>");
+		}); 
+	});
+	
+	// 初始化页面数据
+	jcl.postJSON('/tms35/action/get', "actionId="+actionId, function(data){
+			$('#AC_ID').val(data.row.AC_ID);
+			$('#AC_DESC').val(data.row.AC_DESC);
+			$('#AC_COND').val(data.row.AC_COND);
+			$('#AC_SRC').val(data.row.AC_SRC);
+			$('#AC_ENABLE').val(data.row.AC_ENABLE);
+			$('#AC_TXN').val(data.row.AC_TXN);
+			
+			//select设置value的值的项目为当前选中项
+			setTimeout(function() {
+				$("#AC_DST").attr("value",data.row.AC_DST);
+			},500);
+	});
+		
+	// 保存
+	$("#updateBtn").click(function(){
+		var acDescObject=$('input[name=AC_DESC]');
+		var acDesc=acDescObject.val();
+		
+		var acCondObject=$('input[name=AC_COND]');
+		var acCond=acCondObject.val();
+		
+		var acSrcObject=$('input[name=AC_SRC]');
+		var acSrc=acSrcObject.val();
+		
+		var acDstObject=$('select[name=AC_DST]');
+		var acDst=acDstObject.val();
+		
+		if(Trim(acDesc)==""){
+			alert('#springMessage("view.tms35.action.acDesc")'+"不能为空");
+			acDescObject.focus();
+			return;
+		}else{
+			if(!checkeLength(acDesc,50)){
+				alert('#springMessage("view.tms35.action.acDesc")'+'不能超过50个字符');
+				acDescObject.focus();
+				return;
+			}
+			if(!checkeSpecialCode(acDesc)){
+				alert('#springMessage("view.tms35.action.acDesc")'+'不能包含特殊字符');
+				acDescObject.focus();
+				return;
+			}
+		}
+		if(acCond != ""){
+			if(!checkeLength(acCond,200)){
+				alert('#springMessage("view.tms35.action.acCond")'+'不能超过200个字符');
+				acCondObject.focus();
+				return;
+			}
+		}
+		if(acSrc != ""){
+			if(!checkeLength(acSrc,200)){
+				alert('#springMessage("view.tms35.action.acSrc")'+'不能超过200个字符');
+				acSrcObject.focus();
+				return;
+			}
+		}
+		
+		if(acDst==""){
+			alert('#springMessage("view.tms35.action.acDst")'+"不能为空");
+			acDstObject.focus();
+			return;
+		}
+		
+		var params = $('#dataForm').serialize();
+		jcl.postJSON('/tms35/action/edit', params, function(data){
+			dialog.show();
+		});
+		
+	});
+	
+	// 取消
+	$('#cancelBtn').click(function(){
+		window.close();
+	});
+	
+	// 返回
+	$('#backBtn').click(function(){
+		window.close();
+	});
+	
+	// 条件框的双击事件，弹出条件编辑页面
+	$('#AC_COND').dblclick(function(){
+		var stat_cond = $('#AC_COND').val();
+		var rv = window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+''+"&stat_cond="+stat_cond+"&txnId="+txnId,window,'dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		$('#AC_COND').val(rv);
+	});
+	
+	// 条件框的双击事件，弹出条件编辑页面
+	$('#AC_SRC').dblclick(function(){
+		var stat_cond = $('#AC_SRC').val();
+		var rv = window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+''+"&stat_cond="+stat_cond+"&txnId="+txnId,window,'dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		$('#AC_SRC').val(rv);
+	});
+	
+});
+
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.edit.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.sure")' class="btn" id="backBtn"/>
+	</div>
+</div>
+
+
+<form name="dataForm" id="dataForm" method="post">
+	
+<input type="hidden" id="AC_ID" name="AC_ID"/>
+<input type="hidden" id="AC_ENABLE" name="AC_ENABLE"/>
+<input type="hidden" id="AC_TXN" name="AC_TXN"/>
+
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.action.acDesc")：</label> 
+		<span class="list-box-item-content"><input name="AC_DESC" id="AC_DESC" maxlength="50" type="text" class="itext"/><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.action.acCond")：</label> 
+		<span class="list-box-item-content"><input name="AC_COND" id="AC_COND" maxlength="200" type="text" class="itext"/>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.action.acSrc")：</label> 
+		<span class="list-box-item-content"><input name="AC_SRC" id="AC_SRC" maxlength="200" type="text" class="itext"/><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms35.action.acDst")：</label> 
+		<span class="list-box-item-content"> <select name="AC_DST" id = "AC_DST">
+                     <option value="">--请选择--</option>
+               </select><font color="red" id="fontid_type">*</font>
+		</span>
+	</li>
+</ul>
+<div class="button-box">
+	<input type="button" value="#springMessage("view.tms.pub.btn.save")" class="btn" id="updateBtn"/>
+	<input type="button" value="#springMessage("view.tms.pub.btn.cancel")" class="btn" id="cancelBtn"/>
+</div>
+</form>
+
+</body>
+</html>

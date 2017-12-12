@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.report.fraud.list.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link href="$rc.contextPath/s/common/css/tree.css" rel="stylesheet" type="text/css" />
+<!-- <script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script> -->
+<script type="text/javascript" src="$rc.contextPath/s/report/echarts/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/echarts/echarts.js"></script>
+
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/FusionCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/FusionMaps/FusionMaps.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/FusionWidgets/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/PowerCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/query/jcq.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/reportPrint.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/reportEcharts.js"></script>
+<style type="text/css">
+.chartsDiv{
+	height:300px;
+	width:98%;
+	border:0.5px solid;
+}
+</style>
+<script type="text/javascript">
+var echarts;
+var myChart;
+$(document).ready(function(){
+	initParams();
+	qBox = new jcl.ui.Box({
+		title:'#springMessage("view.report.fraud.form.title")'
+	});
+	qBox.title.css({cursor: 'pointer'});
+	qBox.container.parent().parent().css({borderBottomWidth:0});
+	displayBoxContent(qBox.title, qBox.container);
+	qBox.title.click();
+	
+	//快速查询表单
+	qForm = new jcl.ui.Form({
+		display: true,
+		layout: 'list',
+		items:[
+			{label:'#springMessage("view.report.pub.form.txnName")',name:'txnIds',  type:'treeselector',rtNode:true, multiple:true, cascadeCheck:true, ds:{type:'remote', url:'/tms35/trandef/query', parser:{key:'list', text:'TAB_DESC', value:'TAB_NAME'}, lazyLoad:true}},
+			{label:'#springMessage("view.report.pub.form.date")',type: 'dateduration', duraSeparator:' ', viewSeparator:'至', layout:'date', items:[{name:'startTime'},{name:'endTime'}]},
+			{label:'#springMessage("view.report.pub.form.areaName")', name:'location', type:'jcq.ui.formItem.CustomQueryItem', separator:' ',
+				items:[{name: 'countrycode', type:'selector', items:[{text:'--请选择--',value:''}], ds:{type:'remote',url:'/report/txn/getCountry',parser:{key:'countryList', text:'COUNTRYNAME', value:'COUNTRYCODE'}}}, 
+				       {name: 'regioncode', type:'selector', items:[{text:'--请选择--',value:''}]}, {name: 'citycode', type:'selector', items:[{text:'--请选择--',value:''}]}]}
+		],
+		btns:[
+			{id: 'quick_search_btn', text: '#springMessage("view.cmc.but.find")'}
+		]
+	}, qBox.container);
+	qForm.getItem(1).val(['', date]);
+	
+
+	//加载页面列表数据-处置
+	jcl.postJSON('/report/txn/getPS', '', function(data){
+		var fraudGrid_col = [];
+		var chartForm_target = [];//报表的监控指标
+		var chartForm_ps = [];//报表的监控处置
+		var chartForm_fd = [];//报表的监控交易
+		fraudGrid_col.push({name:'欺诈类型', width: 70, dataIndex:'FRAUDNAME'});
+		// fraudGrid_col.push({name:'#springMessage("view.report.txn.list.txnNum")', width: 45, dataIndex:'TXNNUMBER'});
+		// chartForm_target.push({text:'总数', value:'_NUM'});
+		// chartForm_target.push({text:'欺诈数', value:'_FRAUDNUMBER'});
+		// chartForm_target.push({text:'非欺诈数', value:'_NONFRAUDNUMBER'});
+		// chartForm_ps.push({text:'交易总数', value:'TXNNUMBER'});
+		for(var i =0;i<data.list.length;i++){ 
+			var ps = data.list[i];
+			var key = ps['DP_CODE'];
+			var value = ps['DP_NAME'];
+			// var items = [];
+			// items.push({name:'总数', width: 35, dataIndex:key+'_RATE'});
+			// items.push({name:'欺诈数', width: 50, dataIndex:key+'_FRAUDRATE'});
+			// items.push({name:'非欺诈数', width: 50, dataIndex:key+'_NONFRAUDRATE'});
+			fraudGrid_col.push({name:value, width: 50, dataIndex:key+'_FRAUDNUMBER'});
+			
+			chartForm_ps.push({text:value, value:key});
+		}
+		chartBox = new jcl.ui.Box({
+			title:'欺诈报警信息展示图',
+			marginTop:0
+		});
+		chartBox.title.css({cursor: 'pointer'});
+		chartBox.container.parent().parent().css({borderBottomWidth:0});
+		displayBoxContent(chartBox.title, chartBox.container);
+		
+		chartForm = new jcl.ui.Form({
+			display: true,
+			items:[
+			    // {name:'shape', type:'hidden', value:'lineShape'},
+			    {name:'target',type:'hidden', value:'_FRAUDNUMBER'},
+			    {label:'欺诈类型', name:'fdType', type:'listselector', items:chartForm_fd},
+			    {label:'处置类型', name:'ps', type:'listselector', items:chartForm_ps}
+			    // {label:'#springMessage("view.report.pub.shape.target")', name:'target', type:'listselector', items:chartForm_target},
+				// {label:'#springMessage("view.report.date.shape.scope")', name:'scope', type:'selector', items:[
+				// 	{text:'天', value:'day'},
+				// 	{text:'周', value:'week'},
+				// 	{text:'月', value:'month'}
+				// ]}
+			],
+			btns:[
+				{id: 'chart_search_btn', text: '#springMessage("view.cmc.but.find")'}
+				]
+		}, chartBox.container);
+		chartBox.addDom($('#chartdiv'));
+		// chartForm.getItem('ps').component.jqDom.find('name=entireCheck').click();
+		// chartForm.getItem('target').val('_NUM');
+		$("#chart_search_btn").click(function(){
+			changeTarget();
+		});
+		//组装表格
+		fraudGrid = new jcl.ui.Grid({
+			title:'欺诈报警信息列表',
+			marginTop:0,
+			//width:1100,
+			table:{
+				checkboxEnable:false,
+				columns:fraudGrid_col,
+				ds:{
+					url:"/report/fraud/list",
+					callback:function(list){
+						chartForm_fd = [];
+						for(var i = 0; i < list.length; i++){
+							if (list[i]['FRAUDNAME']) {
+								chartForm_fd.push({text:list[i]['FRAUDNAME'], value:list[i]['FRAUDTYPE']});	
+							};
+						}
+						chartForm.getItem('fdType').component.reload(chartForm_fd);
+						if (chartForm_fd.length > 0) {
+							chartForm.getItem('fdType').val(chartForm_fd[0].value);
+						};
+						if (chartForm_ps.length > 0) {
+							chartForm.getItem('ps').val(chartForm_ps[0].value);
+						};
+						changeTarget(list);
+					}
+				},
+				pagebar: false
+			},
+			toolbar:[
+				{id:"btn-export", icon:"icon-tb-edit", text:'#springMessage("view.report.pub.list.export")'},
+				{id:"btn-print", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.print")'}
+			]
+		});
+		
+		// chartForm.getItem('target').component.onChange(function(){
+		// 	changeTarget();
+		// });
+		// chartForm.getItem('scope').component.onChange(function(){
+		// 	changeTarget();
+		// });
+		
+		//快速查询
+		$("#quick_search_btn").click(function(){
+			var dayTimes = qForm.getItem(1).val();
+			var days = dayTimes.split("\,");
+			if((days[0]!=''&&days[1]!='')&&(days[0]>days[1])){
+				alert('#springMessage("view.tms.pub.datecheck")');
+				return ;
+			}
+			searchData(fraudGrid);
+		});
+		//导出列表信息
+		$("#btn-export").click(exportList);
+		//打印
+		$("#btn-print").click(toprint);
+		searchData(fraudGrid);
+	});
+	//国家改变时
+	qForm.getItem('location').getComponent('countrycode').onChange(function(_this){
+		var regioncode = qForm.getItem('location').getComponent('regioncode');
+		var citycode = qForm.getItem('location').getComponent('citycode');
+		if(_this.value){
+			regioncode.opts.ds = {type:'remote', url:'/report/txn/getRegion?countryCode='
+				+_this.value, parser:{key:'regList',text:'REGIONNAME',value:'REGIONCODE'}};
+			regioncode.reload();
+			regioncode.opts.items.unshift({text:'---请选择---', value:''});
+		}else{
+			regioncode.opts.ds = null;
+			regioncode.reload([{text:'---请选择---', value:''}]);
+		}
+		regioncode.select(0);
+		citycode.opts.ds = null;
+		citycode.reload([{text:'---请选择---', value:''}]);
+		citycode.select(0);
+	});
+
+	//地区改变时
+	qForm.getItem('location').getComponent('regioncode').onChange(function(_this){
+		var citycode = qForm.getItem('location').getComponent('citycode');
+		if(_this.value){
+			citycode.opts.ds = {type:'remote', url:'/report/txn/getCity?regionCode='+_this.value, parser:{key:'cityList',text:'CITYNAME',value:'CITYCODE'}};
+			citycode.reload();
+			citycode.opts.items.unshift({text:'---请选择---', value:''});
+		}else{
+			citycode.opts.ds = null;
+			citycode.reload([{text:'---请选择---', value:''}]);
+		}
+		citycode.select(0);
+	});
+	
+	
+});
+
+//绘制展示图形
+function createShape(list){
+	if (!myChart) {
+		if (echarts) {
+			myChart = echarts.init(document.getElementById('chartdiv'));
+			window.onresize = myChart.resize;
+			setChart(list);
+			return;
+		};
+		// 按需加载
+		require.config({
+		    paths: {
+		        echarts: '$rc.contextPath/s/report/echarts'
+		    }
+		});
+		require(
+		        [
+		            'echarts',
+		            'echarts/chart/bar',
+		            'echarts/chart/pie',
+		            'echarts/chart/funnel',
+		            'echarts/chart/line',
+		            'echarts/chart/map'
+		        ],
+		   function(ec){
+		   		echarts = ec;
+		    	myChart = ec.init(document.getElementById('chartdiv'));
+		    	window.onresize = myChart.resize;
+		    	setChart(list);
+		   }
+		); 
+	}else{
+		setChart(list);
+	}
+}
+//更改展示图形监控指标
+function changeTarget(list){
+	// var qParam = qForm.serialize();
+	// var cParam = chartForm.serialize();
+	// var params = [qParam, cParam].join('&');
+	// fraudGrid.setDsParams(params);
+	// fraudGrid.goPage();
+	// jcl.postJSON('/report/date/showChart', params, function(data){
+	// 	createShape(data.CHARTDATA);
+	// });
+	 if (list) {
+ 		createShape(list);
+	 }else{
+	 	 createShape(fraudGrid.table.page.list);
+	 }
+    
+}
+
+//根据输入的查询信息和图形展示区的设置，查询交易告警信息数据
+function searchData(g){
+	var qParam = qForm.serialize();//查询框中的信息
+	var cParam = chartForm.serialize();//展示图中的设置信息
+	var params = [qParam, cParam].join('&');
+	g.setDsParams(params);
+	g.goPage();
+	chartForm.reset();
+	// createShape(fraudGrid.table.page.list);
+	// jcl.postJSON('/report/date/showChart', params, function(data){
+	// 	createShape(data.CHARTDATA);		//创建图形
+	// });
+}
+function setChart(list){
+		myChart.showLoading({
+		    text: '正在努力的读取数据中...'    //loading话术
+		});
+		var option = getOptionV(list);
+		myChart.hideLoading();
+		myChart.clear();
+		myChart.setOption(option);
+		myChart.refresh;
+		myChart.resize;
+		myChart.restore;
+}
+function getOptionV(list){
+	//处置
+	var cf_ps = chartForm.getItem('ps').val();
+	var cf_ps_t = chartForm.getItem('ps').getText();
+	// 数据类型
+	// var cf_target = ['_FRAUDNUMBER'];
+	// var cf_target_t = ['欺诈数'];
+	// 欺诈列表
+	var cf_fdType = chartForm.getItem('fdType').val();
+	var cf_fdType_t = chartForm.getItem('fdType').getText();
+	// 排名
+	// var cf_tops = chartForm.getItem('tops').val();
+	// 数据集合
+	var g_list = [];
+	if (list) {
+		g_list = list.slice(0);
+	}else{
+		g_list = fraudGrid.table.page.list.slice(0);
+	}
+	// alert(cf_ps_t+'---'+cf_fdType_t);
+ 	var op_legend_data = [];//显示数据类型
+ 	var op_x_data = [];  //xAxis显示列
+ 	var op_series = [];  //数据
+
+ 	var cf_ps_t_arr = cf_ps_t.split(',');
+ 	var cf_ps_arr = cf_ps.split(',');
+	var cf_target_t_arr = ['欺诈数'];
+ 	var cf_target_arr = ['_FRAUDNUMBER'];
+
+ 	op_x_data = cf_fdType_t.split(',');
+ 	var cf_fdType_arr = cf_fdType.split(',');
+ 	for (var i = 0; i < op_x_data.length; i++) {
+ 		if ((i+1)%2 == 0) {
+ 			op_x_data[i] = '\n' + op_x_data[i];
+ 		}
+ 	};
+  	for (var i = 0; i < cf_ps_t_arr.length; i++) {
+  		for (var j = 0; j < cf_target_t_arr.length; j++) {
+  			// op_legend_data.push(cf_ps_t_arr[i]+'-'+cf_target_t_arr[j]);
+  			op_legend_data.push(cf_ps_t_arr[i]);
+  			op_series.push(
+	  			{ 
+	  			// name:cf_ps_t_arr[i]+'-'+cf_target_t_arr[j],
+	  			name:cf_ps_t_arr[i],
+	  			ps:cf_ps_arr[i]+cf_target_arr[j],
+	  			itemStyle : { normal: {label : {show: true, position: 'insideRight'}}},
+	            type:'bar',
+	            // stack: '处置',
+	            data:[]
+	  			}
+  			);
+		}
+	}
+	// 排序，从大到小
+	// g_list.sort(function(a,b){
+ // 		var al = 0;
+ // 		var bl = 0;
+ // 		for (var i = 0; i < cf_ps_arr.length; i++) {
+ // 			// 如果包含总数，直接利用总是排序
+ // 			if (cf_target_arr.indexOf('_NUM')) {
+ // 				al = al+ a[cf_ps_arr[i]+'_NUM'];
+ // 				bl = bl+ b[cf_ps_arr[i]+'_NUM'];
+ // 			}else{
+ // 				// 不包含总数，利用其他所有数据合排序
+ // 				for (var j = 0; j < cf_target_arr.length; j++) {
+ // 					al = al+ a[cf_ps_arr[i]+cf_target_arr[j]];
+ // 					bl = bl+ b[cf_ps_arr[i]+cf_target_arr[j]];
+ // 				};
+ // 			}
+ 			
+ // 		}
+ // 		// alert(bl + '--' + al)
+ // 		return bl -al;
+ // 	});
+	// 将数据放入chart的数据对象中
+  	for(var i = 0; i < g_list.length; i++){
+  		// if (op_x_data.length >= cf_tops) {
+  			// break;
+  		// }else{
+  			// alert(g_list[i]['CITYNAME']+'-'+i)
+  			//alert(cf_txn_arr.indexOf(g_list[i]['TXNID']));
+	  	if(cf_fdType_arr.indexOf(g_list[i]['FRAUDTYPE']) > -1){
+	  			// alert(g_list[i]);
+	  		// 删除总计
+	  		// if (g_list[i]['REPORTTOTAL'] == 'REPORTAREATOTAL') {
+	  		// 	continue;
+	  		// };
+			for(var j = 0; j < op_series.length; j++){
+				var list_v = g_list[i][op_series[j].ps];
+				// alert(g_list[i]['CITYNAME']+'--'+op_series[j].ps+'--'+list_v);
+				if(list_v != null){
+					op_series[j].data.push(list_v);
+				}
+			}
+  		}
+  	}
+  	var option = {};
+	option.op_legend_data = op_legend_data;
+	option.op_x_data = op_x_data;
+	option.op_series = op_series;
+	option.chartID = 'chartdiv';
+	return GenOption(option);
+}
+//列表信息导出
+function exportList(){
+	//查询框中的信息
+	var params = qForm.serialize();		
+	window.open(jcl.env.contextPath+"/report/fraud/export?"+params);
+}
+
+function toprint(){
+	reportPrint({rGrid:fraudGrid, width:fraudGrid.jqDom.width()});
+}
+
+//隐藏/展开相应的层
+function displayBoxContent(trigger, content){
+	trigger.on('click', function(){
+		if(content.is(':hidden')){
+			content.parent().show();
+		}else{
+			content.parent().hide();
+		}
+	})
+}
+
+//初始化时间，当前时间的前一天
+function initParams(){
+	var nowDate = new Date();
+	var operate_Date = new Date(nowDate.getTime() - 24*60*60000);
+	//月报及年报 获取 当天的月份及年
+	toperate_year = nowDate.getFullYear();
+	toperate_month = nowDate.getMonth()+1;
+	
+	operate_year = operate_Date.getFullYear();
+	operate_month = operate_Date.getMonth()+1;//获取本月
+	
+	
+	var operate_day = operate_Date.getDate();
+	var operate_hour = operate_Date.getHours();
+	var operate_minutes = operate_Date.getMinutes();
+	var operate_second = operate_Date.getSeconds();
+	
+	if(toperate_month < 10) toperate_month = "0" + toperate_month;
+	if(operate_month < 10) operate_month = "0" + operate_month;
+	if(operate_day < 10) operate_day = "0" + operate_day;
+	if(operate_hour < 10) operate_hour = "0" + operate_hour;
+	if(operate_minutes < 10) operate_minutes = "0" + operate_minutes;
+	if(operate_second < 10) operate_second = "0" + operate_second;
+	date = operate_year+"-"+operate_month+"-"+operate_day;
+}
+</script>
+</head>
+<body>
+<div id="chartdiv" class="chartsDiv" align="center"></div>
+</body>
+</html>

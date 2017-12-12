@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.aml.edit.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/validate.js"></script>
+<style type="text/css">
+.title-label {
+	font-weight: bold;
+	font-size: 10pt;
+}
+.form-item-label {
+	line-height:26px; 
+	text-align:right; 
+	padding-right:10px; 
+	float:left; 
+	display:block; 
+	width:200px; 
+}
+</style>
+<script type="text/javascript">
+var msgType = jQuery.url.param('msgType');
+var messageId = jQuery.url.param('messageId');
+var groupId = jQuery.url.param('groupId');
+var url = jQuery.url.param('url');
+$(document).ready(function(){
+	qBox = new jcl.ui.Box({
+		title:'#springMessage("view.tms.aml.edit.title")'
+	});
+	qBox.container.parent().parent().css({borderBottomWidth:0});
+
+	//公共信息
+	var tmpItems = [];
+	if(msgType == 'NPS' || msgType == 'RPS' || msgType == 'CPS'){
+		tmpItems = [
+			{label: '#springMessage("view.tms.aml.RBIF.RINM")', name: 'RINM'},
+			{label: '#springMessage("view.tms.aml.RBIF.FIRC")', name: 'FIRC'},
+			{label: '#springMessage("view.tms.aml.RBIF.FICD")', name: 'FICD'},
+			{label: '#springMessage("view.tms.aml.RBIF.RFSG")', name: 'RFSG',required:true},
+			{label: '#springMessage("view.tms.aml.RBIF.ORXN")', name: 'ORXN'},
+			{label: '#springMessage("view.tms.aml.RBIF.SSTM")', name: 'SSTM', type:'selector',
+				ds:{type:'code', category:'tms.aml.SSTM'}},
+			{label: '#springMessage("view.tms.aml.RBIF.STCR")', name: 'STCR', type:'selector',
+				ds:{type:'code', category:'tms.aml.STCR'}},
+			{label: '#springMessage("view.tms.aml.RBIF.SSDS")', name: 'SSDS'},
+			{label: '#springMessage("view.tms.aml.RBIF.UDSI")', name: 'UDSI'}
+		];
+	}else{
+		tmpItems = [
+			{label: '#springMessage("view.tms.aml.RBIF.RINM")', name: 'RINM'},
+			{label: '#springMessage("view.tms.aml.RBIF.FIRC")', name: 'FIRC'},
+			{label: '#springMessage("view.tms.aml.RBIF.CIMC")', name: 'CIMC'}
+		];
+	}
+	qBox.addDom('rbif');
+	rbifForm = new jcl.ui.Form({
+		display: true,
+		layout: 'list',
+		items: tmpItems
+	}, qBox.container);
+
+	//可疑主体信息
+	qBox.addDom('ctif');
+	ctifForm = new jcl.ui.Form({
+		display: true,
+		layout: 'list',
+		items:[
+			{label: '#springMessage("view.tms.aml.CTIF.CTNM")', name: 'CTNM'},
+			{label: '#springMessage("view.tms.aml.CTIF.SMID")', name: 'SMID'},
+			{label: '#springMessage("view.tms.aml.CTIF.CITP")', name: 'CITP', type:'selector',
+				ds:{type:'code', category:'tms.aml.CITP'}},
+			{label: '#springMessage("view.tms.aml.CTIF.CTID")', name: 'CTID'},
+			{label: '#springMessage("view.tms.aml.CTIF.CTAR")', name: 'CTAR'},
+			{label: '#springMessage("view.tms.aml.CTIF.CCTL")', name: 'CCTL'},
+			{label: '#springMessage("view.tms.aml.CTIF.CEML")', name: 'CEML'},
+			{label: '#springMessage("view.tms.aml.CTIF.CTVC")', name: 'CTVC', type:'selector',
+				ds:{type:'code', category:'tms.aml.CTVC'}},
+			{label: '#springMessage("view.tms.aml.CTIF.CRNM")', name: 'CRNM'},
+			{label: '#springMessage("view.tms.aml.CTIF.CRIT")', name: 'CRIT', type:'selector',
+				ds:{type:'code', category:'tms.aml.CITP'}},
+			{label: '#springMessage("view.tms.aml.CTIF.CRID")', name: 'CRID'}
+		],
+		btns:[
+			{id: 'sure_btn', text: '#springMessage("view.tms.pub.btn.sure")'}
+		]
+	}, qBox.container);
+	
+	//可疑交易列表
+	stifGrid = new jcl.ui.Grid({
+		title:'#springMessage("view.tms.aml.STIF.list")',
+		marginTop:0,
+		//width:1100,
+		table:{
+			checkboxEnable:false,
+			columns:[
+				{name:'#springMessage("view.tms.aml.STIF.list.CTNM")', width: 80, dataIndex:'CTNM'},
+				{name:'#springMessage("view.tms.aml.STIF.list.TCNM")', width: 35, dataIndex:'TCNM'},
+				{name:'#springMessage("view.tms.aml.STIF.list.CRAT")', width: 35, dataIndex:'CRAT'},
+				{name:'#springMessage("view.tms.aml.STIF.list.TSDR")', width: 45, dataIndex:'TSDR', render:'tms.aml.TSDR'},
+				{name:'#springMessage("view.tms.aml.STIF.list.TSTM")', width: 45, dataIndex:'TSTM'},
+				{name:'#springMessage("view.tms.aml.STIF.list.operate")', width: 45, dataIndex:'OPERATE'}
+			],
+			ds:{
+				url:"",
+				callback:function(list){
+					for(var i = 0; i < list.length; i++){
+						list[i]['OPERATE'] = '<a href="#" onclick="editStif(\''+messageId+'\', \''+msgType+'\', '+i+', \''+groupId+'\', \''+url+'\')" >#springMessage("view.tms.aml.export.btn.edit")</a>';
+					}
+				}
+			},
+			pagebar: false
+		},
+		toolbar: false
+	});
+
+	var params = 'messageId=' + messageId;
+	params += '&msgType=' + msgType;
+	params += '&groupId=' + groupId;
+	params += '&url=' + url;
+	jcl.postJSON('/tms/aml/msgInfo', params, function(data){
+		//公共信息
+		var RBIF = data.RBIF;
+		rbifForm.getItem('RINM').val(convertValue(RBIF.RINM));
+		rbifForm.getItem('FIRC').val(convertValue(RBIF.FIRC));
+		if(msgType == 'NPS' || msgType == 'RPS' || msgType == 'CPS'){
+			rbifForm.getItem('FICD').val(convertValue(RBIF.FICD));
+			rbifForm.getItem('RFSG').val(convertValue(RBIF.RFSG));
+			rbifForm.getItem('ORXN').val(convertValue(RBIF.ORXN));
+			rbifForm.getItem('SSTM').val(convertValue(RBIF.SSTM));
+			rbifForm.getItem('STCR').val(convertValue(RBIF.STCR));
+			rbifForm.getItem('SSDS').val(convertValue(RBIF.SSDS));
+			rbifForm.getItem('UDSI').val(convertValue(RBIF.UDSI));
+		}else{
+			rbifForm.getItem('CIMC').val(convertValue(RBIF.CIMC));
+		}
+
+		//可疑主体信息
+		var CTIF = data.CTIF;
+		ctifForm.getItem('CTNM').val(convertValue(CTIF.CTNM));
+		ctifForm.getItem('SMID').val(convertValue(CTIF.SMID));
+		ctifForm.getItem('CITP').val(convertValue(CTIF.CITP));
+		ctifForm.getItem('CTID').val(convertValue(CTIF.CTID));
+		ctifForm.getItem('CTAR').val(convertValue(CTIF.CTAR));
+		ctifForm.getItem('CCTL').val(convertValue(CTIF.CCTL));
+		ctifForm.getItem('CEML').val(convertValue(CTIF.CEML));
+		ctifForm.getItem('CTVC').val(convertValue(CTIF.CTVC));
+		ctifForm.getItem('CRNM').val(convertValue(CTIF.CRNM));
+		ctifForm.getItem('CRIT').val(convertValue(CTIF.CRIT));
+		ctifForm.getItem('CRID').val(convertValue(CTIF.CRID));
+		
+		//可疑交易列表
+		var STIFs = data.STIFs;
+		for(var i = 0; i < STIFs.list.length; i++){
+			STIFs.list[i]['OPERATE'] = '<a href="#" onclick="editStif(\''+messageId+'\', \''+msgType+'\', '+i+', \''+groupId+'\', \''+url+'\')" >#springMessage("view.tms.aml.export.btn.edit")</a>';
+			STIFs.list[i]['CTNM'] = convertValue(STIFs.list[i]['CTNM']);
+			STIFs.list[i]['TCNM'] = convertValue(STIFs.list[i]['TCNM']);
+			STIFs.list[i]['CRAT'] = convertValue(STIFs.list[i]['CRAT']);
+			STIFs.list[i]['TSDR'] = convertValue(STIFs.list[i]['TSDR']);
+			STIFs.list[i]['TSTM'] = convertValue(STIFs.list[i]['TSTM']);
+		}
+		stifGrid.renderPage(STIFs);
+	});
+	
+	//确定
+	$("#sure_btn").click(function(){
+		//校验
+		//公共信息
+		var RINM = rbifForm.getItem('RINM').val();
+		var FIRC = rbifForm.getItem('FIRC').val();
+		if(!checkColumn(RINM, 128, '#springMessage("view.tms.aml.RBIF.RINM")')) return;
+		if(!checkColumn(FIRC, 6, '#springMessage("view.tms.aml.RBIF.FIRC")')) return;
+		if(msgType == 'NPS' || msgType == 'RPS' || msgType == 'CPS'){
+			var FICD = rbifForm.getItem('FICD').val();
+			var RFSG = rbifForm.getItem('RFSG').val();
+			var ORXN = rbifForm.getItem('ORXN').val();
+			var SSTM = rbifForm.getItem('SSTM').val();
+			var STCR = rbifForm.getItem('STCR').val();
+			var SSDS = rbifForm.getItem('SSDS').val();
+			var UDSI = rbifForm.getItem('UDSI').val();
+
+			if(!checkColumn(FICD, 32, '#springMessage("view.tms.aml.RBIF.FICD")')) return;
+			if(IsEmpty(RFSG) && !IsNumber(RFSG, '+', 0)){
+				alert('#springMessage("view.tms.aml.RBIF.RFSG")只能为正整数');
+				return;
+			}
+			if(!checkColumn(RFSG, 2, '#springMessage("view.tms.aml.RBIF.RFSG")')) return;
+			if(!checkColumn(ORXN, 36, '#springMessage("view.tms.aml.RBIF.ORXN")')) return;
+			if(!checkColumn(SSTM, 2, '#springMessage("view.tms.aml.RBIF.SSTM")')) return;
+			if(!checkColumn(STCR, 2, '#springMessage("view.tms.aml.RBIF.STCR")')) return;
+			if(!checkColumn(SSDS, 500, '#springMessage("view.tms.aml.RBIF.SSDS")')) return;
+			if(!checkColumn(UDSI, 4, '#springMessage("view.tms.aml.RBIF.UDSI")')) return;
+		}else{
+			var CIMC = rbifForm.getItem('CIMC').val();
+
+			if(!checkColumn(CIMC, 15, '#springMessage("view.tms.aml.RBIF.CIMC")')) return;
+		}
+
+		//可疑主体信息
+		var CTNM = ctifForm.getItem('CTNM').val();
+		var SMID = ctifForm.getItem('SMID').val();
+		var CITP = ctifForm.getItem('CITP').val();
+		var CTID = ctifForm.getItem('CTID').val();
+		var CTAR = ctifForm.getItem('CTAR').val();
+		var CCTL = ctifForm.getItem('CCTL').val();
+		var CEML = ctifForm.getItem('CEML').val();
+		var CTVC = ctifForm.getItem('CTVC').val();
+		var CRNM = ctifForm.getItem('CRNM').val();
+		var CRIT = ctifForm.getItem('CRIT').val();
+		var CRID = ctifForm.getItem('CRID').val();
+
+		if(!checkColumn(CTNM, 128, '#springMessage("view.tms.aml.CTIF.CTNM")')) return;
+		if(!checkColumn(SMID, 128, '#springMessage("view.tms.aml.CTIF.SMID")')) return;
+		if(!checkColumn(CITP, 32, '#springMessage("view.tms.aml.CTIF.CITP")')) return;
+		if(!checkColumn(CTID, 32, '#springMessage("view.tms.aml.CTIF.CTID")')) return;
+		if(!checkColumn(CTAR, 128, '#springMessage("view.tms.aml.CTIF.CTAR")')) return;
+		if(!checkColumn(CTAR, 128, '#springMessage("view.tms.aml.CTIF.CTAR")')) return;
+		if(!checkColumn(CCTL, 32, '#springMessage("view.tms.aml.CTIF.CCTL")')) return;
+		if(IsEmpty(CEML) && !IsEmail(CEML)){
+			alert('#springMessage("view.tms.aml.CTIF.CEML")格式不正确');
+			return;
+		}
+		if(!checkColumn(CEML, 32, '#springMessage("view.tms.aml.CTIF.CEML")')) return;
+		if(!checkColumn(CTVC, 2, '#springMessage("view.tms.aml.CTIF.CTVC")')) return;
+		if(!checkColumn(CRNM, 32, '#springMessage("view.tms.aml.CTIF.CRNM")')) return;
+		if(!checkColumn(CRIT, 32, '#springMessage("view.tms.aml.CTIF.CRIT")')) return;
+		if(!checkColumn(CRID, 32, '#springMessage("view.tms.aml.CTIF.CRID")')) return;
+		
+		var eParams = [rbifForm.serialize(), ctifForm.serialize(), params].join('&');
+		jcl.postJSON('/tms/aml/edit', eParams, function(data){
+			if(data.isSuccess){
+				alert('#springMessage("view.tms.aml.edit.success")');
+				jcl.go('/tms/aml/exportList?' + params);
+			}else{
+				alert('#springMessage("view.tms.aml.edit.fail")');
+			}
+
+		});
+	});
+	
+});
+function editStif(messageId, msgType, i, groupId, url){
+	var params = 'messageId='+messageId;
+	params += '&msgType='+msgType;
+	params += '&index='+i;
+	params += '&groupId='+groupId;
+	params += '&url='+url;
+	jcl.go('/tms/aml/editStif?' + params);
+}
+
+function convertValue(value){
+	if(value == '@I'){
+		value = '';
+	}
+	return value;
+}
+
+function checkColumn(value, length, name){
+	if(!checkeLength(value, length)){
+		alert(name + '不能超过' + length + '个字符');
+		return false;
+	}
+	if(!checkXmlSpecialCode(value)){
+		alert(name + '不能包含特殊字符');
+		return false;
+	}
+	return true;
+}
+</script>
+</head>
+<body>
+<label id="rbif" class="title-label">#springMessage("view.tms.aml.RBIF")</label>
+<label id="ctif" class="title-label">#springMessage("view.tms.aml.CTIF")</label>
+</body>
+</html>

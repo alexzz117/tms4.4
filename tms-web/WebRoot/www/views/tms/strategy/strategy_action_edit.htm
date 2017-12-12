@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>修改风险策略</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl_tms_json.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/rule_strategy.js"></script>
+
+<script type="text/javascript">
+var strategyid = jQuery.url.param("id");
+var riskdisposalid = jQuery.url.param("riskdisposalid");
+$(document).ready(function(){
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.stategy.rule.edit.action.edit.title")',
+		width:850,
+		id:'editAcFormBox'
+	});
+	box.addDom('dataForm');
+
+	$('#STRATEGYID').val(strategyid);
+	$('#RISKDISPOSALID').val(riskdisposalid);
+
+	// 初始化页面
+	jcl.postJSON('/tms/strategy/getDisposalEditData','riskdisposalid='+riskdisposalid+'&strategyid='+strategyid,function(data){
+		ruleList = data.ruleList;
+		disposalList = data.disposalList;
+		var riskdisposaltype = data.row.RISKDISPOSALTYPE;
+		$('#RISKDISPOSALNAME').val(data.row.RISKDISPOSALNAME);
+		$('#RISKDISPOSALTYPE').val(riskdisposaltype);
+		$('#DISPOSAL').val(data.row.DISPOSAL);
+
+		var jsonObj = _json2Obj(data.row.METADATA);
+		// 条件
+		// 初始化表头
+		if(riskdisposaltype == '01'){
+			var actioncondstr = '<li class="list-box-item">';
+			actioncondstr += '<label class="list-box-item-label">条件：</label> ';
+			actioncondstr += '<span class="list-box-item-content">';
+			actioncondstr+= "<table border='1' id='typetable' style='border-collapse: collapse;width:100%'>";
+			actioncondstr+="<tr style='font-weight: bold;'>";
+			actioncondstr+="<td width='50%' id='RULETITLE'>规则名称</td>";
+			actioncondstr+="<td width='30%' id='CONDVALTITLE'>执行结果</td>";
+			actioncondstr+="<td width='20%'>操作</td>";
+			actioncondstr+="</tr>";
+			actioncondstr+="</table>";
+			actioncondstr+="</span>";
+			actioncondstr+="</li>";
+			$('#disposalconddivid').html(actioncondstr);
+
+			var condList=jsonObj.root;
+			if(condList == null || condList == ''){
+				// 插入一空行
+				insertRuleRow();
+			}else{
+				var thisRowIndex = 0;
+				$.each(condList, function(idx,item){
+					
+					// 插入一行
+					insertRuleRow();
+
+					// 赋值
+					setRowValue(thisRowIndex,item);
+					
+					thisRowIndex ++;
+				});
+			}
+		}
+		if(riskdisposaltype == '02'){
+			// 初始化表头
+			var actioncondstr = '<li class="list-box-item">';
+			actioncondstr += '<label class="list-box-item-label">条件：</label> ';
+			actioncondstr += '<span class="list-box-item-content">';
+			actioncondstr+= "<table border='1' id='typetable' style='border-collapse: collapse;width:100%'>";
+			actioncondstr+="<tr style='font-weight: bold;'>";
+			actioncondstr+="<td width='50%' id='RULETITLE'>处置方式</td>";
+			actioncondstr+="<td width='30%' id='CONDVALTITLE'>个数</td>";
+			actioncondstr+="<td width='20%'>操作</td>";
+			actioncondstr+="</tr>";
+			actioncondstr+="</table>";
+			actioncondstr+="</span>";
+			actioncondstr+="</li>";
+			$('#disposalconddivid').html(actioncondstr);
+
+			
+			var condList=jsonObj.root;
+			if(condList == null || condList == ''){
+				// 插入一空行
+				insertDisposalRow();
+			}else{
+				var thisRowIndex = 0;
+				$.each(condList, function(idx,item){
+
+					// 插入一行
+					insertDisposalRow();
+
+					// 计算此处置方式的规则个数
+					var valsum = 0;
+					for(var i = 0; i< ruleList.length; i++){
+						if(ruleList[i]['DISPOSAL'] == item.COND){
+							valsum ++;
+						}
+					}
+
+					// 初始化处置方式个数下拉列表
+					$('#CONDVAL'+thisRowIndex).html("<option value=''>--请选择--</option>");// 先清空
+					for (var j = 0; j <= valsum ; j++)
+					{
+						var hm = "<option value='"+j+"'>"+j+"个</option>";
+						$('#CONDVAL'+thisRowIndex).append(hm);
+					}
+
+					// 赋值
+					setRowValue(thisRowIndex,item);
+					
+					thisRowIndex ++;
+				});
+			}
+		}
+		if(riskdisposaltype == '03'){
+			// 初始化表头
+			var actioncondstr = '<li class="list-box-item">';
+			actioncondstr += '<label class="list-box-item-label">条件：</label> ';
+			actioncondstr += '<span class="list-box-item-content">';
+			actioncondstr+= "<table border='1' id='typetable' style='border-collapse: collapse;width:100%'>";
+			actioncondstr+="<tr style='font-weight: bold;'>";
+			//actioncondstr+="<td width='20%'>风险分值</td>";
+			actioncondstr+="<td width='50%' id='FUNCTITLE'>函数</td>";
+			actioncondstr+="<td width='30%' id='CONDVALTITLE'>数值</td>";
+			actioncondstr+="<td width='20%'>操作</td>";
+			actioncondstr+="</tr>";
+			actioncondstr+="</table>";
+			actioncondstr+="</span>";
+			actioncondstr+="</li>";
+			$('#disposalconddivid').html(actioncondstr);
+
+			
+			var condList=jsonObj.root;
+			if(condList == null || condList == ''){
+				// 插入一空行
+				insertScoreRow();
+			}else{
+				var thisRowIndex = 0;
+				$.each(condList, function(idx,item){
+					
+					// 插入一行
+					insertScoreRow();
+
+					// 赋值
+					setRowValue(thisRowIndex,item);
+					
+					thisRowIndex ++;
+				});
+			}
+		}
+		
+
+		var actionList = data.row.ACTIONLIST;
+
+		if(actionList != null && actionList.length > 0){
+			$("#functable tr:last-child").remove(); //删除第一行
+		}
+		// 动作
+		$.each(actionList, function(idx,item){
+			var actioncondstr="<tr>";
+			actioncondstr+="<td>";
+			actioncondstr+="<select name='funcid"+idx+"' id = 'funcid"+idx+"' onchange='funcChange("+idx+");'>";
+			actioncondstr+="<option value=''>--请选择--</option>";
+			for(var i = 0; i<funcList.length; i++){
+				actioncondstr+="<option value='"+funcList[i]['FUNCID']+"'>"+funcList[i]['FUNCNAME']+"</option>";
+			}
+			actioncondstr+="</select>";
+			actioncondstr+="</td>";
+			actioncondstr+="<td><div id='param_"+idx+"' style='display: inline'></div></td>";
+			actioncondstr+="<td>";
+			actioncondstr+="<input type='button' value='add' class='btn' onclick='insertFuncRow(this);'/>";
+			actioncondstr+="<input type='button' value='del' class='btn'  onclick='dellAtom(this);'/>";
+			actioncondstr+="</td><input name='ACTIONJSON"+idx+"' id='ACTIONJSON"+idx+"' type='hidden'/>";
+			actioncondstr+="<input type='hidden' name='DISPOSALACTIONID"+idx+"' id='DISPOSALACTIONID"+idx+"''/><input type='hidden' name='RISKDISPOSALID"+idx+"' id='RISKDISPOSALID"+idx+"''/></tr>";
+				
+			$('#functable').append(actioncondstr);
+			var meta = item.METADATA;
+			$('#funcid'+idx).val(item.FUNCID);
+			$('#ACTIONJSON'+idx).val(meta);
+			$('#DISPOSALACTIONID'+idx).val(item.DISPOSALACTIONID);
+			$('#RISKDISPOSALID'+idx).val(item.RISKDISPOSALID);
+			//根据初始化参数的个数(行数)new 公用插件对象，用户函数选择时，对函数参数的设置
+			var temp = new jcl_tms.util.FuncInvoke({
+				id:'tms'+idx,
+				txnid:txnid
+			});
+			secondfun[idx] = new Array(temp);
+			secondfun[idx][0].setJson(meta);
+			secondfun[idx][0].show('param_'+idx,'edit');
+
+			funccount = idx+1;
+			$('#FUNCCOUNT').val(funccount);
+		});
+	});
+	// 取消按钮
+	$("#cancelBtn").click(function(){
+		jcl.go("/tms/strategy/editStrategy?id="+strategyid+"&tabname=tabAction");// 页面跳转
+	});
+
+	// 确定按钮
+	$("#addBtn").click(function(){
+		
+		if(!checks()){
+			return;
+		}
+
+		// 插入数据库
+		var params = $('#dataForm').serialize();
+		jcl.postJSON('/tms/strategy/editRiskDisposal', params, function(data){
+			alert('保存成功');
+			jcl.go("/tms/strategy/editStrategy?id="+strategyid+"&tabname=tabAction");// 页面跳转
+		});
+	});
+	
+});
+
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<form id="dataForm" name="dataForm">
+	<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.stategy.rule.edit.action.name")：</label> 
+		<span class="list-box-item-content"><input name="RISKDISPOSALNAME" id="RISKDISPOSALNAME" type="text" class="itext"/><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.stategy.rule.edit.action.type")：</label> 
+		<span class="list-box-item-content"><select id="RISKDISPOSALTYPE" name="RISKDISPOSALTYPE">
+				<option value="">--请选择--</option>
+               </select><font color='red'>*</font></span>
+	</li>
+	
+	<!--风险处置类型条件-->
+	<div id='disposalconddivid'></div>
+
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.stategy.rule.edit.action.disposal")：</label> 
+		<span class="list-box-item-content"> <select id="DISPOSAL" name="DISPOSAL">
+                     <option value="">--请选择--</option>
+			</select>
+		</span>
+	</li>
+   <li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.stategy.rule.edit.action.func")：</label> 
+		<span class="list-box-item-content">
+		<table border='1' id='functable' style='border-collapse: collapse;width:100%'>
+			<tr style='font-weight: bold;'>
+			<td width='30%'>#springMessage("view.tms.stategy.rule.edit.action.funcname")</td>
+			<td width='50%'>#springMessage("view.tms.stategy.rule.edit.action.funcparam")</td>
+			<td width='20%'>#springMessage("view.tms.stategy.rule.edit.action.oper")</td>
+			</tr>
+			<tr>
+				<td>
+					<select name="funcid0" id = "funcid0" onchange="funcChange('0')">
+						 <option value="">--请选择--</option>
+				   </select>
+			     </td>
+				<td><div id="param_0" style="display: inline"></div></td>
+				<td>
+				<input type='button' value='add' class='btn' onclick='insertFuncRow(this)'/><input type='button' value='del' class='btn'  onclick='dellAtom(this);'/></td> 
+				<input name="ACTIONJSON0" id="ACTIONJSON0" type="hidden" class="itext"/>
+			</tr>
+		</table>
+		</span>
+	</li>
+
+
+	</ul>
+	<div class="button-box">
+		<input type="button" value="#springMessage("view.tms.pub.btn.save")" class="btn" id="addBtn"/>
+		<input type="button" value="#springMessage("view.tms.pub.btn.cancel")" class="btn" id="cancelBtn"/>
+	</div>
+	<input name="RISKDISPOSALID" id="RISKDISPOSALID" type="hidden" class="itext" />
+	<input name="STRATEGYID" id="STRATEGYID" type="hidden" class="itext" />
+	<input name="DISPOSALCOUNT" id="DISPOSALCOUNT" type="hidden" class="itext" />
+	<input name="FUNCCOUNT" id="FUNCCOUNT" type="hidden" class="itext" value='1'/>
+</form>
+</body>
+</html>

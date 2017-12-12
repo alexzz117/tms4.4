@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.pub.imp.errorarray")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	jcl.postJSON('/tms/mgr/importLog', "", function(data){
+		if(data.importInfo){
+			jcl.ui.messagebox.show({
+				title: jcl.message.get('ui.common.messagebox.info', 'info'),
+				icon: 'icon-msg-info',
+				btn: {
+					text: jcl.message.get('ui.common.messagebox.ok', 'OK'),
+					click: function(btn, msgbox) {
+						msgbox.hide();
+						if (data.url) {
+							jcl.go(data.url);
+						} else {
+							jcl.go('/tms/mgr/list');
+						}
+					}
+				},
+				text: data.importInfo
+			});
+		}
+	});
+	
+});
+</script>
+
+</head>
+<body>
+</body>
+</html>

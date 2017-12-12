@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.monitor.center.risknumst")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionMaps/FusionMaps.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionWidgets/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/PowerCharts/FusionCharts.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	riskBox = new jcl.ui.Box({
+		title:'#springMessage("view.tms.monitor.center.risknumst")'
+	});
+	riskBox.addDom($('#risk_monitor'));
+	
+	riskForm = new jcl.ui.Form({
+		display: true,
+		items:[
+			{label:'刷新频率', name:'riskRefresh', type:'selector', ds:{type:'code', category:'tms.monitor.refleshrate'}},
+			{label:'统计范围', name:'scope', type:'selector', items:[
+   				{text:'当前1小时', value:'currentTime'},
+				{text:'过去4小时', value:'4'},
+				{text:'过去12小时', value:'12'},
+				{text:'过去24小时', value:'24'}
+   			]}
+		]
+	}, $('#risk_conds'));
+	riskForm.jqDom.find('.form-item-label').width(60);
+	
+	riskForm.getItem('riskRefresh').component.onChange(function(){
+		riskChange();
+	});
+	
+	riskForm.getItem('scope').component.onChange(function(){
+		changestmonitor();
+	});
+	
+	//规则运行监控表格显示
+	riskGrid = new jcl.ui.Grid({
+		id:'risk_grid',
+		title: '#springMessage("view.tms.monitor.center.risknumst")',
+		width:230,
+		height:225,
+		marginTop:0,
+		table:{
+			checkboxEnable:false,
+			columns:[
+				{name:'#springMessage("view.tms.monitor.center.st")', width: 40, dataIndex:'STNAME'},
+				{name:'#springMessage("view.tms.monitor.center.statistics")', width: 50, dataIndex:'STVALUE'}
+			],
+			pagebar: false
+		}
+	});
+	riskGrid.jqDom.children('.box-title-wrap').children('.box-title').css({textAlign:'center'});
+	
+	var riskvalue = riskForm.getItem('scope').val();
+	//风险统计数据填充
+	jcl.postJSON('/tms/monitor/grid/all/rmriskst?frm='+riskvalue, "", function(data){
+		dataRiskModel = data;	//给图表数据模型赋值
+		riskGrid.renderPage(data.page);	//填充表格数据
+		strisk();	//填充图表数据
+	});
+	
+	// 取系统时间，之后进行后续的工作
+	jcl.postJSON('/tms/monitor/alarm/time','',function(data){
+		var currentTime = data.row.currentTime;//yyyy-MM-dd HH:mm:ss
+		// 根据服务器时间算出开始时间
+		riskstartTime = new Date(currentTime.substr(0,4),currentTime.substr(5,2)-1,currentTime.substr(8,2),currentTime.substr(11,2),currentTime.substr(14,2),currentTime.substr(17,2));
+		if(riskstartTime=='NaN')riskstartTime = new Date();
+		risknowTime = riskstartTime.getTime();
+		var seconds = riskForm.getItem('riskRefresh').val();
+		if(seconds == undefined){
+			seconds = "1";
+		}
+		riskendTime=riskstartTime.getTime()+Number(seconds)*1000;
+		getRiskTime();
+	});
+});
+
+//图标数据填充
+function strisk(){
+	var width = $('#risk_monitor').width() - riskGrid.jqDom.width() - 10;
+	var chart = new FusionCharts("$rc.contextPath/s/tms/chart/StackedBar2D.swf", "ChartId", width, "225", "0", "0");
+	chart.setDataXML(dataRiskModel.row[0]);
+	chart.render("chartdiv_rmriskst");
+}
+
+//风险统计
+function changestmonitor(){
+	var riskvalue = riskForm.getItem('scope').val();
+	//风险统计数据填充
+	jcl.postJSON('/tms/monitor/grid/all/rmriskst?frm='+riskvalue, "", function(data){
+		dataRiskModel = data;
+		riskGrid.renderPage(data.page);
+		strisk();
+	});
+}
+
+//刷新频率改变时，倒计时结束时
+function riskChange(){
+	riskstartTime.setTime(risknowTime);
+	var seconds = riskForm.getItem('riskRefresh').val();
+	if(seconds == undefined){
+		seconds = "1";
+	}
+    riskendTime=riskstartTime.getTime()+Number(seconds)*1000;
+	//风险统计数
+	changestmonitor();
+}
+
+//计时器
+function getRiskTime(){
+	// 差距时间
+	var nMS =riskendTime - risknowTime;
+	var nM=Math.floor(nMS/(1000*60)) % 60;
+	var nS=Math.floor(nMS/1000) % 60;
+	if(nM==0&&nS==0&&nMS<1000) //当倒计时结束
+	{
+		window.focus();
+		riskChange();
+	}
+	if(nS < 10) nS = "0" + nS;
+	if(nMS >= 0){
+	    $('#reriskTime').text("上次更新时间："+ riskstartTime.getHours()+"时"+riskstartTime.getMinutes()+"分"+riskstartTime.getSeconds() + "秒(" + nM + "分" + nS + "秒)");
+		// 当前时间加1秒
+	    risknowTime = risknowTime +1*1000;
+	    setTimeout("getRiskTime()",1000);
+	}
+}
+</script>
+
+</head>
+<body>
+<div id="risk_monitor">
+	<div id="risk_conds" style="float:left;width:60%;"></div>
+	<div id="reriskTime" style="width:280px;font-size:13px;font-weight:bold;float:right;line-height:26px;text-align:right;"></div>
+	<div class="clear"></div>
+	<div id="risk_grid" style="float:left;height:225px;"></div>
+	<div id="chartdiv_rmriskst" align="center" style="float:right;"></div>
+</div>
+</body>
+</html>

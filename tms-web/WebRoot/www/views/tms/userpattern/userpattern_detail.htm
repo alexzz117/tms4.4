@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.userpattern.center.list.userpattern.detail")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link href="$rc.contextPath/s/common/css/tree.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/alarm_tree.js"></script>
+<style type="text/css">
+.select {
+	font-family: "宋体";
+	font-size: 12px;
+	line-height: 15px;
+	color: #000000;
+	font-weight: bold;
+	cursor: pointer;
+}
+.noselect {
+	cursor: pointer;
+	color: #000000;
+}
+</style>
+<script type="text/javascript">
+var txnPatternName; 
+var userId;
+var patternPropId;
+var txnId;
+var storeColumn;
+var patternId;
+//var dataList;
+$(document).ready(function(){
+	userId = jQuery.url.param("userId");
+	patternPropId = jQuery.url.param("patternPropId");
+	txnId = jQuery.url.param("txnId");
+	storeColumn = jQuery.url.param("storeColumn");
+	txnPatternName = jQuery.url.param("txnPatternName");
+	patternId = jQuery.url.param("patternId");
+	$("#txnPatternName").val(txnPatternName);
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.userpattern.center.list.userpattern.detail")',
+		id:'sessionDetailBox'
+	});
+	box.addDom('mainTable');
+	
+		jcl.postJSON('/tms/userPattern/listCustomer?userId='+userId, "", function(data){
+		if(data.row == null) return;
+
+		$('#user_userid').text(data.row.USERID);
+		$('#user_username').text(data.row.CUSNAME);
+		$('#user_useralias').text(data.row.USERNAME);
+		$('#user_usersex').text(jcl.code.get('tms.common.sex', data.row.SEX));
+		$('#user_usertype').text(jcl.code.get('tms.run.user.acctype', data.row.ACCTYPE));
+		$('#user_certtype').text(jcl.code.get('tms.common.certtype', data.row.CERTTYPE));
+		$('#user_certno').text(data.row.CERTNO);
+		$('#user_birthdate').text(data.row.BIRTHDATE);
+		$('#user_phone').text(data.row.CELLPHONENO);
+// 		$('#user_email').text(data.row.EMAIL);
+		$('#user_opennode').text(data.row.BRH_NAME);
+		$('#user_opentime').text(data.row.OPENTIME);
+		$('#user_opennodecity').text(data.row.CITYNAME);
+	});
+	
+	jcl.postJSON('/tms/userPattern/txnMessage?txnId='+txnId, "", function(data){
+		$('#transname').text(data.row.TXNNAME);
+		$('#channel').text(data.row.CHANNELNAME);
+		$('#creattime').text(data.row.CREATETIME);
+		$('#modifytime').text(data.row.MODIFYTIME);
+		$('#txndesc').text(data.row.TXNDESC);
+	});
+
+	var g = $("#userpatternDiv").grid({
+		title:'#springMessage("view.tms.userpattern.center.userpattern.userdetail")',
+		width:document.body.clientWidth-50,
+		height:400,
+		columns:[
+			{name:'#springMessage("view.tms.userpattern.center.userpattern.name")', width: 50, dataIndex:'VALUE'},
+			{name:'#springMessage("view.tms.userpattern.center.userpattern.number")', width: 70, dataIndex:'NUMBER'},
+			{name:'#springMessage("view.tms.userpattern.center.userpattern.rate")', width: 60, dataIndex:'RATE'}
+		],
+		ds:{
+			url:"/tms/userPattern/detailUserPattern",
+			params:{
+				"userId":userId,
+				"txnId":txnId,
+				"patternPropId":patternPropId,
+				"storeColumn":storeColumn
+				
+			}
+		},
+		//toolbar:[],
+		checkboxEnable:false,
+		pagebar: false,
+		qform: {id:"qformdate", display:false}
+	});
+	g.goPage();
+
+
+	var u = $("#usereditpatternDiv").grid({
+		title:'#springMessage("view.tms.userpattern.center.userpattern.usereditdetail")',
+		width:document.body.clientWidth-50,
+		columns:[
+			{name:'#springMessage("view.tms.userpattern.center.userpattern.name")', width: 50, dataIndex:'PATTERNNAME'},
+			{name:'#springMessage("view.tms.userpattern.center.userpattern.startdate")', width: 70, dataIndex:'STARTDATE'},
+			{name:'#springMessage("view.tms.userpattern.center.userpattern.enddate")', width: 60, dataIndex:'ENDDATE'},
+			{name:'#springMessage("view.tms.userpattern.center.userpattern.isuserd")', width: 60, dataIndex:'ISVALID',render:'common.is'}
+			
+		],
+		ds:{
+			url:"/tms/userPattern/detailPattern",
+			params:{
+				"userId":userId,
+				"patternPropId":patternPropId,
+				"storeColumn":storeColumn,
+				"txnPatternName":txnPatternName
+				
+			}
+		},
+		toolbar:[
+			{id:"btn-add", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.new")'},
+			{id:"btn-edit", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.edit")'},
+			{id:"btn-del", icon:"icon-tb-del", text:'#springMessage("view.tms.pub.btn.del")'}
+		],
+		checkboxEnable:true,
+		pagebar: true,
+		qform: {id:"qform", display:false}
+	});
+	u.goPage();
+
+	$('#btn-add').click(function(){
+		var param = "patternId=" + patternId+ "&patternPropId=" + patternPropId;
+		jcl.postJSON('/tms/userPattern/isCheck', param, function(data){
+			var flag = data.flag;
+			if(flag == false){
+				alert("请检查该行为属性是否授权！");
+				return;
+			}else{
+				var params = 'userId='+userId+ "&patternPropId=" + patternPropId ;
+				params += "&storeColumn=" + storeColumn+"&txnPatternName=" + txnPatternName;
+				params += "&txnId="+txnId;
+				window.showModalDialog('$rc.contextPath/tms/userPattern/add?'+params,'','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+				u.goPage();
+				$("#usereditpatternDiv").click();
+			}
+		});	
+	});
+	
+	$('#btn-edit').click(function(){
+		var rows = u.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")');
+			return;
+		}
+		var userPatternId = "";
+		$.each(rows, function(i,row){
+			userPatternId = row['USERPATTERNID'];
+			});
+			var params = 'userId=' + userId + "&userPatternId=" + userPatternId;
+			params +="&patternPropId=" + patternPropId + "&storeColumn=" + storeColumn;
+			params +="&txnPatternName=" + txnPatternName;
+			params +='&txnId='+txnId;
+			
+			window.showModalDialog('$rc.contextPath/tms/userPattern/mod?'+params,'','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+			u.goPage();
+			$("#usereditpatternDiv").click();
+		
+	});
+	
+	$('#btn-del').click(function(){
+		var rows = u.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.tms.pub.checkbox.msg1")');
+			return;
+		}
+		var userPatternId = "";
+		var patternName = "";
+		$.each(rows, function(i,row){
+			userPatternId = row['USERPATTERNID'];
+			patternName = row['PATTERNNAME'];
+			});
+
+		$("#patternName").val(patternName);
+		var params = $('#dataForm').serialize() +"&txnId="+txnId+"&userPatternId=" + userPatternId +"&userId=" + userId ;
+		if(confirm("确定删除用户行为习惯信息？")){
+			jcl.postJSON('/tms/userPattern/del', params, function(data){
+				alert('删除成功!');
+				u.goPage();
+			});
+		}else{
+			return ;
+		}
+	});
+	
+	$('#backBtn').click(function(){
+		window.close();
+	});
+	$('#usereditpattern').click();
+});
+
+function changeTags(selectedTag){
+	$('#tags > td').removeClass("select").addClass("noselect");
+	$(selectedTag).addClass("select")
+	$('#mainBody > div').hide();
+	$('#'+selectedTag.id+'Div').show();
+}
+
+</script>
+
+</head>
+  <body>
+	<table id="mainTable" width="100%">
+		<tr>
+			<td>
+				<table style="BORDER-COLLAPSE: collapse" border=1 width="100%" align=center>
+					<tr id="tags">
+						<td id="user" class=noselect onclick="changeTags(this)" valign=top width="15%" align="center">#springMessage('view.tms.sessionalarm.detail.user')</td>
+						<td width="1%"></td>
+					<!-- 	<td id="txn" class=noselect onclick="changeTags(this)" valign=top width="15%" align="center">#springMessage('view.tms.sessionalarm.detail.transaction')</td>
+						<td width="1%"></td> -->
+						<td id="userpattern" class=noselect onclick="changeTags(this)" valign=top width="15%" align="center">#springMessage('view.tms.userpattern.center.userpattern.userdetail.title')</td>
+						<td width="1%"></td>
+						<td id="usereditpattern" class=select onclick="changeTags(this)" valign=top width="15%" align="center">#springMessage('view.tms.userpattern.center.userpattern.usereditdetail.title')</td>
+						<td></td>
+					</tr>
+				</table>
+				<table border=0 width="100%" align="center">
+					<tr>
+						<td id="mainBody" valign=top width="100%" colspan=8 align=center>
+							<div id="userDiv" >
+							  	<ul class="list-box">
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.userid"):
+										</label>
+										<span class="list-box-item-content"><div id="user_userid" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.username"):
+										</label>
+										<span class="list-box-item-content"><div id="user_username" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.useralias"):
+										</label>
+										<span class="list-box-item-content"><div id="user_useralias" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.usersex"):
+										</label>
+										<span class="list-box-item-content"><div id="user_usersex" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.usertype"):
+										</label>
+										<span class="list-box-item-content"><div id="user_usertype" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.certtype"):
+										</label>
+										<span class="list-box-item-content"><div id="user_certtype" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.certno"):
+										</label>
+										<span class="list-box-item-content"><div id="user_certno" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.birthdate"):
+										</label>
+										<span class="list-box-item-content"><div id="user_birthdate" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.phone"):
+										</label>
+										<span class="list-box-item-content"><div id="user_phone" style="font-weight: bold"></div> </span>
+									</li>
+<!-- 									<li class="list-box-item"> -->
+<!-- 										<label class="list-box-item-label"> -->
+<!-- 											#springMessage("view.tms.sessionalarm.detail.user.email"): -->
+<!-- 										</label> -->
+<!-- 										<span class="list-box-item-content"><div id="user_email" style="font-weight: bold"></div> </span> -->
+<!-- 									</li> -->
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.opennode"):
+										</label>
+										<span class="list-box-item-content"><div id="user_opennode" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.opentime"):
+										</label>
+										<span class="list-box-item-content"><div id="user_opentime" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.sessionalarm.detail.user.opennodecity"):
+										</label>
+										<span class="list-box-item-content"><div id="user_opennodecity" style="font-weight: bold"></div> </span>
+									</li>
+								</ul>
+							</div>
+							<!--  SessionTag  -->
+							<div id="txnDiv"  style="display:none">
+							  	<ul class="list-box">
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.userpattern.center.list.transname"):
+										</label>
+										<span class="list-box-item-content"><div id="transname" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.userpattern.center.userpattern.channel"):
+										</label>
+										<span class="list-box-item-content"><div id="channel" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.userpattern.center.userpattern.startdate"):
+										</label>
+										<span class="list-box-item-content"><div id="creattime" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.userpattern.center.userpattern.enddate"):
+										</label>
+										<span class="list-box-item-content"><div id="modifytime" style="font-weight: bold"></div> </span>
+									</li>
+									<li class="list-box-item">
+										<label class="list-box-item-label">
+											#springMessage("view.tms.userpattern.center.userpattern.txndesc"):
+										</label>
+										<span class="list-box-item-content"><div id="txndesc" style="font-weight: bold"></div> </span>
+									</li>
+								</ul>
+							</div>
+							<div id="userpatternDiv" style="display:none" align="left"></div>
+							
+							<div id="usereditpatternDiv" style="display:none" align="left"></div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	
+
+	  <div class="button-box">
+		<input type="button" value="#springMessage('view.tms.pub.btn.close')" class="btn" id="backBtn"/>
+	  </div>
+	  <form name="dataForm" id="dataForm" method="post">
+	  <input type="hidden" name="txnPatternName" id="txnPatternName"  />
+	  <input type="hidden" name="patternName" id="patternName"  />
+	  </form>
+  </body>
+</html>

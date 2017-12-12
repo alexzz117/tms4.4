@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.userpattern.center.userpattern.view")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.userpattern.center.userpattern.view")',
+		id:'editValueEditFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.tms.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	var userPatternId = "userPatternId="+jQuery.url.param("userPatternId");
+	var patternPropId = "patternPropId="+jQuery.url.param("patternPropId");
+	var userId = jQuery.url.param("userId");
+	var storeColumn = jQuery.url.param("storeColumn");
+	var txnPatternName = jQuery.url.param("txnPatternName");
+	$('#userId').val(userId);
+	$('#txnPatternName').val(txnPatternName);
+	
+	var qtype = jQuery.url.param("qtype");
+	var geturl = "/tms/userPatternView/get";
+	if(qtype=='new'){
+		geturl = "/tms/userPattern/get";
+	}
+		jcl.postJSON('/tms/userPattern/patternProp', patternPropId, function(data){
+				var sourcetype = data.row.SOURCETYPE;
+				var generalfuncid = data.row.GENERALFUNCID;
+				var datesource = data.row.DATASOURCE;
+				var txnparamcode = data.row.TXNPARAMCODE;
+				var datatype = data.row.DATATYPE;
+				var sourceid= data.row.SOURCEID;
+				var store = data.row.STORECOLUMN;
+				if(datatype == null || datatype == ""){
+					datatype = data.row.TXNPARAMTYPE;
+				}
+				$('#datatype').val(datatype);
+				$('#sourceid').val(sourceid);
+				jcl.postJSON(''+geturl, userPatternId, function(data){	
+					var patternvalue = data.row.PATTERNVALUE;
+					var isvalid = data.row.ISVALID;
+					var startdate = data.row.STARTDATE;
+					var enddate = data.row.ENDDATE;
+					if(isvalid == "0"){//可选时间
+						   document.getElementById("startdate").disabled=false;
+						   document.getElementById("box1").disabled=false;
+						   document.getElementById("enddate").disabled=false;
+						   document.getElementById("box2").disabled=false;
+						   $('#startdate').val(startdate);
+						   $('#enddate').val(enddate);
+					}else{
+						   document.getElementById("isvalid").checked=true;
+						   document.getElementById("startdate").disabled=true;
+						   document.getElementById("box1").disabled=true;
+						   document.getElementById("startdate").value="";
+						   document.getElementById("enddate").disabled=true;
+						   document.getElementById("box2").disabled=true;
+						   document.getElementById("enddate").value="";	
+					}
+				var htmlStr = "";
+				if(sourcetype == "DICT"){
+					var sourceId = $("#sourceid").val()
+					jcl.postJSON('/tms/userPattern/listCode', "sourceId="+sourceId, function(data){
+						var codeList = data.codeList;
+						htmlStr += "<select id='patternvalue' name='patternvalue' >";
+						for(var i=0;i<codeList.length;i++){
+							htmlStr +="<option value='"+codeList[i]["CODE_KEY"]+"'>"+codeList[i]["CODE_VALUE"]+"</option>";
+						}
+						htmlStr +="</select>";
+						$("#pattern").html(htmlStr);
+						$('#patternvalue').val(patternvalue);
+						$("#patternvalue").attr('disabled',true);
+					})
+				}else if(generalfuncid == "dp20001"){
+					if(datesource != null && datesource != "null"){
+						if(datesource == "countryCode"){
+							jcl.postJSON('/tms/userPattern/country', '', function(data){
+								var countryList = data.countryList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<countryList.length;i++){
+									htmlStr +="<option value='"+countryList[i]["COUNTRYCODE"]+"'>"+countryList[i]["COUNTRYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+						}else if(datesource == "regionCode"){
+							jcl.postJSON('/tms/userPattern/region', '', function(data){
+								var regionList = data.regionList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<regionList.length;i++){
+									htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+						}else if(datesource == "cityCode"){
+/*							jcl.postJSON('/tms/userPattern/city', '', function(data){
+								var cityList = data.cityList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<cityList.length;i++){
+									htmlStr +="<option value='"+cityList[i]["CITYCODE"]+"'>"+cityList[i]["CITYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+*/
+							jcl.postJSON('/tms/userPattern/city', 'cityCode='+patternvalue, function(data){
+									var cityList = data.cityList;
+									var regionCode = cityList[0]["REGIONCODE"];
+									jcl.postJSON('/tms/userPattern/region', '', function(data){
+										var regionList = data.regionList;
+										htmlStr += "<select id='regionId' name='regionId' onchange='changeRegion(this)' disabled >";
+										htmlStr +="<option value='' selected>-请选择-</option>";
+										for(var i=0;i<regionList.length;i++){
+											htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+										}
+										htmlStr +="</select>";
+										htmlStr +="<select name='patternvalue' id='patternvalue' style='width:100px;' disabled >";
+										jcl.postJSON('/report/txn/getCity', "regionCode="+regionCode, function(data){
+												var city = data.cityList;
+												htmlStr +="<option value='' selected>-请选择-</option>";
+													for(var j=0;j<city.length;j++){
+														htmlStr += '<option value="'+city[j]["CITYCODE"]+'">'+city[j]["CITYNAME"]+'</option>';
+													}
+													htmlStr +="</select>";
+													$("#pattern").html(htmlStr);
+													$('#regionId').val(regionCode);
+													$('#patternvalue').val(patternvalue);
+												});
+									});
+								});
+						}else if(datesource == "channelType"){
+							jcl.postJSON('/tms/userPattern/channel', '', function(data){
+								var channelList = data.channelList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<channelList.length;i++){
+									htmlStr +="<option value='"+channelList[i]["CHANNELID"]+"'>"+channelList[i]["CHANNELNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+						}else{
+							    htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+							    $("#pattern").html(htmlStr);
+							    $('#patternvalue').val(patternvalue);
+					}
+						}else if(store !=null && store!="null"){
+							if(store.toLowerCase() == "countrycode"){
+							jcl.postJSON('/tms/userPattern/country', '', function(data){
+								var countryList = data.countryList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<countryList.length;i++){
+									htmlStr +="<option value='"+countryList[i]["COUNTRYCODE"]+"'>"+countryList[i]["COUNTRYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+						}else if(store.toLowerCase() == "regioncode"){
+							jcl.postJSON('/tms/userPattern/region', '', function(data){
+								var regionList = data.regionList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<regionList.length;i++){
+									htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+						}else if(store.toLowerCase() == "citycode"){
+/*							jcl.postJSON('/tms/userPattern/city', '', function(data){
+								var cityList = data.cityList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<cityList.length;i++){
+									htmlStr +="<option value='"+cityList[i]["CITYCODE"]+"'>"+cityList[i]["CITYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+*/							jcl.postJSON('/tms/userPattern/city', 'cityCode='+patternvalue, function(data){
+									var cityList = data.cityList;
+									var regionCode = cityList[0]["REGIONCODE"];
+									jcl.postJSON('/tms/userPattern/region', '', function(data){
+										var regionList = data.regionList;
+										htmlStr += "<select id='regionId' name='regionId' onchange='changeRegion(this)' disabled >";
+										htmlStr +="<option value='' selected>-请选择-</option>";
+										for(var i=0;i<regionList.length;i++){
+											htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+										}
+										htmlStr +="</select>";
+										htmlStr +="<select name='patternvalue' id='patternvalue' style='width:100px;' disabled >";
+										jcl.postJSON('/report/txn/getCity', "regionCode="+regionCode, function(data){
+												var city = data.cityList;
+												htmlStr +="<option value='' selected>-请选择-</option>";
+													for(var j=0;j<city.length;j++){
+														htmlStr += '<option value="'+city[j]["CITYCODE"]+'">'+city[j]["CITYNAME"]+'</option>';
+													}
+													htmlStr +="</select>";
+													$("#pattern").html(htmlStr);
+													$('#regionId').val(regionCode);
+													$('#patternvalue').val(patternvalue);
+												});
+									});
+								});
+						}else if(txnparamcode.toLowerCase() == "channeltype"){
+							jcl.postJSON('/tms/userPattern/channel', '', function(data){
+								var channelList = data.channelList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<channelList.length;i++){
+									htmlStr +="<option value='"+channelList[i]["CHANNELID"]+"'>"+channelList[i]["CHANNELNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+								$("#patternvalue").attr('disabled',true);
+							});
+						}else{
+							    htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+							    $("#pattern").html(htmlStr);
+							    $('#patternvalue').val(patternvalue);
+						}
+						
+					}else{
+						    htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+						    $("#pattern").html(htmlStr);
+						    $('#patternvalue').val(patternvalue);
+					}
+				}else if(generalfuncid == "dp20002"){//时间区间化
+					var sourceid = "sourceId=tms.common.hours";
+					jcl.postJSON('/tms/userPattern/listCode', sourceid, function(data){
+						var codeList = data.codeList;
+						htmlStr += "<select id='patternvalue' name='patternvalue' >";
+						for(var i=0;i<codeList.length;i++){
+							htmlStr +="<option value='"+codeList[i]["CODE_KEY"]+"'>"+codeList[i]["CODE_VALUE"]+"</option>";
+						}
+						htmlStr +="</select>";
+					 	htmlStr += "<select id='patternvalue1' name='patternvalue1' >";
+						for(var i=0;i<codeList.length;i++){
+							htmlStr +="<option value='"+codeList[i]["CODE_KEY"]+"'>"+codeList[i]["CODE_VALUE"]+"</option>";
+						}
+						htmlStr +="</select>";
+						$("#pattern").html(htmlStr);
+						var value = patternvalue.split(",");
+						for(var i=0; i<value.length; i++){
+							if(value[0] != null && value[0] !=""){
+								$('#patternvalue').val(value[0]);
+							}
+							if(value[1] != null && value[1] !=""){
+								$('#patternvalue1').val(value[1]);
+							}
+						}
+						$("#patternvalue").attr('disabled',true);
+						$("#patternvalue1").attr('disabled',true);
+					})
+				}else if(generalfuncid == "dp20003"){//数值区间化
+						htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />-";
+						htmlStr +="<input type='text' id='patternvalue1' name='patternvalue1' />";
+						htmlStr +="<input type='hidden' class='itext' id='generalfuncid' name='generalfuncid' value='dp20003' />";
+					$("#pattern").html(htmlStr);
+					var value = patternvalue.split(",");
+						for(var i=0; i<value.length; i++){
+							if(value[0] != null && value[0] !=""){
+								$('#patternvalue').val(value[0]);
+							}
+							if(value[1] != null && value[1] !=""){
+								$('#patternvalue1').val(value[1]);
+							}
+						}
+				}else{
+					htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+					$("#pattern").html(htmlStr);
+					$('#patternvalue').val(patternvalue);
+				}
+				$('#dataForm input').each(function(i){
+					$(this).attr('disabled',true);
+				});
+				$("#patternvalue").attr('disabled',true);
+				$("#patternvalue1").attr('disabled',true);
+				document.getElementById("cancelBtn").disabled=false;
+				})
+			});	
+	
+	
+	$('#cancelBtn').click(function(){
+		window.close();
+	});
+	
+});
+
+
+
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.edit.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.sure")' class="btn" id="backBtn"/>
+	</div>
+</div>
+
+<div id="openDiv"></div>
+
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.userpattern.center.userpattern.pattern")：</label>
+		<div id="pattern"></div>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.userpattern.center.userpattern.isuserd")：</label> 
+		<span class="list-box-item-content"><input type="checkbox" name="isvalid" id="isvalid"  value="0" /></span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label" id="box1" >#springMessage("view.tms.userpattern.center.userpattern.startdate")：</label> 
+		<span class="list-box-item-content"><input id="startdate" name="startdate" type="text" class="itext" onfocus="jcl.datepicker(this)" readonly="readonly" value="" /></span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label" id="box2" >#springMessage("view.tms.userpattern.center.userpattern.enddate")：</label> 
+		<span class="list-box-item-content"><input id="enddate" name="enddate" type="text" class="itext" onfocus="jcl.datepicker(this)" readonly="readonly" value="" /></span>
+	</li>
+</ul>
+			<input type="hidden" name="datatype" id="datatype"  />
+			<input type="hidden" name="sourceid" id="sourceid"  />
+<div class="button-box">
+	
+	<input type='button' value='#springMessage("view.tms.pub.btn.close")' class='btn' id='cancelBtn'/>
+	<input type="hidden" name="userId" id="userId"  />
+    <input type="hidden" name="txnPatternName" id="txnPatternName"  />
+</div>
+</form>
+
+</body>
+</html>

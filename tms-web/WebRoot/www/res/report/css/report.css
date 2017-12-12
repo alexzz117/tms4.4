@@ -1,0 +1,126 @@
+@charset "utf-8";
+body { margin: 0px; padding: 0px; font-size: 62.5%; }
+body,p,span,div,li,td,input,textarea,select{font-family:Verdana,Arial,sans-serif;}
+
+.mask { z-index: 10; position: absolute; top:0px; left:0px; -moz-opacity: 0; opacity: 0; filter: alpha(opacity=0); width: 100%; height: 100%; zoom: 1; background-color:#FFF; display:none; }
+.loading { z-index: 20; width:200px; position: absolute; text-align: center; height: 40px; line-height: 40px; border: 1px solid #99BBE8; background: #FFF url(../images/icon/icon_onload.gif) no-repeat 50px center; }
+.loading span { margin-left: 5px; line-height: 40px; font-size:12px; }
+
+/* -- page table --*/
+.box { width: 600px; margin-right: auto; margin-left: auto; font-size:12px; }
+.box-b-border { border-bottom:1px solid #B2B2B2; }
+.box-t-border { border-top:1px solid #B2B2B2; }
+.box-content-wrap-b { background:#FFFFFF url(../images/page/qform_bg_b.png) repeat-x bottom; margin-right: auto; margin-left: auto; border-right: 1px solid #B2B2B2; border-left: 1px solid #B2B2B2; }
+.box-content-wrap-t { background: url(../images/page/qform_bg_t.png) repeat-x top; padding: 15px; }
+.box-title-wrap-m { background: url(../images/page/box_title_bg.png) repeat-x center -33px; height: 33px; width: 100%; }
+.box-title-wrap-l { background: url(../images/page/box_title_bg.png) no-repeat left top; height: 33px; }
+.box-title-wrap-r { background: url(../images/page/box_title_bg.png) no-repeat right -66px; height: 33px; }
+.box-title { height: 33px; margin-top: 0px; padding-left: 15px; font: bold 12px/33px Verdana, Geneva, sans-serif; color: #333; }
+.box-toolbar-wrap { background: url(../images/page/box_toolbar_bg.png) repeat-x; height: 33px; border-right: 1px solid #B2B2B2; border-left: 1px solid #B2B2B2; }
+.box-toolbar { list-style: none; margin: 0px; padding: 0px 0px 0px 5px; }
+.box-toolbar-item { display: block; float: left; height: 27px; margin-top: 3px; cursor: pointer; padding-right: 2px; padding-left: 2px; color: #069; }
+.box-toolbar-item-text { float: left; font-size: 12px; line-height: 27px; display: block; padding-right: 5px; padding-left: 5px; white-space: nowrap; }
+.box-toolbar-item-icon { float: left; margin: 5px 2px; }
+.box-toolbar-item-hover { background: #FAFCFD; }
+.box-toolbar-item-toggled { background: #CFE0EA; }
+.box-toolbar-item-disabled { color: #999 !important; cursor: auto; }
+.box-qform-wrap-b { background:#FFFFFF url(../images/page/qform_bg_b.png) repeat-x bottom; margin-right: auto; margin-left: auto; border-right: 1px solid #B2B2B2; border-left: 1px solid #B2B2B2; }
+.box-qform-wrap-t { background: url(../images/page/qform_bg_t.png) repeat-x top; padding: 15px; }
+.box-qform form { margin: 0px; }
+.box-qform td { font: 12px Verdana, Geneva, sans-serif; }
+
+.box-btn-close { background: url(../images/page/box_close_btn_bg.gif) no-repeat center 0px; height: 16px; width: 16px; display: block; margin-top: 8px; margin-right: 10px; float: right; overflow: hidden; line-height: 0px; 
+}
+.box-btn-close:hover{ background-position: center -16px; }
+
+/* -- messagebox --*/
+.box-icon{ background: url(../images/icon/icon-messagebox.gif) no-repeat; width: 32px; height: 32px; }
+.icon-msg-none{ width:0px; background-position: -128px 0px;}
+.icon-msg-question{background-position: 0px 0px;}
+.icon-msg-info{background-position: -32px 0px;}
+.icon-msg-warn{background-position: -64px 0px;}
+.icon-msg-error{background-position: -96px 0px;}
+.box-msg {padding-left: 10px; word-wrap:break-word;}
+.box-btn{clear:both; text-align: center; }
+
+/* -- datepicker --*/
+.calendar{ width: 180px; font: 12px Verdana, Geneva, sans-serif; border: 1px solid #999; position: absolute; background: #FFF; z-index:1000;}
+.calendar-ym{ width: 80px; text-align: center; }
+.calendar-ym-box { height: 26px; width: 170px; margin-right: auto; margin-left: auto; text-align: center; }
+.calendar-y-prev, .calendar-y-next, .calendar-m-prev, .calendar-m-next{ width: 22px; height: 26px; line-height: 26px; font-family: Verdana, Geneva, sans-serif; font-weight: bold; text-align: center; cursor: pointer; display: block; text-decoration: none; color: #333; }
+.calendar-week-title { background: #B9F1FF; }
+.calendar-day{ height: 22px; width: 24px; text-align: center; cursor: pointer; font: 10px/22px Verdana, Geneva, sans-serif; }
+.calendar-week{ height: 22px; width: 24px; text-align: center; font: 12px/22px Verdana, Geneva, sans-serif; }
+.calendar-day-picked { background: #3ED9FF; }
+.calendar-day-hover { background: #C8F4FF; }
+.calendar-othermon { color: #999; }
+.calendar-week-box { width: 170px; margin-right: auto; margin-left: auto; }
+.calendar-week-table{ border-collapse:collapse; empty-cells:show; border: 1px solid #CCC; }
+.calendar-btn-box { text-align: right; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; }
+.calendar-btn { border: 1px solid #CCC; font-size: 12px; height: 20px; line-height: 20px; }
+
+/* -- grid --*/
+.grid { overflow-x: auto; border-right: 1px solid #B2B2B2; border-left: 1px solid #B2B2B2; }
+.grid-column { background: url(../images/page/column_bg.png) repeat-x center -2px; height: 24px; border-top: 1px solid #C5C5C5; padding-top: 1px; }
+.grid-column td { font-size: 12px; }
+.column-cell { line-height: 23px; height: 23px; text-align: left; font-size: 12px; text-indent: 6px; color: #333; border-right: 1px solid #D0D0D0; border-left: 1px solid #EEEEEE; border-bottom: 1px solid #D0D0D0; overflow: hidden; font-weight: bold; }
+.column-scroller { border-right: 0px; }
+.row { line-height: 24px; height: 24px; border-top: 1px solid #FFFFFF; border-bottom: 1px solid #EDEDED; border-right: 1px solid #EDEDED; border-left: 1px solid #EDEDED; }
+.row-cell { font-size: 12px; text-indent: 6px; line-height: 24px; height: 24px; overflow: hidden; white-space:nowrap;}
+.row-bg-gray { background: #FAFAFA; }
+.row-bg-selected { background: #CFDAE0 !important; border-top: 1px solid #BCCED7 !important; border-bottom: 1px solid #BCCED7 !important; }
+.row-bg-hover { background: #EFEFEF !important; border-color: #DDDDDD; }
+
+/* -- form element --*/
+.btn { background: url(../images/page/btn_bg.png) repeat-x; height: 24px; border: 1px solid #999; font-size: 12px; line-height: 23px; }
+.itext {width:134px; background: url(../images/page/itext_bg.png) repeat-x; height:18px; line-height:18px; border: 1px solid #999999; padding: 2px 3px 0px; font: 12px Verdana, Arial, sans-serif; }
+.ttext { background: url(../images/page/itext_bg.png) repeat-x top; border: 1px solid #999999; height: 80px; width: 300px; padding: 2px 0px 0px 3px;font: 12px/18px Verdana, Arial, sans-serif; }
+.button-box{text-align: center; padding-top:5px; padding-bottom:5px; clear:both;}
+.long {width:240px;}
+.short {width:60px;}
+select.sselect{width:142px; height:22px; padding: 1px; background:#FFF; border: 1px solid #999999;font: 12px Verdana, Arial, sans-serif;}
+option{background: #FFF; font: 12px Verdana, Arial, sans-serif; }
+select.mselect {background:#FFF; line-height: 20px; border: 1px solid #999999; margin: 0px; font: 12px Verdana, Arial, sans-serif;}
+.invalid{background: url(../images/page/invalid_line.gif) repeat-x center bottom; height:18px; border: 1px solid #CC3300;}
+.error{color:#FF0000; }
+
+/* -- listbox --*/
+.list-box { list-style: none; margin: 0px; padding: 0px; }
+.list-box-item { clear: both; margin-left: 5px; padding: 5px; line-height: 22px; display: block; min-height: 22px;}
+.list-box-item-label { display: block; float: left; line-height: 22px; text-align: right; padding-right: 5px; width:100px;}
+.list-box-item .required{ display: block; float: left; line-height: 22px; width: 12px; color:red; }
+.list-box-item-tip {display: block; float: left; line-height: 22px; padding: 0px 5px 0px; color:#999999;}
+.list-box-item-content { float: left; padding-left: 5px; }
+
+/* -- pagebar --*/
+.pagebar { overflow: hidden; background: url(../images/page/pagebar_bg.png) repeat-x top; height: 28px; border-top: 1px solid #99BBE8; border-right: 1px solid #B2B2B2; border-left: 1px solid #B2B2B2; border-bottom: 1px solid #B2B2B2; }
+.pagebar span, .pagebar div { font-size:12px; }
+.pagebar-pbtn-box { height: 17px; margin-top: 6px; width: 350px; margin-bottom: 5px; float: left; overflow:hidden; }
+.pagebar-pbtn-box span { margin-left: 5px; float: left; }
+.pagebar-info-box { height: 17px; margin-top: 6px; margin-bottom: 5px; width: 220px; text-align: right; float: right; margin-right: 6px; overflow:hidden; line-height: 16px; }
+.pgb-pbtn { background: url(../images/page/pagebar_btn.gif) no-repeat; height: 16px; width: 16px; display: block; float: left; }
+.pgb-text { display: block; float: left; height: 16px; line-height: 16px; }
+.pgb-itext { background: url(../images/page/itext_bg.png) repeat-x; border: 1px solid #999999; height: 14px; width: 35px; font: 12px/14px Arial, sans-serif !important; text-align: right; padding:0px 3px 0px !important; }
+.pbtn-first { background-position: 0px 0px; cursor:pointer; }
+.pbtn-prev { background-position: -16px 0px; cursor:pointer; }
+.pbtn-next { background-position: -32px 0px; cursor:pointer; }
+.pbtn-last { background-position: -48px 0px; cursor:pointer; }
+.pbtn-first-disabled { background-position: 0px -16px; }
+.pbtn-prev-disabled { background-position: -16px -16px; }
+.pbtn-next-disabled { background-position: -32px -16px; }
+.pbtn-last-disabled { background-position: -48px -16px; }
+
+/* -- icon --*/
+.icon { display: block; height: 16px; width: 16px; }
+.icon-tb { background: url(../images/icon/icon_table.gif) no-repeat left 0px !important; }
+.icon-tb-add { background: url(../images/icon/icon_table.gif) no-repeat left -16px !important; }
+.icon-tb-edit { background: url(../images/icon/icon_table.gif) no-repeat left -48px !important; }
+.icon-tb-del { background: url(../images/icon/icon_table.gif) no-repeat left -32px !important; }
+.icon-tb-find { background: url(../images/icon/icon_table.gif) no-repeat left -64px !important; }
+.icon-tb-gear { background: url(../images/icon/icon_table.gif) no-repeat left -80px !important; }
+.icon-tb-aw-u { background: url(../images/icon/icon_table.gif) no-repeat left -96px !important; }
+.icon-tb-aw-r { background: url(../images/icon/icon_table.gif) no-repeat left -112px !important; }
+.icon-tb-aw-l { background: url(../images/icon/icon_table.gif) no-repeat left -128px !important; }
+.icon-tb-lightning { background: url(../images/icon/icon_table.gif) no-repeat left -144px !important; }
+.icon-tb-warn { background: url(../images/icon/icon_table.gif) no-repeat left -160px !important; }
+/* -- end --*/

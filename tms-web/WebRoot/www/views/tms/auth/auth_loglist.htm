@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.auth.authLog.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var authId = jQuery.url.param("authId");
+	var modelName = jQuery.url.param("modelName");
+	
+	var flag = jQuery.url.param("flag");
+	
+	//组装表格
+	var g = $("#boxdiv").grid({
+		title:'#springMessage("view.tms.auth.authLog.title")',
+		checkboxEnable:false,
+		columns:[
+			{name:'#springMessage("view.cmc.log.list.col.operator")', width: 30, dataIndex:'REAL_NAME'},
+			{name:'#springMessage("view.cmc.operator.list.col.loginName")', width: 30, dataIndex:'LOGIN_NAME'},
+			{name:'#springMessage("view.cmc.log.list.col.operateTime")', width: 45, dataIndex:'OPERATE_TIME',render:'datetime'},
+			{name:'#springMessage("view.tms.auth.authList.operateName")', width: 30, dataIndex:'FUNC_NAME'},
+			{name:'#springMessage("view.cmc.log.list.col.operateResult")', width: 20, dataIndex:'OPERATE_RESULT',render:'common.operateresult'},
+			{name:'#springMessage("view.cmc.log.list.col.operateData")', width: 120, dataIndex:'OPERATE_DATA'}
+		],
+		ds:{
+			url:"/tms/auth/toLog",
+			params:{authId:authId}
+		},
+		toolbar:[
+			{id:"btn-back", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.pub.btn.banck")'}
+		],
+		pagebar: true,
+		qform: {}
+
+	});
+	g.goPage();
+	
+	$("#btn-back").click(function(){
+		if(flag=='query'){
+			jcl.go('/tms/auth/dataquary?modelName='+ modelName);
+		} else {
+			jcl.go('/tms/auth/authDataList?modelName='+ modelName);
+		}
+	});
+});
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+</body>
+</html>

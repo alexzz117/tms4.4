@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.auth.modelList.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript">
+var g = "";
+$(document).ready(function(){
+	 //组装表格
+	 g = $("#boxdiv").grid({
+		title:'#springMessage("view.tms.auth.modelViewList.title")',
+		checkboxEnable:false,
+		columns:[
+			{name:'#springMessage("view.tms.auth.modelViewList.modelName")', width: 60, dataIndex:'MODELNAME'},
+			{name:'#springMessage("view.tms.auth.modelViewList.count")', width: 80, dataIndex:'COUNT'}
+		],
+		ds:{
+			url:"/tms/auth/authQuery",
+			callback:function(list){
+				for(var i = 0; i < list.length; i++){
+					list[i]['MODELNAME']= '<a href="#'+(new Date().getTime())+'" onclick="authDataList(\''+list[i]['MODELNAME']+'\')">'+list[i]['MODELNAME']+'</a>';
+				}
+			}
+		},
+		pagebar: false
+	});
+	g.goPage();
+});
+
+//跳转到授权信息列表
+function authDataList(modelName){
+	jcl.go('/tms/auth/dataquary?modelName='+ modelName);
+}
+</script>
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+</body>
+</html>

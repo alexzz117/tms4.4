@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>运行参数管理</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript">
+
+var contextPath ='';
+$(document).ready(function(){
+	var tabBox = new jcl.ui.Box({
+		title:'运行参数管理',
+		id:'confinfo'
+	});
+	tabBox.addDom('conftab');
+	
+	var count = 0;
+	jcl.postJSON('/tms/mgr/runParams/paramModels', '', function(data){
+		var parammodelId='';
+		var parammodelName='';
+		var modellist = data.row;
+		contextPath = data.contextPath;
+		var tHtml='';
+		for(var i=0;i<modellist.length;i++){
+			if(i==0){
+				tHtml+='<td width="10%" valign="top" class="select" id="'+modellist[i]["CODE_KEY"]+'" ';
+				tHtml+='align="center" onclick="changeIfram(this,\''+modellist[i]["CODE_KEY"]+'\',\''+modellist[i]["CODE_VALUE"]+'\')" >';
+				tHtml+= modellist[i]["CODE_VALUE"]+'</td>';
+				tHtml+='<td width="1%"></td>'
+				parammodelId=modellist[i]["CODE_KEY"];
+				parammodelName=modellist[i]["CODE_VALUE"];
+			}else{
+				tHtml+='<td width="10%" valign="top" class="noselect"  id="'+modellist[i]["CODE_KEY"]+'"';
+				tHtml+=' align="center" onclick="changeIfram(this,\''+modellist[i]["CODE_KEY"]+'\',\''+modellist[i]["CODE_VALUE"]+'\')" >';
+				tHtml+= modellist[i]["CODE_VALUE"]+'</td>';
+				tHtml+='<td width="1%"></td>'
+			}
+			count=count+2;
+		}
+		tHtml=tHtml.substring(0,tHtml.length-20);
+		tHtml+='<td ></td>'
+		$('#models').html(tHtml);
+		$('#iframtd').attr("colspan",count);
+		$('#ifrms').attr("src",contextPath+"/tms/mgr/runParams/paramList?modelId="+parammodelId+'&modelName='+parammodelName);
+	});
+	
+	
+});
+
+function changeIfram(obj,modelId,modelName){
+	//obj.style.font-weight='bold'; 
+	$(".select").attr("class","noselect");
+	$('#'+modelId).attr("class","select");
+	$('#ifrms').attr("src",contextPath+"/tms/mgr/runParams/paramList?modelId="+modelId+'&modelName='+modelName);
+}
+</script>
+<style type="text/css">
+.select {
+	font-family: "宋体";
+	font-size: 12px;
+	line-height: 15px;
+	color: #000000;
+	font-weight: bold;
+	cursor: pointer;
+}
+.noselect {
+	cursor: pointer;
+	color: #000000;
+}
+
+</style>
+</head>
+<body>
+<table id="conftab" width="100%" >
+<tr>
+	<td>
+	<table width="100%"    border="1" style="border-collapse: collapse;"   align="center">
+		<tr id="models"></tr>	
+	</table>
+	<table width="100%"   id="confifram" border="0"   align="center">
+		<tr >
+			<td width="100%" valign="top"  align="center" id="iframtd" >
+				<iframe  width="100%" height="300" scrolling="auto" frameborder="0" id="ifrms" ></iframe>
+			</td>
+		</tr>	
+	</table>
+	</td>
+</tr>
+</table>
+
+</body>
+</html>

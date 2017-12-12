@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.rule.actionparam.edit.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl_tms_json.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript">
+var txnId = jQuery.url.param("txnid");
+$(document).ready(function(){
+	var funInvoke = new jcl_tms.util.FuncInvoke({ 
+					id:'',
+					txnid:txnId
+				});
+				
+	var actionmapid = jQuery.url.param("actionmapid");
+	var ruleId = jQuery.url.param("ruleid");
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.rule.actionparam.edit.title")',
+		id:'editNameListFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.tms.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	// 选择条件下拉列表
+	jcl.postJSON('/tms/rule/action/getActionList', "", function(data){
+		$.each(data.row, function(i,row){
+			$("select[name=funcid]").append("<option value='" + row['FUNCID'] + "'>" + row['FUNCNAME'] + "</option>");  
+		}); 
+		// 初始化页面数据
+		jcl.postJSON('/tms/rule/action/get', 'actionmapid='+actionmapid, function(data){
+				$('#ruleid').val(data.row.RULEID);
+				$('#actionmapid').val(actionmapid);
+				$("#funcid").attr("value",data.row.FUNCID);
+				$("#actionname").attr("value",data.row.ACTIONNAME);
+				$('#metadata').val(data.row.METADATA);
+				funInvoke.setJson(data.row.METADATA);
+				funInvoke.show('param_0', "edit");
+		});
+	});
+	
+	// 下拉列表选择事件
+	$('#funcid').change(function(){
+		var funcid=$('select[name=funcid]').val();
+		if(funcid.length > 0){
+			var htmlstr = '<li class="list-box-item">';
+				htmlstr+= '<label class="list-box-item-label">参数：</label> ';
+				htmlstr+= '<span class="list-box-item-content">';
+				htmlstr+= '<div id="param_0" style="display: inline"></div>';
+				htmlstr+= '</span>';
+				htmlstr+= '</li>';
+				
+			$('#paramDiv').html(htmlstr);
+
+			funInvoke = new jcl_tms.util.FuncInvoke({ 
+					id:'',
+					txnid:txnId
+				});
+			jcl.postJSON('/tms/rule/action/getfuncParamList', "funcid="+funcid, function(data){
+				funInvoke.setJson(data.row);
+				funInvoke.show('param_0', "add");	
+				$('#param_0').show();
+			});
+		}else{
+			$('#param_0').hide();
+			$('#paramDiv').html('');
+		}
+		
+	});
+	
+	
+	// 修改
+	$("#updateBtn").click(function(){
+		var funcidObject = $('#funcid');
+		var funcid = funcidObject.val();
+		var actionnameObject = $('#actionname');
+		var actionname = actionnameObject.val();
+		
+		if(Trim(actionname)==""){
+			alert('#springMessage("view.tms.rule.actionparam.check.funcnamevalue")');
+			actionnameObject.focus();
+			return;
+		}else{
+			if(!checkeLength(actionname,32)){
+				alert('#springMessage("view.tms.rule.actionparam.funcname")'+'不能超过32个字符');
+				actionnameObject.focus();
+				return;
+			}
+			if(!checkeSpecialCode(actionname)){
+				alert('#springMessage("view.tms.rule.actionparam.funcname")'+'不能包含特殊字符');
+				actionnameObject.focus();
+				return;
+			}
+		}
+		
+		if(funcid==""){
+			alert('#springMessage("view.tms.rule.actionparam.check.funcidvalue")');
+			funcidObject.focus();
+			return;
+		}
+		
+		
+		// 校验参数和参数组
+		var checkResult = funInvoke.save("param_0");
+
+		if( checkResult != null && checkResult.length > 0){
+			alert(checkResult);
+			return;
+		}
+		
+		$('#metadata').val(funInvoke.getJson());
+		
+		var params = $('#dataForm').serialize();
+		jcl.postJSON('/tms/rule/action/mod', params, function(data){
+			dialog.show();
+		});
+		
+	})
+	
+	// 取消
+	$('#cancelBtn').click(function(){
+		jcl.go('/tms/rule/edit?ruleId=' + ruleId + '&tabindex=2');
+	});
+	
+	// 返回
+	$('#backBtn').click(function(){
+		jcl.go('/tms/rule/edit?ruleId=' + ruleId + '&tabindex=2');
+	});
+	
+});
+
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.edit.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.sure")' class="btn" id="backBtn"/>
+	</div>
+</div>
+
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.rule.actionparam.funcname")：</label> 
+		<span class="list-box-item-content"> <input type="text" id="actionname" name="actionname"  maxlength="32"/><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.rule.actionparam.check.funcid")：</label> 
+		<span class="list-box-item-content"> <select name="funcid" id = "funcid">
+                     <option value="">--请选择--</option>
+               </select><font color="red">*</font>
+		</span>
+	</li>
+	<div id='paramDiv'>
+		<li class="list-box-item">
+			<label class="list-box-item-label">参数：</label>
+			<span class="list-box-item-content">
+			<div id="param_0" style="display: inline"></div>
+			</span>
+		</li>
+	</div>
+</ul>
+<div class="button-box">
+	<input type="button" value="#springMessage("view.tms.pub.btn.mod")" class="btn" id="updateBtn"/>
+	<input type="button" value="#springMessage("view.tms.pub.btn.cancel")" class="btn" id="cancelBtn"/>
+</div>
+<input type="hidden" name="ruleid" id="ruleid"/>
+<input type="hidden" name="actionmapid" id="actionmapid"/>
+<input type="hidden" name="metadata" id="metadata"/>
+</form>
+
+</body>
+</html>

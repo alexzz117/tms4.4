@@ -1,0 +1,1151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>交易模型</title>
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<link type="text/css" rel="stylesheet" href="$rc.contextPath/s/common/css/page.css" />
+<script type="text/javascript">
+	var dualAudit = '${readonly}' == 'true';
+	var uris = [
+		'/tms35/trandef/init',
+	    '/tms35/trandef/query',
+	    '/tms35/trandef/edit_prepare',
+	    '/tms35/trandef/delete',
+	    '/tms35/trandef/save',
+	    '/tms35/tranmdl/query',
+	    '/tms35/tranmdl/saveModel',
+	    '/tms35/tranmdl/saveModelRefTab',
+	    '/tms35/tranmdl/saveModelRefFd',
+	    '/tms35/tranmdl/queryAvailableStoreFd',
+	    '/tms35/tranmdl/queryAllStoreFd',
+	    '/tms35/switch/save',
+	    '/tms35/switch/list',
+	    '/tms35/process/save',
+	    '/tms35/process/list',
+	    '/tms35/rule/save',
+	    '/tms35/rule/getRuleId',
+	    '/tms35/rule/list',
+	    '/tms35/strategy/save',
+	    "/tms35/strategy/list",
+	    "/tms35/strategy/rulelist",
+	    "/tms35/strategy/refList",
+	    "/tms35/strategy/saveStrategyRule",
+	    '/tms35/action/save',
+	    "/tms35/action/list",
+	    '/tms/stat/save',
+	    "/tms/stat/list",
+	    "/tms/stat/checkCond",
+	    "/tms/stat/refTree",
+	    '/tms/mgr/list',
+	    '/tms/mgr/add',
+	    '/tms/mgr/mod',
+	    '/tms/mgr/get',
+	    '/tms/mgr/del',
+	    '/tms/mgr/valuelist',
+	    '/tms/mgr/valueadd',
+	    '/tms/mgr/valuemod',
+	    '/tms/mgr/valueget',
+	    '/tms/mgr/valuedel',
+	    '/tms/mgr/changevalueget',
+	    '/tms/mgr/changevalue',
+	    '/tms/mgr/export',
+	    'xxxxxxxxxxxxxx'
+	];
+</script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/jquery.cookie.js"></script>
+<!-- <script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script> -->
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript">
+	jcl.postJSON = function(uri, params, callback, loading){
+		var url = '';
+	    if (!dualAudit && $.inArray(uri, uris) > -1) {
+	    	url = [(jcl.env.contextPath + '/dualaudit'), uri].join('');
+	    } else {
+	    	url = [jcl.env.contextPath, uri].join('');
+	    }
+		url += ((url.indexOf('?') != -1) ? '&' : '?' ) + 'format=json&t=' + new Date().getTime();
+		var _loading = true;
+		if(loading != undefined){_loading = loading;}
+		jcl.ajax({
+			loading: _loading,
+			url : url,
+			data: params,
+			dataType: 'json',
+			callback: function(data){
+				if(typeof(data) == 'object'){
+					//TODO 处理业务异常
+					//if(common_callback(data)){;}
+					callback(data);
+				}else{
+					//TODO 处理其他服务异常
+				}
+			}
+		});
+	};
+</script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/model.ui.HandlerFunction.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/txn_model.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/tran_def.js"></script>
+<!--script type="text/javascript" src="$rc.contextPath/s/tms35/js/switch.js"></script-->
+<!--script type="text/javascript" src="$rc.contextPath/s/tms35/js/process.js"></script-->
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat_pub.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/cond.js"></script>
+<!--script type="text/javascript" src="$rc.contextPath/s/tms35/js/draw_rule.js"></script-->
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/action.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/ruleMain.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/rule.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/rule_c.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/strategyMain.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/strategyInfo.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/strategyRule.js"></script>
+<style type="text/css">
+.enablecolor{ zoom: 1; filter: alpha(opacity=30); opacity: 0.5; }
+/*.enablecolor{ background-color: #EEE685;opacity:0.3;filter: alpha(opacity=30);}*/
+.funcparam-dialog{max-height:300px; height:expression(this.scrollHeight>300 ? "300px" : "auto" ); overflow:auto}
+.cond-textarea{width:470px;}
+.textarea-diy{width:760px;}
+.form-item-content .text-diy{width:760px;}
+#main-box{width:100%; height:100%;}
+#left-box{width:260px; border-right: 1px solid #B2B2B2; float:left; height:100%;}
+#hide-box{width:5px; float:left; border-right: 1px solid #B2B2B2; height:100%; background:#D4E2F1;}
+.x-layout-mini-left{background:url("$rc.contextPath/s/tms35/images/mini-left.gif");}
+.x-layout-mini-right{background:url("$rc.contextPath/s/tms35/images/mini-right.gif");}
+.x-layout-mini{cursor: pointer; display: block; top: 48%; opacity: 0.5; position: absolute; width: 5px; height:35px;}
+.x-layout-mini-over{opacity:1;-moz-opacity:1;filter:none}
+#right-box{float:left; overflow:auto;}
+#tree-box{overflow:auto; padding-left:10px; width:250px;}
+.model_itext { width: 100px; }
+.txn-attr-group{background:#EEF7FF; height:24px; line-height:24px; border-top:1px solid #98CBF5; border-bottom:1px solid #98CBF5; }
+.ref-model{background:#FFF2BF; border-top:1px solid #FFCC00; border-bottom:1px solid #FFCC00; padding-left:5px;}
+.group-ec{width:22px; height:24px; display:block; cursor:pointer; float:left; -moz-user-select:none; -webkit-user-select:none;}
+.group-collapse{background: url($rc.contextPath/s/common/images/page/arr_right.gif) no-repeat center center;}
+.group-expand{background: url($rc.contextPath/s/common/images/page/arr_down.gif) no-repeat center center;}
+.ttext-rule {background: url(../images/page/itext_bg.png) repeat-x top;	border: 1px solid #999999; 	height: 60px; width: 138px; padding: 2px 0px 0px 3px; font: 12px/18px Verdana, Arial, sans-serif;}
+</style>
+<script type="text/javascript" language="javascript">
+//var cond_dialog = {};
+var ref,tree ;
+$(document).ready(function(){
+	ref = new ref_tree();
+    var page = {};
+    //box
+    var _title = jcl.message.get('ui.tms35.discern.'+(dualAudit?'view':'')+'tree', '交易模型' + (dualAudit ? '查看' : ''));
+    document.title = _title;
+    var frame = page.frame = new jcl.ui.Frame({
+        title: _title
+    });
+    frame.addDom('#main-box');
+
+    //工具条
+    var toolbar = page.toolbar = new jcl.ui.Toolbar({
+        border: [0,0,1,0],
+        btns:[
+			//{id:"tree-newtransation", icon:"icon-tb-add", text:"新建", disabled:true},
+            //{id:"tree-edittransation", icon:"icon-tb-edit", text:"编辑", disabled:true},
+            //{id:"tree-deltransation", icon:"icon-tb-del", text:"删除",  disabled:true}
+            {id:"tree-newtransation", icon:"icon-tb-add", text:"新建"},
+            {id:"tree-deltransation", icon:"icon-tb-del", text:"删除",  disabled:true}
+        ]
+    }, $('#left-toolbar'));
+
+    //树
+    tree = page.tree = new jcl.ui.Tree({
+    	// iconable: false,
+        sm:{
+          type: 'row'
+      }
+    }, $('#tree-box'));
+
+    // model.api = {
+    //      init: function(txnId, page){},
+    //      load: function(txnId){},
+    //      isDirty: function(){},
+    //      save: function(){}
+    // };
+
+    var tabs = [
+    	{title:'交易定义', dom:'#formbox-txn_def', handler: model.txnDef}, // DO NOT CHANGE INDEX
+    	{title:'交易模型定义', dom:'#grid-txn_mdl', handler: model.tranModel},
+    	{title:'交易统计', dom:'#statGridDiv', handler: model.stat},
+    	{title:'交易规则', dom:'#formbox-rule_main', handler: model.ruleMain},
+    	{title:'交易策略', dom:'#strategy_main', handler: model.strategyMain}
+    ];
+
+    // var acHandlers = [model.txnDef, model.txnModel, model.switcher, model.processor, model.stat, model.ac, model.rule];
+    var acTabIndex = -1;
+
+    function getAcHandler(index){
+   		var tab = tabs[index];
+   		var list = tree.select();
+   		var txnId = list[0];
+   		if(tab.handler.isInit){
+   			tab.handler.load(txnId);
+   		}else{
+   			tab.handler.isInit = true;
+   			tab.handler.init(txnId, page);
+   		}
+   		$(tab.dom).triggerHandler('resizes');
+    }
+
+    //多页签面板
+    var tabPanel = page.tabPanel = new jcl.ui.TabPanel({tabsWrap:true}, $('#right-box'));
+
+    tabPanel.onTabClick(function(index){
+    	if(acTabIndex >= 0 && tabs[acTabIndex].handler.isDirty()){
+          	 var msg = '['+tabPanel.getTitle(acTabIndex)+']数据已修改，是否放弃保存？';
+             if(!confirm(msg)){
+            	 //TODO save
+            	 return false;
+             }
+        }
+    	// 根据当前交易判断
+    	var list = tree.select();
+		if(list.length > 0){
+			var node = tree.getNode(list[0]);
+			var nodeId = node.id;
+			var nodeTxnId = node.txnid;
+			if (index == 0) { // 在交易定义标签
+				if(nodeId == 'T'){ // 当前交易为root时,不允许删除
+					toolbar.disable('#tree-deltransation');
+				}else{
+					toolbar.enable('#tree-deltransation');
+				}
+				if(nodeTxnId == null || nodeTxnId.trim() == ''){
+					toolbar.enable('#tree-newtransation');
+				}else{
+					toolbar.disable('#tree-newtransation');
+				}
+			}else{ // 切到非交易定义标签时,toolbar不允许操作
+				
+				toolbar.disable('#tree-newtransation');
+	    		toolbar.disable('#tree-deltransation');
+	    	}
+		} else {
+			 jcl.msg.info('请选择交易!');
+    		 return false;
+		}
+    	acTabIndex = index;
+    	return true;
+    });
+    
+    $.each(tabs, function(i, tab){
+    	 tabPanel.addTab(tab.title, $(tab.dom), getAcHandler);
+    });
+
+    $('#right-box').on('resizes', function(){
+    	var leftBox = $('#left-box');
+    	var _width = $('#main-box').width()-(leftBox.is(':hidden') ? 0 : leftBox.outerWidth(true))-$('#hide-box').outerWidth(true);
+		$(this).width(_width);
+    });
+
+    frame.container.bind('resizes', function(){
+        $('#tree-box').height($(this).height() - $('#left-toolbar').outerHeight());
+        tabPanel.height($(this).height());
+        $('#right-box').triggerHandler('resizes');
+        if(acTabIndex >= 0){
+        	$(tabs[acTabIndex].dom).triggerHandler('resizes');
+        }
+    }).triggerHandler('resizes');
+
+    tree.onSelectChange(function(){
+		tabPanel.activeTab(0); // 会调用 onTabClick
+		var list = tree.select();
+		if(list.length > 0){
+			var node = tree.getNode(list[0]);
+			frame.setTitle(frame.opts.title + ' ['+nodePath(node) + ']');
+		} else {
+			 jcl.msg.info('请选择交易!');
+    		 return false;
+		}
+	});
+
+    tree.onSelect(function(){
+    	if(acTabIndex >= 0 && tabs[acTabIndex].handler.isDirty()){
+          	var msg = '['+tabPanel.getTitle(acTabIndex)+']数据已修改，是否放弃保存？';
+            if(!confirm(msg)){
+           	 	return false;
+            }
+        }
+    	acTabIndex = -1;
+    	return true;
+    });
+
+    jcl.postJSON('/tms35/trandef/query', '', function(data){
+        for(var i = 0, l = data.list.length; i < l; i++){
+            if(data.list[i].id == 'T'){
+                data.list[i].icon = 'ticon-root';
+                break;
+            }
+        }
+        tree.render(data.list);
+        //if(!dualAudit){ // 双审页面时
+        	// 当交易停用时,变背景颜色,加已停用字样
+            $.each(data.list, function(i, row){
+            	//var nodeDomNode = tree.jqDom.find('li [nid='+row.id+']');
+            	//var nodeDomSpan = nodeDomNode.find('.tn-text');
+            	if('0' == (row.enable + '')){
+            		/* 
+            		$.each(nodeDomSpan, function(z, obj){
+            			var o = $(obj);
+            			if(!o.hasClass('enablecolor')){
+            				o.append('[已停用]');
+            			}
+            		}); 
+            		*/
+            		//nodeDomSpan.addClass("enablecolor");
+            		var id = tree.opts.id + '_' + row.id;
+            		tree.jqDom.find('#'+id).find('span.tn-text').addClass("enablecolor");
+            	} 
+            	/*
+            	if (row.isgroup == '0') {
+            		nodeDomNode.removeClass().addClass("tn leaf");
+            	} else {
+            		nodeDomNode.removeClass().addClass("tn node");
+            	}
+            	*/
+            });
+        //}
+        tree.select('T');
+    });
+    //cond_dialog = new jcl.ui.Dialog({"title":'条件', draggable: true, "zindex" : '701'});
+	//cond_dialog.addDom('common_cond');
+	function nodePath(node){
+        var text = node.text;
+        var count = 0;
+        while(node.id != 'T' && count < 10){
+            node = tree.getNode(node.fid);
+            text = node.text + ' > ' + text;
+            count ++;
+        }
+        return text;
+    }
+
+	//隐藏交易树按钮事件
+	$('#hide-box').on({
+		'mouseenter': function(){
+			$(this).addClass('x-layout-mini-over');
+		},
+		'mouseleave':function(){
+			$(this).removeClass('x-layout-mini-over');
+		},
+		'click': function(){
+			if($('#left-box').is(':visible')){
+				$('#left-box').hide('fast', function(){
+					reImprove(frame, tabs);
+				});
+				$(this).removeClass('x-layout-mini-left').addClass('x-layout-mini-right');
+			}else{
+				$('#left-box').show('fast', function(){
+					reImprove(frame, tabs);
+				});
+				$(this).removeClass('x-layout-mini-right').addClass('x-layout-mini-left');
+			}
+		}
+	}, '.x-layout-mini');
+});
+
+function reImprove(frame, tabs){
+	frame.container.triggerHandler('resizes');
+	for(var t=0;t<tabs.length;t++){
+		var tabDom = $(tabs[t].dom);
+		if(tabDom.is(':visible')){
+			var maxWidth = $('#right-box').width(),
+			contentWidth = -1;
+			var reDoms = tabDom.children('div.box div.grid');
+			$.each(reDoms, function(i, reDom){
+				var thisWidth = $(this).width();
+				if(thisWidth > maxWidth){
+					$(this).width(maxWidth - 10);
+					thisWidth = maxWidth;
+				}
+				if(thisWidth > contentWidth){
+					contentWidth = thisWidth;
+				}
+			});
+			tabDom.triggerHandler('resizes');
+		}else{
+			tabDom.triggerHandler('resizes');
+		}
+	}
+}
+</script>
+</head>
+<body>
+<div id="main-box">
+    <div id="left-box">
+        <div id="left-toolbar"></div>
+        <div id="tree-box" style="position: relative;"></div>
+    </div>
+    <div id="hide-box">
+		<div id="btn-icon" class="x-layout-mini x-layout-mini-left">&nbsp;</div>
+    </div>
+    <div id="right-box"></div>
+</div>
+
+
+<div style="display:none">
+	<div id="formbox-txn_def">
+		<form name="data-form" id="data-form" method="post">
+
+			<input name="parent_tab" type="hidden" id="parent_tab" />
+			<input name="tab_name" type="hidden" id="tab_name" />
+			<input name="MODELUSED_O" type="hidden" id="MODELUSED_O" />
+			<input name="TRAINDATE" type="hidden" id="TRAINDATE" />
+			<input name="op" type="hidden" id="op" />
+
+			<ul class="list-box">
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="txnfname">
+						<font color="red">*</font>名称：</label>
+					<span class="list-box-item-content">
+						<input name="tab_desc" type="text" class="itext" id="tab_desc" />
+					</span>
+				</li>
+
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="ORDERBY">
+						<font color="red">*</font>#springMessage("view.tms.traffic.grouporder")：</label>
+					<span class="list-box-item-content">
+						<input name="show_order" type="text" class="itext short" id="show_order" />
+					</span>
+				</li>
+
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="ORDERBY">
+						<font color="red">*</font>交易类型：
+					</label>
+					<span class="list-box-item-content">
+						<input name="txn_type" type="radio" value="0" checked="checked"/>交易组
+						<input name="txn_type" type="radio" value="1"/>交易
+					</span>
+				</li>
+
+				<li class="list-box-item" id="txnid_li" style="display: none">
+					<label class="list-box-item-label" for="txnfname"><font color="red">*</font>#springMessage("view.tms35.discern.txnid")：</label>
+					<span class="list-box-item-content">
+						<input name="txnid" type="text" class="itext" id="txnid" />
+					</span>
+				</li>
+
+				<li class="list-box-item" id="disposal_li">
+					<label class="list-box-item-label">
+						<font color="red">*</font>处置策略：</label>
+					</label>
+					<span class="list-box-item-content">
+						<span id='disposal_span'></span>
+					</span>
+				</li>
+				
+				<li class="list-box-item" id="chann_li">
+					<label class="list-box-item-label" for="txnversion">
+						<font color="red" id="chann_color">*</font>
+						#springMessage("view.report.pub.form.channelName")：</label>
+					<span class="list-box-item-content">
+						<select name="chann" id="chann" style="width: 100px" >
+						</select><span id='chann_span'></span>
+					</span>
+				</li>
+
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="txnffname">#springMessage("view.tms35.traffic.groupparent")：</label>
+					<span class="list-box-item-content">
+						<input name="ffname" type="text" class="itext" id="txnffname" disabled="disabled" />
+					</span>
+				</li>
+
+				<li class="list-box-item" id="item-menu">
+					<label class="list-box-item-label"><font color="red" id="chann_color">*</font>模型状态：</label>
+					<span class="list-box-item-content">
+						<select name="MODELUSED" id = 'MODELUSED'>
+		               </select>
+					</span>
+				</li>
+
+				<li class="list-box-item" id="item-menu">
+					<label class="list-box-item-label" for="txnstatus">有效性：</label>
+					<span class="list-box-item-content">
+						<input type="radio" name="is_enable" value="1" checked="checked"  /> 启用
+						<input type="radio" name="is_enable" value="0"/> 停用
+					</span>
+				</li>
+
+				<li class="list-box-item" id="item-menu">
+					<label class="list-box-item-label" for="txnstatus">&nbsp;</label>
+					<span class="list-box-item-content">
+						<input type="button" value='#springMessage("view.tms.pub.btn.save")' class="btn" id="txnmodSubmitButton" />
+					</span>
+				</li>
+			</ul>
+		</form>
+	</div>
+
+	<div id="formbox-txn_mdl"></div>
+
+	<div id="grid-txn_mdl"></div>
+
+	<div id="formbox-switch_mdl">
+		<table id="switchTable" border='1' style='border-collapse: collapse;'>
+			<tr>
+				<td colspan="9">
+					<input id="switch_btn-add"  type="button" value="#springMessage('view.tms35.stat.btn.newdialog')" class="btn"/>
+					<input id="switch_btn-edit" type="button" value="#springMessage('view.tms35.stat.btn.editdialog')" class="btn"/>
+					<input id="switch_btn-del"  type="button" value="#springMessage('view.tms35.stat.btn.del')" class="btn"/>
+					<input id="switch_btn-save"  type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn"/>
+				</td>
+			</tr>
+			<tr>
+				<td width="5%"><div class="column-cell"><input id="switch_checkbox_all" type="checkbox" /></div></td>
+				<td width="5%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_order')</div></td>
+				<td width="15%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_desc')</div></td>
+				<td width="15%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_type')</div></td>
+				<td width="20%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_cond')</div></td>
+				<td width="8%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_enable')</div></td>
+				<td width="8%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_txn')</div></td>
+				<td width="8%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_createtime')</div></td>
+				<td width="8%"><div class="column-cell">#springMessage('view.tms35.switch.list.sw_modifytime')</div></td>
+			</tr>
+	 	</table>
+	</div>
+
+	<div id="formbox-process_mdl">
+		<table id="processTable" border='1' style='border-collapse: collapse;'>
+			<tr>
+				<td colspan="9">
+					<input id="process_btn-add"  type="button" value="#springMessage('view.tms35.stat.btn.newdialog')" class="btn"/>
+					<input id="process_btn-edit" type="button" value="#springMessage('view.tms35.stat.btn.editdialog')" class="btn"/>
+					<input id="process_btn-del"  type="button" value="#springMessage('view.tms35.stat.btn.del')" class="btn"/>
+					<input id="process_btn-save"  type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn"/>
+				</td>
+			</tr>
+			<tr>
+				<td width="5%"><div class="column-cell"><input id="process_checkbox_all" type="checkbox" /></div></td>
+				<td width="8%"><div class="column-cell">#springMessage('view.tms35.process.list.ps_order')</div></td>
+				<td width="20%"><div class="column-cell">#springMessage('view.tms35.process.list.ps_name')</div></td>
+				<td width="15%"><div class="column-cell">#springMessage('view.tms35.process.list.ps_cond')</div></td>
+				<td width="15%"><div class="column-cell">#springMessage('view.tms35.process.list.ps_value')</div></td>
+				<td width="15%"><div class="column-cell">#springMessage('view.tms35.process.list.ps_enable')</div></td>
+				<td width="20%"><div class="column-cell">#springMessage('view.tms35.process.list.ps_txn')</div></td>
+			</tr>
+	 	</table>
+	</div>
+	<div id="formbox-rule_main">
+		
+		</div>
+	<div id="formbox-rule_list0" style="width:900px">
+		<!--div>
+			<input type="button" id='add_rule' value="新建" class="btn"/>
+			<input type="button" id='edit_rule' value="编辑" class="btn"/>
+			<input type="button" id='copy_rule' value="复制" class="btn"/>
+			<input type="button" id='view_rule' value="查看" class="btn"/>
+			<input type="button" id='del_rule' value="删除" class="btn"/>
+			<input type="button" id='enable_rule' value="启用" class="btn"/>
+			<input type="button" id='disable_rule' value="停用" class="btn"/>
+			<input type="button" id='ref_rule' value="引用点" class="btn"/>
+			<input type="button" id='drow_line' value="画连接线" class="btn"/>
+			<input type="button" id='del_line' value="删连接线" class="btn"/>
+			<input type="button" id='save_image' value="保存图层" class="btn"/>
+		</div-->
+
+	</div>
+	
+	<div id="strategy_main">
+	</div>
+	<div id="strategy_list">
+	</div>
+	<div id="strategy_rule_list">
+	</div>
+	<div id="formbox-rule_list1" style="width:1100px;height:300px;overflow-y:auto">
+	</div>
+	<div id="rule-ref_list" style="width:900px">
+	</div>
+
+	<!-- 5 def add begin -->
+	<div id="formbox-txn_def_add">
+		<form name="data-form" id="data-form" method="post">
+
+			<input name="parent_tab" type="hidden" id="parent_tab" />
+			<input name="tab_name" type="hidden" id="tab_name" />
+			<input name="MODELUSED" type="hidden" id="MODELUSED" value='0'/>
+			<input name="op" type="hidden" id="op" />
+
+			<ul class="list-box">
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="txnfname">
+						<font color="red">*</font>名称：</label>
+					<span class="list-box-item-content">
+						<input name="tab_desc" type="text" class="itext" id="tab_desc" />
+					</span>
+				</li>
+
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="ORDERBY">
+						<font color="red">*</font>#springMessage("view.tms.traffic.grouporder")：</label>
+					<span class="list-box-item-content">
+						<input name="show_order" type="text" class="itext short" id="show_order" />
+					</span>
+				</li>
+
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="ORDERBY">
+						<font color="red">*</font>交易类型：
+					</label>
+					<span class="list-box-item-content">
+						<input name="txn_type" type="radio" value="0" checked="checked"/>交易组
+						<input name="txn_type" type="radio" value="1"/>交易
+					</span>
+				</li>
+
+				<li class="list-box-item" id="txnid_li" style="display: none">
+					<label class="list-box-item-label" for="txnfname"><font color="red">*</font>#springMessage("view.tms35.discern.txnid")：</label>
+					<span class="list-box-item-content">
+						<input name="txnid" type="text" class="itext" id="txnid" />
+					</span>
+				</li>
+
+				<li class="list-box-item" id="disposal_li">
+					<label class="list-box-item-label">
+						<font color="red">*</font>处置策略：</label>
+					</label>
+					<span class="list-box-item-content">
+						<span id='disposal_span'></span>
+					</span>
+				</li>
+
+
+				<li class="list-box-item" id="chann_li">
+					<label class="list-box-item-label" for="txnversion">
+						<font color="red" id="chann_color" style="display: none">*</font>#springMessage("view.report.pub.form.channelName")：</label>
+					<span class="list-box-item-content">
+						<select name="chann" id="chann" style="width: 100px" >
+						</select><span id='chann_span'></span>
+					</span>
+				</li>
+				
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="txnffname">#springMessage("view.tms35.traffic.groupparent")：</label>
+					<span class="list-box-item-content">
+						<input name="ffname" type="text" class="itext" id="txnffname" disabled="disabled" />
+					</span>
+				</li>
+
+				<li class="list-box-item" id="item-menu">
+					<label class="list-box-item-label" for="txnstatus">有效性：</label>
+					<span class="list-box-item-content">
+						<input type="radio" name="is_enable" value="1" checked="checked"  /> 启用
+						<input type="radio" name="is_enable" value="0"/> 停用
+					</span>
+				</li>
+
+				<li class="list-box-item" id="item-menu">
+					<label class="list-box-item-label" for="txnstatus">&nbsp;</label>
+					<span class="list-box-item-content">
+						<input type="button" value='#springMessage("view.tms.pub.btn.sure")' class="btn" id="add_txnmodSubmitButton" />
+						<input type="button" value='#springMessage("view.tms.pub.btn.cancel")' class="btn" id="add_txncancelSubmitButton" />
+					</span>
+				</li>
+			</ul>
+		</form>
+	</div>
+	<!-- 5 def add end -->
+	<!-- 1 switch begin -->
+	<div id="switch_add">
+		<ul class="list-box">
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.switch.list.sw_order")：</label>
+				<span class="list-box-item-content"><input name="SW_ORDER" id="SW_ORDER" maxlength="50" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.switch.list.sw_cond")：</label>
+				<span class="list-box-item-content"><input name="SW_COND" id="SW_COND" maxlength="256" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.switch.list.sw_desc")：</label>
+				<span class="list-box-item-content"><input name="SW_DESC" id="SW_DESC" maxlength="50" type="text" class="itext"/>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.switch.list.sw_type")：</label>
+				<span class="list-box-item-content"> <select name="SW_TYPE" id="SW_TYPE"></select>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.switch.list.sw_enable")：</label>
+				<span class="list-box-item-content"> <select name="SW_ENABLE" id="SW_ENABLE"></select>
+				</span>
+			</li>
+			<li class="list-box-item" id='li_sw_createtime'>
+				<label class="list-box-item-label">#springMessage("view.tms35.switch.list.sw_createtime")：</label>
+				<span class="list-box-item-content" id="switch_add_sw-createtime"></span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.switch.list.sw_txn")：</label>
+				<span class="list-box-item-content" id="switch_add_tab-desc"></span>
+			</li>
+		</ul>
+
+		<div class="button-box">
+			<input type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn" id="switch_add_saveBtn"/>
+			<input type="button" value="#springMessage('view.tms.pub.btn.cancel')" class="btn" id="switch_add_cancelBtn"/>
+		</div>
+	</div>
+	<!-- 1 switch end -->
+
+	<!-- 3 process begin -->
+	<!--3.1 process_value start-->
+	<div id="process_ps_value">
+		<table border='0' id='table_ps_value' >
+			<tbody>
+				<tr class="column-cell">
+					<!--td width='10%'><input type="checkbox" name="ps_value_checkbox" id="ps_value_checkbox_checkall"/></td-->
+					<td width='20%' align="right">处置方式</td>
+					<td width='35%' align="center">开始值</td>
+					<td width='20%' align="center"></td>
+					<td width='35%' align="center">结束值</td>
+				</tr>
+			</tbody>
+			<tbody id='ps_value_tb'></tbody>
+			<tr>
+				<td colspan='4' align='center'>
+					<!--input type='button' value='增加' class='btn' id='ps_value_add_btn'/>
+					<input type='button' value='删除' class='btn' id='ps_value_del_btn'/-->
+					<input type='button' value='确定' class='btn'  id='ps_value_sav_btn'/>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!--3.1 process_value end-->
+	<!-- 3 process end -->
+
+	<!--2 stat start-->
+	<!--2.1 stat_list start-->
+	<div id="statGridDiv" class="grid-column">
+		<!--筛选条件-->
+			<!--<form id="stat_qform" name="stat_qform" style="display:none">
+				<table>
+		        <tr>
+		           <td width="10%">#springMessage("ui.view.tms35.stat.statDesc")</td>
+		           <td width="15%">
+		               <input name="STAT_DESC" id="STAT_DESC" type="text" class="itext" value=""/>
+		           </td>
+
+		       	   <td width="10%">#springMessage("ui.view.tms35.stat.statObject")</td>
+		           <td width="15%">
+		               <select name="STAT_PARAM" id="STAT_PARAM">
+		               	<option value="">--请选择--</option>
+		               </select>
+		           </td>
+
+				   <td width="10%">#springMessage("ui.view.tms35.stat.statAim")</td>
+		           <td width="15%">
+		               <select name="STAT_DATAFD" id="STAT_DATAFD">
+		               	<option value="">--请选择--</option>
+		               </select>
+		           </td>
+				   <td width="10%">#springMessage("ui.view.tms35.stat.statFun")</td>
+		           <td width="15%">
+		               <select name="STAT_FN" id="STAT_FN">
+		               	<option value="">--请选择--</option>
+		               </select>
+		           </td>
+		        </tr>
+				</table>
+			</form>-->
+		<!--列表-->
+		<!--<table id="statTable" border='1' style='border-collapse: collapse;width:100%'>
+		<tr>
+			<td colspan="14">
+				<input id="btn-add" type="button" value="#springMessage('view.tms35.stat.btn.newdialog')" class="btn" enablerule='0'/>
+				<input id="btn-edit" type="button" value="#springMessage('view.tms35.stat.btn.editdialog')" class="btn" enablerule='1'/>-->
+				<!--input id="btn-cond" type="button" value="#springMessage('view.tms35.stat.btn.cond')" class="btn" enablerule='1'/-->
+				<!--<input id="btn-del" type="button" value="#springMessage('view.tms35.stat.btn.del')" class="btn" enablerule='2'/>
+				<input id="btn-valid" type="button" value="#springMessage('view.tms35.stat.btn.valid')" class="btn" enablerule='1'/>
+				<input id="btn-find" type="button" value="#springMessage('view.tms35.stat.btn.find')" class="btn" enablerule='0'/>
+				<input id="btn-cancelfind" type="button" value="#springMessage('view.tms35.stat.btn.cancelfind')" class="btn" enablerule='0'/>
+				<input id="btn-ref" type="button" value="#springMessage('view.tms35.stat.btn.ref')" class="btn" enablerule='1'/>
+				<input id="btn-save" type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn" enablerule='0'/>
+			</td>
+		</tr>
+		<tr>
+			<td width="5%"><div class="column-cell"><input name="statcheckbox_all" type="checkbox" onclick="selectAll('statGridDiv',this);"/></div></td>
+			<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statName')</div></td>
+			<td width="10%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statDesc')</div></td>
+			<td width="10%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statObject')</div></td>
+			<td width="15%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statCond')</div></td>
+			<td width="10%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statAim')</div></td>
+			<td width="8%"><div class="column-cell">#springMessage('ui.view.tms35.stat.statFun')</div></td>
+			<td width="7%"><div class="column-cell">#springMessage('ui.view.tms35.stat.funParam')</div></td>
+			<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.countUnit')</div></td>
+			<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.countRound')</div></td>
+			<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.continues')</div></td>
+			<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.unResult')</div></td>
+			<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.succes')</div></td>
+			<td width="5%"><div class="column-cell">#springMessage('ui.view.tms35.stat.fail')</div></td>
+		</tr>
+	 	</table>-->
+	 </div>
+	<!--2.1 stat_list end-->
+	<!--2.2 stat_add start-->
+	<div id="statAddDiv"  style="display:none">
+		<form name="statAddForm" id="statAddForm" method="post">
+
+		<input type="hidden" id="STAT_TXN" name="STAT_TXN"/>
+		<input type="hidden" id="FN_PARAM" name="FN_PARAM"/>
+
+		<ul class="list-box">
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statDesc")：</label>
+				<span class="list-box-item-content"><input name="STAT_DESC" id="STAT_DESC" maxlength="50" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statObject")：</label>
+				<span class="list-box-item-content"> <select name="STAT_PARAM" id="STAT_PARAM" >
+		                     <option value="">--请选择--</option>
+		               </select><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statCond")：</label>
+				<span class="list-box-item-content"><input name="STAT_COND" id="STAT_COND" maxlength="256" type="text" class="itext"/>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statAim")：</label>
+				<span class="list-box-item-content"> <select name="STAT_DATAFD" id = 'STAT_DATAFD'>
+		                     <option value="">--请选择--</option>
+		               </select>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statFun")：</label>
+				<span class="list-box-item-content"> <select name="STAT_FN" id = 'STAT_FN'>
+		                     <option value="">--请选择--</option>
+		               </select><font color="red" id="fontid_type">*</font>
+				</span>
+			</li>
+			<li class="list-box-item" style="display:none" id="paramLi">
+				<label class="list-box-item-label">函数参数：</label>
+				<span class="list-box-item-content"><input name="FN_PARAM" id="FN_PARAM" maxlength="512" type="text" class="itext"/>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.countUnit")：</label>
+				<span class="list-box-item-content"><input name="COUNUNIT" id="COUNUNIT" maxlength="8" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.countRound")：</label>
+				<span class="list-box-item-content"> <select name="COUNTROUND" id = 'COUNTROUND'>
+		                     <option value="">--请选择--</option>
+		               </select><font color="red" id="fontid_type">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.continues")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id='CONTINUES' name='CONTINUES' />
+		 		</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.unResult")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id='STAT_UNRESULT' name='STAT_UNRESULT'/>
+		 		</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.succes")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id='RESULT_COND_SUCC' name='RESULT_COND_SUCC'/>
+		 		</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.fail")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id='RESULT_COND_FAIL' name='RESULT_COND_FAIL'/>
+		 		</span>
+			</li>
+		</ul>
+		<div class="button-box">
+			<input type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn" id="addStatBtn"/>
+			<input type="button" value="#springMessage('view.tms.pub.btn.cancel')" class="btn" id="cancelStatBtn"/>
+		</div>
+		</form>
+	</div>
+	<!--2.2 stat_add end-->
+
+	<!--2.3 stat_edit start-->
+	<div id="statEditDiv"  style="display:none">
+		<form name="statEditForm" id="statEditForm" method="post">
+
+		<input type="hidden" id="STAT_TXN" name="STAT_TXN"/>
+		<input type="hidden" id="STAT_ID" name="STAT_ID"/>
+		<input type="hidden" id="STAT_VALID" name="STAT_VALID"/>
+		<input type="hidden" id="STAT_NAME" name="STAT_NAME"/>
+		<input type="hidden" id="FN_PARAM" name="FN_PARAM"/>
+
+		<ul class="list-box">
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statDesc")：</label>
+				<span class="list-box-item-content"><input id="STAT_DESC" name="STAT_DESC" maxlength="50" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statObject")：</label>
+				<span class="list-box-item-content"> <select name="STAT_PARAM" id="STAT_PARAM" >
+		                     <option value="">--请选择--</option>
+		               </select><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statCond")：</label>
+				<span class="list-box-item-content"><input id="STAT_COND" name="STAT_COND" maxlength="256" type="text" class="itext"/>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statAim")：</label>
+				<span class="list-box-item-content"> <select name="STAT_DATAFD" id="STAT_DATAFD" onchange='func_selected(this);'>
+		                     <option value="">--请选择--</option>
+		               </select>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.statFun")：</label>
+				<span class="list-box-item-content"> <select name="STAT_FN" id="STAT_FN" onchange='func_selected(this);'>
+		                     <option value="">--请选择--</option>
+		               </select><font color="red" id="fontid_type">*</font>
+				</span>
+			</li>
+			<li class="list-box-item" style="display:none" id="paramLi">
+				<label class="list-box-item-label">函数参数：</label>
+				<span class="list-box-item-content"><input name="FN_PARAM" id="FN_PARAM" maxlength="512" type="text" class="itext"/>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.countUnit")：</label>
+				<span class="list-box-item-content"><input id="COUNUNIT" name="COUNUNIT" maxlength="8" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.countRound")：</label>
+				<span class="list-box-item-content"> <select name="COUNTROUND" id="COUNTROUND">
+		                     <option value="">--请选择--</option>
+		               </select><font color="red" id="fontid_type">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.continues")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id="CONTINUES" name='CONTINUES'/>
+		 		</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.unResult")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id="STAT_UNRESULT" name="STAT_UNRESULT"/>
+		 		</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.succes")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id="RESULT_COND_SUCC" name="RESULT_COND_SUCC"/>
+		 		</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("ui.view.tms35.stat.fail")：</label>
+				<span class="list-box-item-content">
+					<input type='checkbox' id="RESULT_COND_FAIL" name="RESULT_COND_FAIL"/>
+		 		</span>
+			</li>
+		</ul>
+		<div class="button-box">
+			<input type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn" id="updateStatBtn"/>
+			<input type="button" value="#springMessage('view.tms.pub.btn.cancel')" class="btn" id="cancelStatBtn"/>
+		</div>
+	</form>
+	</div>
+	<!--2.3 stat_edit end-->
+	<!--2 stat end-->
+
+	<!-- common_cond begin -->
+	<div id="common_cond">
+		<table>
+			<tr>
+				<td colspan="4">
+					<table><tr><td>交易属性：</td><td><select name="STAT_DATAFD" id="STAT_DATAFD"  style="width:100px"></select></td>
+					<td align='right'>交易统计：</td><td><select name="STAT_FN" id="STAT_FN" style="width:100px"></select></td></tr>
+
+					<tr><td>日期函数：</td><td><select name="DATE_FUNC" id="DATE_FUNC" style="width:100px"></select></td>
+					<td>字符函数：</td><td><select name="STR_FUNC" id="STR_FUNC" style="width:100px"></select></td></tr>
+
+					<tr><td>关系函数：</td><td><select name="OPER_FUNC" id="OPER_FUNC" style="width:100px"></select></td>
+					<td align='right'>名单：</td><td><select name="ROSTER_FUNC" id="ROSTER_FUNC" style="width:100px"></select></td></tr>
+
+					<tr><td>自定义函数：</td><td><select name="DIY_FUNC" id="DIY_FUNC" style="width:100px"></select></td>
+					<td>交易规则：</td><td><select name="RULE_FUNC" id="RULE_FUNC" style="width:100px"></select></td></tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td><form name="cn_dataForm" id="cn_dataForm" method="post">
+					<ul class="list-box">
+						<!--li class="list-box-item">
+							<span class="list-box-item-content"><textarea name="STAT_COND_NAME" id="STAT_COND_NAME" class="ttext" cols="45" rows="6" readonly="readonly"></textarea>
+							</span>
+						</li-->
+						<li class="list-box-item">
+							<span class="list-box-item-content"><textarea name="STAT_COND_VALUE" id="STAT_COND_VALUE" class="ttext"  cols="45" rows="6"></textarea>
+							<input type="button" value="#springMessage('view.tms.pub.btn.sure')" class="btn" id="updateBtn"/>
+							</span>
+						</li>
+					</ul>
+					</form>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!-- common_cond end -->
+
+
+	<!-- 4 action_list start -->
+	<div id="acGridDiv" class="grid-column">
+	 </div>
+	<!-- 4 action_list end -->
+
+
+
+	<!-- 4 action_add end -->
+	<div id="acAddDiv" style="display:none">
+		<form name="acAddForm" id="acAddForm" method="post">
+		<input type="hidden" id="AC_TXN" name="AC_TXN"/>
+		<ul class="list-box">
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acDesc")：</label>
+				<span class="list-box-item-content"><input name="AC_DESC" id="AC_DESC" maxlength="50" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acCond")：</label>
+				<span class="list-box-item-content"><input name="AC_COND" id="AC_COND" maxlength="200" type="text" class="itext"/>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acSrc")：</label>
+				<span class="list-box-item-content"><input name="AC_SRC" id="AC_SRC" maxlength="200" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acDst")：</label>
+				<span class="list-box-item-content"> <select name="AC_DST" id = "AC_DST">
+		                     <option value="">--请选择--</option>
+		               </select><font color="red" id="fontid_type">*</font>
+				</span>
+			</li>
+		</ul>
+		<div class="button-box">
+			<input type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn" id="addBtn"/>
+			<input type="button" value="#springMessage('view.tms.pub.btn.cancel')" class="btn" id="cancelBtn"/>
+		</div>
+		</form>
+	</div>
+	<!-- 4 action_add end -->
+
+	<!-- 4 action_edit start -->
+	<div id="acEditDiv" style="display:none">
+		<form name="dataForm" id="dataForm" method="post">
+
+		<input type="hidden" id="AC_ID" name="AC_ID"/>
+		<input type="hidden" id="AC_ENABLE" name="AC_ENABLE"/>
+		<input type="hidden" id="AC_TXN" name="AC_TXN"/>
+
+		<ul class="list-box">
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acDesc")：</label>
+				<span class="list-box-item-content"><input name="AC_DESC" id="AC_DESC" maxlength="50" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acCond")：</label>
+				<span class="list-box-item-content"><input name="AC_COND" id="AC_COND" maxlength="200" type="text" class="itext"/>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acSrc")：</label>
+				<span class="list-box-item-content"><input name="AC_SRC" id="AC_SRC" maxlength="200" type="text" class="itext"/><font color="red">*</font>
+				</span>
+			</li>
+			<li class="list-box-item">
+				<label class="list-box-item-label">#springMessage("view.tms35.action.acDst")：</label>
+				<span class="list-box-item-content"> <select name="AC_DST" id = "AC_DST">
+		                     <option value="">--请选择--</option>
+		               </select><font color="red" id="fontid_type">*</font>
+				</span>
+			</li>
+		</ul>
+		<div class="button-box">
+			<input type="button" value="#springMessage('view.tms.pub.btn.save')" class="btn" id="updateBtn"/>
+			<input type="button" value="#springMessage('view.tms.pub.btn.cancel')" class="btn" id="cancelBtn"/>
+		</div>
+		</form>
+	</div>
+	<!-- 4 action_edit end -->
+
+
+
+</div>
+	<!--  rule_add begin -->
+	<div id="rule_add" style="display: none;">
+		<form name="dataForm" id="dataForm" method="post">
+			<input type="hidden" id="RULE_TXN" name="RULE_TXN" />
+			<input type="hidden" id="RULE_COND" name="RULE_COND" />
+			<input type="hidden" id="X" name="X" />
+			<input type="hidden" id="Y"	name="Y" />
+
+			<ul class="list-box">
+				<li class="list-box-item"><label class="list-box-item-label"><font color="red">*</font>规则名称：</label>
+					<span class="list-box-item-content">
+						<input name="RULE_SHORTDESC" id="RULE_SHORTDESC" maxlength="10" type="text" class="itext" /> </span></li>
+				<li class="list-box-item"><label class="list-box-item-label"><font color="red">*</font>#springMessage("view.tms35.rule.ruleDesc")：</label>
+					<span class="list-box-item-content">
+						<textarea id="RULE_DESC" name="RULE_DESC" class="ttext-rule" style="resize:none" ></textarea> </span></li>
+				<li class="list-box-item"><label class="list-box-item-label"><font color="red">*</font>#springMessage("view.tms35.rule.ruleCond")：</label>
+					<span class="list-box-item-content">
+						<input name="RULE_COND_IN" id="RULE_COND_IN" maxlength="640" type="text" class="itext" readonly="true"/> </span></li>
+				<li class="list-box-item"><label class="list-box-item-label"><font color="red">*</font>#springMessage("view.tms35.rule.ruleScore")：</label>
+					<span class="list-box-item-content">
+						<input name="RULE_SCORE" id="RULE_SCORE" maxlength="8" type="text" class="itext" /> </span></li>
+				<li class="list-box-item"><label class="list-box-item-label">#springMessage("view.tms35.rule.isTest")：</label>
+					<span class="list-box-item-content">
+						<input type='checkbox' id='RULE_ISTEST' name='RULE_ISTEST' checked="checked" /></span></li>
+				<li class="list-box-item" id="item-menu">
+					<label class="list-box-item-label" for="txnstatus">有效性：</label>
+					<span class="list-box-item-content">
+						<input type="radio" id="ENABLE" name="RULE_ENABLE" value="1" /> 启用
+						<input type="radio" id="DISABLE" name="RULE_ENABLE" value="0" /> 停用
+					</span>
+				</li>
+			</ul>
+			<div class="button-box">
+			<input type="button" value="确定" class="btn" id="addBtn" />
+			<input type="button" value="确定" class="btn" id="updateBtn" />
+			<input type="button" value="#springMessage('view.tms.pub.btn.cancel')" class="btn" id="cancelBtn" />
+		</div>
+		</form>
+
+	</div>
+	<!--  rule_add end -->
+</body>
+</html>

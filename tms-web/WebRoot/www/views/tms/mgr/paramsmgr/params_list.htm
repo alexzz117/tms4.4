@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.metaobjparam.objlist")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<style type="text/css">
+.select {
+	font-family: "宋体";
+	font-size: 12px;
+	line-height: 15px;
+	color: #000000;
+	cursor: pointer;
+}
+</style>
+<script type="text/javascript">
+var modelId = jQuery.url.param("modelId");
+var modelName = jQuery.url.param("modelName");
+$(document).ready(function(){
+
+	var count =0;
+	var dialog = new jcl.ui.Dialog({
+		title:'#springMessage("view.cmc.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	var param = 'modelId='+modelId;
+	jcl.postJSON('/tms/mgr/runParams/paramList', param, function(data){
+		var paramlist = data.row;
+		var codelist = data.codelist;
+		var tHtml='';
+		for(var i=0;i<paramlist.length;i++){
+			tHtml+='<tr  style="font-size: 12px" >';
+			tHtml+='<td valign="top"  align="center">';
+			tHtml+=paramlist[i]["SYSPARAMNAME"];
+			tHtml+='<input name="paramName'+count+'" id="paramName'+count+'" type="hidden" size="10" value="'+paramlist[i]["SYSPARAMNAME"]+'" />';
+			tHtml+='<input name="paramId'+count+'" id="paramId'+count+'" type="hidden" size="10" value="'+paramlist[i]["SYSPARAMID"]+'" />';
+			tHtml+='<input name="dataType'+count+'" id="dataType'+count+'" type="hidden" size="10" value="'+paramlist[i]["DATATYPE"]+'" />';
+			tHtml+='<input name="valuetype'+count+'" id="valuetype'+count+'" type="hidden" size="10" value="'+paramlist[i]["VALUETYPE"]+'" />';
+			tHtml+='</td>';
+			
+			tHtml+='<td  valign="top"   align="center">';
+			if(paramlist[i]["DICTID"]==null || paramlist[i]["DICTID"]==''){
+				if(paramlist[i]["STARTVALUE"]!=null && paramlist[i]["STARTVALUE"]!='' ){
+					if(paramlist[i]["VALUETYPE"]=='1'){
+						tHtml+='<input name="STARTVALUE'+count+'" id="STARTVALUE'+count+'" type="text" size="10" value="'+paramlist[i]["STARTVALUE"]+'"';
+						if(paramlist[i]["DATATYPE"]=='DateType'){
+							tHtml+=' onfocus="jcl.datepicker(this)" readonly="readonly"  ';
+						}
+						tHtml+=' />';
+					}else{
+						tHtml+='<input name="STARTVALUE'+count+'" id="STARTVALUE'+count+'" type="text" size="10" value="'+paramlist[i]["STARTVALUE"]+'"';
+						if(paramlist[i]["DATATYPE"]=='DateType'){
+							tHtml+=' onfocus="jcl.datepicker(this)" readonly="readonly"  ';
+						}
+						tHtml+=' /> ~ ';
+						tHtml+='<input name="ENDVALUE'+count+'" id="ENDVALUE'+count+'" type="text" size="10" value="'+paramlist[i]["ENDVALUE"]+'" ';
+						if(paramlist[i]["DATATYPE"]=='DateType'){
+							tHtml+=' onfocus="jcl.datepicker(this)" readonly="readonly"  ';
+						}
+						tHtml+='/>';
+					}
+				}else{
+					if(paramlist[i]["VALUETYPE"]=='1'){
+						tHtml+='<input name="STARTVALUE'+count+'" id="STARTVALUE'+count+'" type="text" size="10" value="" ';
+						if(paramlist[i]["DATATYPE"]=='DateType'){
+							tHtml+=' onfocus="jcl.datepicker(this)" readonly="readonly"  ';
+						}
+						tHtml+='/>';
+					}else{
+						tHtml+='<input name="STARTVALUE'+count+'" id="STARTVALUE'+count+'" type="text" size="10" value="" ';
+						if(paramlist[i]["DATATYPE"]=='DateType'){
+							tHtml+=' onfocus="jcl.datepicker(this)" readonly="readonly"  ';
+						}
+						tHtml+=' /> ~ ' ;
+						tHtml+='<input name="ENDVALUE'+count+'" id="ENDVALUE'+count+'" type="text" size="10" value="" ';
+						if(paramlist[i]["DATATYPE"]=='DateType'){
+							tHtml+=' onfocus="jcl.datepicker(this)" readonly="readonly"  ';
+						}
+						tHtml+='/>';
+					}
+				}
+			}else{
+				if(paramlist[i]["VALUETYPE"]=='1'){
+					tHtml+='<select name="STARTVALUE'+count+'" id="STARTVALUE'+count+'"  style="width: 180px">';
+					for(var j=0;j<codelist.length;j++){
+						if(paramlist[i]["DICTID"]==codelist[j]["CATEGORY_ID"]){
+							if(paramlist[i]["STARTVALUE"]!=null && paramlist[i]["STARTVALUE"]==codelist[j]["CODE_KEY"]){
+							tHtml+='<option value="'+codelist[j]["CODE_KEY"]+'" selected="selected">'+codelist[j]["CODE_VALUE"]+'</option>';
+							}else{
+							tHtml+='<option value="'+codelist[j]["CODE_KEY"]+'">'+codelist[j]["CODE_VALUE"]+'</option>';
+							}
+						}
+					}
+					tHtml+='</select>';
+				}else{
+					tHtml+='<select name="STARTVALUE'+count+'" id="STARTVALUE'+count+'"  style="width: 100px">';
+					for(var j=0;j<codelist.length;j++){
+						if(paramlist[i]["DICTID"]==codelist[j]["CATEGORY_ID"]){
+							if(paramlist[i]["STARTVALUE"]!=null && paramlist[i]["STARTVALUE"]==codelist[j]["CODE_KEY"]){
+							tHtml+='<option value="'+codelist[j]["CODE_KEY"]+'" selected="selected">'+codelist[j]["CODE_VALUE"]+'</option>';
+							}else{
+							tHtml+='<option value="'+codelist[j]["CODE_KEY"]+'">'+codelist[j]["CODE_VALUE"]+'</option>';
+							}
+						}
+					}
+					tHtml+='</select>';
+					tHtml+='<select name="ENDVALUE'+count+'" id="ENDVALUE'+count+'"  style="width: 100px">';
+					for(var j=0;j<codelist.length;j++){
+						if(paramlist[i]["DICTID"]==codelist[j]["CATEGORY_ID"]){
+							if(paramlist[i]["STARTVALUE"]!=null && paramlist[i]["STARTVALUE"]==codelist[j]["CODE_KEY"]){
+							tHtml+='<option value="'+codelist[j]["CODE_KEY"]+'" selected="selected">'+codelist[j]["CODE_VALUE"]+'</option>';
+							}else{
+							tHtml+='<option value="'+codelist[j]["CODE_KEY"]+'">'+codelist[j]["CODE_VALUE"]+'</option>';
+							}
+						}
+					}
+					tHtml+='</select>';
+				}
+			}
+			tHtml+='</td>';
+			tHtml+='<td   valign="top" colspan="3" align="center">';
+			tHtml+=paramlist[i]["SYSPARAMDESC"];
+			tHtml+='</td>';
+			tHtml+='</tr>';
+			count++;
+		}		
+		$('#paramlist').html(tHtml);
+		$('#count').val(count);	
+		$('#modelId').val(modelId);	
+	});
+	
+	$('#addSubmitButton').click(function(){
+		var count = $('#count').val();
+		
+		for(var i=0;i<count;i++){
+			var dataType = $('#dataType'+i).val();
+			var valuetype = $('#valuetype'+i).val();
+			var startvalue = $('#STARTVALUE'+i).val();
+			var endvalue = $('#ENDVALUE'+i).val();
+			var paramName = $('#paramName'+i).val();
+			if(startvalue==''){
+				alert('参数："'+paramName+'"的值不能为空');
+				return;
+				break;
+			}else{
+				var flag = checkeLength(startvalue);
+				if(!flag){
+					alert('参数："'+paramName+'"的值超长');
+					return;
+				}
+				flag = checkeSpecialCode(startvalue);
+				if(!flag){
+					alert('参数："'+paramName+'"的值含有特殊字符');
+					return;
+				}
+				flag = checkType(dataType,startvalue);
+				if(!flag){
+					alert('参数："'+paramName+'"的值输入格式不正确');
+					return;
+					break;
+				}
+			}
+			if(valuetype=='2'){
+				if(endvalue==''){
+					alert('参数："'+paramName+'"的结束值不能为空');
+					return;
+					break;
+				}else{
+					var flag = checkeLength(endvalue);
+					if(!flag){
+						alert('参数："'+paramName+'"的结束值超长');
+						return;
+					}
+					flag = checkeSpecialCode(endvalue);
+					if(!flag){
+						alert('参数："'+paramName+'"的结束值含有特殊字符');
+						return;
+					}
+					flag = checkType(dataType,endvalue);
+					if(!flag){
+						alert('参数："'+paramName+'"的结束值输入格式不正确');
+						return;
+						break;
+					}
+					f = checkEndValue(startvalue,endvalue,paramName);
+					if(!f){
+						return;
+						break;
+					}
+				}
+			}
+			
+		}
+		var params = $('#txn-paramForm').serialize();		
+		jcl.postJSON('/tms/mgr/runParams/addSysParams', params, function(data){
+			if(data.success){
+				dialog.show();
+			}
+		});	
+	});
+	//验证类型
+	function checkType(type,value){
+		var f = true;
+		if(type=='NumberType'){
+			var r   =    /^\d*$/; //非负整数     
+			if(!r.test(value)){
+				f=false;
+			}
+		}
+		return f;
+	}
+	//对类型为整数的值进行起始值与结束值的比较
+	function checkEndValue(start,end,paramName){
+		if(parseInt(start)>parseInt(end)){
+			alert('参数 "'+paramName+'" 的起始值不能大于结束值');
+			return false;
+		}
+		return true;
+	}
+	
+	$('#goonBtn').click(function(){
+		jcl.go('/tms/mgr/runParams/paramList?modelId='+modelId+'&modelName='+modelName);
+	});
+});
+
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.tms.pub.operate.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.tms.pub.btn.sure")' class="btn" id="goonBtn"/>
+	</div>
+</div>
+
+<form name="txn-paramForm" id="txn-paramForm" method="post">
+	<input name="count" type="hidden" id="count" />
+	<input name="modelId" type="hidden" id="modelId" />
+	
+	<table width="100%"   id="conftab" border="1" style="border-collapse: collapse;">
+		<tr style="font-weight: bold;font-size: 12px">
+			<td width="30%" valign="top"  align="center">
+				参数名
+			</td>
+			
+			<td width="23%" valign="top"   align="center">
+				参数值
+			</td>
+			<td width="40%" valign="top" colspan="3" align="center">
+				参数描述
+			</td>
+		</tr>
+		<tbody id="paramlist">
+			
+		</tbody>
+		
+	</table>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.tms.pub.btn.save")' class="btn" id="addSubmitButton"/>
+	</div>	
+	</form>
+
+</body>
+</html>

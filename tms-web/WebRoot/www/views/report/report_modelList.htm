@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>模型评价</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link href="$rc.contextPath/s/common/css/tree.css" rel="stylesheet" type="text/css" />
+<!-- <script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script> -->
+<script type="text/javascript" src="$rc.contextPath/s/report/echarts/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/echarts/echarts.js"></script>
+
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/query/jcq.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/reportPrint.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/report/js/reportEcharts.js"></script>
+<style type="text/css">
+.chartsDiv{
+	height:300px;
+	width:98%;
+	border:0.5px solid;
+	/*display:none; */
+}
+</style>
+<script type="text/javascript">
+var startDate = '';
+var endDate = '';
+var echarts;
+var myChart;
+$(document).ready(function(){
+	
+	initParams();
+	
+	qBox = new jcl.ui.Box({
+		title:'模型评价信息查询'
+	});
+	qBox.title.css({cursor: 'pointer'});
+	qBox.container.parent().parent().css({borderBottomWidth:0});
+	displayBoxContent(qBox.title, qBox.container);
+	qBox.title.click();
+	
+	//快速查询表单
+	qForm = new jcl.ui.Form({
+		display: true,
+		layout: 'list',
+		items:[
+			{label:'#springMessage("view.report.pub.form.txnName")',name:'TXNID', required:true,  type:'treeselector',rtNode:true,sm:{type:'row'}, multiple:false, cascadeCheck:false, ds:{type:'remote', url:'/tms35/trandef/query', parser:{key:'list', text:'TAB_DESC', value:'TAB_NAME'}, lazyLoad:true}},
+			{label:'#springMessage("view.report.pub.form.date")',type: 'dateduration', required:true, duraSeparator:' ', viewSeparator:'至', layout:'date', items:[{name:'startTime'},{name:'endTime'}]}
+		],
+		btns:[
+			{id: 'quick_search_btn', text: '#springMessage("view.cmc.but.find")'}
+		]
+	}, qBox.container);
+	
+	qForm.getItem(1).val([startDate, endDate]);// 日期范围默认区间，1个月
+	
+	chartBox = new jcl.ui.Box({
+		title:'模型评价展示图',
+		marginTop:0
+	});
+	chartBox.title.css({cursor: 'pointer'});
+	chartBox.container.parent().parent().css({borderBottomWidth:0});
+	displayBoxContent(chartBox.title, chartBox.container);
+	
+	chartForm = new jcl.ui.Form({
+		display: true,
+		items:[
+		    {name:'shape', type:'hidden', value:'lineShape'}
+		]
+	}, chartBox.container);
+	chartBox.addDom($('#chartdiv'));
+	
+	//组装表格
+	dateGrid = new jcl.ui.Grid({
+		title:'模型评价信息列表',
+		marginTop:0,
+		table:{
+			checkboxEnable:false,
+			columns:[
+				{name:'模型名称', width: 50, dataIndex:'TAB_DESC'},
+				{name:'日期', width: 30, dataIndex:'STARTDATE'},
+				{name:'训练精度最大值', width: 50, dataIndex:'M_FLSCORE_MAX'},
+				{name:'训练精度最小值', width: 50, dataIndex:'M_FLSCORE_MIN'},
+				{name:'训练精度平均值', width: 50, dataIndex:'M_FLSCORE_AVG'},
+				{name:'运行精度最大值', width: 50, dataIndex:'R_FLSCORE_MAX'},
+				{name:'运行精度最小值', width: 50, dataIndex:'R_FLSCORE_MIN'},
+				{name:'运行精度平均值', width: 50, dataIndex:'R_FLSCORE_AVG'}
+			],
+			ds:{
+				url:"/report/model/list"
+			},
+			pagebar: true
+		},
+		toolbar:[
+			{id:"btn-export", icon:"icon-tb-edit", text:'#springMessage("view.report.pub.list.export")'},
+			{id:"btn-print", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.print")'}
+		]
+	});
+	
+	//快速查询
+	$("#quick_search_btn").click(function(){
+		var txnid = qForm.getItem(0).val();
+		if(txnid.length == 0){
+			alert("交易名称不能为空");
+			return;
+		}
+		var dayTimes = qForm.getItem(1).val();
+		var days = dayTimes.split("\,");
+		if(days[0].length == 0){
+			alert('开始日期不能为空');
+			return ;
+		}
+		if(days[1].length == 0){
+			alert('结束日期不能为空');
+			return ;
+		}
+		if((days[0]!=''&&days[1]!='')&&(days[0]>days[1])){
+			alert('#springMessage("view.tms.pub.datecheck")');
+			return ;
+		}
+		searchData(dateGrid);
+	});
+	//导出列表信息
+	$("#btn-export").click(exportList);
+	//打印
+	$("#btn-print").click(toprint);
+
+	searchData(dateGrid);
+});
+
+//绘制展示图形
+function createShape(data){
+		if (!myChart) {
+		if (echarts) {
+			myChart = echarts.init(document.getElementById('chartdiv'));
+			window.onresize = myChart.resize;
+			setChart(data);
+			return;
+		};
+		// 按需加载
+		require.config({
+		    paths: {
+		        echarts: '$rc.contextPath/s/report/echarts'
+		    }
+		});
+		require(
+		        [
+		            'echarts',
+		            'echarts/chart/bar',
+		            'echarts/chart/pie',
+		            'echarts/chart/funnel',
+		            'echarts/chart/line',
+		            'echarts/chart/map'
+		        ],
+		   function(ec){
+		   		echarts = ec;
+		    	myChart = ec.init(document.getElementById('chartdiv'));
+		    	window.onresize = myChart.resize;
+		    	setChart(data);
+		   }
+		); 
+	}else{
+		setChart(data);
+	}
+}
+//更改展示图形监控指标
+function changeTarget(){
+	var qParam = qForm.serialize();
+	var cParam = chartForm.serialize();
+	var params = [qParam, cParam].join('&');
+	dateGrid.setDsParams(params);
+	dateGrid.goPage();
+	jcl.postJSON('/report/model/showChart', params, function(data){
+		createShape(data);
+	});
+}
+
+//根据输入的查询信息和图形展示区的设置，查询交易告警信息数据
+function searchData(g){
+	var qParam = qForm.serialize();//查询框中的信息
+	var cParam = chartForm.serialize();//展示图中的设置信息
+	var params = [qParam, cParam].join('&');
+	g.setDsParams(params);
+	g.goPage();
+	jcl.postJSON('/report/model/showChart', params, function(data){
+		createShape(data);		//创建图形
+	});
+}
+function setChart(data){
+		myChart.showLoading({
+		    text: '正在努力的读取数据中...'  //loading话术
+		});
+		var option = getOptionV(data.CHARTDATA);
+		myChart.hideLoading();
+		myChart.clear();
+		myChart.setOption(option);
+		myChart.refresh;
+		myChart.resize;
+		myChart.restore;
+}
+function getOptionV(list){
+	var g_list = [];
+	if (list) {
+		g_list = list.slice(0);
+	}else{
+		g_list = txnGrid.table.page.list.slice(0);
+	}
+ 	var op_legend_data = ['训练精度','运行精度'];//显示数据类型
+ 	var op_x_data = [];  //xAxis显示列
+ 	var op_series = [];  //数据
+
+  	//op_legend_data.push('训练精度');
+  	//op_legend_data.push('运行精度');
+	op_series.push(
+		{ name:'训练精度',
+		ps:'M_FLSCORE_AVG',
+		itemStyle : { normal: {label : {show: true, position: 'insideRight'}}},
+    	type:'bar',
+    // stack: '处置',
+    	data:[]
+		}
+	);
+	op_series.push(
+		{ name:'运行精度',
+		ps:'R_FLSCORE_AVG',
+		itemStyle : { normal: {label : {show: true, position: 'insideRight'}}},
+    	type:'bar',
+    // stack: '处置',
+    	data:[]
+		}
+	);
+	var g_index = 1;
+  	for(var i = 0; i < g_list.length; i++){
+  		//alert(cf_txn_arr.indexOf(g_list[i]['TXNID']));
+  			if ((g_index)%2 == 0) {
+	  			op_x_data.push('\n'+g_list[i]['STARTDATE']);
+	  		}else{
+	  			op_x_data.push(g_list[i]['STARTDATE']);
+	  		}
+  			for(var j = 0; j < op_series.length; j++){
+  				var list_v = g_list[i][op_series[j].ps];
+  				//alert(op_series[j].ps+'--'+list_v);
+  				if(list_v != null){
+  					op_series[j].data.push(list_v);
+  				}
+  			}
+  			g_index++;
+  	}
+  	var option = {};
+	option.op_legend_data = op_legend_data;
+	option.op_x_data = op_x_data;
+	option.op_series = op_series;
+	/* option.title = {
+	        text: '模型评价趋势图',
+	        subtext: '',
+	    	 x: 'left',
+	    	 y: 'top'   
+			}; */
+	option.chartID = 'chartdiv';
+	return GenOption(option);
+}
+//列表信息导出
+function exportList(){
+	//查询框中的信息
+	var params = qForm.serialize();		
+	window.open(jcl.env.contextPath+"/report/model/export?"+params);
+}
+
+function toprint(){
+	reportPrint({rGrid:dateGrid, width:dateGrid.jqDom.width()});
+}
+
+//隐藏/展开相应的层
+function displayBoxContent(trigger, content){
+	trigger.on('click', function(){
+		if(content.is(':hidden')){
+			content.parent().show();
+		}else{
+			content.parent().hide();
+		}
+	})
+}
+
+//初始化时间，当前时间的前一天
+function initParams(){
+	var nowDate = new Date();
+	
+	var cur_m = (nowDate.getMonth() +1);
+	var cur_d = nowDate.getDate();
+	if(cur_m < 10) cur_m = '0'+cur_m;
+	if(cur_d < 10) cur_d = '0'+cur_d;
+	endDate = nowDate.getFullYear()  + '-' + cur_m  + '-' + cur_d ;
+	
+	nowDate.setMonth(nowDate.getMonth());
+	
+	var last_m = (nowDate.getMonth());
+	var last_d = nowDate.getDate();
+	if(last_m < 10) last_m = '0'+last_m;
+	if(last_d < 10) last_d = '0'+last_d;
+	startDate = nowDate.getFullYear()  + '-' + last_m  + '-' + last_d;
+	
+}
+
+</script>
+</head>
+<body>
+<div id="chartdiv" class="chartsDiv" align="center"></div>
+</body>
+</html>

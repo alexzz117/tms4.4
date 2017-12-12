@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms35.action.list.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/stat.js"></script>
+<script type="text/javascript">
+$(document).ready(function (){
+	var txnId = jQuery.url.param("txnId");
+	txnId = "T0101";
+	var param = "txnId="+txnId;
+	// 查询列表
+	jcl.postJSON("/tms35/action/list", param, function(data){
+		// 初始化列表
+		$.each(data.row, function(i,row){
+			var rosterList = data.ROSTERLIST;// 名单
+			var ac_enable = row.AC_ENABLE;
+			var rowHtml = "<tr";
+			if (ac_enable == '0') {
+				rowHtml += " bgcolor='Silver'";
+			}
+			rowHtml += ">";
+			
+			rowHtml += "<input type='hidden' id='AC_ID' value="+row.AC_ID+" name='AC_ID' />";
+			rowHtml += "<input type='hidden' id='AC_ENABLE' value="+row.AC_ENABLE+" name='AC_ENABLE' />";
+			rowHtml += "<input type='hidden' id='AC_TXN' value="+row.AC_TXN+" name='AC_TXN' />";
+			rowHtml += "<td><div class='row-cell'><input type='checkbox'  name='statcheckbox'"+i+" id='statcheckbox'"+i+" onclick='changeBtn(this);' /></div></td>";
+			rowHtml += "<td>";
+			rowHtml += appendTextDiv(row.AC_DESC,'AC_DESC');// 汉字描述，读写
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendTextDiv(row.AC_COND,'AC_COND');// 条件，当条件运行返回true，执行动作，读写
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendTextDiv(row.AC_SRC,'AC_SRC');// 源对象，一般是一个交易属性，也可以是一个表达式，读写
+			rowHtml += "</td>";
+			rowHtml += "<td>";
+			rowHtml += appendSelectDiv(rosterList,row.AC_DST,'AC_DST');// 源对象所插入的名单名，下拉列表
+			rowHtml += "</td>";
+			rowHtml += "</tr>";
+			$("#actionTable").append(rowHtml);
+		});
+	});
+		
+	// 控制列表的显示/隐藏
+	$("#openOperSpan").click(function(){
+		if($('#gridDiv').is(":hidden")){
+			$('#openOperSpan').text('+');
+			$('#gridDiv').show();
+		}else{
+			$('#openOperSpan').text('-');
+			$('#gridDiv').hide();
+		}
+	});
+	
+	// 增加按钮点击事件
+	$("#btn-add").click(function(){
+		window.showModalDialog("$rc.contextPath/tms35/action/add?txnId="+txnId,'增加','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		jcl.go('/tms35/action/list?txnId='+txnId);
+	});
+	
+			
+	// 编辑按钮点击事件
+	$("#btn-edit").click(function(){
+		 var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var statId = [];
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	var stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+				statId.push('AC_ID=' + stat_id); 
+			 } 
+		 }); 
+		
+		window.showModalDialog("$rc.contextPath/tms35/action/edit?"+statId+"&txnId="+txnId,'编辑','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		jcl.go('/tms35/action/list?txnId='+txnId);
+	});
+	
+	
+	// 条件按钮点击事件
+	$("#btn-cond").click(function(){
+		 var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var statId = [];
+		 var stat_cond;
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+			 	stat_cond = $(this).parent().parent().next().next().next().next().text();
+			 } 
+		 }); 
+		
+		window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+stat_id+"&stat_cond="+stat_cond+"&txnId="+txnId+"&type=0",'条件','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		jcl.go('/tms35/action/list?txnId='+txnId);
+	});
+	
+	// 有效性按钮点击事件
+	$("#btn-valid").click(function(){
+		var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var stat_id = "";
+		 var stat_valid = "";
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+			 	stat_valid = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[1].value;
+			 } 
+		 }); 
+		 
+		var param = "stat_id="+stat_id+"&stat_status="+stat_valid
+		jcl.postJSON("/tms35/action/validStat",param,function(data){
+			jcl.go('/tms35/action/list?txnId='+txnId);
+		});
+	});
+
+	// 删除按钮点击事件
+	$("#btn-del").click(function(){
+		var checked = $("input[type='checkbox'][name='statcheckbox']"); 
+		 
+		 var count = 0;
+		 var statId = [];
+		 $(checked).each(function(index){ 
+			 if(index == 0){
+				return true;// 如果是第一行标题行continue
+			 }
+			 if($(this).attr("checked")==true)  
+			 { 
+			 	stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+				statId.push('ac_id=' + stat_id); 
+				count ++;
+			 } 
+		 }); 
+		 if(count == 0){
+			alert('#springMessage("view.tms.pub.checkbox.msg0")');
+			return;
+		 }
+		 
+		 if (confirm('#springMessage("view.tms.pub.del.confirm")')) {
+		 	var param = statId.join('&');
+		 	jcl.postJSON("/tms35/action/delAc", param, function(data){
+		 		jcl.go('/tms35/action/list?txnId=' + txnId);
+		 	});
+		 }
+	});
+	
+	// 筛选按钮点击事件
+	$("#btn-find").click(function(){
+		// 显示查询条件DIV
+		$('#qform').show();
+	});
+	
+	// 取消筛选按钮点击事件
+	$("#btn-cancelfind").click(function(){
+		// 隐藏查询条件DIV
+		$('#qform').hide();
+		
+		// 数据全部显示
+		document.qform.AC_DESC.value = "";
+		searchAcList();
+	});
+	
+	// 查询按钮点击事件
+	$("#quick_search_btn").click(function(){
+		// 过滤数据
+		searchAcList();
+	});
+	
+	// 条件框的双击事件，弹出条件编辑页面
+	$("input[name='AC_COND']").live('dblclick',function(){
+		var stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+		var stat_cond = $(this).val();
+		var rv = window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+''+"&stat_cond="+stat_cond+"&txnId="+txnId,window,'dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		var params = "AC_COND_COLUMN=AC_COND&AC_COND_VALUE="+rv+"&TXNID="+txnId+"&AC_ID="+stat_id;
+		jcl.postJSON('/tms35/action/updateCond', params, function(data){
+				jcl.go('/tms35/action/list?txnId='+txnId);
+		});
+	});
+	
+	// 条件框的双击事件，弹出条件编辑页面
+	$("input[name='AC_SRC']").live('dblclick',function(){
+		var stat_id = this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;
+		var stat_cond = $(this).val();
+		var rv = window.showModalDialog("$rc.contextPath/tms/stat/cond?stat_id="+''+"&stat_cond="+stat_cond+"&txnId="+txnId,window,'dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		var params = "AC_COND_COLUMN=AC_SRC&AC_COND_VALUE="+rv+"&TXNID="+txnId+"&AC_ID="+stat_id;
+		jcl.postJSON('/tms35/action/updateCond', params, function(data){
+				jcl.go('/tms35/action/list?txnId='+txnId);
+		});
+	});
+	
+	// 初始化按钮状态
+	btnStatus(0);
+});	
+
+// 动作列表数据修改后异步保存修改后的数据
+function saveStatList(_this){
+	// 获取参数
+	var acId = _this.parentNode.parentNode.parentNode.getElementsByTagName('input')[0].value;// 主键
+	var _this_name = _this.name;// 修改的对象名
+	var _this_value = _this.value;// 修改的对象值
+	
+	// 异步调用
+	var param = "AC_ID="+acId+"&OBJECT_NAME="+_this_name+"&OBJECT_VALUE="+_this_value;
+	
+	jcl.postJSON("/tms35/action/updateAcList",param,function(data){
+		
+	});
+}
+
+// 校验输入框
+function checkObject(_this){
+	var thisValue = _this.value;
+	var thisId = _this.id;
+	if(thisId == 'AC_DESC'){
+		if(Trim(AC_DESC)==""){
+			alert('#springMessage("view.tms35.action.acDesc")'+"不能为空");
+			return false;
+		}else{
+			if(!checkeLength(thisValue,50)){
+				alert('#springMessage("view.tms35.action.acDesc")'+'不能超过50个字符');
+				return false;
+			}
+			if(!checkeSpecialCode(thisValue)){
+				alert('#springMessage("view.tms35.action.acDesc")'+'不能包含特殊字符');
+				return false;
+			}
+		}
+	}
+	
+	if (thisId == 'AC_COND') {
+		if(!checkeLength(thisValue,200)){
+			alert('#springMessage("view.tms35.action.acCond")'+'不能超过200个字符');
+			return false;
+		}
+	}
+	
+	if (thisId == 'AC_SRC') {
+		if(!checkeLength(thisValue,200)){
+			alert('#springMessage("view.tms35.action.acSrc")'+'不能超过200个字符');
+			return false;
+		}
+	}
+	
+	if (thisId == 'AC_DST') {
+		if (thisValue == "") {
+			alert('#springMessage("view.tms35.action.acDst")' + "不能为空");
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+</script>
+
+
+</head>
+  
+<body>
+<!--标题-->
+<div class="box-title">
+ 	<table border='1' style='border-collapse: collapse;width:100%'>
+ 	<tr>
+ 		<td width="1%"><span id="openOperSpan" style="cursor:hand">+</span></td>
+		<td width="99%">#springMessage("view.tms35.action.list.title")</td>
+ 	</tr>
+	</table>
+</div>
+	
+<div id="gridDiv" class="grid-column">
+	<!--筛选条件-->
+		<form id="qform" name="qform" style="display:none">
+			<table>
+	        <tr>
+	           <td width="10%">#springMessage("view.tms35.action.acDesc")</td>
+	           <td width="15%">
+	               <input name="AC_DESC" id="AC_DESC" type="text" class="itext" value="" onkeyup="searchAcList();"/>
+	           </td>
+	        </tr>
+			</table>
+		</form>
+	<!--列表-->
+	<table id="actionTable" border='1' style='border-collapse: collapse;width:100%'>
+	<tr>
+		<td colspan="13">
+			<input id="btn-add" type="button" value="#springMessage('view.tms35.action.btn.newdialog')" class="btn" enablerule='0'/>
+			<input id="btn-edit" type="button" value="#springMessage('view.tms35.action.btn.editdialog')" class="btn" enablerule='1'/>
+			<!--input id="btn-cond" type="button" value="#springMessage('view.tms35.action.btn.cond')" class="btn" enablerule='1'/-->
+			<input id="btn-del" type="button" value="#springMessage('view.tms35.action.btn.del')" class="btn" enablerule='2'/>
+			<input id="btn-valid" type="button" value="#springMessage('view.tms35.action.btn.valid')" class="btn" enablerule='1'/>
+			<input id="btn-find" type="button" value="#springMessage('view.tms35.action.btn.find')" class="btn" enablerule='0'/>
+			<input id="btn-cancelfind" type="button" value="#springMessage('view.tms35.action.btn.cancelfind')" class="btn" enablerule='0'/>
+		</td>
+	</tr>
+	<tr>
+		<td width="5%"><div class="column-cell"><input name="statcheckbox" id="statcheckbox" type="checkbox" onclick="selectAll(this);"/></div></td>
+		<td width="20%"><div class="column-cell">#springMessage('view.tms35.action.acDesc')</div></td>
+		<td width="10%"><div class="column-cell">#springMessage('view.tms35.action.acCond')</div></td>
+		<td width="10%"><div class="column-cell">#springMessage('view.tms35.action.acSrc')</div></td>
+		<td width="20%"><div class="column-cell">#springMessage('view.tms35.action.acDst')</div></td>
+	</tr>
+ 	</table>
+ </div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.alarm.assign.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/validate.js"></script>
+<script type="text/javascript">
+    
+	//var txnCode = jQuery.url.param('txnCode');
+	//console.log("------999----");
+	var args;
+    if (window.opener) { //For FF and Chrome
+    	args = window.opener.a;
+    }else { 
+    	args = window.dialogArguments;		    	
+    }
+    
+    var arrTxncodes=[];
+    
+    for(i=0;i<args.length;i++){
+    	arrTxncodes[i]=args[i]["TXNCODE"];
+    	//console.log("-----txncode---"+arrTxncodes[i]);
+    }
+    
+	$(document).ready(function() {
+		var assignBox = new jcl.ui.Box({
+			title : '#springMessage("view.tms.alarm.assign.title")'
+		});
+
+		var assignForm = new jcl.ui.Form({
+			display : true,
+			layout : 'list',
+			items : [ {
+				label : '#springMessage("view.tms.alarm.assign.operId")',
+				name : 'OLD_OPERID'
+			}, {
+				label : '#springMessage("view.tms.alarm.assign.assignId")',
+				name : 'OPERID',
+				type : 'selector',
+				title : '--请选择--',
+				items : [],
+				required : true
+			} ],
+			btns : [ {
+				id : 'ps_sure',
+				text : '#springMessage("view.tms.alarm.assign.submit")'
+			}, {
+				id : 'ps_cancel',
+				text : '#springMessage("view.tms.pub.btn.cancel")'
+			} ]
+		}, assignBox.container);
+		assignForm.disable('OLD_OPERID', true);
+
+		// 监控人员工作量统计列表
+		var operStatGrid = new jcl.ui.Grid({
+			title : '#springMessage("view.tms.alarm.assign.stat.capacity")',
+			marginTop : 5,
+			table : {
+				checkboxEnable : false,
+				columns : [ {
+					name : '#springMessage("view.tms.alarm.assign.operId")',
+					width : 35,
+					dataIndex : 'LOGIN_NAME'
+				}, {
+					name : '#springMessage("view.tms.alarm.assign.stat.total")',
+					width : 35,
+					dataIndex : 'ASSIGN_NUMBER'
+				}, {
+					name : '#springMessage("view.tms.alarm.assign.stat.psNum")',
+					width : 35,
+					dataIndex : 'PROCESS_NUMBER'
+				}, {
+					name : '#springMessage("view.tms.alarm.assign.stat.unPsNum")',
+					width : 35,
+					dataIndex : 'UNPROCESS_NUMBER'
+				} ],
+				pagebar : false
+			}
+		});
+
+		var params = [];
+		params.push({
+			name : 'TXNCODES',
+			value :arrTxncodes
+		});
+		
+		jcl.postJSON('/tms/alarmevent/assign', params, function(data) {
+			var txn = data['txnMap'],operList = data['operList'], statList = data['list'], operId = null;
+			var operList = data['operList'], statList = data['list'], operId = null;
+			var items = [];
+			
+			if(null!=txn){
+				for (var i = 0, len = operList.length; i < len; i++) {
+					var row = operList[i];
+					if (row['OPERATOR_ID'] != txn['OPERID']) {
+						items.push({
+							text : row['LOGIN_NAME'],
+							value : row['OPERATOR_ID']
+						});
+					}else{
+						assignForm.getItem('OLD_OPERID').val(row['LOGIN_NAME']);						
+					}
+				}
+			}else{
+				assignForm.getItem('OLD_OPERID').jqDom.remove();			
+				for (var i = 0, len = operList.length; i < len; i++) {
+					var row = operList[i];
+						items.push({
+							text : row['LOGIN_NAME'],
+							value : row['OPERATOR_ID']
+						});			
+				}
+			}
+				
+			if (statList) {
+				operStatGrid.renderPage({
+					list : statList
+				});
+				assignForm.getItem('OPERID').component.reload(items);
+			}
+		}, false);
+		var isSure = false;
+		$("#ps_sure").click(function() {
+			
+		    try {
+				var this_btn = $(this);
+				if (!IsEmpty(assignForm.getItem('OPERID').val())) {
+					throw '#springMessage("view.tms.alarm.assign.assignId")';
+				}
+				
+				var param = assignForm.jqDom.serializeArray();
+				param.push({
+					name : "PSSTATUS",
+					value : "02"
+				});
+				param.push({
+					name : 'PS_TYPE',
+					value : '0'
+				});
+				param.push({
+					name : 'PS_RESULT',
+					value : '1'
+				});
+				param.push({
+					name : 'PS_INFO',
+					value : '报警事件分派'
+				});
+								
+				param = param.concat(params);
+			
+				jcl.postJSON('/tms/alarmevent/saveAssign', param, function(data) {
+					disableView(assignForm);
+					jcl.msg.info('分派成功');
+					isSure = true;
+					window.returnValue = 1;
+					window.close();
+				});
+			} catch (e) {
+				jcl.msg.error(e + '不能为空');
+			}
+		});
+
+		$("#ps_cancel").click(function() {
+			if (isSure)
+				window.returnValue = 1;
+			window.close();
+		});
+	});
+	function disableView(assignForm) {
+		$("#ps_sure").hide();
+		assignForm.disable('OPERID', true);
+	}
+</script>
+</head>
+<body>
+</body>
+</html>

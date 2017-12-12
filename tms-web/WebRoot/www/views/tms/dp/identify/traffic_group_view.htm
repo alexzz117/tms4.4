@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>交易查看</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link href="$rc.contextPath/s/common/css/tree.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/identify_tree.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/identify_view_tree_init.js"></script>
+
+<script type="text/javascript" >
+function mark(){
+	var weight=$('#WEIGHT').val();
+	if(weight==0){
+		$('#mark').show();
+	}else{
+		$('#mark').hide();
+	}
+}
+
+</script>
+
+</head>
+<body>
+
+<table id="func-box">
+	<tr>
+		<td width="180px" valign="top" style="border-right: 1px solid #B2B2B2;" id="leftTd1">
+			<div id="tree-box" style="width:180px;"></div>
+			<div id="button-box" style="width:180px;">
+				<a href="javascript:;" class="operate" id="tree-editgroup" style="display: none">#springMessage("view.tms.discern.viewbaseinfo")</a><br/>
+				<a href="javascript:;" class="operate" id="tree-edittransation" style="display: none">#springMessage("view.tms.discern.viewbaseinfo")</a>
+				<a href="javascript:;" class="operate" id="tree-conftransation" style="display: none">#springMessage("view.tms.discern.viewconfiginfo")</a><br />
+			</div>
+		</td>
+		<td valign="top" width="95%"> <!-- 
+		<input type="button" value="隐藏" onclick="yc()" id="btnyc" />
+		<input type="button" value="还原" onclick="hy()" id="btnhy" style="display: none"/>-->
+		<div id="ifram-box" style="display:none;width:100%;height:500px;"> 
+			<iframe frameborder="0"  scrolling="auto" width="100%" height="100%" style="border: hidden" name="iframbox" id="iframId" ></iframe>
+		</div>
+		<div id="form-box" style="display:none; width:100%;">
+			<form name="data-form-group" id="data-form-group" method="post">
+			<input name="group_id" type="hidden" id="fid" />
+			<input name="parent_id" type="hidden" id="ffid" />
+			<input name="channelid" type="hidden" id="channelid" />
+			<input name="status" type="hidden" id="status" value="1" />
+			<ul class="list-box">
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="fname">#springMessage("view.tms.traffic.groupname")：</label> 
+					<span class="list-box-item-content">
+					<input name="group_name" type="text" class="itext" id="fname" disabled="disabled"/>
+					</span></li>
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="info">#springMessage("view.tms.traffic.groupdesc")：</label> 
+					<span class="list-box-item-content"><textarea name="info" class="ttext" id="info" disabled="disabled"></textarea></span></li>
+									
+				<li class="list-box-item" id="item-ffname">
+					<label class="list-box-item-label" for="ffname">#springMessage("view.tms.traffic.groupparent")：</label> 
+					<span class="list-box-item-content">
+						<input name="ffname" type="text" class="itext" id="ffname" disabled="disabled"/>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label" for="onum">#springMessage("view.tms.traffic.grouporder")：</label> 
+					<span class="list-box-item-content">
+					<input name="onum" type="text" class="itext short" id="onum" disabled="disabled"/></span></li>
+				
+			</ul>
+	        <!-- 
+			<div class="button-box">
+				<input type="button" value='#springMessage("view.tms.pub.btn.cancel")' class="btn" id="cancelButton"/>
+			</div>
+			 -->
+			</form>
+		</div>
+			
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

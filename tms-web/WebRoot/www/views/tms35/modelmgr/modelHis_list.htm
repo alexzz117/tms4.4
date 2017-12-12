@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>模型训练历史</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+.mcparam-dialog{max-height:500px; height:expression(this.scrollHeight>500 ? "500px" : "auto" ); overflow-y:auto;overflow-x:hidden;}
+</style>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+
+<script type="text/javascript">
+	
+var txn_id = jQuery.url.param("txn_id");
+
+$(document).ready(function(){
+	
+	//组装表格     
+	var g = new jcl.ui.Grid({
+		title:'模型历史列表',
+		checkboxEnable:true,
+		toolbar:[
+			{id:"btn-correlation", icon:"icon-tb-find", text:'模型相关度', enable:'oneRowSelected'},
+			{id:"btn-back", icon:"icon-tb-add", text:'返回'}
+		],
+		table:{
+			columns:[
+				{name:'模型编号', width: 30, dataIndex:'TRAINID'},
+				{name:'交易名称', width: 60, dataIndex:'TAB_DESC'},
+				{name:'学习期开始时间', width: 40, dataIndex:'TRAINDATE'},
+				{name:'模型状态', width: 40, dataIndex:'MODELUSED', render: 'tms.model.modelused'},
+				{name:'模型处理开始时间', width: 60, dataIndex:'STARTTIME'},
+				{name:'模型处理结束时间', width: 60, dataIndex:'ENDTIME'},
+				{name:'模型精度', width: 30, dataIndex:'F1SCORE'},
+				{name:'执行状态', width: 30, dataIndex:'EXECSTATE', render: 'tms.model.execstate'},
+				{name:'模型描述', width: 60, dataIndex:'MODELDESC'}
+			],
+			ds:{
+				url:"/tms/modelmgr/mhList",
+				params:{'txn_id':txn_id},
+				callback:function(list){
+					for(var i = 0; i < list.length; i++){
+						var traindate = list[i]['TRAINDATE'];
+						var starttime = list[i]['STARTTIME'];
+						var endtime = list[i]['ENDTIME'];
+						var modeldesc = list[i]['MODELDESC'];
+						 
+						 list[i]['MODELDESC'] = XMLEncode(modeldesc);
+						 
+						if(traindate != null){
+							traindate = String(traindate);
+							if(traindate >= 14)
+								list[i]['TRAINDATE'] = traindate.substring (0,4)+'-'+traindate.substring (4,6)+'-'+traindate.substring (6,8)+' ' 
+							+traindate.substring (8,10) +':'+traindate.substring (10,12) +':'+traindate.substring (12,14);
+						}
+						if(starttime != null){
+							starttime = String(starttime);
+							if(starttime >= 14)
+								list[i]['STARTTIME'] = starttime.substring (0,4)+'-'+starttime.substring (4,6)+'-'+starttime.substring (6,8)+' ' 
+							+starttime.substring (8,10) +':'+starttime.substring (10,12) +':'+starttime.substring (12,14);
+						}
+						if(endtime != null){
+							endtime = String(endtime);
+							if(endtime >= 14)
+								list[i]['ENDTIME'] = endtime.substring (0,4)+'-'+endtime.substring (4,6)+'-'+endtime.substring (6,8)+' ' 
+							+endtime.substring (8,10) +':'+endtime.substring (10,12) +':'+endtime.substring (12,14);
+						}
+					}
+				}
+			},
+			pagebar: true
+		
+		}
+	});
+	g.goPage();
+function XMLEncode(str)
+{	
+		if(str == null || str.length == 0){
+			return "";
+		}
+       str=str.replace(new RegExp('&','g'),"&amp;");
+       str=str.replace(new RegExp('<','g'),"&lt;");
+      str=str.replace(new RegExp(">",'g'),"&gt;");
+      str=str.replace(new RegExp("'",'g'),"&apos;");
+      str=str.replace(new RegExp("\"",'g'),"&quot;");
+      return str;
+}
+	g.toolbar.onClick('#btn-back', function(){
+		history.back();
+	});
+	
+	//对话框显示
+	var dialog = new jcl.ui.Dialog({
+		width: 600,
+		draggable: true,
+		title:'模型相关度列表'
+	});
+	
+	dialog.jqDom.find('.box-content').addClass("mcparam-dialog");// 设置DIALOG自动滚动条
+	dialog.jqDom.find('.box-content').removeClass("box-content");// 设置DIALOG自动滚动条
+	
+	//组装表格     
+	var mc_table = new jcl.ui.Table({
+		columns:[
+			{name:'属性名称', width: 30, dataIndex:'FEATURENAME'},
+			{name:'相关度', width: 20, dataIndex:'RELEMEASURE'}
+		],
+		checkboxEnable:false,
+		pagebar:false
+	},$('#boxdiv'));
+	
+	g.toolbar.onClick('#btn-correlation', function(){
+		var train_id = g.selectedOneRow().TRAINID;
+		var txnid = g.selectedOneRow().TXNID;
+		jcl.postJSON('/tms/modelmgr/mcList','trainid='+train_id+"&txnid="+txnid,function(data){
+			mc_table.renderPage(data.page);
+			dialog.addDom($('#boxdiv'));
+			$('#boxdiv').show();
+			dialog.show();
+		});
+		
+		//jcl.go('/tms/modelmgr/mcList?trainid='+g.selectedOneRow().TRAINID);
+	});
+});
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box" style="display:none;"></div>
+</body>
+</html>

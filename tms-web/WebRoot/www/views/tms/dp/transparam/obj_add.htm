@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.metaobj.addobj")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript">
+var versionId = jQuery.url.param("versionId");
+var versionName = jQuery.url.param("versionName");
+var flag = true;
+$(document).ready(function(){
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.metaobj.addobj")',
+		id:'addObjFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.cmc.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	$("#addBtn").click(function(){
+		var objname=$('input[name=OBJNAME]').val();
+		var orderby=$('input[name=ORDERBY]').val();
+		var objcode=$('input[name=OBJCODE]').val();
+		var info=$('#info').val();
+		if(objname.trim()==""){
+			alert('#springMessage("view.tms.metaobj.namenotnull")！');
+			return ;
+		}else {
+			var flag = checkeLength(objname);
+			if(!flag){
+				alert('类别名称长度超长');
+				return;
+			}
+			flag = checkeSpecialCode(objname);
+			if(!flag){
+				alert('类别名称含有特殊字符');
+				return;
+			}
+		}
+		if(objcode.trim()==""){
+			alert('#springMessage("view.tms.metaobj.codenotnull")！');
+			return ;
+		}else {	
+			var flag = checkeLength(objcode,'16');
+			if(!flag){
+				alert('类别代码长度超长');
+				return;
+			}
+			flag = checkeSpecialCode(objcode);
+			if(!flag){
+				alert('类别代码含有特殊字符');
+				return;
+			}
+		}
+				
+		var r   =    /^\d*$/;　　//非负整数     
+		if(orderby!=''){
+			if(orderby.length>4){
+				alert('显示顺序不能大于4位数');
+				return;
+			}else if(!r.test(orderby)){
+				alert('#springMessage("view.tms.metaobj.orderisnum")');
+				return;
+			}
+		}else if(orderby==''){
+			alert('显示顺序不能为空！');
+			return;
+		}
+		if(info!=''){
+			var flag = checkeLength(info,'255');
+			if(!flag){
+				alert('描述信息长度超长');
+				return;
+			}
+		}
+		
+		$('input[name=OBJNAME]').val(objname.trim());
+		$('input[name=OBJCODE]').val(objcode.trim());
+		var params = $('#dataForm').serialize();
+		jcl.postJSON('/tms/mgr/meta/objoperate', params, function(data){
+			dialog.show();
+		});
+		
+	})
+	$('#cancelBtn').click(function(){
+		jcl.go('/tms/mgr/meta/objlist?versionId='+versionId+'&versionName='+versionName);
+	});
+	$('#goonBtn').click(function(){
+		jcl.go('/tms/mgr/meta/objadd?versionId='+versionId+'&versionName='+versionName);
+	});
+	$('#backBtn').click(function(){
+		jcl.go('/tms/mgr/meta/objlist?versionId='+versionId+'&versionName='+versionName);
+	});
+	$('#VERSIONID').val(versionId);
+});
+
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.add.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.continueCrt")' class="btn" id="goonBtn"/>
+		<input type="button" value='#springMessage("view.cmc.pub.btn.banck")' class="btn" id="backBtn"/>
+	</div>
+</div>
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobj.name")：</label> 
+		<span class="list-box-item-content"><input name="OBJNAME" id="OBJNAME" type="text" class="itext"  /><font color="red">*</font></span>
+		<span id="username_info" class="list-box-item-content"></span>
+		<input name="VERSIONID" id="VERSIONID" type="hidden" class="itext" />
+		<input name="METAOBJID" id="METAOBJID" type="hidden" class="itext" />
+		
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobj.code")：</label> 
+		<span class="list-box-item-content">
+			<input name="OBJCODE" id="OBJCODE" type="text" class="itext" /><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobj.order")：</label> 
+		<span class="list-box-item-content">
+			<input name="ORDERBY" id="ORDERBY" type="text" class="itext"  /><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobj.isextend")：</label> 
+		<span class="list-box-item-content">
+			<input type="radio" name="ISEXTEND" value="0" checked="checked" /> #springMessage("view.tms.pub.flag.false")
+			<input type="radio" name="ISEXTEND" value="1" /> #springMessage("view.tms.pub.flag.true")
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobj.isdisplay")：</label> 
+		<span class="list-box-item-content">
+			<input type="radio" name="ISDISPLAY" value="0" /> #springMessage("view.tms.pub.flag.false")
+			<input type="radio" name="ISDISPLAY" value="1" checked="checked" /> #springMessage("view.tms.pub.flag.true")
+		</span>
+		<input name="STATUS" id="STATUS" type="hidden" class="itext" value="1" />
+	</li>
+	<!--  
+	<li class="list-box-item">
+		<label class="list-box-item-label">是否启用：</label> 
+		<span class="list-box-item-content">
+			<input type="radio" name="STATUS" value="0" checked="checked" /> #springMessage("view.tms.pub.flag.false")
+			<input type="radio" name="STATUS" value="1" /> #springMessage("view.tms.pub.flag.true")
+		</span>
+	</li>
+	-->
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobj.info")：</label> 
+		<span class="list-box-item-content">
+			<textarea name="info" class="ttext" id="info" ></textarea>
+		</span>
+	</li>
+</ul>
+<div class="button-box">
+	<input type="button" value='#springMessage("view.tms.pub.btn.save")' class="btn" id="addBtn"/>
+	<input type="button" value='#springMessage("view.tms.pub.btn.cancel")' class="btn" id="cancelBtn"/>
+</div>
+</form>
+
+</body>
+</html>

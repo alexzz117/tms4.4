@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<!-- 用户行为习惯管理 -->
+	<!-- service方法的配置信息：
+		modelId:模块id；
+		modelName:模块名称；
+		id:调用的service方法名称；
+		name：操作名称，逗号分隔；
+		cacheRefreshService：缓存同步service；
+		isAuth：是否需要授权，目前全都为true；
+		txnId：相关联的交易的字段名；
+		queryTableName：授权信息查询表名；queryTablePk：授权信息查询主键值；
+		tableName:实际操作的数据库表名；tablePk:实际操作的数据库表主键；syncPk：未用
+		operateData：操作数据显示时查询字段名；
+		realOper：数据操作类型（u、c、d、batch、subbatch）；
+		isRefresh：是否需要刷新缓存；refreshMsg：缓存刷新传递的报文内容
+	-->
+	<!-- IP地址维护 -->
+	<method modelId="ipprotect" modelName="IP地址维护" id="importIpLocation" name="导入IP地址库" cacheRefreshService="commonCacheRefresh" 
+	txnId="" queryTableName="TMS_MGR_IPLOCATION" queryTablePk="CITYCODE" tableName="TMS_MGR_IPLOCATION" tablePk="CITYCODE" tablePkType="NUMBER" syncPk=""
+		   operateData="" realOper="u" isAuth="false" isRefresh="true" refreshMsg="TMS_MGR_IPLOCATION">
+	</method>
+	<!-- 用户行为习惯 -->
+	<method modelId="userpattern" modelName="用户行为习惯管理" id="saveUserPattern" name="新建用户行为习惯,编辑用户行为习惯,删除用户行为习惯" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_COM_USERPATTERN" queryTablePk="USERID" tableName="TMS_COM_USERPATTERN" tablePk="USERID" tablePkType="VARCHAR" syncPk=""
+		   operateData="" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_USERPATTERN">
+	</method>
+	<!-- 名单管理开始 -->
+	<!-- 1.名单 -->
+	<method modelId="roster" modelName="名单管理" id="createNameList" name="新建名单" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTER" tablePk="ROSTERID" tablePkType="NUMBER"  syncPk="ROSTERID"
+		   operateData="rosterdesc" realOper="c" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTER">
+	</method>
+	<method modelId="roster" modelName="名单管理" id="updateOneNameList" name="编辑名单" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTER" tablePk="ROSTERID" tablePkType="NUMBER" syncPk="ROSTERID"
+		   operateData="rosterdesc_span" realOper="u" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTER">
+	</method>
+	<method modelId="roster" modelName="名单管理" id="deleteNameList" name=",,删除名单" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTER" tablePk="ROSTERID" tablePkType="NUMBER" syncPk="ROSTERID"
+		   operateData="rosterdesc" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTER">
+	</method>
+	<!-- 2.名单值 -->
+	<method modelId="roster" modelName="名单管理" id="createValueList" name="新建名单值" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" tablePkType="NUMBER" syncPk="ROSTERID"
+		   operateData="rostervalue" realOper="c" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTERVALUE">
+	</method>
+	<method modelId="roster" modelName="名单管理" id="updateOneValueList" name="编辑名单值" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" tablePkType="NUMBER" syncPk="ROSTERID"
+		   operateData="rostervalue" realOper="u" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTERVALUE">
+	</method>
+	<method modelId="roster" modelName="名单管理" id="deleteValueList" name=",,删除名单值" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" tablePkType="NUMBER" syncPk="ROSTERID"
+		   operateData="rostervalue" realOper="subbatch" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTERVALUE">
+	</method>
+	<!-- <method modelId="roster" modelName="名单管理" id="updateOneValueListForConvert" name="名单值转换" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTERVALUE" queryTablePk="ROSTERVALUEID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" syncPk="ROSTERSYNCID"
+		   operateData="rostervalue" realOper="u" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTERVALUE" depModels="roster" depPks="ROSTERNEWID">
+	</method> -->
+	<method modelId="rosterconvert" modelName="名单管理" id="updateOneValueListForConvert" name="名单值转换" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" tablePkType="NUMBER" syncPk="ROSTERSYNCID"
+		   operateData="rostervalue" realOper="u" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTERVALUE" depModels="roster" depPks="ROSTERDEPID">
+	</method>
+	<!-- <method modelId="roster" modelName="名单管理" id="importNameList" name="通过txt、csv文件导入名单" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" syncPk="ROSTERID"
+		   operateData="rostervalue" realOper="" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTER">
+	</method>
+	<method modelId="roster" modelName="名单管理" id="importNameTxt" name="通过xls、xlsx文件导入名单" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" syncPk="ROSTERID"
+		   operateData="rostervalue" realOper="" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTER">
+	</method> -->
+	<method modelId="roster" modelName="名单管理" id="importRoster" name="名单导入" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_MGR_ROSTER" queryTablePk="ROSTERID" tableName="TMS_MGR_ROSTERVALUE" tablePk="ROSTERVALUEID" tablePkType="NUMBER" syncPk="ROSTERID"
+		   operateData="rosterdesc" realOper="u" isAuth="true" isRefresh="true" refreshMsg="TMS_MGR_ROSTERVALUE">
+	</method>
+	 
+	<!-- 交易配置开始 -->
+	<!-- 1.交易定义 -->
+	<method modelId="tranConf" modelName="交易配置" id="saveTranDef" name="新建交易,编辑交易,删除交易,新建交易组,编辑交易组,删除交易组" cacheRefreshService="commonCacheRefresh" 
+		   txnId="TAB_NAME" queryTableName="TMS_COM_TAB" queryTablePk="TAB_NAME" tableName="TMS_COM_TAB" tablePk="TAB_NAME" tablePkType="VARCHAR" syncPk="TAB_NAME"
+		   operateData="TAB_DESC" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_TAB" depModels="tranConf" depPks="PARENT_TAB">
+	</method>
+	
+	<!-- 2.交易模型 -->
+	<method modelId="tranConf" modelName="交易配置" id="saveModel" name="新建交易属性,编辑交易属性,删除交易属性" cacheRefreshService="commonCacheRefresh" 
+		   txnId="TAB_NAME" queryTableName="TMS_COM_TAB" queryTablePk="TAB_NAME" tableName="TMS_COM_FD" tablePk="TAB_NAME,REF_NAME"  tablePkType="VARCHAR,VARCHAR" syncPk="TAB_NAME"
+		   operateData="NAME" realOper="subbatch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_TAB" depModels="tranConf" depPks="TAB_NAME">
+	</method>
+	
+	<!-- 3.引用表 -->
+	<method modelId="tranConf" modelName="交易配置" id="saveModelRefTab" name="新建交易引用表,编辑交易引用表,删除交易引用表" cacheRefreshService="commonCacheRefresh" 
+		   txnId="TAB_NAME" queryTableName="TMS_COM_TAB" queryTablePk="TAB_NAME" tableName="TMS_COM_REFTAB" tablePk="REF_ID" tablePkType="NUMBER" syncPk="TAB_NAME"
+		   operateData="REF_DESC" realOper="subbatch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_TAB" depModels="tranConf" depPks="TAB_NAME">
+	</method>
+	
+	<!-- 4.引用字段 -->
+	<method modelId="tranConf" modelName="交易配置" id="saveModelRefFd" name="新建交易引用字段,编辑交易引用字段,删除交易引用字段" cacheRefreshService="commonCacheRefresh" 
+		   txnId="TAB_NAME" queryTableName="TMS_COM_TAB" queryTablePk="TAB_NAME" tableName="TMS_COM_REFFD" tablePk="REF_ID,REF_NAME,TAB_NAME" tablePkType="NUMBER,VARCHAR,VARCHAR" syncPk="TAB_NAME"
+		   operateData="REF_DESC" realOper="subbatch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_TAB" depModels="tranConf" depPks="TAB_NAME">
+	</method>
+	
+	<!-- 交易规则开始 -->
+	<method modelId="tranRule" modelName="交易规则" id="saveRule" name="新建规则,编辑规则,删除规则,启用规则,停用规则,复制规则" cacheRefreshService="commonCacheRefresh" 
+		   txnId="RULE_TXN" queryTableName="TMS_COM_RULE" queryTablePk="RULE_ID" tableName="TMS_COM_RULE" tablePk="RULE_ID" tablePkType="NUMBER" syncPk="RULE_ID"
+		   operateData="RULE_SHORTDESC" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_RULE" depModels="tranConf" depPks="RULE_TXN">
+	</method>
+	
+	<method modelId="tranRule" modelName="交易规则" id="saveAc" name="新建动作,编辑动作,删除动作,启用动作,停用动作,复制动作" cacheRefreshService="commonCacheRefresh" 
+		   txnId="RULE_TXN" queryTableName="TMS_COM_RULE" queryTablePk="RULE_ID" tableName="TMS_COM_RULE_ACTION" tablePk="AC_ID" tablePkType="NUMBER" syncPk="RULE_ID"
+		   operateData="AC_DESC" realOper="subbatch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_RULE_ACTION">
+	</method>
+	
+	
+	<!-- 交易策略开始 -->
+	<method modelId="tranSt" modelName="交易策略" id="saveStrategy" name="新建策略,编辑策略,删除策略,启用策略,停用策略,复制策略" cacheRefreshService="commonCacheRefresh" 
+		   txnId="ST_TXN" queryTableName="TMS_COM_STRATEGY" queryTablePk="ST_ID" tableName="TMS_COM_STRATEGY" tablePk="ST_ID" tablePkType="NUMBER" syncPk="ST_ID"
+		   operateData="ST_NAME" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_STRATEGY" depModels="tranConf" depPks="ST_TXN">
+	</method>
+	
+	<method modelId="tranSt" modelName="交易策略" id="saveStrategyRule" name="选择规则,,删除规则" cacheRefreshService="commonCacheRefresh" 
+		   txnId="ST_TXN" queryTableName="TMS_COM_STRATEGY" queryTablePk="ST_ID" tableName="TMS_COM_STRATEGY_RULE_REL" tablePk="ST_ID,RULE_ID" tablePkType="NUMBER,NUMBER" syncPk="ST_ID"
+		   operateData="RULE_SHORTDESC" realOper="subbatch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_STRATEGY_RULE_REL">
+	</method>
+	
+	<!-- method modelId="tranSt" modelName="交易策略" id="saveStrategyEval" name="新建评估类型,编辑评估类型,删除评估类型,启用评估类型,停用评估类型,复制评估类型" cacheRefreshService="commonCacheRefresh" 
+		   txnId="ST_TXN" queryTableName="TMS_COM_STRATEGY" queryTablePk="ST_ID" tableName="TMS_COM_STRATEGY_RULE_EVAL" tablePk="ST_ID" tablePkType="NUMBER" syncPk="ST_ID"
+		   operateData="ST_NAME" realOper="subbatch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_STRATEGY_RULE_EVAL">
+	</method> -->
+	<!-- 规则路由开始 -->
+	<!-- method modelId="ruleChild" modelName="规则路由" id="saveChild" name="新建规则路由,编辑规则路由,删除规则路由" cacheRefreshService="commonCacheRefresh" 
+		   txnId="RULE_TXN" queryTableName="TMS_COM_RULE_CHILD" queryTablePk="RC_ID" tableName="TMS_COM_RULE_CHILD" tablePk="RC_ID" tablePkType="NUMBER" syncPk="RC_ID"
+		   operateData="RULE_ID" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_RULE" depModels="tranRule" depPks="RULE_ID,CHILD_ID">
+	</method> -->
+	
+	<!-- 交易开关开始 -->
+	<!-- method modelId="tranSwitch" modelName="交易开关" id="saveSwitch" name="新建开关,编辑开关,删除开关,启用开关,停用开关" cacheRefreshService="commonCacheRefresh" 
+		   txnId="SW_TXN" queryTableName="TMS_COM_SWITCH" queryTablePk="SW_ID" tableName="TMS_COM_SWITCH" tablePk="SW_ID" tablePkType="NUMBER" syncPk="SW_ID"
+		   operateData="SW_DESC" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_SWITCH" depModels="tranConf" depPks="SW_TXN">
+	</method> -->
+	
+	<!-- 交易动作开始 -->
+	<!-- method modelId="tranAction" modelName="交易动作" id="saveAc" name="新建动作,编辑动作,删除动作,启用动作,停用动作" cacheRefreshService="commonCacheRefresh" 
+		   txnId="AC_TXN" queryTableName="TMS_COM_ACTION" queryTablePk="AC_ID" tableName="TMS_COM_ACTION" tablePk="AC_ID" tablePkType="NUMBER" syncPk="AC_ID"
+		   operateData="AC_DESC" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_ACTION" depModels="tranConf" depPks="AC_TXN">
+	</method> -->
+	
+	<!-- 交易统计开始 -->
+	<method modelId="tranStat" modelName="交易统计" id="saveStat" name="新建统计,编辑统计,删除统计,启用统计,停用统计" cacheRefreshService="commonCacheRefresh" 
+		   txnId="STAT_TXN" queryTableName="TMS_COM_STAT" queryTablePk="STAT_ID" tableName="TMS_COM_STAT" tablePk="STAT_ID" tablePkType="NUMBER" syncPk="STAT_ID"
+		   operateData="STAT_DESC" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_STAT" depModels="tranConf" depPks="STAT_TXN">
+	</method>
+	
+	<!-- 交易处置开始 -->
+	<!-- method modelId="tranProcess" modelName="交易处置" id="saveProcess" name="新建处置,编辑处置,删除处置,启用处置,停用处置" cacheRefreshService="commonCacheRefresh" 
+		   txnId="PS_TXN" queryTableName="TMS_COM_PROCESS" queryTablePk="PS_ID" tableName="TMS_COM_PROCESS" tablePk="PS_ID" tablePkType="NUMBER" syncPk="PS_ID"
+		   operateData="PS_NAME" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_COM_PROCESS" depModels="tranConf" depPks="PS_TXN">
+	</method> -->
+	
+	<!-- 设备指纹应用管理 -->
+	<method modelId="dfpApp" modelName="设备指纹应用管理" id="saveApp" name="新建应用,编辑应用,删除应用" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_DFP_APPLICATION" queryTablePk="APP_ID" tableName="TMS_DFP_APPLICATION" tablePk="APP_ID" tablePkType="VARCHAR" syncPk=""
+		   operateData="" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_DFP_APPLICATION">
+	</method>
+	
+	<!-- 设备指纹属性管理 -->
+	<method modelId="dfpPro" modelName="设备指纹属性管理" id="savePro" name="新建属性,编辑属性,删除属性" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_DFP_PROPERTY" queryTablePk="PROP_ID" tableName="TMS_DFP_PROPERTY" tablePk="PROP_ID" tablePkType="NUMBER" syncPk=""
+		   operateData="" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_DFP_PROPERTY">
+	</method>
+	
+	<!-- 设备指纹应用属性关联管理 -->
+	<method modelId="dfpAppPro" modelName="设备指纹应用属性关联管理" id="saveAppPro" name="新建应用属性,编辑应用属性,删除应用属性" cacheRefreshService="commonCacheRefresh" 
+		   txnId="" queryTableName="TMS_DFP_APP_PROPERTIES" queryTablePk="ID" tableName="TMS_DFP_APP_PROPERTIES" tablePk="ID" tablePkType="NUMBER" syncPk=""
+		   operateData="" realOper="batch" isAuth="true" isRefresh="true" refreshMsg="TMS_DFP_APP_PROPERTIES">
+	</method>
+	
+	
+	
+</config>	 

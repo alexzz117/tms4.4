@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.dp.pattern.edit.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.dp.pattern.edit.title")',
+		id:'editPatternFormBox'
+	});
+	box.addDom('dataForm');
+	
+	
+	
+	var patternId = "patternId="+jQuery.url.param("patternId");
+	jcl.postJSON('/tms/dp/pattern/get', patternId, function(data){
+			$('#patternId').val(data.row.PATTERNID);
+			$('#patternName').val(data.row.PATTERNNAME);
+			$('#patternDesc').val(data.row.PATTERNDESC);
+			//radio设置value的值的项目为当前选中项
+			$("input[@name=status][value=" + data.row.STATUS + "]").attr("checked",true);
+			var txnid = data.row.TXNID;
+			$("#txnid").val(txnid);
+			var txnName = data.txnName;
+			$("#txnName").html(txnName);
+			
+			$('#oldpatternName').val(data.row.PATTERNNAME);
+	});
+	
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.tms.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	$("#updateBtn").click(function(){
+		var patternName=$('input[name=patternName]').val();
+		var patternDsc =$('#patternDesc').val();
+		if(patternName==""){
+			alert('#springMessage("view.tms.dp.pattern.name.check")');
+			return ;
+		}
+		if(!checkeLength(patternName, '')) {
+			alert('#springMessage("view.tms.dp.pattern.name.check3")');
+			return ;	
+		}
+		if(!checkeSpecialCode(patternName)) {
+			alert('#springMessage("view.tms.dp.pattern.name.check2")');
+			return ;	
+		}
+		if(!checkeLength(patternDsc, '256')) {
+			alert('#springMessage("view.tms.dp.pattern.desc.checkLength")');
+			return ;
+		}
+		if(!checkeSpecialCode(patternDsc)) {
+			alert('#springMessage("view.tms.dp.pattern.desc.specialCode")');
+			return ;	
+		}
+		var txnid=$('select[id=txnid]').val();
+		if(txnid==""){
+			alert('#springMessage("view.tms.dp.pattern.txnid.check")');
+			return ;
+		}
+		if(txnid=="Gnull"){
+			alert('#springMessage("view.tms.dp.pattern.txnid.checknull")');
+			return ;
+		}
+		var conds = "txnId="+txnid + "&patternId="+jQuery.url.param("patternId");
+		jcl.postJSON('/tms/dp/pattern/checkExist', conds, function(data){
+			if (data.row == "true") {
+				alert("交易"+ $("#txnId").find("option:selected").text() +"不能重复配置,一个交易暂支持配置一个行为模式.");
+				
+				$('#txnid option:first').attr('selected','selected'); 
+				return;
+			}
+			var params = $('#dataForm').serialize();
+			jcl.postJSON('/tms/dp/pattern/mod', params, function(data){
+				dialog.show();
+			});
+		});
+		
+		
+	})
+	$('#cancelBtn').click(function(){
+		jcl.go('/tms/dp/pattern/list');
+	});
+	$('#backBtn').click(function(){
+		jcl.go('/tms/dp/pattern/list');
+	});
+	
+});
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.edit.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.sure")' class="btn" id="backBtn"/>
+	</div>
+</div>
+
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.name")：</label> 
+		<span class="list-box-item-content">
+		<input id="patternName" name="patternName" type="text" class="itext"/><font color="red">*</font>
+		<input id="oldpatternName" name="oldpatternName" type="hidden" class="itext"/>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.desc")：</label> 
+		<span class="list-box-item-content">
+		<textarea name="patternDesc" class="ttext" id="patternDesc" ></textarea>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.dp.pattern.txnid")：</label> 
+		<span class="list-box-item-content" id="txnName"> </span>
+		<input id="txnid" name="txnid" type="hidden" value="" class="itext"/>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.pub.btn.isused")：</label> 
+		<span class="list-box-item-content">
+	<input type="radio" id="status" name="status" value="1" /> 是
+			<input type="radio" id="status" name="status" value="0" checked="checked" /> 否
+ </span>
+	</li>
+	<!-- 页面只有一个text，需要加一个空input标签防止回车提交-->
+	 <input   style= "display:none; "/>
+</ul>
+<div class="button-box">
+	<input type='button' value='#springMessage("view.tms.pub.btn.mod")' class='btn' id='updateBtn'/>
+	<input type='button' value='#springMessage("view.tms.pub.btn.cancel")' class='btn' id='cancelBtn'/>
+	<input name="patternId" id="patternId" type="hidden" class="itext" />
+</div>
+</form>
+
+</body>
+</html>

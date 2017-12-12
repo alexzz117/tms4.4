@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.monitor.center.alarm")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	//取上下文alertid
+	alertid = jQuery.url.param("alertid");
+	
+	//XXX 这么写太恶心了,改了 --yangk 20110725
+	jcl.postJSON('/tms/monitor/alarm/get_alarmlist_detail', "alertid="+alertid, function(data){
+		//告警详细信息列表
+		$('#boxdiv_alertid').text(data.row[0].ALERTID);
+		$('#boxdiv_createtime').text(data.row[0].CREATETIME);
+		$('#boxdiv_txnname').text(data.row[0].TXNNAME);
+		$('#boxdiv_ipaddr').text(data.row[0].IPADDR);
+		$('#boxdiv_location').text(data.row[0].COUNTRYNAME + "-" + data.row[0].REGIONNAME + "-" + data.row[0].CITYNAME );
+		$('#boxdiv_sessionid').text(data.row[0].SESSIONID);
+		$('#boxdiv_deviceid').text(data.row[0].DEVICEID);
+		$('#boxdiv_userid').text(data.row[0].USERID);
+		$('#boxdiv_disposal').text(jcl.code.get("tms.rule.disposal", data.row[0].DISPOSAL));
+		$('#boxdiv_risklevel').text(data.row[0].RISKLEVEL);
+		$('#boxdiv_score').text(data.row[0].TOTALSCORE);
+		$('#boxdiv_iscorrect').text(jcl.code.get("tms.common.display", data.row[0].ISCORRECT));
+		//触发规则列表
+		var table = "";
+		table+="<table>"
+		table+="<tr style='font-weight: bold;'>"
+		table+="<td width='25%'>"
+		table+="#springMessage('view.tms.monitor.center.ruleid')"
+		table+="</td>"
+		table+="<td width='25%'>"
+		table+="#springMessage('view.tms.monitor.center.rulename')"
+		table+="</td>"
+		table+="<td width='25%'>"
+		table+="#springMessage('view.tms.monitor.center.rulescore')"
+		table+="</td>"
+		table+="<td width='25%'>"
+		table+="#springMessage('view.tms.monitor.center.rulesmessage')"
+		table+="</td>"
+		table+="</tr>"
+		
+		$.each(data.row, function(i, entry){
+			table+="<tr>"
+			table += "<td>";
+			table += transformNull(entry.RULEID);
+			table += "</td>";
+			
+			table += "<td>";
+			table += transformNull(entry.RULENAME);
+			table += "</td>";
+			
+			table += "<td>";
+			table += transformNull(entry.SCORE);
+			table += "</td>";
+			
+			table += "<td>";
+			table += transformNull(entry.MESSAGE);
+			table += "</td>";
+			table += "</tr>"
+		});
+		
+		table += "</table>";
+		$('#dataForm').append(table);
+	});
+	
+	var box1 = new jcl.ui.Box({
+		title: '#springMessage("view.tms.monitor.center.rulelist")',
+		id:''
+	});
+	box1.addDom('dataForm');
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.monitor.center.alarm.detailinfo")',
+		id:'editNameListFormBox'
+	});
+	box.addDom('dataForm1');
+	
+	$('#backBtn').click(function(){
+		jcl.go('/tms/monitor/alarm/get_alarmlist');
+	});
+});
+
+function transformNull(arg){
+	return arg == null || arg == 'null' ? '' : arg;
+}
+</script>
+
+</head>
+  <body>
+  	<form id="qform" name="qform">
+	  <div name="dataForm1" id="dataForm1">
+	  	<ul class="list-box">
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.alertid"):
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_alertid" style="font-weight: bold"></div> </span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.createtime")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_createtime" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.txnname")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_txnname" style="font-weight: bold"></div>
+					</span>
+				</li>
+				
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.iscorrect")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_iscorrect" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.score")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_score" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.risklevel")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_risklevel" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.disposal")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_disposal" style="font-weight: bold"></div>
+					</span>
+				</li>
+				
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.transactiontraffic.sessionid.en")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_sessionid" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.transactiontraffic.userid")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_userid" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.ruletraffic.clientipaddr")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_ipaddr" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.transactiontraffic.deviceid")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_deviceid" style="font-weight: bold"></div>
+					</span>
+				</li>
+				<li class="list-box-item">
+					<label class="list-box-item-label">
+						#springMessage("view.tms.monitor.center.alarm.location")：
+					</label>
+					<span class="list-box-item-content"><div id="boxdiv_location" style="font-weight: bold"></div>
+					</span>
+				</li>
+			</ul>
+	  </div>
+	  <div name="dataForm" id="dataForm" ></div>
+	  <div class="button-box">
+		<input type="button" value='#springMessage("view.tms.pub.btn.banck")' class="btn" id="backBtn"/>
+	  </div>
+	</form>
+  </body>
+</html>

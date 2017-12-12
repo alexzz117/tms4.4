@@ -1,0 +1,553 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.userpattern.center.userpattern.edit")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+var flag;
+$(document).ready(function(){
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.userpattern.center.userpattern.edit")',
+		id:'editValueEditFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.tms.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	var userPatternId = "userPatternId="+jQuery.url.param("userPatternId");
+	var patternPropId = "patternPropId="+jQuery.url.param("patternPropId");
+	var userId = jQuery.url.param("userId");
+	var storeColumn = jQuery.url.param("storeColumn");
+	var txnPatternName = jQuery.url.param("txnPatternName");
+	var txnId = jQuery.url.param("txnId");
+	$('#userId').val(userId);
+	$('#userPatternId').val(jQuery.url.param("userPatternId"));
+	$('#txnPatternName').val(txnPatternName);
+	$('#TXNID').val(txnId);
+	
+		initParams();
+		jcl.postJSON('/tms/userPattern/patternProp', patternPropId, function(data){
+				var sourcetype = data.row['SOURCETYPE'];
+				var generalfuncid = data.row.GENERALFUNCID;
+				var datesource = data.row.DATASOURCE;
+				var txnparamcode = data.row.TXNPARAMCODE;
+				var datatype = data.row.DATATYPE;
+				var sourceid= data.row.SOURCEID;
+				var store = data.row.STORECOLUMN;
+				if(datatype == null || datatype == ""){
+					datatype = data.row.TXNPARAMTYPE;
+				}
+				$('#datatype').val(datatype);
+				$('#sourceid').val(sourceid);
+				jcl.postJSON('/tms/userPattern/get', userPatternId, function(data){	
+						var patternvalue = data.row.PATTERNVALUE;
+						var isvalid = data.row.ISVALID;
+						var startdate = data.row.STARTDATE;
+						var enddate = data.row.ENDDATE;
+						if(isvalid == "0"){//可选时间
+							   document.getElementById("startdate").disabled=false;
+							   document.getElementById("box1").disabled=false;
+							   document.getElementById("enddate").disabled=false;
+							   document.getElementById("box2").disabled=false;
+							   $('#startdate').val(startdate);
+							   $('#enddate').val(enddate);
+						}else{
+							   document.getElementById("isvalid").checked=true;
+							   document.getElementById("startdate").disabled=true;
+							   document.getElementById("box1").disabled=true;
+							   document.getElementById("startdate").value="";
+							   document.getElementById("enddate").disabled=true;
+							   document.getElementById("box2").disabled=true;
+							   document.getElementById("enddate").value="";	
+						}
+				var htmlStr = "";
+				if(sourcetype == "DICT"){
+					var sourceId = $("#sourceid").val()
+					jcl.postJSON('/tms/userPattern/listCode', "sourceId="+sourceId, function(data){
+						var codeList = data.codeList;
+						htmlStr += "<select id='patternvalue' name='patternvalue' >";
+						for(var i=0;i<codeList.length;i++){
+							htmlStr +="<option value='"+codeList[i]["CODE_KEY"]+"'>"+codeList[i]["CODE_VALUE"]+"</option>";
+						}
+						htmlStr +="</select>";
+						flag = "0";
+						$("#pattern").html(htmlStr);
+						$('#patternvalue').val(patternvalue);
+					})
+				}else if(generalfuncid == "dp20001"){
+					if(datesource != null && datesource != "null"){
+						if(datesource == "countryCode"){
+							jcl.postJSON('/tms/userPattern/country', '', function(data){
+								var countryList = data.countryList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<countryList.length;i++){
+									htmlStr +="<option value='"+countryList[i]["COUNTRYCODE"]+"'>"+countryList[i]["COUNTRYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								flag = "0";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+							});
+						}else if(datesource == "regionCode"){
+							jcl.postJSON('/tms/userPattern/region', '', function(data){
+								var regionList = data.regionList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<regionList.length;i++){
+									htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								flag = "0";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+							});
+						}else if(datesource == "cityCode"){
+/*							jcl.postJSON('/tms/userPattern/city', '', function(data){
+								var cityList = data.cityList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<cityList.length;i++){
+									htmlStr +="<option value='"+cityList[i]["CITYCODE"]+"'>"+cityList[i]["CITYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+*/	
+							jcl.postJSON('/tms/userPattern/city', 'cityCode='+patternvalue, function(data){
+									var cityList = data.cityList;
+									var regionCode = cityList[0]["REGIONCODE"];
+									jcl.postJSON('/tms/userPattern/region', '', function(data){
+										var regionList = data.regionList;
+										htmlStr += "<select id='regionId' name='regionId' onchange='changeRegion(this)' >";
+										htmlStr +="<option value='' selected>-请选择-</option>";
+										for(var i=0;i<regionList.length;i++){
+											htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+										}
+										htmlStr +="</select>";
+										htmlStr +="<select name='patternvalue' id='patternvalue' style='width:100px;'  >";
+										jcl.postJSON('/report/txn/getCity', "regionCode="+regionCode, function(data){
+												var city = data.cityList;
+												htmlStr +="<option value='' selected>-请选择-</option>";
+													for(var j=0;j<city.length;j++){
+														htmlStr += '<option value="'+city[j]["CITYCODE"]+'">'+city[j]["CITYNAME"]+'</option>';
+													}
+													htmlStr +="</select>";
+													flag = "0";
+													$("#pattern").html(htmlStr);
+													$('#regionId').val(regionCode);
+													$('#patternvalue').val(patternvalue);
+												});
+									});
+								});
+						}else if(datesource == "channelType"){
+							jcl.postJSON('/tms/userPattern/channel', '', function(data){
+								var channelList = data.channelList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<channelList.length;i++){
+									htmlStr +="<option value='"+channelList[i]["CHANNELID"]+"'>"+channelList[i]["CHANNELNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								flag = "0";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+							});
+						}else{
+							    htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+							    $("#pattern").html(htmlStr);
+							    $('#patternvalue').val(patternvalue);
+					}
+						}else if(store !=null && store!="null"){
+							if(store.toLowerCase() == "countrycode"){
+							jcl.postJSON('/tms/userPattern/country', '', function(data){
+								var countryList = data.countryList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<countryList.length;i++){
+									htmlStr +="<option value='"+countryList[i]["COUNTRYCODE"]+"'>"+countryList[i]["COUNTRYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								flag = "0";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+							});
+						}else if(store.toLowerCase() == "regioncode"){
+							jcl.postJSON('/tms/userPattern/region', '', function(data){
+								var regionList = data.regionList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<regionList.length;i++){
+									htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								flag = "0";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+							});
+						}else if(store.toLowerCase() == "citycode"){
+/*							jcl.postJSON('/tms/userPattern/city', '', function(data){
+								var cityList = data.cityList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<cityList.length;i++){
+									htmlStr +="<option value='"+cityList[i]["CITYCODE"]+"'>"+cityList[i]["CITYNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								$("#pattern").html(htmlStr);
+*/
+							jcl.postJSON('/tms/userPattern/city', 'cityCode='+patternvalue, function(data){
+									var cityList = data.cityList;
+									var regionCode = cityList[0]["REGIONCODE"];
+									jcl.postJSON('/tms/userPattern/region', '', function(data){
+										var regionList = data.regionList;
+										htmlStr += "<select id='regionId' name='regionId' onchange='changeRegion(this)' >";
+										htmlStr +="<option value='' selected>-请选择-</option>";
+										for(var i=0;i<regionList.length;i++){
+											htmlStr +="<option value='"+regionList[i]["REGIONCODE"]+"'>"+regionList[i]["REGIONNAME"]+"</option>";
+										}
+										htmlStr +="</select>";
+										htmlStr +="<select name='patternvalue' id='patternvalue' style='width:100px;'  >";
+										jcl.postJSON('/report/txn/getCity', "regionCode="+regionCode, function(data){
+												var city = data.cityList;
+												htmlStr +="<option value='' selected>-请选择-</option>";
+													for(var j=0;j<city.length;j++){
+														htmlStr += '<option value="'+city[j]["CITYCODE"]+'">'+city[j]["CITYNAME"]+'</option>';
+													}
+													htmlStr +="</select>";
+													flag = "0";
+													$("#pattern").html(htmlStr);
+													$('#regionId').val(regionCode);
+													$('#patternvalue').val(patternvalue);
+												});
+									});
+								});
+						}else if(txnparamcode.toLowerCase() == "channeltype"){
+							jcl.postJSON('/tms/userPattern/channel', '', function(data){
+								var channelList = data.channelList;
+								htmlStr += "<select id='patternvalue' name='patternvalue' >";
+								for(var i=0;i<channelList.length;i++){
+									htmlStr +="<option value='"+channelList[i]["CHANNELID"]+"'>"+channelList[i]["CHANNELNAME"]+"</option>";
+								}
+								htmlStr +="</select>";
+								flag = "0";
+								$("#pattern").html(htmlStr);
+								$('#patternvalue').val(patternvalue);
+							});
+						}else{
+							    htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+							    $("#pattern").html(htmlStr);
+							    $('#patternvalue').val(patternvalue);
+						}
+					}else{
+						    htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+						    $("#pattern").html(htmlStr);
+						    $('#patternvalue').val(patternvalue);
+					}
+				}else if(generalfuncid == "dp20002"){//时间区间化
+					var sourceid = "sourceId=tms.common.hours";
+					jcl.postJSON('/tms/userPattern/listCode', sourceid, function(data){
+						var codeList = data.codeList;
+						htmlStr += "<select id='patternvalue' name='patternvalue' >";
+						for(var i=0;i<codeList.length;i++){
+							htmlStr +="<option value='"+codeList[i]["CODE_KEY"]+"'>"+codeList[i]["CODE_VALUE"]+"</option>";
+						}
+						htmlStr +="</select>";
+					 	htmlStr += "<select id='patternvalue1' name='patternvalue1' >";
+						for(var i=0;i<codeList.length;i++){
+							htmlStr +="<option value='"+codeList[i]["CODE_KEY"]+"'>"+codeList[i]["CODE_VALUE"]+"</option>";
+						}
+						htmlStr +="</select>";
+						flag = "1";
+						$("#pattern").html(htmlStr);
+						var value = patternvalue.split(",");
+						for(var i=0; i<value.length; i++){
+							if(value[0] != null && value[0] !=""){
+								$('#patternvalue').val(value[0]);
+							}
+							if(value[1] != null && value[1] !=""){
+								$('#patternvalue1').val(value[1]);
+							}
+						}
+					})
+				}else if(generalfuncid == "dp20003"){//数值区间化
+						htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />-";
+						htmlStr +="<input type='text' id='patternvalue1' name='patternvalue1' />";
+						htmlStr +="<input type='hidden' class='itext' id='generalfuncid' name='generalfuncid' value='dp20003' />";
+						flag = "2";
+					$("#pattern").html(htmlStr);
+					var value = patternvalue.split(",");
+						for(var i=0; i<value.length; i++){
+							if(value[0] != null && value[0] !=""){
+								$('#patternvalue').val(value[0]);
+							}
+							if(value[1] != null && value[1] !=""){
+								$('#patternvalue1').val(value[1]);
+							}
+						}
+				}else{
+						htmlStr +="<input type='text' id='patternvalue' name='patternvalue' />";
+					$("#pattern").html(htmlStr);
+					$('#patternvalue').val(patternvalue);
+				}		
+				})
+			});	
+	
+	$("#addBtn").click(function(){
+		var datatype = $("#datatype").val();
+		var value = $("#patternvalue").val();
+		var value1 = $("#patternvalue1").val();
+		if(datatype == "IpType" && !isIP(value)){
+			alert('行为习惯值格式不正确');
+			return ;
+		}
+		if(datatype == "MoneyType"){
+			if(value != null && value != ""){
+				if(!IsNumber(value, '+', 2)) {
+					alert('行为习惯值格式不正确');
+					return ;	
+				}
+			}
+			if(value1 != null && value1 != ""){
+				if(!IsNumber(value1, '+', 2)) {
+					alert('行为习惯值格式不正确');
+					return ;	
+				}
+			}
+			if(value != null && value != "" && value1 != null && value1 != "" ){
+					if(!checkeLength(value, '32') || !checkeLength(value1, '32')){
+						alert('行为习惯值超长');
+						return ;					
+					}
+					if(Number(value)>Number(value1)){
+						alert('结束值应大于开始值');
+						return ;
+					}
+			}	
+		}
+		if(!checkeLength(value, '32')) {
+			alert('行为习惯值超长');
+			return ;	
+		}
+		if(value1 != null && value1 != ""){
+			if(!checkeLength(value1, '32')) {
+				alert('行为习惯值超长');
+				return ;	
+			}
+		}	
+		if(!checkeSpecialCode(value)) {
+			alert('行为习惯值中含有特殊字符');
+			return ;	
+		}
+		if(value1 != null && value1 != ""){
+			if(!checkeSpecialCode(value1)) {
+				alert('行为习惯值中含有特殊字符');
+				return ;	
+			}
+		}
+		var patternvalue = "";
+		if($("#generalfuncid").val() != "" && $("#generalfuncid").val() == "dp20003"){
+			if((value1 == null || value1 =="") && (value == null || value =="")){
+				alert("行为习惯不能为空");
+				return;
+			}
+			if(value1 == null || value1 ==""){
+				patternvalue = value + ",";
+			}else{
+				patternvalue = value + "," + value1;
+			}
+		}else{
+			if(value1 == null || value1 ==""){
+				patternvalue = value;
+			}else{
+				patternvalue = value + "," + value1;
+			}
+		}
+		if(patternvalue == ""){
+			alert("行为习惯不能为空");
+			return;
+		}
+		var isvalid = document.getElementById("isvalid");
+		var isValId = "";
+		if(isvalid.checked){
+			isValId = "1";
+		}else{
+			isValId = "0";
+		}
+		var startdate = $("#startdate").val();
+		var enddate = $("#enddate").val();
+		var date = $("#date").val();
+		if(isValId == "0" && startdate == ""){
+			alert("开始日期不能为空");
+			return;
+		}
+		if(isValId == "0" && enddate == ""){
+			alert("结束日期不能为空");
+			return;
+		}
+		if(isValId == "0" && enddate<date){
+			alert("此行为习惯已过期，无法保存");
+			return;
+		}
+		if(startdate != "" && startdate>enddate){
+			alert("开始日期不能大于结束日期");
+			return;
+		}
+		
+		var patternValueName;
+		if(flag == "0"){
+			patternValueName = $('#patternvalue').find("option:selected").text();
+		}else if(flag == "1"){
+			patternValueName = patternvalue.replace(",", "-");
+		}else if(flag == "2"){
+			var num = patternvalue.length;
+			if(patternvalue.substring(0,1) == ",") patternValueName = "<=" + patternvalue.substring(1);
+			else if(patternvalue.substring(num-1) == ",") patternValueName = ">=" + patternvalue.substring(0, num-1);
+			else patternValueName = patternvalue.replace(",", "-");
+		}else{
+			patternValueName = patternvalue;
+		}
+		$('#patternValueName').val(patternValueName);
+		$('#patternValue').val(patternvalue);
+		var params = $('#dataForm').serialize()+"&isValId="+isValId+"&storeColumn="+storeColumn+"&"+patternPropId;
+		//var params = patternPropId+"&userId="+userId+"&"+userPatternId+"&storeColumn="+storeColumn+"&patternvalue="+patternvalue+"&isValId="+isValId+"&startdate="+startdate+"&enddate="+enddate+"&txnPatternName="+txnPatternName;
+			jcl.postJSON('/tms/userPattern/mod', params, function(data){
+				dialog.show();
+			});		
+		});
+	
+	$('#goonBtn').click(function(){
+		window.showModalDialog('$rc.contextPath/tms/userPattern/add?userId=' + userId + 
+								"&" + patternPropId + "&storeColumn=" + storeColumn,'','dialogWidth=1000px;dialogHeight=600px;resizable=yes');	
+		window.close();
+	});
+	$('#backBtn').click(function(){
+		window.close();
+	});
+	
+	$('#cancelBtn').click(function(){
+		window.close();
+	});
+	
+});
+
+
+//选择省份，显示地区城市名称
+function changeRegion(obj){
+	var regionCode = obj.value;
+	if(regionCode!=""){
+		jcl.postJSON('/report/txn/getCity', "regionCode="+regionCode, function(data){
+			
+			var cityList = data.cityList;
+		
+			var cityHtml = '<option value="">#springMessage("view.report.pub.flag.select")</option>';
+			for(var j=0;j<cityList.length;j++){
+				cityHtml += '<option value="'+cityList[j]["CITYCODE"]+'">'+cityList[j]["CITYNAME"]+'</option>';
+			}
+			$("#patternvalue").html(cityHtml);
+			$("#patternvalue").show();
+		});
+	}else{
+		var cityHtml = '<option value="">#springMessage("view.report.pub.flag.select")</option>';
+		$("#patternvalue").html(cityHtml);
+		$("#patternvalue").hide();
+	}
+}
+
+
+function initParams(){
+	var nowDate = new Date();
+	var operate_Date = new Date(nowDate.getTime() + 30*24*60*1*60000);
+	
+	var year = nowDate.getFullYear();
+	var month = nowDate.getMonth()+1;//获取本月
+	var day = nowDate.getDate();
+
+	
+	var operate_year = operate_Date.getFullYear();
+	var operate_month = operate_Date.getMonth()+1;//获取本月
+	var operate_day = operate_Date.getDate();
+
+	
+	if(month < 10) month = "0" + month;
+	if(day < 10) day = "0" + day;
+
+	if(operate_month < 10) operate_month = "0" + operate_month;
+	if(operate_day < 10) operate_day = "0" + operate_day;
+	
+	$('#enddate').val(operate_year+"-"+operate_month+"-"+operate_day);
+	$('#startdate').val(year+"-"+month+"-"+day);
+	$('#date').val(year+"-"+month+"-"+day);
+}
+
+function isUsed(){
+	var isvalid = document.getElementById("isvalid");
+	if(isvalid.checked){
+	   document.getElementById("startdate").disabled=true;
+	   document.getElementById("box1").disabled=true;
+	   document.getElementById("startdate").value="";
+	   document.getElementById("enddate").disabled=true;
+	   document.getElementById("box2").disabled=true;
+	   document.getElementById("enddate").value="";		
+	}else{
+	   document.getElementById("startdate").disabled=false;
+	   document.getElementById("box1").disabled=false;
+	   document.getElementById("enddate").disabled=false;
+	   document.getElementById("box2").disabled=false;
+	   initParams();
+	}
+}
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.edit.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.sure")' class="btn" id="backBtn"/>
+	</div>
+</div>
+
+<div id="openDiv"></div>
+
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.userpattern.center.userpattern.pattern")：</label>
+		<div id="pattern"></div>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.userpattern.center.userpattern.isuserd")：</label> 
+		<span class="list-box-item-content"><input type="checkbox" name="isvalid" id="isvalid" onclick="isUsed()" value="0" /></span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label" id="box1" >#springMessage("view.tms.userpattern.center.userpattern.startdate")：</label> 
+		<span class="list-box-item-content"><input id="startdate" name="startdate" type="text" class="itext" onfocus="jcl.datepicker(this)" readonly="readonly" value="" /></span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label" id="box2" >#springMessage("view.tms.userpattern.center.userpattern.enddate")：</label> 
+		<span class="list-box-item-content"><input id="enddate" name="enddate" type="text" class="itext" onfocus="jcl.datepicker(this)" readonly="readonly" value="" /></span>
+	</li>
+</ul>
+			<input type="hidden" name="datatype" id="datatype"  />
+			<input type="hidden" name="sourceid" id="sourceid"  />
+<div class="button-box">
+	
+	<input type='button' value='#springMessage("view.tms.pub.btn.save")' class='btn' id='addBtn'/>
+	<input type='button' value='#springMessage("view.tms.pub.btn.cancel")' class='btn' id='cancelBtn'/>
+	<input type="hidden" name="userId" id="userId"  />
+	<input type="hidden" name="TXNID" id="TXNID"  />
+    <input type="hidden" name="txnPatternName" id="txnPatternName"  />
+    <input type="hidden" name="patternValue" id="patternValue"  />
+     <input type="hidden" name="userPatternId" id="userPatternId"  />
+    <input type="hidden" name="patternValueName" id="patternValueName"  />
+    <input type="hidden" name="date" id="date"  />
+</div>
+</form>
+
+</body>
+</html>

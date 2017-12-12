@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.metaobjparam.objlist")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript">
+var objId = jQuery.url.param("objId");
+var versionId = jQuery.url.param("versionId");
+var versionName = jQuery.url.param("versionName");
+var typeName = jQuery.url.param("typeName");
+$(document).ready(function(){
+	//组装表格
+	var g = $("#boxdiv").grid({
+		title:'#springMessage("view.tms.metaobjparam.objlist")('+typeName+')',
+		columns:[
+			{name:'#springMessage("view.tms.metaobjparam.name")', width: 60, dataIndex:'PROPNAME'},
+			{name:'#springMessage("view.tms.metaobjparam.datasourcecode")', width: 60, dataIndex:'DATASOURCE'},
+			{name:'#springMessage("view.tms.metaobjparam.code")', width: 60, dataIndex:'PROPCODE'},
+			{name:'#springMessage("view.tms.metaobjparam.datatype")', width: 40, dataIndex:'DATATYPE'},
+			{name:'#springMessage("view.tms.metaobjparam.createTime")', width: 80, dataIndex:'CREATETIME'},
+			{name:'#springMessage("view.tms.metaobjparam.order")', width: 40, dataIndex:'ORDERBY'},
+			{name:'#springMessage("view.tms.metaobjparam.isnull")', width: 40, dataIndex:'ISNULL', render:'tms.common.display'}
+		],
+		ds:{
+			url:"/tms/mgr/meta/objparamlist",
+			params:{objId:''+objId}
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', toggleQform:true},
+			{id:"btn-add", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.new")'},
+			{id:"btn-edit", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.edit")'},
+			{id:"btn-del", icon:"icon-tb-del", text:'#springMessage("view.tms.pub.btn.del")'},
+			{id:"back_Btn", icon:"icon-tb-aw-l", text:'#springMessage("view.cmc.pub.btn.banck")'}
+			
+		],
+		pagebar: true,
+		qform: {id:"qform", display:false}
+
+	});
+	g.goPage();
+	
+	
+	$("#quick_search_btn").click(function(){
+		var PROPNAME = $('#PROPNAME').val();
+		var PROPCODE = $('#PROPCODE').val();
+		var flag = checkeSpecialCode(PROPNAME);
+		if(!flag){
+			alert('属性名称含有特殊字符');
+			return;
+		}
+		var flagCode = checkeSpecialCode(PROPCODE);
+		if(!flagCode){
+			alert('属性代码含有特殊字符');
+			return;
+		}
+		var params = $('#qform').serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+	$("#btn-add").click(function(){
+		jcl.go('/tms/mgr/meta/objparamadd?versionId='+versionId+'&versionName='+versionName+'&objId='+objId+'&typeName='+typeName);
+	});
+	
+	$("#btn-edit").click(function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.cmc.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.cmc.pub.checkbox.msg1")!');
+			return;
+		}
+		var objParamId = [];
+		$.each(rows, function(i,row){
+			objParamId.push('objParamId='+row['METAOBJPROPID']);
+		});                  
+		jcl.go('/tms/mgr/meta/objParammod?'+objParamId[0]+'&versionId='+versionId+'&versionName='+versionName+'&objId='+objId+'&typeName='+typeName);
+	});
+	
+	
+	$("#btn-del").click(function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.cmc.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.cmc.pub.checkbox.msg1")!');
+			return;
+		}
+		if(confirm('#springMessage("view.cmc.pub.del.confirm")?')){
+			var objParamId = [];
+			$.each(rows, function(i,row){
+				objParamId.push('objParamId='+row['METAOBJPROPID']);
+			});  
+			var params = objParamId.join('&');
+			var versionId = $('#VERSIONID').val();
+			params +='&versionId='+versionId;
+			//alert(params);
+			jcl.postJSON('/tms/mgr/meta/delobjparam', params, function(data){
+				if(data.success){
+					alert('#springMessage("view.cmc.pub.del.success")!');
+					g.goPage();
+				}
+			});
+		}
+	});
+	
+	//启用
+	$("#btn-used").click(function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.cmc.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.cmc.pub.checkbox.msg1")!');
+			return;
+		}
+		var objId = [];
+		var status;
+		$.each(rows, function(i,row){
+			status=row['STATUS'];
+			objId.push('objId='+row['METAOBJID']);
+		});
+		if(status=='1'){
+			alert("已经处于启用状态！");
+			return;
+		}
+		var params = objId[0]+"&status=1";
+		
+		jcl.postJSON('/tms/mgr/meta/updateStatus', params, function(data){
+			if(data.success){
+				alert('操作成功!');
+				g.goPage();
+			}
+		});
+	});
+	
+	//停用
+	$("#btn-unused").click(function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.cmc.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.cmc.pub.checkbox.msg1")!');
+			return;
+		}
+		var objId = [];
+		var status ;
+		$.each(rows, function(i,row){
+			status=row['STATUS'];
+			objId.push('objId='+row['METAOBJID']);
+		});
+		if(status=='0'){
+			alert("已经处于停用状态！");
+			return;
+		}
+		var params = objId[0]+"&status=0";
+		
+		jcl.postJSON('/tms/mgr/meta/updateStatus', params, function(data){
+			if(data.success){
+				alert('操作成功!');
+				g.goPage();
+			}
+		});
+	});
+	
+	$('#back_Btn').click(function(){
+		jcl.go('/tms/mgr/meta/objlist?versionId='+versionId+'&versionName='+versionName);
+	});
+	
+	$("#objId").val(objId);
+	$("#typeName").val(typeName);	
+	$("#VERSIONID").val(versionId);
+});
+
+
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<form id="qform" name="qform">
+<input style="display: none"/>
+   <table>
+       <tr>
+           <td width="100">#springMessage("view.tms.metaobjparam.name")</td>
+           <td width="180">
+			   <input name="VERSIONID" id="VERSIONID" type="hidden" class="itext" value=""/>
+               <input name="objId" id="objId" type="hidden" class="itext" value=""/>
+               <input name="typeName" id="typeName" type="hidden" class="itext" value=""/>
+               <input name="PROPNAME" id="PROPNAME" type="text" class="itext" value=""/>
+           </td>
+           <td width="100">#springMessage("view.tms.metaobjparam.code")</td>
+           <td width="180">
+           	   <input name="PROPCODE" id="PROPCODE" type="text" class="itext" value=""/>
+           </td>
+           <td width="100">#springMessage("view.tms.metaobjparam.control")</td>
+           <td width="180">
+               <select name="RWCONTROL" id="RWCONTROL" style="width: 120">
+               		<option value="">#springMessage("view.tms.pub.flag.select")</option>
+               		<option value="1">#springMessage("view.tms.metaobjparam.control.hid")</option>
+               		<option value="2">#springMessage("view.tms.metaobjparam.control.read")</option>
+               		<option value="3">#springMessage("view.tms.metaobjparam.control.write")</option>
+               </select>
+           </td>
+            <td  align="center" >
+            <input id="quick_search_btn" type="button" value='#springMessage("ui.common.btn.qquery")' class="btn"/>
+            </td>
+       </tr>
+          
+	</table>
+</form>
+
+</body>
+</html>

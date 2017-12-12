@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--<context:property-placeholder location="classpath:profiles/tms-web/properties/*.properties" ignore-unresolvable="true" />-->
+
+    <context:property-placeholder location="classpath:web.properties" ignore-unresolvable="true" />
+	
+	<bean id="commonHessianProxyFactoryBean" class="com.sfpay.framework.common.hession.spring.HessianProxyFactoryBean" abstract="true">
+		<property name="overloadEnabled" value="true" />
+		<!-- 读超时（毫秒） -->
+		<property name="readTimeout" value="60000" />
+		<!-- 连接超时（毫秒） -->
+		<property name="connectTimeout" value="60000" />
+	</bean>
+
+	<!-- 调用风控代理顺手付交易审核接口 -->
+	<bean name="sypayTransactionAuditService" parent="commonHessianProxyFactoryBean">
+		<property name="serviceUrl">
+			<value>${SYPAY-RISK-PROXY-SERVER}/hessian/sypayTransactionAuditService</value>
+		</property>
+		<property name="serviceInterface">
+			<value>com.sfpay.sypay.risk.proxy.SypayTransactionAuditService</value>
+		</property>
+	</bean>
+
+</beans>

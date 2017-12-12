@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.metaobjparam.addobjparam")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/obj_param.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/commoncheck.js"></script>
+<script type="text/javascript">
+var versionId = jQuery.url.param("versionId");
+var versionName = jQuery.url.param("versionName");
+var typeName = jQuery.url.param("typeName");
+var objId = jQuery.url.param("objId");
+var flag = true;
+$(document).ready(function(){
+	
+	var box = new jcl.ui.Box({
+		title: '#springMessage("view.tms.metaobjparam.addobjparam")',
+		id:'addObjFormBox'
+	});
+	box.addDom('dataForm');
+	
+	var dialog = jcl.ui.Dialog({
+		title:'#springMessage("view.cmc.pub.dialog.title")'
+	});
+	dialog.addDom('succesInfo');
+	
+	jcl.postJSON('/tms/mgr/meta/getDataType', 'versionId='+versionId, function(data){
+	
+			var datalist = data.dataTypeList;
+			var usedtype = data.usedtype;
+			var tHtml='<option value="">-请选择-</option>';
+			var hidHtml = '';
+			for(var i=0;i<datalist.length;i++){
+				if(usedtype.indexOf(','+datalist[i]["DATATYPE"]+',')<0){
+				tHtml+='<option value="'+datalist[i]["DATATYPE"]+'">'+datalist[i]["DATATYPENAME"]+'</option>';
+				hidHtml+='<input type="hidden" id="parent'+datalist[i]["DATATYPE"]+'" value="'+datalist[i]["PARENTDATATYPE"]+'" />';
+				}
+			}			
+			$('#DATATYPE').html(tHtml);
+			$('#datatypehid').html(hidHtml);
+	});
+	
+	$("#addBtn").click(function(){
+		var objname=$('input[name=PROPNAME]').val();
+		var orderby=$('input[name=ORDERBY]').val();
+		var objcode=$('input[name=PROPCODE]').val();
+		var datasource=$('input[name=DATASOURCE]').val();
+		var datatype=$('#DATATYPE').val();
+		var storeColumn=$('#STORECOLUMN').val();
+		var sourceType=$('#SOURCETYPE').val();
+		var DEFAULTVALUE=$('#DEFAULTVALUE').val();
+		
+		var PROPDESC=$('#PROPDESC').val();
+		
+		if(objname.trim()==""){
+			alert('#springMessage("view.tms.metaobjparam.namenotnull")！');
+			return ;
+		}else {
+			var flag = checkeLength(objname);
+			if(!flag){
+				alert('#springMessage("view.tms.metaobjparam.nametolong")！');
+				return;
+			}
+			flag = checkeSpecialCode(objname);
+			if(!flag){
+				alert('#springMessage("view.tms.metaobjparam.namespecial")！');
+				return;
+			}
+		}
+		// 增加对数据来源字段的判断	
+		if(datasource.trim()==""){
+			alert('#springMessage("view.tms.metaobjparam.datasourcenotnull")！');
+			return ;
+		}else {	
+			var flag = checkeLength(datasource);
+			if(!flag){
+				alert('#springMessage("view.tms.metaobjparam.dataStolong")！');
+				return;
+			}
+			flag = checkeSpecialCode(datasource);
+			if(!flag){
+				alert('#springMessage("view.tms.metaobjparam.dataSspecial")！');
+				return;
+			}
+		}
+		if(objcode.trim()==""){
+			alert('#springMessage("view.tms.metaobjparam.codenotnull")！');
+			return ;
+		}else {	
+			var flag = checkeLength(objcode);
+			if(!flag){
+				alert('#springMessage("view.tms.metaobjparam.codetolong")！');
+				return;
+			}
+			flag = checkeSpecialCode(objcode);
+			if(!flag){
+				alert('#springMessage("view.tms.metaobjparam.codespecial")！');
+				return;
+			}
+		}
+		if(datatype==""){
+			alert('#springMessage("view.tms.metaobjparam.datatypeempty")！');
+			return ;
+		}	
+		if(storeColumn==null || storeColumn==""){
+			alert('#springMessage("view.tms.metaobjparam.storecolumnempty")！');
+			return ;
+		}
+		if(sourceType==""){
+			alert('#springMessage("view.tms.metaobjparam.sourceempty")！');
+			return ;
+		}	
+		if(sourceType=='DICT'){
+			var sourceId=$('#SOURCEID').val();
+			if(sourceId==''){
+				alert('#springMessage("view.tms.metaobjparam.sourceIdempty")！');
+				return ;
+			}
+		}
+		if(DEFAULTVALUE.trim()!=''){
+			var flag = checkeLength(DEFAULTVALUE,'32');
+			if(!flag){
+				alert('属性默认值长度超长');
+				return;
+			}
+			flag = checkeSpecialCode(DEFAULTVALUE);
+			if(!flag){
+				alert('默认值含有特殊字符');
+				return;
+			}
+		}
+		if(orderby!=''){
+			var r   =    /^\d*$/;　　//正整数     
+			if(orderby.length>4){
+				alert('显示顺序不能大于4位数');
+				return;
+			}else if(!r.test(orderby)){	
+				alert('#springMessage("view.tms.metaobjparam.orderisnum")');
+				return;
+			}
+		}else {
+			alert('显示顺序不能为空');
+			return;
+		}
+		if(PROPDESC!=''){
+			var flag = checkeLength(PROPDESC,'256');
+			if(!flag){
+				alert('属性描述信息长度超长');
+				return;
+			}
+		}
+		
+		$('input[name=PROPNAME]').val(objname.trim());
+		$('input[name=PROPCODE]').val(objcode.trim());
+		$('#DEFAULTVALUE').val(DEFAULTVALUE.trim());
+		
+		var params = $('#dataForm').serialize();
+		jcl.postJSON('/tms/mgr/meta/optobjparam', params, function(data){
+			dialog.show();
+		});
+		
+	})
+	$('#cancelBtn').click(function(){
+		jcl.go('/tms/mgr/meta/objparamlist?versionId='+versionId+'&versionName='+versionName+'&objId='+objId+'&typeName='+typeName);
+	});
+	$('#goonBtn').click(function(){
+		jcl.go('/tms/mgr/meta/objparamadd?versionId='+versionId+'&versionName='+versionName+'&objId='+objId+'&typeName='+typeName);
+	});
+	$('#backBtn').click(function(){
+		jcl.go('/tms/mgr/meta/objparamlist?versionId='+versionId+'&versionName='+versionName+'&objId='+objId+'&typeName='+typeName);
+	});
+	$('#METAOBJID').val(objId);
+	$('#versionId').val(versionId);
+});
+
+</script>
+
+</head>
+<body>
+<div id="succesInfo">
+	<div>#springMessage("view.cmc.pub.add.success")</div>
+	<div class="button-box">
+		<input type="button" value='#springMessage("view.cmc.pub.btn.continueCrt")' class="btn" id="goonBtn"/>
+		<input type="button" value='#springMessage("view.cmc.pub.btn.banck")' class="btn" id="backBtn"/>
+	</div>
+</div>
+<form name="dataForm" id="dataForm" method="post">
+<ul class="list-box">
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.name")：</label> 
+		<span class="list-box-item-content"><input name="PROPNAME" id="PROPNAME" type="text" class="itext"  /><font color="red">*</font></span>
+		<span id="username_info" class="list-box-item-content"></span>
+		<input name="METAOBJID" id="METAOBJID" type="hidden" class="itext" />
+		<input name="METAOBJPROPID" id="METAOBJPROPID" type="hidden" class="itext" />
+		
+		<input name="versionId" id="versionId" type="hidden" class="itext" />
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.datasourcecode")：</label> 
+		<span class="list-box-item-content">
+			<input name="DATASOURCE" id="DATASOURCE" type="text" class="itext" /><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.code")：</label> 
+		<span class="list-box-item-content">
+			<input name="PROPCODE" id="PROPCODE" type="text" class="itext" /><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.datatype")：</label> 
+		<span class="list-box-item-content">
+			<select name="DATATYPE" id="DATATYPE" style="width: 80px" onchange="selectFuncByType(this,'add')"></select><font color="red">*</font>
+		</span>
+		<span id="datatypehid"></span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.storecolumn")：</label> 
+		<span class="list-box-item-content">
+			<select name="STORECOLUMN" id="STORECOLUMN" style="width: 80px"></select><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.datasource")：</label> 
+		<span class="list-box-item-content">
+			<select name="SOURCETYPE" id="SOURCETYPE" style="width: 80px" onchange="selectSource(this)">
+				<option value="DIY">手工输入</option>
+				<option value="LIST">#springMessage("view.tms.metaobjparam.datasource.LIST")</option>
+				<option value="DICT">#springMessage("view.tms.metaobjparam.datasource.DICT")</option>
+				<option value="TXNDATA">#springMessage("view.tms.metaobjparam.datasource.TXNDATA")</option>
+				<option value="TXNSTAT">#springMessage("view.tms.metaobjparam.datasource.TXNSTAT")</option>
+				<option value="TXNBEHA">#springMessage("view.tms.metaobjparam.datasource.TXNBEHA")</option>
+				<option value="USERDATA">#springMessage("view.tms.metaobjparam.datasource.USERDATA")</option>
+				<option value="USERSTAT">#springMessage("view.tms.metaobjparam.datasource.USERSTAT")</option>
+				<option value="USERBEHA">#springMessage("view.tms.metaobjparam.datasource.USERBEHA")</option>
+			</select><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item" id="trSOURCEID" style="display: none">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.sourceid")：</label> 
+		<span class="list-box-item-content">
+			<select name="SOURCEID" id="SOURCEID" style="width: 80px"  ></select><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.default")：</label> 
+		<span class="list-box-item-content">
+			<input name="DEFAULTVALUE" id="DEFAULTVALUE" type="text" class="itext"  style="width: 80px" />
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.order")：</label> 
+		<span class="list-box-item-content">
+			<input name="ORDERBY" id="ORDERBY" type="text" class="itext" style="width: 80px" /><font color="red">*</font>
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.control")：</label> 
+		<span class="list-box-item-content">
+			<input type="radio" name="RWCONTROL" value="1" /> #springMessage("view.tms.metaobjparam.control.hid")
+			<input type="radio" name="RWCONTROL" value="2" checked="checked" /> #springMessage("view.tms.metaobjparam.control.read")
+			<input type="radio" name="RWCONTROL" value="3"  /> #springMessage("view.tms.metaobjparam.control.write")
+		</span>
+	</li>
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.isnull")：</label> 
+		<span class="list-box-item-content">
+			<input type="radio" name="ISNULL" value="0" /> #springMessage("view.tms.pub.flag.false")
+			<input type="radio" name="ISNULL" value="1" checked="checked" /> #springMessage("view.tms.pub.flag.true")
+		</span>
+		<input name="STATUS" id="STATUS" type="hidden" class="itext" value="1"/>
+	</li>
+	<!--  
+	<li class="list-box-item">
+		<label class="list-box-item-label">是否启用：</label> 
+		<span class="list-box-item-content">
+			<input type="radio" name="STATUS" value="0" checked="checked" /> #springMessage("view.tms.pub.flag.false")
+			<input type="radio" name="STATUS" value="1" /> #springMessage("view.tms.pub.flag.true")
+		</span>
+	</li>
+	-->
+	<li class="list-box-item">
+		<label class="list-box-item-label">#springMessage("view.tms.metaobjparam.info")：</label> 
+		<span class="list-box-item-content">
+			<textarea name="PROPDESC" class="ttext" id="PROPDESC" ></textarea>
+		</span>
+	</li>
+</ul>
+<div class="button-box">
+	<input type="button" value='#springMessage("view.tms.pub.btn.save")' class="btn" id="addBtn"/>
+	<input type="button" value='#springMessage("view.tms.pub.btn.cancel")' class="btn" id="cancelBtn"/>
+</div>
+</form>
+
+</body>
+</html>

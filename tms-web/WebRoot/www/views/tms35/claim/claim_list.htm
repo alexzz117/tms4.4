@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>理赔信息管理</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript">
+	var g;
+$(document).ready(function(){
+	//组装表格     
+	g = new jcl.ui.Grid({
+		title:'理赔信息列表',
+		qform:{
+			display: false,
+			items:[
+				{label: '理赔编号', name: 'CLAIM_ID'},
+				{label: '案件编号', name: 'CASE_NO'},
+				{label: '客户会员号', name: 'USERID'},
+				{label: '客户会员名', name: 'USERNAME'},
+				{label: '理赔状态', name: 'CLAIM_STATUS', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.claim.status'}
+				},
+				{label: '理赔创建时间', name: 'CREATETIME',type:'date'},
+				{label: '理赔完成时间', name: 'COMPLETETIME',type:'date'}
+			],btns:[
+				{id: 'quick_search_btn', text: '#springMessage("view.cmc.but.find")'}
+			]
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', action:'toggleQform'}
+		],
+		table:{
+			columns:[
+			    {name:'理赔编号', width: 20, dataIndex:'CLAIM_ID'},
+				{name:'案件编号', width: 20, dataIndex:'CASE_NO'},
+				{name:'客户会员号', width: 60, dataIndex:'USERID'},
+				//{name:'客户会员名', width: 40, dataIndex:'USERNAME'},
+				{name:'理赔状态', width: 30, dataIndex:'CLAIM_STATUS', render:'tms.claim.status'},
+				{name:'理赔创建时间', width: 25, dataIndex:'CREATETIME',render:'datetime'},
+				{name:'理赔完成时间', width: 25, dataIndex:'COMPLETETIME',render:'datetime'},
+				{name:'操作', width: 80, dataIndex:'OP'}
+			],
+			ds:{
+				url:"/tms/claim/list",
+				params:{},
+				callback:function(list){
+					for(var i = 0; i < list.length; i++){
+							list[i]['OP']= '<a href="#'+(new Date().getTime())+'" onclick="claimApprove(\''+list[i]['USERID']+'\')">理赔审批</a>';
+					}
+				}
+			},
+			pagebar: true
+		
+		}
+	});
+	var data = {
+		row: [{
+			CLAIM_ID: 1,
+			CASE_NO: 1,
+			USERID: '20126959961913',
+			USERNAME: 'ChiKASum',
+			CLAIM_STATUS: '新建',
+			OP:'<a href="#" onclick="claimApprove(\'20126959961913\',\'01\')">理赔审批</a>'
+		}, {
+			CLAIM_ID: 2,
+			CASE_NO: 1,
+			USERID: '20103959981923',
+			USERNAME: '胡浩',
+			CLAIM_STATUS: '财务部已审批',
+			OP:'<a href="#" onclick="claimApprove(\'20103959981923\',\'05\')">理赔审批</a>'
+		},{
+			CLAIM_ID: 3,
+			CASE_NO: 1,
+			USERID: '20126959961916',
+			USERNAME: 'AShiK',
+			CLAIM_STATUS: '待审批',
+			OP:'<a href="#" onclick="claimApprove(\'20126959961913\',\'02\')">理赔审批</a>，<a href="#" onclick="claimPrint(\'20126959961913\')">打印预览</a> '
+		}]
+	};
+	g.renderPage({
+		list: data.row
+	});
+	//g.goPage();
+	
+	// 查询
+	$("#quick_search_btn").click(function(){
+		var params = g.qform.jqDom.serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+});
+
+function claimApprove(userid,claim_status){
+	var url = '/tms/claim/add?userid=' + userid+'&claim_status='+claim_status;
+	url = jcl.env.contextPath + url;
+	if (navigator.userAgent.indexOf('Chrome') > 0) {
+		var winOption = 'width=880,height=500,resizable=yes';
+		window.open(url, '', winOption);
+	}else {
+		var returnValue = window.showModalDialog(url, '', 'dialogWidth=880px;dialogHeight=500px;resizable=yes');
+		if (returnValue == 1) 
+			g.goPage();
+	}
+}
+function claimPrint(userid){
+	var url = '/tms/claim/add?userid=' + userid;
+	url = jcl.env.contextPath + url;
+	if (navigator.userAgent.indexOf('Chrome') > 0) {
+		var winOption = 'width=880,height=500,resizable=yes';
+		window.open(url, '', winOption);
+	}else {
+		var returnValue = window.showModalDialog(url, '', 'dialogWidth=880px;dialogHeight=500px;resizable=yes');
+		if (returnValue == 1) 
+			g.goPage();
+	}
+}
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+</body>
+</html>

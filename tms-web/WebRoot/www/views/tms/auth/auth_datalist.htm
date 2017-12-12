@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.auth.authList.title")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript">
+var g = "";
+
+var modelName = jQuery.url.param("modelName");
+$(document).ready(function(){
+	var columns;//数据项
+	var tools;//工具栏
+	var linkFlag = true;//是否添加连接
+	if(modelName=='名单管理'){
+		columns = [
+				{name:'#springMessage("view.tms.auth.authList.operateData")', width: 30, dataIndex:'DATAVALUE'},
+				{name:'#springMessage("view.tms.auth.authList.authNum")', width: 30, dataIndex:'AUTH_ID'},
+				//{name:'#springMessage("view.tms.auth.authList.txnName")', width: 50, dataIndex:'TXNNAME'},
+				{name:'#springMessage("view.tms.auth.authList.origFunc")', width: 30, dataIndex:'OPERATENAME'},
+				{name:'#springMessage("view.tms.auth.authList.subOperateNum")', width: 30, dataIndex:'SUB_OPERATE_NUM'},
+				{name:'#springMessage("view.tms.auth.authList.propostName")', width: 30, dataIndex:'REAL_NAME'},
+				{name:'#springMessage("view.tms.auth.authList.propostTime")', width: 40, dataIndex:'PROPOSER_TIME'}
+			];
+		tools = [
+			{id:"btn-auth", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.auth")', enable:'rowSelected'},
+			{id:"btn-suboperate", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.subOperate")', enable:'oneRowSelected'},
+			{id:"btn-log", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.log")', enable:'oneRowSelected'},
+			{id:"btn-back", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.pub.btn.banck")'}
+		];
+		linkFlag = false;
+	} else if(modelName=='交易配置') {
+		columns = [
+			{name:'#springMessage("view.tms.auth.authList.operateData")', width: 30, dataIndex:'DATAVALUE'},
+			{name:'#springMessage("view.tms.auth.authList.authNum")', width: 30, dataIndex:'AUTH_ID'},
+			{name:'#springMessage("view.tms.auth.authList.txnName")', width: 50, dataIndex:'TXNNAME'},
+			{name:'#springMessage("view.tms.auth.authList.origFunc")', width: 30, dataIndex:'OPERATENAME'},
+			{name:'#springMessage("view.tms.auth.authList.subOperateNum")', width: 30, dataIndex:'SUB_OPERATE_NUM'},
+			{name:'#springMessage("view.tms.auth.authList.propostName")', width: 30, dataIndex:'REAL_NAME'},
+			{name:'#springMessage("view.tms.auth.authList.propostTime")', width: 40, dataIndex:'PROPOSER_TIME'}
+		];
+		tools = [
+					{id:"btn-auth", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.auth")', enable:'rowSelected'},
+					{id:"btn-suboperate", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.subOperate")', enable:'oneRowSelected'},
+					{id:"btn-log", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.log")', enable:'oneRowSelected'},
+					{id:"btn-back", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.pub.btn.banck")'}
+		];
+		linkFlag = false;
+	} else {
+		columns = [
+					{name:'#springMessage("view.tms.auth.authList.operateData")', width: 30, dataIndex:'DATAVALUE'},
+					{name:'#springMessage("view.tms.auth.authList.authNum")', width: 30, dataIndex:'AUTH_ID'},
+					{name:'#springMessage("view.tms.auth.authList.txnName")', width: 50, dataIndex:'TXNNAME'},
+					{name:'#springMessage("view.tms.auth.authList.origFunc")', width: 30, dataIndex:'OPERATENAME'},
+					//{name:'#springMessage("view.tms.auth.authList.subOperateNum")', width: 30, dataIndex:'SUB_OPERATE_NUM'},
+					{name:'#springMessage("view.tms.auth.authList.propostName")', width: 30, dataIndex:'REAL_NAME'},
+					{name:'#springMessage("view.tms.auth.authList.propostTime")', width: 40, dataIndex:'PROPOSER_TIME'}
+		]
+		tools = [
+					{id:"btn-auth", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.auth")', enable:'rowSelected'},
+					{id:"btn-suboperate", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.subOperate")', enable:'oneRowSelected'},
+					{id:"btn-log", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.auth.authList.log")', enable:'oneRowSelected'},
+					{id:"btn-back", icon:"icon-tb-aw-l", text:'#springMessage("view.tms.pub.btn.banck")'}
+		];
+	}
+	
+	//组装表格
+	g = new jcl.ui.Grid({
+		title:'#springMessage("view.tms.auth.authList.title")',
+		//checkboxEnable:false, 禁用grid中的复选框
+		table:{
+			columns:columns,
+			ds:{
+				url:"/tms/auth/authList",
+				params:{'modelName':modelName},
+				callback:function(list){
+					for(var i = 0; i < list.length; i++){
+						if(linkFlag){
+							var auth_id = list[i]['AUTH_ID'];
+							var operate_data = list[i]['DATAVALUE'];
+							var table_name = list[i]['QUERY_TABLE_NAME'];
+							var table_pk = list[i]['QUERY_TABLE_PK'];
+							var table_pkvalue = list[i]['QUERY_PKVALUE'];
+							var operate_name = list[i]['ORIG_OPERATENAME'];
+							list[i]['DATAVALUE'] = '<a href="#'+(new Date().getTime())+'" onclick="toCompare(\''+operate_name+'\',\''+table_name+'\',\''+table_pk+'\',\''+table_pkvalue+'\',\''+auth_id+'\')">'+list[i]['DATAVALUE']+'</a>';
+						}
+						
+						list[i]['PROPOSER_TIME'] = jcl.util.convert.datetime(list[i]['PROPOSER_TIME']);
+					}
+				}
+			},
+			pagebar: true
+		},
+		toolbar:tools,
+		qform: {display:false}
+	});
+	g.goPage();
+	
+	//对话框显示
+	var dialog = new jcl.ui.Dialog({draggable: true});
+	
+	//授权意见表单
+	var authForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label: '#springMessage("view.tms.auth.authDetail.isAccess")', name: 'AUTH_STATUS', required:true, value:'1', type:'radio', items:[
+            	{text: '是', value: '1'},
+                {text: '否', value: '2'}
+            ]},
+			{label: '#springMessage("view.tms.auth.authDetail.reason")', name:'AUTH_MSG', required:true, type: 'textarea'},
+			{label: '#springMessage("view.tms.auth.authList.origFunc")', name:'FUNCNAME', required:true, type:'hidden'},
+			{label: 'AUTH_IDS', name:'AUTH_IDS', type: 'hidden'},
+			{label: 'OPERATENAME', name:'OPERATENAME', type: 'hidden'},
+			{label: 'TXNNAME', name:'TXNNAME', type: 'hidden'},
+			{label: 'AUTH_IDS', name:'OPERATEDATA_VALUE', type: 'hidden'}
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'updateBtn'},
+			{text: '#springMessage("view.tms.pub.btn.banck")', cls: 'cancelBtn'}
+		]
+	});
+	dialog.addDom(authForm.jqDom);
+	
+	authForm.jqDom.find('.updateBtn').click(function(){
+		var status = authForm.jqDom.find("[name='AUTH_STATUS']").val();
+		var msg = authForm.jqDom.find('[name=AUTH_MSG]').val();
+		
+		if(Trim(msg)==''){
+			alert('#springMessage("view.tms.auth.authDetail.noreason")');
+			return ;
+		}
+		if(Trim(msg)!='' &&  msg.lengths() > 2048) {
+			alert('#springMessage("view.tms.auth.authDetail.reasonToolong")');
+			return ;	
+		}
+		if(Trim(msg)!='' && !checkeSpecialCode(msg)){
+			alert('#springMessage("view.tms.auth.authDetail.specialMsg")');
+			return ;
+		}
+		
+		var rows = g.selectedRows();
+		var authIds = "";
+		var funcName = "";
+		var operatedataValue = "";
+		var txnname = "";
+		var operatename = "";
+		$.each(rows, function(i,row){
+			authIds = authIds + "," + row['AUTH_ID'];
+			funcName = funcName + "," + row['FUNCNAME'];
+			operatedataValue = operatedataValue + "~" + row['OPERATEDATA_VALUE'];
+			var t_txnname = row['TXNNAME'];
+			if(t_txnname != undefined && t_txnname != ''){
+				txnname += ","+t_txnname;
+			}
+			
+			var t_operatename = row['OPERATENAME'];
+			if (t_operatename != undefined && t_operatename != '') {
+				operatename += "," + t_operatename;
+			}
+			
+		});
+		if(authIds!=''){
+			authIds = authIds.substring(1, authIds.length);
+		}
+		if(funcName!=''){
+			funcName = funcName.substring(1, funcName.length);
+		}
+		if(operatedataValue != ''){
+			operatedataValue = operatedataValue.substring(1, operatedataValue.length);
+		}
+		if(txnname != ''){
+			txnname = txnname.substring(1, txnname.length);
+		}
+		if(operatename != ''){
+			operatename = operatename.substring(1, operatename.length);
+		}
+		authForm.jqDom.find('[name=AUTH_IDS]').val(authIds);
+		authForm.jqDom.find('[name=FUNCNAME]').val(funcName);
+		authForm.jqDom.find('[name=TXNNAME]').val(txnname);
+		authForm.jqDom.find('[name=OPERATENAME]').val(operatename);
+		authForm.jqDom.find('[name=OPERATEDATA_VALUE]').val(operatedataValue);
+		var params = authForm.jqDom.serialize();
+		jcl.postJSON('/tms/auth/modAuth', params, function(data){
+			dialog.hide();
+			jcl.msg.info('#springMessage("view.tms.auth.authList.authsuccess")');
+			g.goPage();
+		});
+	}).end().find('.cancelBtn').click(function(){
+		dialog.hide();
+	});
+	
+	//点击授权按钮
+	g.toolbar.onClick('#btn-auth', function(){
+		authForm.reset();
+		
+		dialog.setTitle('#springMessage("view.tms.auth.authList.authopinion")');
+		authForm.jqDom.show();
+		dialog.show();
+	});
+	
+	//点击查看子操作按钮
+	g.toolbar.onClick('#btn-suboperate', function(){
+		var rows = g.selectedRows();
+		var authId = rows[0]['AUTH_ID'];
+		var param = "authId="+authId+"&modelName="+modelName;
+		jcl.go('/tms/auth/listSubOperate?'+param,"子操作列表");
+	});
+	
+	//单击查看日志按钮
+	g.toolbar.onClick('#btn-log', function(){
+		var rows = g.selectedRows();
+		var param = '';
+		var logTile = '';
+		$.each(rows, function(i,row){
+			param = 'authId='+row['AUTH_ID'];
+			logTile = row['FUNC_NAME']+'-'+row['OPERATE_DATA']+'授权日志';
+		});
+		param = param + "&modelName="+modelName;
+		jcl.go('/tms/auth/toLog?'+param,logTile);
+	});
+	
+	//单击返回按钮
+	g.toolbar.onClick('#btn-back', function(){
+		jcl.go('/tms/auth/modelList');
+	});
+});
+
+//跳转到数据对比页面
+function toCompare(operate_name,table_name,table_pk,table_pkvalue,auth_id){
+	var params = "operate_name="+operate_name+"&table_name="+table_name+"&table_pk="+table_pk+"&table_pkvalue="
+	+table_pkvalue+"&auth_id="+auth_id+"&modelName="+modelName+"&flag=1";
+	jcl.go('/tms/auth/dataCompare?'+params,'#springMessage("view.tms.auth.datacompare.title")');
+}
+</script>
+
+</head>
+<body>
+
+</body>
+</html>

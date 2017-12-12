@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<context:component-scan base-package="cn.com.higinet.tms35.manage" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	<context:component-scan base-package="cn.com.higinet.tmsreport.web" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	
+	<mvc:interceptors>
+		<bean id="TransModelInterceptor" class="cn.com.higinet.tms35.manage.handler.TransModelInterceptor">
+			<property name="iteratorSimpleDao" ref="iteratorSimpleDao" />
+			<property name="disableUrlList">
+				<!-- 当满足指定条件时，不能进行操作的URL列表 -->
+				<list>
+					<value>/tms35/trandef/save</value><!-- 交易定义 -->
+					<value>/tms35/tranmdl/saveModel</value><!-- 交易模型定义 -->
+					<value>/tms35/tranmdl/saveModelRefTab</value><!-- 交易模型引用表 -->
+					<value>/tms35/tranmdl/saveModelRefFd</value><!-- 交易模型引用字段 -->
+					<value>/tms/stat/save</value><!-- 交易统计 -->
+					<value>/tms35/rule/save</value><!-- 交易规则 -->
+					<value>/tms35/action/save</value><!-- 规则动作 -->
+					<value>/tms35/strategy/save</value><!-- 交易策略 -->
+					<value>/tms35/strategy/saveStrategyRule</value><!-- 交易策略规则 -->
+				</list>
+			</property>
+		</bean>
+	</mvc:interceptors>
+</beans>

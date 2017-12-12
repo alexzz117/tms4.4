@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.report.center.alert")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionMaps/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/FusionWidgets/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/PowerCharts/FusionCharts.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-1.3.2-vsdoc2.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/mycommon.js"></script>
+<!--jquery操作表格-->
+<script type="text/javascript">
+
+	var cityNum =0;
+	var myArray = new Array();
+	var dataLineNum =0; // 数据行数 maxiao 2011-9-2
+	
+	$(document).ready(function(){
+		ClearAllSign();
+	});
+	
+//检测该序号是否在此数组中
+Array.prototype.S=String.fromCharCode(2);
+Array.prototype.in_array=function(e)
+{
+var r=new RegExp(this.S+e+this.S);
+return (r.test(this.S+this.join(this.S)+this.S));
+}
+//获取当月最后一天
+function getLastDay(year,month)
+{
+ var new_year = year;    //取当前的年份
+ var new_month = month++;//取下一个月的第一天，方便计算（最后一天不固定）
+ if(month>12)            //如果当前大于12月，则年份转到下一年
+ {
+  new_month -=12;        //月份减
+  new_year++;            //年份增
+ }
+ var new_date = new Date(new_year,new_month,1);                //取当年当月中的第一天
+ return (new Date(new_date.getTime()-1000*60*60*24)).getDate();//获取当月最后一天日期
+}
+//自定义方法：
+function findObj(theObj, theDoc)
+{ 
+	var p, i, foundObj; 
+	if(!theDoc) theDoc = document; 
+	if( (p = theObj.indexOf("?")) > 0 && parent.frames.length) 
+	{    
+		theDoc = parent.frames[theObj.substring(p+1)].document;    
+		theObj = theObj.substring(0,p); 
+	} 
+	if(!(foundObj = theDoc[theObj]) && theDoc.all) 
+		foundObj = theDoc.all[theObj]; 
+		
+	for (i=0; !foundObj && i < theDoc.forms.length; i++)     
+		foundObj = theDoc.forms[i][theObj]; 
+		
+	for(i=0; !foundObj && theDoc.layers && i < theDoc.layers.length; i++)     
+		foundObj = findObj(theObj,theDoc.layers[i].document); 
+		
+	if(!foundObj && document.getElementById) 
+		foundObj = document.getElementById(theObj);    
+	return foundObj;
+}
+
+//添加一个行
+function AddSignRow(){ //读取最后一行的行号，存放在txtTRLastIndex文本框中 
+	var txtTRLastIndex = findObj("txtTRLastIndex",document);
+	var rowID = parseInt(txtTRLastIndex.value);
+	
+	var signFrame = findObj("SignFrame",document);
+	
+	//添加行
+	var newTR = signFrame.insertRow(signFrame.rows.length);
+	newTR.id = "SignItem" + rowID;
+	
+	//添加列:序号
+	var newNameTD=newTR.insertCell(0);	
+	//添加列内容
+	newNameTD.innerHTML = newTR.rowIndex.toString();
+		
+	//添加列:省份
+	var newNameTD=newTR.insertCell(1);	
+	//添加列内容
+	newNameTD.innerHTML = '<select id="region'+rowID+'" name="region'+rowID+'" onchange="changecity('+rowID+')"> <option value="0">--#springMessage("view.tms.report.center.select")--</option> </select>';
+	 //请选择省份：<select id="region" name="region" onchange="changecity()"> <option value="0">--请选择--</option> </select>
+	
+	initRegion(rowID);
+	
+	//添加城市列
+	var newDeleteTD=newTR.insertCell(2);	
+	//添加列内容
+	newDeleteTD.innerHTML = '<span id='+rowID+'><select id="city'+rowID+'" name="city'+rowID+'"> <option value="0">--#springMessage("view.tms.report.center.select")--</option> </select></span>';
+	//请选择城市：<select id="city" name="city""> <option value="0">--请选择--</option> </select>
+	
+	//添加列:删除按钮
+	var newDeleteTD=newTR.insertCell(3);	
+	//添加列内容
+	newDeleteTD.innerHTML = "<div align='center'><a href='javascript:;' onclick=\"DeleteSignRow('" + rowID + "')\"><font color='#FF0000'>删除</font></a></div>";
+	
+	//将行号推进下一行
+	txtTRLastIndex.value = (rowID + 1).toString() ;
+
+	cityNum = txtTRLastIndex.value;
+	
+	// 数据行加1
+	dataLineNum++;
+}
+
+//删除指定行
+function DeleteSignRow(rowid){
+	var signFrame = findObj("SignFrame",document);
+	var signItem = findObj('SignItem'+rowid,document);
+	
+	//获取将要删除的行的Index
+	var rowIndex = signItem.rowIndex;
+	
+	//删除指定Index的行
+	signFrame.deleteRow(rowIndex);
+	//保存删除的序号 
+	//要保存的生成代码时候的序号值 maxiao 2011-9-2
+	//myArray.push(rowIndex);
+	myArray.push(rowid);
+	
+	//重新排列序号，如果没有序号，这一步省略
+	for(i=rowIndex;i<signFrame.rows.length;i++){
+		signFrame.rows[i].cells[0].innerHTML = i.toString();
+	}
+	//不可动index,只能处理数量 maxiao 2011-9-2
+	//cityNum = signFrame.rows.length;
+	
+	// 数据行减1
+	if(dataLineNum>=1)dataLineNum--;
+}
+//清空列表
+function ClearAllSign(){
+	var signFrame = findObj("SignFrame",document);
+	var rowscount = signFrame.rows.length;
+	
+	//循环删除行,从最后一行往前删除
+	for(i=rowscount - 1;i > 0; i--){
+	   signFrame.deleteRow(i);
+	}
+	
+	//重置最后行号为1
+	var txtTRLastIndex = findObj("txtTRLastIndex",document);
+	txtTRLastIndex.value = "1";
+	
+	//数据行数清0
+	dataLineNum=0;
+	
+	//预添加一行
+	AddSignRow();
+}
+function initRegion(indexNo){
+	//省份数据
+	jcl.postJSON('/tms/report/region/list', "", function(data){
+		$.each(data.row, function(i,row){
+			//alert(row['REGIONCODE']);
+			$("select[name=region"+indexNo+"]").append("<option value='" + row['REGIONCODE'] + "'>" + row['REGIONNAME'] + "</option>");  
+		}); 
+	});
+}
+
+function changecity(indexNo){
+	
+	//清空city选项
+	/*var cityfrm = document.getElementById("city"+indexNo);
+	for (var i = 0; i < cityfrm.length; i++)
+	{
+		    cityfrm.remove(i); 
+	}*/
+	var clearFrm = document.getElementById(indexNo);
+	clearFrm.innerHTML = '<select id="city'+indexNo+'" name="city'+indexNo+'"> <option value="0">--#springMessage("view.tms.report.center.select")--</option> </select>';
+	
+	var rulefrm = document.getElementById("region"+indexNo);
+	var region = rulefrm.options[rulefrm.selectedIndex].value;
+	
+	//城市数据
+	jcl.postJSON('/tms/report/city/list?regioncode='+region, "", function(data){
+		$.each(data.row, function(i,row){
+			$("select[id=city"+indexNo+"]").append("<option value='" + row['CITYCODE'] + "'>" + row['CITYNAME'] + "</option>");  
+		}); 
+	});
+}
+
+function SubCity(){
+	//求一共有多少行 maxiao 2011-9-2
+	//第一行是title，不算
+	if(dataLineNum < 1){
+		alert('#springMessage("view.tms.report.center.leastOne")');
+		return false;
+	}
+
+	var flag = "city";
+	var city = "";
+	var citycode = [];
+	
+	//不从前台取时间了 后台取 maxiao 2011-9-2
+	/*var myDate = new Date().toLocaleString();
+	//var year = new Date().toLocaleString().split("年")[0].replace(/年|月/g, "-").replace(/日/g, " ");
+	var year = myDate.split("#springMessage('view.tms.report.center.year')")[0];
+	var month = myDate.split("#springMessage('view.tms.report.center.year')")[1].split("#springMessage('view.tms.report.center.month')")[0];
+	if(month < 10){
+		month = "0"+month;
+	}
+	
+	//本月第一天
+	var startTime = year+"-"+month+"-"+"01";
+	//本月最后一天
+	//var MonthNextFirstDay=new Date(Nowdate.getYear(),Nowdate.getMonth()+1,1);
+  	//var end_time=new Date(startTime-86400000).toLocaleString().substr(0,10).replace(/年|月/g, "-").replace(/日/g, " ");;
+  	var end_time = year+"-"+month+"-"+getLastDay(year,month);*/
+  	
+  	// 地区数 初始值是0，而不是1 maxiao 2011-9-2
+  	var count = 0; 
+  	
+  	// 用cityNum，前提是cityNum不能减少 maxiao 2011-9-2
+	for(var i=1;i<cityNum;i++){
+		// 如果不在删除的数组里，就取值
+		if(!myArray.in_array(i)){
+			var temp = document.getElementById("city"+i);
+			var tempRegion = document.getElementById("region"+i);
+			if(tempRegion!=null){
+				var value = temp.options[temp.selectedIndex].value;
+				var valueRegion = tempRegion.options[tempRegion.selectedIndex].value;
+				// 没有选择地区
+				if(valueRegion=="0"){
+					alert('#springMessage("view.tms.report.center.selprovince")');
+					return;
+				}
+				// 选择地区、没选城市，允许，但要将对比维度设为“地区”
+				else if(value=="0"){
+					flag = "region";
+					count++;
+					city += valueRegion + ",";
+					//alert('#springMessage("view.tms.report.center.concity")');
+					//return;
+				}else{
+					city += value + ",";
+				}
+			}
+		}
+	}
+	// 如果行数大于地区数 且对比维度是“地区” 则证明有行选择了城市 此时要求全选城市 maxiao 2011-9-2
+	if(count < dataLineNum && flag == "region"){
+		alert('#springMessage("view.tms.report.center.concity")');
+		return;
+	}
+	citycode.push('citycode=' + city.substr(0,city.length-1)); 
+	//ClearAllSign()
+	//jcl.go('/tms/report/chart/condition/list?'+citycode[0]+"&operate_time="+startTime+"&end_time="+end_time+"&flag="+flag);
+	jcl.go('/tms/report/chart/condition/list?'+citycode[0]+"&flag="+flag);
+}
+</script>
+<!--表格操作js结束--> 
+</head>
+<body class="dialog_body">
+  <form method="post" >
+  <div>
+   	<table border="0" width="900" cellpadding="0" cellspacing="0" class="table">
+	 	<tr><td nowrap="4" style="font-weight:bold;font-size:15px">
+	 		#springMessage('view.tms.report.center.regioncity')：
+		    <input type="button" name="Add" value="#springMessage('view.tms.report.center.addline')" onclick="AddSignRow()" class="btn"/> 
+		    <input name='txtTRLastIndex' type='hidden' id='txtTRLastIndex' value="1" />
+		    <input type="button" name="Submit" value="#springMessage('view.tms.pub.btn.sure')" onclick="SubCity()" class="btn"/>
+		    </td>
+		</tr>	    
+	  </table>
+  </div>
+  <div>
+	<table width="650" border="1" cellpadding="2" cellspacing="1" id="SignFrame">
+      <tr id="trHeader">
+        <td width="75" align="center" style="font-weight:bold;font-size:13px" nowrap>#springMessage('view.tms.report.center.serial')</td>
+        <td width="200" align="center" style="font-weight:bold;font-size:13px" nowrap>#springMessage('view.tms.report.center.province')</td>
+        <td width="300" align="center" style="font-weight:bold;font-size:13px" nowrap>#springMessage('view.tms.report.center.city')</td>
+        <td width="75" align="center" style="font-weight:bold;font-size:13px" nowrap>#springMessage('view.tms.report.center.operator')</td>
+      </tr>
+    </table>
+   </div>
+  </form>
+ </body>
+</html>

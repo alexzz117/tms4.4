@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>选择规则</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script> 
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+
+<script type="text/javascript">
+//var txnid = $("#txnid",window.dialogArguments.document).val();
+var txnid = jQuery.url.param("txnid");// 交易主键
+var id = jQuery.url.param("id");// 策略主键
+
+$(document).ready(function(){
+	
+	$('#TXNID').val(txnid);
+	$('#STRATEGYID').val(id);
+	//组装表格
+	var g = $("#boxdiv").grid({
+		title:'#springMessage("view.tms.stategy.rule.edit.rule.add.title")',
+		columns:[
+			{name:'#springMessage("view.tms.rule.add.rulename")', width: 50, dataIndex:'RULENAME'},
+			{name:'#springMessage("view.tms.rule.add.desc")', width: 80, dataIndex:'RULEDESC'},
+			{name:'#springMessage("view.tms.rule.add.score")', width: 20, dataIndex:'SCORE'},
+			{name:'#springMessage("view.tms.rule.add.weight")', width: 20, dataIndex:'WEIGHT'},
+			{name:'#springMessage("view.tms.rule.add.disposal")', width: 20, dataIndex:'DISPOSAL',render:'tms.rule.disposal'},
+			{name:'#springMessage("view.tms.rule.add.status")', width: 20, dataIndex:'STATUS',render:'tms.mgr.rulestatus'}
+		],
+		ds:{
+			url:"/tms/strategy/getRuleList",
+			params:{TXNID:txnid,STRATEGYID:id},
+			callback:function(list){
+				for(var i = 0; i < list.length; i++){
+					list[i]['WEIGHT'] += '%';
+				}
+			}
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', toggleQform:true},
+			{id:"btn-add", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.sure")'},
+			{id:"btn-back", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.banck")'}
+		],
+		pagebar: true,
+		qform: {id:"qform", display:false}
+
+	});
+	g.goPage();
+	
+	// 查询按钮
+	$("#quick_search_btn").click(function(){
+		var params = $('#qform').serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+
+	// 确定按钮
+	$("#btn-add").click(function(){
+		// 校验
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")!');
+			return;
+		}
+		
+		var ruleid = [];
+		$.each(rows, function(i, row){
+			ruleid.push('ruleid='+row['RULEID']);
+		});
+		var params = ruleid.join('&');
+
+		// 插入数据库
+		params += '&strategyid='+id;
+		jcl.postJSON('/tms/strategy/addStrategyRule', params, function(data){
+			jcl.go("/tms/strategy/editStrategy?id="+id+"&tabname=tabRule");// 页面跳转
+		});
+	});
+
+	
+	// 取消按钮
+	$("#btn-back").click(function(){
+		jcl.go("/tms/strategy/editStrategy?id="+id+"&tabname=tabRule");// 页面跳转
+	});	
+
+
+	// 规则状态下拉
+	jcl.code.selector('STATUS','tms.mgr.rulestatus',{text:'--请选择--',value:''});
+	// 处置方式下拉
+	jcl.code.selector('DISPOSAL','tms.rule.disposal',{text:'--请选择--',value:''});
+	
+});
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<form id="qform" name="qform">
+<input style="display: none"/>
+   <table>
+       <tr>
+           <td width="10%"align='center'>#springMessage("view.tms.rule.add.rulename")</td>
+           <td width="15%">
+               <input name="RULENAME" id="RULENAME" type="text" class="itext" value=""/>
+           </td>
+           <td width="10%"align='center'>#springMessage("view.tms.rule.add.status")</td>
+           <td width="15%">
+            <select id="STATUS" name="STATUS">
+               </select>
+           </td>
+		   <td width="10%" align='center'>#springMessage("view.tms.rule.add.disposal")</td>
+           <td width="15%"> 
+			<select id="DISPOSAL" name="DISPOSAL">
+                     <option value="">--请选择--</option>
+			</select>
+           </td>
+		   <input name="TXNID" id="TXNID" type="hidden"/>
+		   <input name="STRATEGYID" id="STRATEGYID" type="hidden"/>
+           <td  align="center"><input id="quick_search_btn" type="button" value="#springMessage('ui.common.btn.qquery')" class="btn"/></td>
+       </tr>
+
+	</table>
+</form>
+</body>
+</html>

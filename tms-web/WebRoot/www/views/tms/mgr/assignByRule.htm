@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>任务分派管理页面</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/aml/form.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/aml/txnct.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/aml/config.js"></script>
+<style type="text/css">
+#func-box{width:100%;}
+#left-box{width:260px; border-right: 1px solid #B2B2B2; float:left;}
+#right-box{margin-left:260px; _margin-left:0px; _float:left;_overflow:auto;}
+#tree-box{overflow:auto; padding-left:10px; width:250px;}
+#form-box{overflow:auto; margin:0px;}
+#node-info{line-height:28px; padding-left: 5px;}
+textarea {
+    background-color: #f9f9f9;
+    border: 1px solid #bbd;
+    box-shadow: 0 0 5px #dde inset;
+    color: #777;
+    font-size: 12px;
+    line-height: 130%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    resize: vertical;
+}
+textarea.parent:focus {
+    border-color: #888;
+    color: #223;
+    outline: medium none;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+	var page = {};
+	//box
+	var frame = page.frame = new jcl.ui.Frame({
+		title : jcl.message.get('view.tms.aml.config.title', '任务分派管理')
+	});
+	frame.addDom('#func-box');
+
+	
+
+	var tree = page.tree = new jcl.ui.Tree({
+		sm:{
+			type: 'row'
+		}
+	}, $('#tree-box'));
+	
+	var flag = "";
+	var acTabIndex = -1;
+	
+	frame.container.bind('resizes', function(){
+		var height = $(this).height() - $('#left-toolbar').outerHeight();
+		$('#tree-box').height(height);
+		$('div.tabp-list').height(height);
+		if (acTabIndex != -1) {
+			var tabp = $('div.tabp-content:eq(' + acTabIndex + ')');
+			var form = tabp.find('form.form');
+			var _this = form.find('.ttext');
+			var formWidth = form.width();
+			var thisHeight = _this.height();
+			_this.height(height + thisHeight - tabp.height() - 20);
+			_this.width(formWidth - form.find('.form-item-label').outerWidth(true) - 20);
+		}
+	}).triggerHandler('resizes');
+
+
+    var g = new jcl.ui.Grid({
+		title:'人员列表',
+		marginTop:0,
+		toolbar:[
+				{id:"btn-add", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.new")'},
+				{id:"btn-edit", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.edit")', enable:'oneRowSelected'},
+				{id:"btn-del", icon:"icon-tb-del", text:'删除', enable:'rowSelected'}
+			],		
+		table:{
+			checkboxEnable:true,
+			columns:[
+				{name:'状态', width: 8, dataIndex:'IS_ENABLE', render:'tms.mgr.rulestatus'},
+				{name:'处理人', width: 15, dataIndex:'OPERID'},
+				{name:'开始时间', width: 10, dataIndex:'STARTTIME'},
+				{name:'结束时间', width: 10, dataIndex:'ENDTIME'},
+				{name:'处置方式', width: 50, dataIndex:'DISPOSALS_NAME'}
+			],
+			ds:{
+				url:"/tms/assignAuto/assignInfo",
+				params:{}
+			},
+			pagebar: false
+		
+		}
+	}, $('#right-box'));
+    
+    var addDialog = new jcl.ui.Dialog({title:'添加被分派人', draggable: true});
+    var editDialog = new jcl.ui.Dialog({title:'被分派人编辑管理', draggable: true});
+    
+    
+    var addForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label:'交易名称', name: 'AS_STRATEGYID', type: 'hidden'},
+			{label:'处理人', name:'OPERID', type: 'selector', 
+				title: '--请选择--', items:[], required:true},
+			{label:'开始时间', name:'STARTTIME', required:true},
+			{label:'结束时间', name:'ENDTIME', required:true},
+			{label:'处置方式', name:'DISPOSALS', type: 'listselector', 
+				title: '--请选择--', items:[], required:true},
+			{label:'状态', name: 'IS_ENABLE', type:'radio', required:true,
+				items:[{text: '启动', value: '1'},{text: '停用', value: '0', checked:true}]}
+			
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'addBtn'},
+			{text: '#springMessage("view.tms.pub.btn.cancel")', cls: 'cancelBtn'}
+		]
+	});
+    addDialog.addDom(addForm.jqDom);
+    
+    addForm.jqDom.find('.addBtn').click(function(){
+    	var operid = addForm.getItem('OPERID').val();
+    	var starttime = addForm.getItem('STARTTIME').val();
+		var endtime = addForm.getItem('ENDTIME').val();
+		var disposals = addForm.getItem('DISPOSALS').val();
+		
+		if(operid==""){
+			alert('请选择一个处理人');
+			addForm.getItem('OPERID').component.focus();
+			return;
+		}
+		if (!/^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/.test(starttime)){
+			alert('开始时间不能为空且不能超过8字符,格式必须为:HH:mm:ss(24小时制)');
+			return;
+		}
+		if (!/^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/.test(endtime)){
+			alert('结束时间不能为空且不能超过8字符,格式必须为:HH:mm:ss(24小时制)');
+			return;
+		}
+		if(starttime>=endtime){
+			alert('结束时间不能小于或等于开始时间！');
+			return;
+		}
+		if(disposals==""){
+			alert('请选择一个处置方式');
+			addForm.getItem('DISPOSALS').component.focus();
+			return;
+		}
+		
+    	var params = $.param(addForm.data());//addForm.jqDom.serialize();
+		jcl.postJSON('/tms/assignAuto/add', params, function(data){
+			addDialog.hide();
+			jcl.msg.info('#springMessage("view.cmc.pub.add.success")');
+			
+			params = "TAB_NAME="+flag;
+			g.setDsParams(params);
+			g.goPage();
+		});
+		
+	}).end().find('.cancelBtn').click(function(){
+		addDialog.hide();
+	});
+    
+    g.toolbar.onClick('#btn-add', function(){
+    	addForm.reset();
+		addDialog.show();
+		var params = [];
+		params.push({name:'TAB_NAME', value:flag});
+		jcl.postJSON('/tms/assignAuto/get', params, function(data){
+			var txn=data["txnMap"],users=data["users"],eventTypePage=data["eventTypePage"];
+			if(txn){
+				var as_strategyid = txn["TAB_NAME"];
+				addForm.set({
+					'AS_STRATEGYID': as_strategyid,	
+					'STARTTIME': '00:00:00',
+					'ENDTIME': '23:59:59'
+					});
+			}
+			if(users){
+				var items = [];
+				for(var i = 0; i<users.length; i++){
+					var row = users[i];
+					items.push({text:row['REAL_NAME']+"("+row['LOGIN_NAME']+")", value:row['OPERATOR_ID']});
+				} 
+				addForm.getItem('OPERID').component.reload(items);
+			}
+			
+			
+		}, false);
+	});
+    
+	jcl.postJSON('/tms/assignAuto/eventType', "", function(data){
+		var eventTypePage=data["eventTypePage"];
+		
+		if(eventTypePage){
+			var items = [];
+			for(var i = 0; i<eventTypePage.length; i++){
+				var row = eventTypePage[i];
+				items.push({text:row['DP_NAME'], value:row['DP_CODE']});
+			} 
+			addForm.getItem('DISPOSALS').component.reload(items);
+			editForm.getItem('DISPOSALS').component.reload(items);
+		}
+		
+	}, false);
+	
+    var editForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label:'分派主键ID', name:'AS_ID', type: 'hidden'},
+			{label:'处理人', name:'OPERID', required:true},
+			{label:'开始时间', name:'STARTTIME', required:true},
+			{label:'结束时间', name:'ENDTIME', required:true},
+			{label:'处置方式', name:'DISPOSALS', type: 'listselector', 
+				title: '--请选择--', items:[], required:true},
+			{label:'状态', name: 'IS_ENABLE', type:'radio', required:true,
+				items:[{text: '启动', value: '1'},{text: '停用', value: '0'}]}
+			
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'updateBtn'},
+			{text: '#springMessage("view.tms.pub.btn.cancel")', cls: 'cancelBtn'}
+		]
+	});
+
+	editDialog.addDom(editForm.jqDom);
+	
+	//不可编辑
+	editForm.getItem('OPERID').disable(true);
+	
+	editForm.jqDom.find('.cancelBtn').click(function(){
+		editDialog.hide();
+	}).end().find('.updateBtn').click(function(){
+		var starttime = editForm.getItem('STARTTIME').val();
+		var endtime = editForm.getItem('ENDTIME').val();
+		var disposals = editForm.getItem('DISPOSALS').val();
+		
+		if (!/^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/.test(starttime)){
+			alert('开始时间不能为空且不能超过8字符,格式必须为:HH:mm:ss(24小时制)');
+			return;
+		}
+		if (!/^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/.test(endtime)){
+			alert('结束时间不能为空且不能超过8字符,格式必须为:HH:mm:ss(24小时制)');
+			return;
+		}
+		if(starttime>=endtime){
+			alert('结束时间不能小于或等于开始时间！');
+			return;
+		}
+		if(disposals==""){
+			alert('请选择一个处置方式');
+			editForm.getItem('DISPOSALS').component.focus();
+			return;
+		}
+		
+		var params = $.param(editForm.data());//editForm.jqDom.serialize();
+		jcl.postJSON('/tms/assignAuto/update', params, function(data){
+			editDialog.hide();
+			jcl.msg.info('#springMessage("view.tms.pub.edit.success")');
+			
+			params = "TAB_NAME="+flag;
+			g.setDsParams(params);
+			g.goPage();
+		});
+	});
+	
+	g.toolbar.onClick('#btn-edit', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.cmc.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.cmc.pub.checkbox.msg1")!');
+			return;
+		}
+		
+		var as_id = rows[0]["AS_ID"];
+		var operid = rows[0]["OPERID"];
+		var starttime = rows[0]["STARTTIME"];
+		var endtime = rows[0]["ENDTIME"];
+		var is_enable = rows[0]["IS_ENABLE"];
+		var disposals = rows[0]["DISPOSALS"];
+		if(disposals==null)
+			disposals="";
+		//alert(disposals);		
+		editForm.set({
+			'AS_ID': as_id,
+			'OPERID': operid,
+			'STARTTIME': starttime,
+			'ENDTIME': endtime,
+			"IS_ENABLE":is_enable,
+			"DISPOSALS":disposals
+			});
+		editDialog.show();
+	});
+    
+    tree.onSelectChange(function(){
+		var list = tree.select();
+		if(list.length > 0){
+			var node = tree.getNode(list[0]);
+			frame.setTitle(frame.opts.title + ' ['+nodePath(node) + ']');
+			
+			flag = list[0];
+			params = "TAB_NAME="+flag;
+			g.setDsParams(params);
+			g.goPage();
+			
+		} else {
+			 jcl.msg.info('请选择交易!');
+    		 return false;
+		}
+	});	
+	
+	
+    jcl.postJSON('/tms35/trandef/query', '', function(data){
+        for(var i = 0, l = data.list.length; i < l; i++){
+            if(data.list[i].id == 'T'){
+                data.list[i].icon = 'ticon-root';
+                break;
+            }
+        }
+        tree.render(data.list);
+        $.each(data.list, function(i, row){
+        	if('0' == (row.enable + '')){
+        		var id = tree.opts.id + '_' + row.id;
+        		tree.jqDom.find('#'+id).find('span.tn-text').addClass("enablecolor");
+        	}
+        });
+        tree.select('T');
+    });
+    
+	function nodePath(node){
+        var text = node.text;
+        var count = 0;
+        while(node.id != 'T' && count < 10){
+            node = tree.getNode(node.fid);
+            text = node.text + ' > ' + text;
+            count ++;
+        }
+        return text;
+    }
+	
+	// 取消任务
+	g.toolbar.onClick('#btn-del', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")!');
+			return;
+		}
+		if(confirm('#springMessage("view.tms.pub.del.confirm")?')){
+			var list = [];
+			$.each(rows, function(i, row){
+				list.push(
+					$.extend({}, row)
+				);
+			});
+
+			var json_data = JSON.stringify({'del':list});
+			var json_data_encode = encodeURIComponent(json_data);
+			var url_para = "postData=" + json_data_encode;
+			
+			jcl.postJSON('/tms/assignAuto/del', url_para, function(data){
+				alert('#springMessage("view.tms.pub.del.success")');
+				
+				params = "TAB_NAME="+flag;
+				g.setDsParams(params);
+				g.goPage();
+				
+			});
+		}else{
+			return ;
+		}
+	});
+	
+	jcl.postJSON('/tms/assignAuto/getStatus', '', function(data){
+		var startvalue=data["STARTVALUE"];
+		if(startvalue=="1"){
+			$('#node-info FONT').append('开');
+			$('#node-info input').attr('value','0');
+			$('#node-info span').append('关闭');
+		}
+		else if(startvalue=="0"){
+			$('#node-info FONT').append('关');
+			$('#node-info input').attr('value','1');
+			$('#node-info span').append('打开');
+		}
+	});
+	
+	$("#ps_sure").click(function(){
+		if(confirm('确认修改当前状态')){
+			params = [];
+			var startvalue = $('#node-info input').attr('value');
+			params.push({name:'STARTVALUE', value: startvalue});
+			jcl.postJSON('/tms/assignAuto/switch', params, function(data){
+			
+				if(startvalue=="1"){
+					$('#node-info FONT').empty();
+					$('#node-info FONT').append('开');
+					$('#node-info input').attr('value','0');
+					$('#node-info span').empty();
+					$('#node-info span').append('关闭');
+				}
+				else if(startvalue=="0"){
+					$('#node-info FONT').empty();
+					$('#node-info FONT').append('关');
+					$('#node-info input').attr('value','1');
+					$('#node-info span').empty();
+					$('#node-info span').append('打开');
+				}
+			});
+		}
+	});
+	
+});
+
+</script>
+</head>
+<body>
+	<div id="func-box">
+
+		<div id="left-box">
+			<div id="left-toolbar">
+				<div class="toolbar box-b-b" >
+					<div id="node-info" style="margin: 2px;">
+						<a class="toolbar-item-text">开关状态:</a>
+						<strong><FONT style="float: left;font-size:11pt;color:red;"></FONT></strong>
+						<div class="toolbar-item" style="margin-left: 20px;"  onmouseover="this.style.backgroundColor='#FFFFFF'" onmouseout="this.style.backgroundColor=''">
+							<a  class="toolbar-item-icon icon icon-tb-edit"></a>
+							<input type="hidden" />
+							<span  id="ps_sure" class="toolbar-item-text"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="tree-box"></div>
+		</div>
+
+		<div id="right-box">
+			
+		</div>
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>通道限额管理</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript">
+var g = "";
+$(document).ready(function(){
+	
+			
+	//组装表格     
+	g = new jcl.ui.Grid({
+		title:'通道限额信息列表',
+		qform:{
+			display: true,
+			layout: 'list',
+			items:[
+				{label: '选择银行', name: 'BANK_CODE', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.code'}
+				},
+				{label: '银行卡类型', name: 'CARD_TYPE', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.card.type'}
+				},
+				{label: '业务类型', name: 'BUSINESS_TYPE', type:'selector',
+					items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.business.type'}
+				}
+			],btns:[
+				{id: 'quick_search_btn', text: '#springMessage("view.cmc.but.find")'}
+			]
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', action:'toggleQform'},
+			{id:"btn-add", icon:"icon-tb-add", text:'#springMessage("view.tms.pub.btn.new")'},
+			{id:"btn-edit", icon:"icon-tb-edit", text:'#springMessage("view.tms.pub.btn.edit")', enable:'oneRowSelected'},
+			{id:"btn-del", icon:"icon-tb-del", text:'#springMessage("view.tms.pub.btn.del")', enable:'rowSelected'}
+		],
+		table:{
+			columns:[
+				{name:'银行', width: 25, dataIndex:'BANK_CODE', render: 'tms.bank.code'},
+				{name:'银行卡类型', width: 30, dataIndex:'CARD_TYPE', render: 'tms.bank.card.type'},
+				{name:'业务类型', width: 30, dataIndex:'BUSINESS_TYPE', render:'tms.bank.business.type'},
+				{name:'单笔限额',width: 30, dataIndex:'ONE_QUOTA'},
+				{name:'单日限额',width: 30, dataIndex:'DAY_QUOTA'},
+				{name:'单月限额',width: 30, dataIndex:'MONTH_QUOTA'},
+				{name:'日累计次数',width: 20, dataIndex:'DAY_TIMES'},
+				{name:'月累计次数',width: 20, dataIndex:'MONTH_TIMES'}
+			],
+			ds:{
+				url:"/tms/bankQuota/list",
+				params:{}
+			},
+			pagebar: true
+		
+		}
+	});
+	g.goPage();
+	
+	// 查询
+	$("#quick_search_btn").click(function(){
+		var params = g.qform.jqDom.serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+	
+	//对话框显示
+	var addDialog = new jcl.ui.Dialog({title:'通道限额信息增加', draggable: true});
+	var editDialog = new jcl.ui.Dialog({title:'通道限额信息修改', draggable: true});
+	//添加表单
+	var addForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label: '选择银行', name: 'BANK_CODE', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.code'}
+			},
+			{label: '银行卡类型', name: 'CARD_TYPE', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.card.type'}
+			},
+			{label: '业务类型', name: 'BUSINESS_TYPE', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.business.type'}
+			},
+			{label: '单笔限额', name:'ONE_QUOTA', required:true},
+			{label: '单日限额', name:'DAY_QUOTA', required:true},
+			{label: '单月限额', name:'MONTH_QUOTA', required:true},
+			{label: '日累计次数', name:'DAY_TIMES', required:true},
+			{label: '月累计次数', name:'MONTH_TIMES', required:true}
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'addBtn'},
+			{text: '#springMessage("view.tms.pub.btn.cancel")', cls: 'cancelBtn'}
+		]
+	});
+	addDialog.addDom(addForm.jqDom);
+	
+	addForm.jqDom.find('.addBtn').click(function(){
+		var bank_code = addForm.getItem('BANK_CODE').val();
+		var card_type = addForm.getItem('CARD_TYPE').val();
+		var business_type = addForm.getItem('BUSINESS_TYPE').val();
+		var one_quota = addForm.getItem('ONE_QUOTA').val();
+		var day_quota = addForm.getItem('DAY_QUOTA').val();
+		var month_quota = addForm.getItem('MONTH_QUOTA').val();
+		var day_times = addForm.getItem('DAY_TIMES').val();
+		var month_times = addForm.getItem('MONTH_TIMES').val();
+		if(bank_code==""){
+			alert('请选择一个银行编码！！');
+			addForm.getItem('bank_code').component.focus();
+			return;
+		}
+		if(card_type==""){
+			alert('请选择一个银行卡类型！！');
+			addForm.getItem('card_type').component.focus();
+			return;
+		}
+		if(business_type==""){
+			alert('请选择一个银行业务类型！！');
+			addForm.getItem('business_type').component.focus();
+			return;
+		}
+		if(one_quota!=""){
+			if(!/^[0-9]*$/.test(one_quota)){
+				alert('单笔限额只能是数字');
+				addForm.getItem('one_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('单笔限额不能为空');
+			addForm.getItem('one_quota').component.focus();
+			return;
+		}
+		if(day_quota!=""){
+			if(!/^[0-9]*$/.test(day_quota)){
+				alert('单日限额只能是数字');
+				addForm.getItem('day_quota').component.focus();
+				return;
+			}
+			if(parseInt(one_quota)>parseInt(day_quota)){
+				alert('单日限额不能小于单笔限额');
+				addForm.getItem('day_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('单日限额不能为空');
+			addForm.getItem('day_quota').component.focus();
+			return;
+		}
+		if(month_quota!=""){
+			if(!/^[0-9]*$/.test(month_quota)){
+				alert('单月限额只能是数字');
+				addForm.getItem('month_quota').component.focus();
+				return;
+			}
+			if(parseInt(day_quota)>parseInt(month_quota)){
+				alert('单月限额不能小于单日限额');
+				addForm.getItem('day_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('单月限额不能为空');
+			addForm.getItem('month_quota').component.focus();
+			return;
+		}
+		if(day_times!=""){
+			if(!/^[0-9]*$/.test(day_times)){
+				alert('日累计次数只能是数字');
+				addForm.getItem('day_times').component.focus();
+				return;
+			}
+		}else{
+			alert('日累计次数不能为空');
+			addForm.getItem('day_times').component.focus();
+			return;
+		}
+		if(month_times!=""){
+			if(!/^[0-9]*$/.test(month_times)){
+				alert('月累计次数只能是数字');
+				addForm.getItem('month_times').component.focus();
+				return;
+			}
+			if(parseInt(day_times)>parseInt(month_times)){
+				alert('月累计次数不能小于日累计次数');
+				addForm.getItem('day_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('月累计次数不能为空');
+			addForm.getItem('month_times').component.focus();
+			return;
+		}
+		
+		var params = $.param(addForm.data());;//addForm.jqDom.serialize();
+		jcl.postJSON('/tms/bankQuota/add', params, function(data){
+			addDialog.hide();
+			jcl.msg.info('#springMessage("view.cmc.pub.add.success")');
+			g.goPage();
+		});
+		
+	}).end().find('.cancelBtn').click(function(){
+		addDialog.hide();
+	});
+	
+	//显示添加form
+	g.toolbar.onClick('#btn-add', function(){
+		addForm.reset();
+		addDialog.show();
+	});
+	
+	var editForm = new jcl.ui.Form({
+		display: false,
+		layout: 'list',
+		items:[
+			{label: '编号', name: 'ID', type: 'hidden'},
+			{label: '选择银行', name: 'BANK_CODE', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.code'}
+			},
+			{label: '银行卡类型', name: 'CARD_TYPE', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.card.type'}
+			},
+			{label: '业务类型', name: 'BUSINESS_TYPE', required:true, type:'selector',
+				items:[{text:'--请选择--', value:''}], ds:{type:'code', category:'tms.bank.business.type'}
+			},
+			{label: '单笔限额', name:'ONE_QUOTA', required:true},
+			{label: '单日限额', name:'DAY_QUOTA', required:true},
+			{label: '单月限额', name:'MONTH_QUOTA', required:true},
+			{label: '日累计次数', name:'DAY_TIMES', required:true},
+			{label: '月累计次数', name:'MONTH_TIMES', required:true}
+			
+		],
+		btns:[
+			{text: '#springMessage("view.tms.pub.btn.save")', cls: 'updateBtn'},
+			{text: '#springMessage("view.tms.pub.btn.cancel")', cls: 'cancelBtn'}
+		]
+	});
+
+	editDialog.addDom(editForm.jqDom);
+	
+	//不可编辑
+	editForm.getItem('BANK_CODE').disable(true);
+	editForm.getItem('CARD_TYPE').disable(true);
+	editForm.getItem('BUSINESS_TYPE').disable(true);
+	
+	editForm.jqDom.find('.cancelBtn').click(function(){
+		editDialog.hide();
+	}).end().find('.updateBtn').click(function(){
+		var one_quota = editForm.getItem('ONE_QUOTA').val();
+		var day_quota = editForm.getItem('DAY_QUOTA').val();
+		var month_quota = editForm.getItem('MONTH_QUOTA').val();
+		var day_times = editForm.getItem('DAY_TIMES').val();
+		var month_times = editForm.getItem('MONTH_TIMES').val();
+		if(one_quota!=""){
+			if(!/^[0-9]*$/.test(one_quota)){
+				alert('单笔限额只能是数字');
+				editForm.getItem('one_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('单笔限额不能为空');
+			editForm.getItem('one_quota').component.focus();
+			return;
+		}
+		if(day_quota!=""){
+			if(!/^[0-9]*$/.test(day_quota)){
+				alert('单日限额只能是数字');
+				editForm.getItem('day_quota').component.focus();
+				return;
+			}
+			if(parseInt(one_quota)>parseInt(day_quota)){
+				alert('单日限额不能小于单笔限额');
+				editForm.getItem('day_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('单日限额不能为空');
+			editForm.getItem('day_quota').component.focus();
+			return;
+		}
+		if(month_quota!=""){
+			if(!/^[0-9]*$/.test(month_quota)){
+				alert('单月限额只能是数字');
+				editForm.getItem('month_quota').component.focus();
+				return;
+			}
+			if(parseInt(day_quota)>parseInt(month_quota)){
+				alert('单月限额不能小于单日限额');
+				editForm.getItem('day_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('单月限额不能为空');
+			editForm.getItem('month_quota').component.focus();
+			return;
+		}
+		if(day_times!=""){
+			if(!/^[0-9]*$/.test(day_times)){
+				alert('日累计次数只能是数字');
+				editForm.getItem('day_times').component.focus();
+				return;
+			}
+		}else{
+			alert('日累计次数不能为空');
+			editForm.getItem('day_times').component.focus();
+			return;
+		}
+		if(month_times!=""){
+			if(!/^[0-9]*$/.test(month_times)){
+				alert('月累计次数只能是数字');
+				editForm.getItem('month_times').component.focus();
+				return;
+			}
+			if(parseInt(day_times)>parseInt(month_times)){
+				alert('月累计次数不能小于日累计次数');
+				editForm.getItem('day_quota').component.focus();
+				return;
+			}
+		}else{
+			alert('月累计次数不能为空');
+			editForm.getItem('month_times').component.focus();
+			return;
+		}
+		
+		var params = $.param(editForm.data());//editForm.jqDom.serialize();
+		jcl.postJSON('/tms/bankQuota/mod', params, function(data){
+			editDialog.hide();
+			jcl.msg.info('#springMessage("view.tms.pub.edit.success")');
+			g.goPage();
+		});
+	});
+	
+	g.toolbar.onClick('#btn-edit', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.cmc.pub.checkbox.msg0")!');
+			return;
+		}
+		if(rows.length>1){
+			alert('#springMessage("view.cmc.pub.checkbox.msg1")!');
+			return;
+		}
+		
+		var Id = rows[0]["ID"];
+		jcl.postJSON('/tms/bankQuota/get', 'ID='+Id, function(data){
+			editForm.set(data.row, {
+				'BANK_CODE': 'BANK_CODE',
+				'CARD_TYPE': 'CARD_TYPE',
+				'BUSINESS_TYPE': 'BUSINESS_TYPE',
+				'ONE_QUOTA': 'ONE_QUOTA',
+				'DAY_QUOTA': 'DAY_QUOTA',
+				'MONTH_QUOTA': 'MONTH_QUOTA',
+				'DAY_TIMES': 'DAY_TIMES',
+				'MONTH_TIMES': 'MONTH_TIMES',
+				'CREATOR_ID': 'CREATOR_ID'
+				
+			});
+			//cacheProcessByCARD_TYPE(data.row['CARD_TYPE'], editForm);
+		});
+		editDialog.show();
+	});
+	
+	//检查字符串是否合法标识符
+	function isValidLetters(str){
+		var regx = /^\w+$/;
+		if(regx.test(str)){
+			return true;
+		}
+		return false;
+	}
+	
+	// 删除
+	g.toolbar.onClick('#btn-del', function(){
+		var rows = g.selectedRows();
+		if(rows.length == 0){ 
+			alert('#springMessage("view.tms.pub.checkbox.msg0")!');
+			return;
+		}
+		if(confirm('#springMessage("view.tms.pub.del.confirm")?')){
+			var list = [];
+			$.each(rows, function(i, row){
+				list.push(
+					$.extend({}, row)
+				);
+			});
+
+			var json_data = JSON.stringify({'del':list});
+			var json_data_encode = encodeURIComponent(json_data);
+			var url_para = "postData=" + json_data_encode;
+			
+			jcl.postJSON('/tms/bankQuota/del', url_para, function(data){
+				alert('#springMessage("view.tms.pub.del.success")');
+				g.goPage();
+			});
+		}else{
+			return ;
+		}
+	});
+});
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<div style="display: none;">
+<ul style="list-style:none;" id="exportUL">
+	<li class="list-box-item"><a href="#"  id="txt">TXT</a></li>
+	<li class="list-box-item"><a href="#"  id="csv">CSV</a></li>
+	<li class="list-box-item"><a href="#"  id="xls">Excel2003及以下版本</a></li>
+	<li class="list-box-item"><a href="#"  id="xlsx">Excel2007及以上版本</a></li>
+</ul>
+</div>
+</body>
+</html>

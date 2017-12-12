@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>查看用户统计值</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript">
+var g = "";
+var statFuncData;
+var statValues;
+var statId = 0;
+
+$(document).ready(function(){
+	 g = $("#boxdiv").grid({
+			title:'查看用户统计值',
+			qform:{
+				display: false,
+				layout: 'list',
+				items:[
+					{label: '客户号', name: 'USERID', type: 'text'},
+					{label: '登录名称', name: 'USERNAME', type: 'text'},
+					{label: '终端ID', name: 'DEVICEID', type: 'text'},
+					{label: '交易树', name: 'transBranches' ,width:400,type:'treeselector',title:'--请选择--', items:statFuncData,sm:{type:"row"},rtNode:false, multiple:false, cascadeCheck:false},
+					{label: '交易统计', id:"STAT_ID",name: 'STAT_ID', type: 'selector',width:400,title:'--请选择--'},
+					{label: '更新时间',type: 'dateduration', duraSeparator:' 到  ', layout:'datetime', 
+						items:[{name:'startTime'},{name:'endTime'}]},
+					{label: '是否查询', name: 'isQuery',type:'hidden',value:'true',id:'isQuery'}
+				],btns:[
+					{id: 'quick_search_btn', text: '#springMessage("view.cmc.but.find")'}
+				]
+			},
+			toolbar:[
+			            {id : "btn-find",icon : "icon-tb-find",text : '#springMessage("view.tms.pub.btn.find")',action : 'toggleQform'}
+			            ],
+			table:{
+			columns:[ 
+				{name:'统计名称', width: 30, dataIndex:'STAT_DESC'},				
+				{name:'统计值', width: 50, dataIndex:'STOREVALUE'},
+				{name:'更新时间', width: 30, dataIndex:'FINISHTIME',render:"datetime"}
+			],
+			
+			ds:{
+				url:"/tms35/dataanalysic/statList",
+				params:{isFirstEnter:"TRUE"},
+				callback:function(list){
+				}
+			},
+			pagebar: true,
+			}
+		});
+		
+	       jcl.postJSON('/tms35/dataanalysic/transBranches', "", function(data){
+			statFuncData = new Array();
+			var all_dic = new Array();
+			$.each(data.row, function(i, row){
+				statFuncData.push({id:row['ID'],fid:row['FID'],ftype:row['FTYPE'],text:row['CODE_VALUE'] + '('+row['CODE_KEY']+ ')' ,code_key:row['CODE_KEY']});
+				// 统计（叶子节点）
+				if(row['FTYPE']==2){
+					all_dic.push({CODE_KEY:row['CODE_KEY'],CODE_VALUE:row['CODE_VALUE']});						
+				}
+			});
+			g.qform.getItem('transBranches').component.reload(statFuncData);
+		});
+		g.goPage();
+		$("#quick_search_btn").click(function(){
+		    $('#isQuery').val('true');
+		    if(statId==0){
+		    	alert("请选择交易统计");
+		    	return;
+		    }
+		    var USERID =  g.qform.jqDom.find('[name=USERID]').val();
+		    var USERNAME = g.qform.jqDom.find('[name=USERNAME]').val();
+		    var  startTime = g.qform.jqDom.find('[name=startTime]').val();
+		    var  endTime = g.qform.jqDom.find('[name=endTime]').val();
+		    var  deviceid =  g.qform.jqDom.find('[name=DEVICEID]').val();
+		    var  transBranches =  g.qform.jqDom.find('[name=transBranches]').val();
+		    var params = 'USERID='+USERID+'&USERNAME='+USERNAME+'&startTime='+startTime+'&endTime='+endTime+'&deviceid='+deviceid+'&statId='+statId+'&transBranches='+transBranches;
+			g.setDsParams(params);
+			 if(deviceid != '' && USERID !='' && USERNAME !=''){
+				alert("终端id只能跟交易树下统计来查询");
+				return;
+			} 
+			if(statId !='' && USERID =='' && USERNAME =='' && deviceid == ''){
+				alert("交易树下的统计不能为空且必须和客户号或者登录名称条件来查询");
+			    return;
+			} 
+			g.goPage();
+		});
+		
+		// 交易树选择事件
+		g.qform.getItem("transBranches").component.tree.onSelectChange(function(){
+			var t = g.qform.getItem("transBranches").component.tree;
+			var list = t.select();
+			if (list.length > 0) {
+				var s_node = t.getNode(list[0]);
+				getTxnId(s_node);
+				
+				
+			}
+		});
+		
+		//根据交易树选择值获取交易类型　
+		function getTxnId(_this){
+			if(_this.id!=''){
+				txnId = _this.id;
+			}
+			initTransWeiDu(txnId);
+			
+		}
+		
+		//初始化交易维度
+		function initTransWeiDu(txnId){
+			jcl.postJSON('/tms35/dataanalysic/statfunc', "txnId=" + txnId, function(data){
+				statValues = new Array();
+				$.each(data.row, function(i,row){
+					statValues.push({id:row['ID'],fid:row['FID'],ftype:row['FTYPE'],text:row['CODE_VALUE'],code_key:row['CODE_KEY']});
+					
+				}); 
+				g.qform.getItem('STAT_ID').component.reload(statValues);
+	
+				
+			});
+           
+		}
+		g.qform.getItem("STAT_ID").component.onChange(function(){
+			var t = g.qform.getItem("STAT_ID").component;
+			var list = t.select();
+			statId = list['id'];
+			
+		});
+
+	});
+	
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box">
+
+</div>
+</body>
+</html>

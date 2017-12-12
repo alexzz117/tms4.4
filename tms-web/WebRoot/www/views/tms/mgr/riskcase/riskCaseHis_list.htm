@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>通道开关管理</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript">
+
+var g = "";
+$(document).ready(function(){
+	//组装表格     
+	g = new jcl.ui.Grid({
+		title:'风险案件管理列表',
+		width: 2200,
+		marginTop:10,
+		qform : {
+			display : false,
+			layout : 'list',
+			items : [{label : '案件编号',name : 'CASE_NO',type : 'text'},
+                     {label : '案件标题',name : 'TITLE',type : 'text'}, 
+                     {label : '立案来源',name : 'SRC_TYPE',type : 'selector',
+	                    	 items : [ {	text : '--请选择--',	value : ''} ],
+	                    	 ds : {	type : 'code',	category : 'tms.case.src.type'}}, 
+                      {label : '案件发生时间',type : 'dateduration',duraSeparator : ' 到  ',layout : 'datetime',
+                    		 items : [ {	name : 'CUR_DATE_START'}, {	name : 'CUR_DATE_END'} ]}, 
+                      {label : '立案时间',type : 'dateduration',duraSeparator : ' 到 ',layout : 'datetime',
+                    		 items : [ {	name : 'CREATED_DATE_START'}, {	name : 'CREATED_DATE_END'} ]}, 
+                      {label : '是否再调查案件',name : 'IS_RE_CHECK',type : 'selector',
+                    		 items : [ {	text : '--请选择--',	value : ''}, {	text : '是',	value : '1'}, {	text : '否',	value : '0'} ],
+                    		 ds : {	type : 'code',	category : ''}},
+                      {label : '客户号',name : 'USERID',type : 'text'}, 
+                      {label : '客户名称',name : 'LOGIN_NAME',type : 'text'}, 
+                      {label : '注册手机号',name : 'MOBILE',type : 'text'} ],
+                      btns : [ {id : 'quick_search_btn',text : '#springMessage("view.cmc.but.find")'}, {id : 'btn-query-reset',text : '重置'} ]},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', action:'toggleQform'}
+		],
+		table:{
+			columns:[
+				{name:'案件编号',width:10,dataIndex:'CASE_NO'}, 
+				{name:'案件标题',width:27,dataIndex:'TITLE'}, 
+				{name:'立案来源',width:10,dataIndex:'SRC_TYPE',render:'tms.case.src.type'}, 
+				{name:'案件发生时间',width:12,dataIndex:'CUR_DATE',render:'date'},  
+				{name:'立案时间',width:17,dataIndex:'CREATED_DATE',render:'datetime'},
+				{name:'是否再调查案件',width:9,dataIndex:'IS_RE_CHECK',render:'common.is'}, 
+				{name:'立案人',width:15,dataIndex:'OPERATOR'}, 
+				{name:'客户名称',width:20,dataIndex:'CUSNAME'}, 
+				{name:'客户号',width:17,dataIndex:'USERID'}, 
+				{name:'注册手机号',width:17,dataIndex:'MOBILE'}, 
+				{name:'客户状态',width:8,dataIndex:'STATUS'},
+				{name:'是否再调查案件', width: 10, dataIndex:'IS_RE_CHECK', render: 'common.is'},
+				{name:'金额是否核对无误',width: 10, dataIndex: 'IS_AMOUNT_CORRECT', render: 'common.is'},
+				{name:'是否有银行纸质信息',width: 10, dataIndex: 'IS_BANK_PROVE', render: 'common.is'},
+				{name:'是否电话确认',width: 10, dataIndex: 'IS_PHONE_CHECK', render: 'common.is'},
+				{name:'是否确认为本人',width: 10, dataIndex: 'IS_OWNER', render: 'common.is'},
+				{name:'处置操作',width: 10, dataIndex: 'DISPOSAL'},	
+				{name:'调查结果',width: 13, dataIndex: 'FINAL_DECISION', render: 'tms.case.final.decision'},
+				{name:'结案人工号',width: 10, dataIndex: 'UPDATED_BY'},	
+				{name:'结案时间',width: 20, dataIndex: 'UPDATED_DATE', render:'datetime'}	
+			],
+			ds:{
+				url:"/tms/riskCase/hisList",
+				params:{}
+			},
+			pagebar: true
+		}
+	});
+	g.goPage();	
+	
+	$("#btn-query-reset").click(function() {
+		g.qform.reset();
+	});
+
+	$("#quick_search_btn").click(function() {
+		var params = g.qform.jqDom.serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+	
+});
+
+</script>
+
+<style type="text/css">
+.grid{
+    margin:0 10px;
+    padding-right:10px;
+}
+</style>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+<div style="display: none;">
+<ul style="list-style:none;" id="exportUL">
+	<li class="list-box-item"><a href="#"  id="txt">TXT</a></li>
+	<li class="list-box-item"><a href="#"  id="csv">CSV</a></li>
+	<li class="list-box-item"><a href="#"  id="xls">Excel2003及以下版本</a></li>
+	<li class="list-box-item"><a href="#"  id="xlsx">Excel2007及以上版本</a></li>
+</ul>
+</div>
+</body>
+</html>

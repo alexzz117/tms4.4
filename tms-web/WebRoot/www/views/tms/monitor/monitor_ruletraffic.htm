@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>#springMessage("view.tms.monitor.center.alarm")</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="$rc.contextPath/s/tms/css/Style.css" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.url.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms/js/common/jcl_tms.js"></script>
+<script type="text/javascript">
+var regioncode ;
+$(document).ready(function(){
+
+	initParams();
+	var g = $("#boxdiv_detailalarm").grid({
+		title:'#springMessage("view.tms.monitor.center.ruletraffic")',
+		//width:1150,height:50,checkboxEnable:false,
+		//width:document.body.clientWidth-30,height:250,
+		columns:[
+			//{name:'序号', width: 15, dataIndex:'PATTERNID'},
+			//document.body.clientWidth=1376
+			{name:'#springMessage("view.tms.monitor.center.rulename")', width: 100, dataIndex:'RULENAME'},
+			{name:'#springMessage("view.tms.monitor.center.alarm.score")', width: 20, dataIndex:'SCORE'},
+			{name:'#springMessage("view.tms.monitor.center.ruletraffic.numtimes")', width: 20, dataIndex:'NUMTIMES'},
+			{name:'#springMessage("view.tms.monitor.center.transactiontraffic.matchstatistic.txnname")', width: 40, dataIndex:'TXNNAME'},
+			{name:'#springMessage("view.tms.monitor.center.ruletraffic.username")', width: 50, dataIndex:'USERID'},
+			{name:'#springMessage("view.tms.monitor.center.alarm.location")', width: 65, dataIndex:'COUNTRYNAME'}
+		],
+		ds:{
+			url:"/tms/monitor/alarm/get_ruletrafficlist",
+			params:{
+				"operate_time":$('#operate_time').val(),
+				"end_time":$('#end_time').val(),
+				"rulename":$('#rulename').val()
+			},
+			callback:function(list){
+				for(var i = 0; i < list.length; i++){
+					list[i]['RULENAME']= '<a href="#" onclick="listRuleTrafficDetail(\''+list[i]['RULETRIGID']+'\')" >'+list[i]['RULENAME']+'</a>';
+				}
+				for(var i = 0; i < list.length; i++){
+					if(list[i]['COUNTRYNAME'] == null || list[i]['COUNTRYNAME'] == ''){
+						list[i]['COUNTRYNAME'] = '<font color="red">'+'未知'+'</font>';
+					}
+					if(list[i]['REGIONNAME'] == null || list[i]['REGIONNAME'] == ''){
+						list[i]['REGIONNAME'] = '<font color="red">'+'未知'+'</font>';
+					}
+					if(list[i]['CITYNAME'] == null || list[i]['CITYNAME'] == ''){
+						list[i]['CITYNAME'] = '<font color="red">'+'未知'+'</font>';
+					}
+					list[i]['COUNTRYNAME'] = list[i]['COUNTRYNAME'] + "-" + list[i]['REGIONNAME'] + "-" + list[i]['CITYNAME'] ;
+				}
+				for(var i = 0; i < list.length; i++){
+					list[i]['NUMTIMES'] = list[i]['NUMTIMES'] + '#springMessage("view.tms.monitor.center.ruletraffic.millisecond")' ;
+				}
+			}
+		},
+		toolbar:[
+			{id:"btn-find", icon:"icon-tb-find", text:'#springMessage("view.tms.pub.btn.find")', toggleQform:true}
+		],
+		checkboxEnable:false,
+		pagebar: true,
+		qform: {id:"qformdate", display:false}
+	});
+	
+	g.goPage();
+	
+	$("#quick_search_btn").click(function(){
+		
+		var startTime = $('#operate_time').val();
+		var end_time = $('#end_time').val();
+		//if(startTime=="" && end_time!=""){
+		//	alert('#springMessage("view.cmc.log.list.msg.beginTime")');
+		//	return ;
+		//}
+		if(startTime!="" && end_time!="" && startTime>end_time){
+			alert('#springMessage("view.cmc.log.list.msg.endTimeEarly")');
+			return ;
+		}
+		var params = $('#qformdate').serialize();
+		g.setDsParams(params);
+		g.goPage();
+	});
+});
+
+function listRuleTrafficDetail(ruletrigid){
+	jcl.go('/tms/monitor/alarm/get_ruletrafficlist_detail?ruletrigid=' + ruletrigid);
+}
+
+function initParams(){
+	var nowDate = new Date();
+	var operate_Date = new Date(nowDate.getTime() - 1*60000);
+	
+	var year = nowDate.getFullYear();
+	var month = nowDate.getMonth()+1;//获取本月
+	var day = nowDate.getDate();
+	var hour = nowDate.getHours();
+	var minutes = nowDate.getMinutes();
+	var second = nowDate.getSeconds();
+	
+	var operate_year = operate_Date.getFullYear();
+	var operate_month = operate_Date.getMonth()+1;//获取本月
+	var operate_day = operate_Date.getDate();
+	var operate_hour = operate_Date.getHours();
+	var operate_minutes = operate_Date.getMinutes();
+	var operate_second = operate_Date.getSeconds();
+	
+	if(month < 10) month = "0" + month;
+	if(day < 10) day = "0" + day;
+	if(hour < 10) hour = "0" + hour;
+	if(minutes < 10) minutes = "0" + minutes;
+	if(second < 10) second = "0" + second;
+	
+	if(operate_month < 10) operate_month = "0" + operate_month;
+	if(operate_day < 10) operate_day = "0" + operate_day;
+	if(operate_hour < 10) operate_hour = "0" + operate_hour;
+	if(operate_minutes < 10) operate_minutes = "0" + operate_minutes;
+	if(operate_second < 10) operate_second = "0" + operate_second;
+	
+	$('#operate_time').val(operate_year+"-"+operate_month+"-"+operate_day+" "+operate_hour+":"+operate_minutes+":"+operate_second);
+	$('#end_time').val(year+"-"+month+"-"+day+" "+hour+":"+minutes+":"+second);
+}
+
+</script>
+</head>
+  <body>
+  	<form id="qformdate" name="qformdate" method="post">
+		<table>
+			<tr>
+				<td width="90" align="right">
+					#springMessage("view.tms.monitor.center.rulename")：
+				</td>
+				<td width="200">
+					<input name="rulename" type="text" class="itext" id="rulename" />
+				</td>
+			</tr>
+			<tr>
+				<td width="90" align="right">
+					#springMessage("view.tms.report.center.timescope")：
+				</td>
+				<td width="600">
+					<input name="operate_time" id="operate_time" onfocus="jcl_tms.datepicker(this)" readonly="readonly" type="text" class="tms-itext" value="" /> -- <input name="end_time" id="end_time" onfocus="jcl_tms.datepicker(this)" readonly="readonly" type="text" class="tms-itext" value="" /> <input id="quick_search_btn" type="button" value='#springMessage("ui.common.btn.qquery")' class="btn" /> 
+				</td>
+			</tr>
+		</table>
+	</form>
+    <div id="boxdiv_detailalarm" class="box"></div>
+  </body>
+</html>

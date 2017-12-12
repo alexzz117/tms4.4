@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>模型管理</title>
+<link href="$rc.contextPath/s/common/css/page.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/browser.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/js/jcl.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/env.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/common/env/message.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/commoncheck.js"></script>
+<script type="text/javascript" src="$rc.contextPath/s/tms35/js/json2.js"></script>
+<script type="text/javascript">
+var g = "";
+$(document).ready(function(){
+	
+	//组装表格     
+	g = new jcl.ui.Grid({
+		title:'模型列表',
+		
+		toolbar:[
+			{id:"btn-mtrain", icon:"icon-tb-add", text:'模型训练', enable:'rowSelected'},
+			{id:"btn-mhl", icon:"icon-tb-find", text:'模型训练历史', enable:'oneRowSelected'}
+		],
+		table:{
+			columns:[
+				{name:'交易名称', width: 60, dataIndex:'TAB_DESC'},
+				{name:'模型状态', width: 40, dataIndex:'MODELUSED', render: 'tms.model.modelused'},
+				{name:'学习期开始时间', width: 60, dataIndex:'TRAINDATE'},
+				{name:'运行期开始时间', width: 60, dataIndex:'RUNDATE'}
+			],
+			ds:{
+				url:"/tms/modelmgr/list",
+				params:{},
+				callback:function(list){
+					for(var i = 0; i < list.length; i++){
+						var traindate = list[i]['TRAINDATE'];
+						var rundate = list[i]['RUNDATE'];
+						 
+						if(traindate != null){
+							traindate = String(traindate);
+							if(traindate >= 14)
+								list[i]['TRAINDATE'] = traindate.substring (0,4)+'-'+traindate.substring (4,6)+'-'+traindate.substring (6,8)+' ' 
+							+traindate.substring (8,10) +':'+traindate.substring (10,12) +':'+traindate.substring (12,14);
+						}
+						if(rundate != null){
+							rundate = String(rundate);
+							if(rundate >= 14)
+								list[i]['RUNDATE'] = rundate.substring (0,4)+'-'+rundate.substring (4,6)+'-'+rundate.substring (6,8)+' ' 
+							+rundate.substring (8,10) +':'+rundate.substring (10,12) +':'+rundate.substring (12,14);
+						}
+					}
+				}
+			},
+			pagebar: true
+		
+		}
+	});
+	g.goPage();
+	
+	
+	// 模型训练
+	g.toolbar.onClick('#btn-mtrain', function(){
+		
+		if(confirm('确定开始模型训练?')){
+			var rows = g.selectedRows();
+			
+			var isContinue = true;
+			var txnid = [];
+			$.each(rows, function(i, row){
+				/*var modelused = row.MODELUSED;
+				if(modelused == '2'){
+					alert('模型['+(row.TAB_DESC)+']处于运行期，不能训练！');
+					isContinue = false;
+					return false;
+				}*/
+				txnid.push('txnids='+row['TAB_NAME']);
+			});
+			
+			if(!isContinue) return;
+			
+			var params = txnid.join('&');
+			jcl.postJSON('/tms/modelmgr/mTrain', params, function(data){
+				alert("模型开始训练");
+				g.goPage();
+			});
+		}else{
+			return ;
+		}
+	});
+	
+	// 模型训练
+	g.toolbar.onClick('#btn-mhl', function(){
+		jcl.go('/tms/modelmgr/mhList?txn_id='+g.selectedOneRow().TAB_NAME);
+	});
+
+	
+});
+</script>
+
+</head>
+<body>
+
+<div id="boxdiv" class="box"></div>
+
+</body>
+</html>
