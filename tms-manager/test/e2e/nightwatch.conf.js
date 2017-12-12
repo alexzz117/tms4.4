@@ -1,0 +1,66 @@
+require('babel-register');
+var config = require('../../config');
+var phantomjs = require('phantomjs-prebuilt');
+
+require('nightwatch-cucumber')({
+  nightwatchClientAsParameter: true,
+  featureFiles: ['test/e2e/features'],
+  stepDefinitions: ['test/e2e/features/step_definitions'],
+  jsonReport: 'test/e2e/reports/cucumber.json',
+  htmlReport: 'test/e2e/reports/cucumber.html',
+  openReport: false
+});
+
+// http://nightwatchjs.org/gettingstarted#settings-file
+module.exports = {
+  src_folders: ['test/e2e/specs'],
+  output_folder: 'test/e2e/reports',
+  custom_assertions_path: ['test/e2e/custom-assertions'],
+
+  selenium: {
+    start_process: true,
+    server_path: require('selenium-server').path,
+    host: '127.0.0.1',
+    port: 4444,
+    screenshots:'true',
+    cli_args: {
+      'webdriver.chrome.driver': require('chromedriver').path
+    }
+  },
+
+  test_settings: {
+    default: {
+      selenium_port: 4444,
+      selenium_host: 'localhost',
+      silent: true,
+      globals: {
+        devServerURL: 'http://localhost:' + (process.env.PORT || config.dev.port)
+      }
+    },
+
+    chrome: {
+      desiredCapabilities: {
+        browserName: 'chrome',
+        javascriptEnabled: true,
+        acceptSslCerts: true
+      }
+    },
+
+    firefox: {
+      desiredCapabilities: {
+        browserName: 'phantomjs',
+        javascriptEnabled: true,
+        acceptSslCerts: true
+      }
+    },
+    phantom: {
+      desiredCapabilities: {
+        browserName: 'firefox',
+        javascriptEnabled: true,
+        acceptSslCerts: true,
+        'phantomjs.page.settings.userAgent': 'Mozilla/5.0(Macintosh; Intel Mac OS x 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
+        'phantomjs.binary.path':phantomjs.path
+      }
+    }
+  }
+}
