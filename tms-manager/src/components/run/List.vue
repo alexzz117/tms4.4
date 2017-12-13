@@ -24,11 +24,11 @@
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="del">删除</el-button>
-      <el-button plain class="el-icon-setting" @click="showValueList">名单值</el-button>
-      <el-button plain class="el-icon-setting" @click="del">导入</el-button>
-      <el-button plain class="el-icon-setting" @click="del">导出</el-button>
+      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>
+      <el-button plain class="el-icon-delete" @click="del" :disabled="delBtnStatus">删除</el-button>
+      <el-button plain class="el-icon-setting" @click="showValueList" :disabled="btnStatus">名单值</el-button>
+      <el-button plain class="el-icon-setting" @click="importList" :disabled="btnStatus">导入</el-button>
+      <el-button plain class="el-icon-setting" @click="exportList" :disabled="btnStatus">导出</el-button>
     </div>
     <el-table
       :data="gridData"
@@ -65,14 +65,14 @@
           <el-input v-model="listDialogform.rosterdesc" auto-complete="off" :disabled="status"></el-input>
         </el-form-item>
         <el-form-item label="名单数据类型" prop="datatype">
-          <el-select v-model="listDialogform.datatype" placeholder="状态" :disabled="status">
+          <el-select v-model="listDialogform.datatype" :disabled="status">
             <el-option label="字符类型" value="0"></el-option>
             <el-option label="设备标识" value="1"></el-option>
             <el-option label="ip地址" value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="名单类型" prop="rostertype">
-          <el-select v-model="listDialogform.rostertype" placeholder="状态" :disabled="status">
+          <el-select v-model="listDialogform.rostertype" :disabled="status">
             <el-option label="白名单" value="0"></el-option>
             <el-option label="灰名单" value="1"></el-option>
             <el-option label="黑名单" value="2"></el-option>
@@ -110,14 +110,12 @@
           pageindex:this.pageindex,
           pagesize:val
         })
-        console.log(`每页 ${val} 条`);
       },
       handleCurrentChange(val) {
         this.sel({
           pageindex:val,
           pagesize:this.pagesize
         })
-        console.log(`当前页: ${val}`);
       },
       openDialog(flag) {
         this.flag = flag
@@ -152,6 +150,16 @@
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
+        if (val.length === 1){
+          this.btnStatus = false
+          this.delBtnStatus = false
+        } else if (val.length > 1){
+          this.btnStatus = true
+          this.delBtnStatus = false
+        } else {
+          this.btnStatus = true
+          this.delBtnStatus = true
+        }
       },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
@@ -224,8 +232,14 @@
 //        valuelist/:rosterid/:datatype
         var rosterid = this.multipleSelection[0].rosterid
         var datatype = this.multipleSelection[0].datatype
-        var url = `valuelist/:${rosterid}/:${datatype}`
+        var url = `valuelist/${rosterid}/${datatype}`
         this.$router.push(url);
+      },
+      importList() {
+
+      },
+      exportList() {
+
       }
     },
     data() {
@@ -250,6 +264,8 @@
           remark: "",
         },
         status: true,
+        btnStatus: true,
+        delBtnStatus: true,
         dialogTitle: '',
         formLabelWidth: '150px',
         rules: {

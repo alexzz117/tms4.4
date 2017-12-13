@@ -33,11 +33,13 @@ var check = {
     if (!check.checkSpecialCharacter(value, 1)){
       return callback(new Error('请以字母开头，包括字母、数字和下划线'));
     }
+    callback()
   },
   checkFormZhSpecialCharacter: function (rule, value, callback) {
     if (!check.checkSpecialCharacter(value, 2)){
       return callback(new Error('请不要输入特殊字符！如($,%)'));
     }
+    callback()
   },
   /*
    * 校验特殊字符
