@@ -7,7 +7,7 @@ var config = {
   prefix: 'api'  // node.js 测试环境
 }
 
-function post(url, param, cb) {
+function post (url, param, cb, errorCb) {
   var sendUrl = config.prefix + url + config.suffix
   axios.post(sendUrl, param)
     .then(function (response) {
@@ -17,17 +17,24 @@ function post(url, param, cb) {
           var data = util.toggleObjKey(response.data)
           cb(data)
         } else {
-          alert(response.data.error)
+          if (typeof errorCb === 'function') {
+            errorCb(response.data)
+          } else {
+            alert(response.data.error)
+          }
           // this.$message(response.data.error)
         }
       }
     })
     .catch(function (error) {
-      cb(error)
-      alert(error)
+      if (typeof errorCb === 'function') {
+        errorCb(error)
+      } else {
+        alert(error)
+      }
     })
 }
 
 export default {
-  post:post
+  post: post
 }
