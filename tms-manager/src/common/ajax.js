@@ -23,7 +23,7 @@ function post(url, param, cb) {
       }
     })
     .catch(function (error) {
-      console.log(error)
+      cb(error)
       alert(error)
     })
 }
