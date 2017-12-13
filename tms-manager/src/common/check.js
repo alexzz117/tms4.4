@@ -27,6 +27,7 @@ var check = {
     if (!check.checkSpecialCode(value)){
       return callback(new Error('请不要输入特殊字符！如($,%)'));
     }
+    callback()
   },
   checkFormEnSpecialCharacter: function (rule, value, callback) {
     if (!check.checkSpecialCharacter(value, 1)){

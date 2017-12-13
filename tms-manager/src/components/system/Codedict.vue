@@ -78,10 +78,11 @@
     },
     data () {
       var categoryIdExist = (rule, value, callback) => {
+        console.log(1232)
         if (this.dialogType === 'edit' && this.selectedRows[0].category_id === value) {
           callback()
         } else {
-          ajax.post('/cmc/codedict/category/checkCategoryId', {categoryId: value}, function (data) {
+          ajax.post('/cmc/codedict/check/categoryId', {categoryId: value}, function (data) {
             if (data.checkresult === false) {
               return callback(new Error('该代码类别key已存在'))
             } else {
@@ -174,13 +175,12 @@
         Object.assign(paramsObj, this.queryForm)
         ajax.post('/cmc/codedict/category/list', paramsObj, function (data) {
           if (data.page) {
-            console.log(123)
-            console.log(data)
             self.bindGridData(data)
           }
         })
       },
       addData (formName) {
+        console.log(123)
         this.$refs[formName].validate((valid) => {
           if (valid) {
             var self = this
