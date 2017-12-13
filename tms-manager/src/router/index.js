@@ -20,6 +20,7 @@ import Tranmdl from '@/components/run/Tranmdl'
 
 import AuthCenter from '@/components/system/AuthCenter'
 import Codedict from '@/components/system/Codedict'
+import CodedictInfo from '@/components/system/CodedictInfo'
 import Ipaddr from '@/components/system/Ipaddr'
 import Log from '@/components/system/Log'
 
@@ -83,6 +84,11 @@ export default new Router({
           path: 'codedict',
           name: 'Codedict',
           component: Codedict
+        },
+        {
+          path: 'codeDictInfo',
+          name: 'CodeDictInfo',
+          component: CodedictInfo
         },
         {
           path: 'ipaddr',
