@@ -61,3 +61,4 @@ var check = {
     return legal;
   }
 }
+export default check
