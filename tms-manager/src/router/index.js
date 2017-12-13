@@ -10,6 +10,7 @@ import Role from '@/components/auth/Role'
 import Function from '@/components/auth/Function'
 
 import List from '@/components/run/List'
+import ValueList from '@/components/run/ValueList'
 import Txn from '@/components/run/Txn'
 import Rule from '@/components/run/Rule'
 import Stat from '@/components/run/Stat'
@@ -57,6 +58,11 @@ export default new Router({
           path: 'function',
           name: 'Function',
           component: Function
+        },
+        {
+          path: 'valuelist/:rosterid/:datatype',
+          name: 'ValueList',
+          component: ValueList
         },
         {
           path: 'list',

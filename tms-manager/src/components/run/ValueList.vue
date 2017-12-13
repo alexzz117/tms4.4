@@ -1,34 +1,26 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="100px" :model="listForm" :rules="rules"
+    <el-form label-position="right" label-width="100px" :model="valueListForm" :rules="rules"
              :inline="inline" style="text-align: left">
-      <el-form-item label="名单名称" prop="rosterdesc">
-        <el-input v-model="listForm.rosterdesc"></el-input>
-      </el-form-item>
-      <el-form-item label="名单数据类型">
-        <el-select v-model="listForm.datatype" placeholder="名单数据类型">
-          <el-option label="字符类型" value="0"></el-option>
-          <el-option label="设备标识" value="1"></el-option>
-          <el-option label="ip地址" value="2"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="名单类型">
-        <el-select v-model="listForm.rostertype" placeholder="名单类型">
-          <el-option label="白名单" value="0"></el-option>
-          <el-option label="灰名单" value="1"></el-option>
-          <el-option label="黑名单" value="2"></el-option>
-        </el-select>
+      <el-form-item label="名单值" prop="rostervalue">
+        <el-input v-model="valueListForm.rostervalue"></el-input>
       </el-form-item>
     </el-form>
+
+    <!--{id:"btn-find", icon:"icon-tb-find", text:'查询', action:'toggleQform'},-->
+    <!--{id:"btn-add", icon:"icon-tb-add", text:'新建'},-->
+    <!--{id:"btn-edit", icon:"icon-tb-edit", text:'编辑', enable:'oneRowSelected'},-->
+    <!--{id:"btn-del", icon:"icon-tb-del", text:'删除', enable:'rowSelected'},-->
+    <!--{id:"btn-valueMgr", icon:"icon-tb-edit", text:'值转换', enable:'oneRowSelected'},-->
+    <!--{id:"btn-back", icon:"icon-tb-aw-l", text:'返回'}-->
 
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
       <el-button plain class="el-icon-edit" @click="openDialog('edit')">编辑</el-button>
       <el-button plain class="el-icon-delete" @click="del">删除</el-button>
-      <el-button plain class="el-icon-setting" @click="showValueList">名单值</el-button>
-      <el-button plain class="el-icon-setting" @click="del">导入</el-button>
-      <el-button plain class="el-icon-setting" @click="del">导出</el-button>
+      <el-button plain class="el-icon-setting" @click="showValueList">值转换</el-button>
+      <el-button plain class="el-icon-setting" @click="backList">返回</el-button>
     </div>
     <el-table
       :data="gridData"
@@ -37,13 +29,10 @@
       style="width: 100%"
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="left"></el-table-column>
-      <el-table-column prop="rostername" label="名单英文名" align="left" width="120"></el-table-column>
-      <el-table-column prop="rosterdesc" label="名单名称" align="left" width="120"></el-table-column>
-      <el-table-column prop="datatype" label="名单数据类型" align="left" width="120"></el-table-column>
-      <el-table-column prop="rostertype" label="名单类型" align="left" width="120"></el-table-column>
-      <el-table-column prop="valuecount" label="值数量" align="left" width="120"></el-table-column>
-      <el-table-column prop="createtime" label="创建时间" align="left" width="150"></el-table-column>
-      <el-table-column prop="iscache" label="是否缓存" align="left" width="120"></el-table-column>
+      <el-table-column prop="rostervalue" label="名单值" align="left" width="120"></el-table-column>
+      <el-table-column prop="enabletime" label="开始时间" align="left" width="120"></el-table-column>
+      <el-table-column prop="disabletime" label="结束时间" align="left" width="120"></el-table-column>
+      <el-table-column prop="createtime" label="创建时间" align="left" width="120"></el-table-column>
       <el-table-column prop="remark" label="备注" align="left" width="120"></el-table-column>
     </el-table>
     <el-pagination style="margin-top: 10px; text-align: right;"
@@ -55,40 +44,46 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
-    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible">
-      <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
+    <el-dialog :title="dialogTitle" :visible.sync="valueListDialogVisible">
+      <el-form :model="valueListDialogform" :rules="rules" ref="valueListDialogform" :label-width="formLabelWidth"
                style="text-align: left">
-        <el-form-item label="名单英文名" prop="rostername">
-          <el-input v-model="listDialogform.rostername" auto-complete="off" :disabled="status"></el-input>
+
+        <!--<el-table-column prop="rostervalue" label="名单值" align="left" width="120"></el-table-column>-->
+        <!--<el-table-column prop="enabletime" label="开始时间" align="left" width="120"></el-table-column>-->
+        <!--<el-table-column prop="disabletime" label="结束时间" align="left" width="120"></el-table-column>-->
+        <!--<el-table-column prop="remark" label="备注" align="left" width="120"></el-table-column>-->
+
+        <el-form-item label="名单值" prop="rostervalue">
+          <el-input v-model="valueListDialogform.rostername" auto-complete="off" :disabled="status"></el-input>
         </el-form-item>
         <el-form-item label="名单名称" prop="rosterdesc">
-          <el-input v-model="listDialogform.rosterdesc" auto-complete="off" :disabled="status"></el-input>
+          <el-input v-model="valueListDialogform.rosterdesc" auto-complete="off" :disabled="status"></el-input>
         </el-form-item>
         <el-form-item label="名单数据类型" prop="datatype">
-          <el-select v-model="listDialogform.datatype" placeholder="状态" :disabled="status">
+          <el-select v-model="valueListDialogform.datatype" placeholder="状态" :disabled="status">
             <el-option label="字符类型" value="0"></el-option>
             <el-option label="设备标识" value="1"></el-option>
             <el-option label="ip地址" value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="名单类型" prop="rostertype">
-          <el-select v-model="listDialogform.rostertype" placeholder="状态" :disabled="status">
+          <el-select v-model="valueListDialogform.rostertype" placeholder="状态" :disabled="status">
             <el-option label="白名单" value="0"></el-option>
             <el-option label="灰名单" value="1"></el-option>
             <el-option label="黑名单" value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否缓存" prop="iscache">
-          <el-radio v-model="listDialogform.iscache" label="1">是</el-radio>
-          <el-radio v-model="listDialogform.iscache" label="2">否</el-radio>
+          <el-radio v-model="valueListDialogform.iscache" label="1">是</el-radio>
+          <el-radio v-model="valueListDialogform.iscache" label="2">否</el-radio>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input type="textarea" v-model="listDialogform.remark"></el-input>
+          <el-input type="textarea" v-model="valueListDialogform.remark"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="listDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('listDialogform')">保 存</el-button>
+        <el-button @click="valueListDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('valueListDialogform')">保 存</el-button>
       </div>
     </el-dialog>
   </div>
@@ -280,3 +275,4 @@
     }
   }
 </script>
+
