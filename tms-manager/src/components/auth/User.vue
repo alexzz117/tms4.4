@@ -150,6 +150,50 @@
       handleSelectionChange (val) {
         this.multipleSelection = val
       },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            if (this.flag === 'add') {
+              this.addUser()
+            } else if (this.flag === 'edit') {
+              this.updateUser()
+            }
+          } else {
+            this.$message('请正确填写用户信息');
+            return false;
+          }
+        });
+      },
+      bindGridData(data) {
+        this.roleData = data.page.list
+        this.currentPage = data.page.index
+        this.pagesize = data.page.size
+        this.total = data.page.total
+      },
+      selRole () {
+        var self = this;
+        ajax.post('/cmc/role/listNormalRole', null,function (data) {
+          self.roles = data.row;
+        })
+      },
+      selUser() {
+        var self = this;
+        ajax.post('/cmc/operator/list', {
+          login_name: this.userForm.login_name,
+          real_name: this.userForm.real_name,
+          flag: this.userForm.flag,
+          role: this.userForm.role,
+          pageindex: 1,
+          pagesize: 10
+        }, function (data) {
+          if (data.page) {
+            self.bindGridData(data)
+          }
+        })
+      },
       openDialog (flag) {
         this.flag = flag
         if (flag === 'edit') {
@@ -180,40 +224,9 @@
           }
         }
         this.roleDialogVisible = true
-      },
-      submitForm(formName) {
-        if (this.flag === 'add') {
-          this.addUser()
-        } else if (this.flag === 'edit') {
-          this.updateUser()
+        if (this.$refs['userDialogForm']) {
+          this.$refs['userDialogForm'].clearValidate()
         }
-      },
-      bindGridData(data) {
-        this.roleData = data.page.list
-        this.currentPage = data.page.index
-        this.pagesize = data.page.size
-        this.total = data.page.total
-      },
-      selRole () {
-        var self = this;
-        ajax.post('/cmc/role/listNormalRole', null,function (data) {
-          self.roles = data.row;
-        })
-      },
-      selUser() {
-        var self = this;
-        ajax.post('/cmc/operator/list', {
-          login_name: this.userForm.login_name,
-          real_name: this.userForm.real_name,
-          flag: this.userForm.flag,
-          role: this.userForm.role,
-          pageindex: 1,
-          pagesize: 10
-        }, function (data) {
-          if (data.page) {
-            self.bindGridData(data)
-          }
-        })
       },
       addUser() {
         var self = this
