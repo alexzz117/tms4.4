@@ -43,16 +43,16 @@
     <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible">
       <el-form :model="dictDialogForm" :rules="rules" ref="dictDialogForm">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
-          <el-input v-model="dictDialogForm.category_id" auto-complete="off" :disabled="categoryIdReadonly" maxlength="50"></el-input>
+          <el-input v-model="dictDialogForm.category_id" auto-complete="off" :disabled="categoryIdReadonly" :maxlength="50"></el-input>
         </el-form-item>
         <el-form-item label="代码类别value:" :label-width="formLabelWidth" prop="category_name">
-          <el-input v-model="dictDialogForm.category_name" auto-complete="off" maxlength="50"></el-input>
+          <el-input v-model="dictDialogForm.category_name" auto-complete="off" :maxlength="50"></el-input>
         </el-form-item>
         <el-form-item label="代码类别sql:" :label-width="formLabelWidth" prop="category_sql">
-          <el-input v-model="dictDialogForm.category_sql" auto-complete="off" maxlength="50"></el-input>
+          <el-input v-model="dictDialogForm.category_sql" auto-complete="off" :maxlength="50"></el-input>
         </el-form-item>
         <el-form-item label="描述信息" :label-width="formLabelWidth" prop="info">
-          <el-input type="textarea" v-model="dictDialogForm.info" maxlength="200"></el-input>
+          <el-input type="textarea" v-model="dictDialogForm.info" :maxlength="200"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -65,6 +65,7 @@
 
 <script>
   import ajax from '@/common/ajax'
+  import check from '@/common/check'
 
   export default {
     computed: {
@@ -111,39 +112,33 @@
         dictDialogForm: this.initDialogForm(),
         queryRules: {
           category_id: [
-            { max: 50, message: '长度在50个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ],
           category_name: [
-            { max: 50, message: '长度在50个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
         },
         rules: {
           category_id: [
             { required: true, message: '请输入代码类别key', trigger: 'blur' },
             { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' },
             { validator: categoryIdExist, trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
           ],
           category_name: [
             { required: true, message: '请输入代码类别value', trigger: 'blur' },
-            { max: 50, message: '长度在50个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ],
           category_sql: [
-            { max: 50, message: '长度在50个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ],
           info: [
-            { max: 200, message: '长度在200个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
         }
       }

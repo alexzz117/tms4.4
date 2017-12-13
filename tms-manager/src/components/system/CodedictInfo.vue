@@ -58,6 +58,7 @@
 
 <script>
   import ajax from '@/common/ajax'
+  import check from '@/common/check'
 
   export default {
     computed: {
@@ -88,31 +89,25 @@
         rules: {
           category_id: [
             { required: true, message: '请输入代码类别key', trigger: 'blur' },
-            { max: 50, message: '长度在50个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ],
           code_key: [
             { required: true, message: '请输入代码key', trigger: 'blur' },
-            { max: 50, message: '长度在50个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ],
           code_value: [
             { required: true, message: '请输入代码value', trigger: 'blur' },
-            { max: 50, message: '长度在50个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ],
           onum: [
             { pattern: /^[1-9]\d{0,2}$/, message: '顺序最多只能输入3位数字' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
           ],
           info: [
-            { max: 200, message: '长度在200个字符以内', trigger: 'blur' }
-            // ,
-            // { validator: util.checkSpecialCode, trigger: 'blur' }
+            { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
         }
       }
