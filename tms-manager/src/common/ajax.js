@@ -33,7 +33,7 @@ var config = {
 
 let defaultOption = {
   url: '',
-  param: '',
+  param: {},
   success: function (data) {},
   error: function (data) { alert(data.error) },
   fail: function (error) { alert(error) }

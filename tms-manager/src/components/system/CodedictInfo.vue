@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>数据字典信息</h1>
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
@@ -180,10 +179,19 @@
           if (valid) {
             var self = this
             var paramsObj = this.dictDialogForm
-            ajax.post('/cmc/codedict/code/add', paramsObj, function (data) {
-              self.getData()
-              self.$message('添加成功')
-              self.dictDialogVisible = false
+            // ajax.post('/cmc/codedict/code/add', paramsObj, function (data) {
+            //   self.getData()
+            //   self.$message('添加成功')
+            //   self.dictDialogVisible = false
+            // })
+            ajax.post({
+              url: '/cmc/codedict/code/add',
+              param: paramsObj,
+              success: function (data) {
+                self.getData()
+                self.$message('添加成功')
+                self.dictDialogVisible = false
+              }
             })
           } else {
             return false
@@ -198,9 +206,18 @@
           pagesize: this.pageSize
         }
         // Object.assign(paramsObj, this.queryForm)
-        ajax.post('/cmc/codedict/category/codelist', paramsObj, function (data) {
-          if (data.page) {
-            self.bindGridData(data)
+        // ajax.post('/cmc/codedict/category/codelist', paramsObj, function (data) {
+        //   if (data.page) {
+        //     self.bindGridData(data)
+        //   }
+        // })
+        ajax.post({
+          url: '/cmc/codedict/category/codelist',
+          param: paramsObj,
+          success: function (data) {
+            if (data.page) {
+              self.bindGridData(data)
+            }
           }
         })
       },
@@ -213,11 +230,22 @@
           return
         }
         if (confirm('确定删除?')) {
-          ajax.post('cmc/codedict/code/del', {
-            codeId: data.code_id
-          }, function (data) {
-            self.$message('删除成功')
-            self.getData()
+          // ajax.post('cmc/codedict/code/del', {
+          //   codeId: data.code_id
+          // }, function (data) {
+          //   self.$message('删除成功')
+          //   self.getData()
+          // })
+
+          ajax.post({
+            url: 'cmc/codedict/code/del',
+            param: {
+              codeId: data.code_id
+            },
+            success: function (data) {
+              self.$message('删除成功')
+              self.getData()
+            }
           })
         }
       },
@@ -226,10 +254,19 @@
           if (valid) {
             var self = this
             var paramsObj = this.dictDialogForm
-            ajax.post('/cmc/codedict/code/update', paramsObj, function (data) {
-              self.getData()
-              self.$message('编辑成功')
-              self.dictDialogVisible = false
+            // ajax.post('/cmc/codedict/code/update', paramsObj, function (data) {
+            //   self.getData()
+            //   self.$message('编辑成功')
+            //   self.dictDialogVisible = false
+            // })
+            ajax.post({
+              url: '/cmc/codedict/code/update',
+              param: paramsObj,
+              success: function (data) {
+                self.getData()
+                self.$message('编辑成功')
+                self.dictDialogVisible = false
+              }
             })
           } else {
             return false

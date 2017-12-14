@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>数据字典</h1>
     <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
              :inline="inline" style="text-align: left">
       <el-form-item label="代码类别key:" prop="category_id">
@@ -78,15 +77,25 @@
     },
     data () {
       var categoryIdExist = (rule, value, callback) => {
-        console.log(1232)
         if (this.dialogType === 'edit' && this.selectedRows[0].category_id === value) {
           callback()
         } else {
-          ajax.post('/cmc/codedict/check/categoryId', {categoryId: value}, function (data) {
-            if (data.checkresult === false) {
-              return callback(new Error('该代码类别key已存在'))
-            } else {
-              callback()
+          // ajax.post('/cmc/codedict/check/categoryId', {categoryId: value}, function (data) {
+          //   if (data.checkresult === false) {
+          //     return callback(new Error('该代码类别key已存在'))
+          //   } else {
+          //     callback()
+          //   }
+          // })
+          ajax.post({
+            url: '/cmc/codedict/check/categoryId',
+            param: {categoryId: value},
+            success: function (data) {
+              if (data.checkresult === false) {
+                return callback(new Error('该代码类别key已存在'))
+              } else {
+                callback()
+              }
             }
           })
         }
@@ -173,9 +182,18 @@
           pagesize: this.pageSize
         }
         Object.assign(paramsObj, this.queryForm)
-        ajax.post('/cmc/codedict/category/list', paramsObj, function (data) {
-          if (data.page) {
-            self.bindGridData(data)
+        // ajax.post('/cmc/codedict/category/list', paramsObj, function (data) {
+        //   if (data.page) {
+        //     self.bindGridData(data)
+        //   }
+        // })
+        ajax.post({
+          url: '/cmc/codedict/category/list',
+          param: paramsObj,
+          success: function (data) {
+            if (data.page) {
+              self.bindGridData(data)
+            }
           }
         })
       },
@@ -185,10 +203,19 @@
           if (valid) {
             var self = this
             var paramsObj = this.dictDialogForm
-            ajax.post('/cmc/codedict/category/add', paramsObj, function (data) {
-              self.getData()
-              self.$message('添加成功')
-              self.dictDialogVisible = false
+            // ajax.post('/cmc/codedict/category/add', paramsObj, function (data) {
+            //   self.getData()
+            //   self.$message('添加成功')
+            //   self.dictDialogVisible = false
+            // })
+            ajax.post({
+              url: '/cmc/codedict/category/add',
+              param: paramsObj,
+              success: function (data) {
+                self.getData()
+                self.$message('添加成功')
+                self.dictDialogVisible = false
+              }
             })
           } else {
             return false
@@ -204,11 +231,22 @@
           return
         }
         if (confirm('确定删除?')) {
-          ajax.post('/cmc/codedict/category/del', {
-            categoryId: data.category_id
-          }, function (data) {
-            self.$message('删除成功')
-            self.getData()
+          // ajax.post('/cmc/codedict/category/del', {
+          //   categoryId: data.category_id
+          // }, function (data) {
+          //   self.$message('删除成功')
+          //   self.getData()
+          // })
+
+          ajax.post({
+            url: '/cmc/codedict/category/del',
+            param: {
+              categoryId: data.category_id
+            },
+            success: function (data) {
+              self.$message('删除成功')
+              self.getData()
+            }
           })
         }
       },
@@ -217,10 +255,19 @@
           if (valid) {
             var self = this
             var paramsObj = this.dictDialogForm
-            ajax.post('/cmc/codedict/category/update', paramsObj, function (data) {
-              self.getData()
-              self.$message('编辑成功')
-              self.dictDialogVisible = false
+            // ajax.post('/cmc/codedict/category/update', paramsObj, function (data) {
+            //   self.getData()
+            //   self.$message('编辑成功')
+            //   self.dictDialogVisible = false
+            // })
+            ajax.post({
+              url: '/cmc/codedict/category/update',
+              param: paramsObj,
+              success: function (data) {
+                self.getData()
+                self.$message('编辑成功')
+                self.dictDialogVisible = false
+              }
             })
           } else {
             return false
