@@ -7,7 +7,7 @@
 		<version>4.3.0</version>
 	</parent>
 	<artifactId>tms-core</artifactId>
-    <version>4.3.0-RELEASE</version>
+    <version>4.4.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>cn.com.higinet</groupId>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>cn.com.higinet</groupId>
 			<artifactId>tms-common</artifactId>
-			<version>4.3.1-SNAPSHOT</version>
+			<version>4.3.1-RELEASE</version>
 		</dependency>
 		<!-- 以下是第三方包，在maven仓库没有找到的，手动提交到私有仓库的包 -->
 		<dependency>
