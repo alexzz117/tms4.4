@@ -150,7 +150,7 @@
         this.dialogType = dialogType
         if (dialogType === 'edit') {
           this.dialogTitle = '编辑字典信息'
-          var length = this.selectedRows.length
+          let length = this.selectedRows.length
           if (length !== 1) {
             this.$message('请选择一行字典信息。')
             return
@@ -177,8 +177,8 @@
       addData (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            var self = this
-            var paramsObj = this.dictDialogForm
+            let self = this
+            let paramsObj = this.dictDialogForm
             // ajax.post('/cmc/codedict/code/add', paramsObj, function (data) {
             //   self.getData()
             //   self.$message('添加成功')
@@ -200,7 +200,7 @@
       },
       getData () {
         let self = this
-        var paramsObj = {
+        let paramsObj = {
           categoryId: this.categoryId,
           pageindex: this.currentPage,
           pagesize: this.pageSize
@@ -222,9 +222,9 @@
         })
       },
       delData () {
-        var self = this
-        var data = this.selectedRows[0]
-        var length = this.selectedRows.length
+        let self = this
+        let data = this.selectedRows[0]
+        let length = this.selectedRows.length
         if (length !== 1) {
           this.$message('请选择一行字典信息。')
           return
@@ -252,8 +252,8 @@
       updData (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            var self = this
-            var paramsObj = this.dictDialogForm
+            let self = this
+            let paramsObj = this.dictDialogForm
             // ajax.post('/cmc/codedict/code/update', paramsObj, function (data) {
             //   self.getData()
             //   self.$message('编辑成功')

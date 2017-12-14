@@ -76,7 +76,7 @@
       }
     },
     data () {
-      var categoryIdExist = (rule, value, callback) => {
+      let categoryIdExist = (rule, value, callback) => {
         if (this.dialogType === 'edit' && this.selectedRows[0].category_id === value) {
           callback()
         } else {
@@ -177,7 +177,7 @@
       },
       getData () {
         let self = this
-        var paramsObj = {
+        let paramsObj = {
           pageindex: this.currentPage,
           pagesize: this.pageSize
         }
@@ -201,8 +201,8 @@
         console.log(123)
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            var self = this
-            var paramsObj = this.dictDialogForm
+            let self = this
+            let paramsObj = this.dictDialogForm
             // ajax.post('/cmc/codedict/category/add', paramsObj, function (data) {
             //   self.getData()
             //   self.$message('添加成功')
@@ -223,9 +223,9 @@
         })
       },
       delData () {
-        var self = this
-        var data = this.selectedRows[0]
-        var length = this.selectedRows.length
+        let self = this
+        let data = this.selectedRows[0]
+        let length = this.selectedRows.length
         if (length !== 1) {
           this.$message('请选择一行代码类别信息。')
           return
@@ -253,8 +253,8 @@
       updData (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            var self = this
-            var paramsObj = this.dictDialogForm
+            let self = this
+            let paramsObj = this.dictDialogForm
             // ajax.post('/cmc/codedict/category/update', paramsObj, function (data) {
             //   self.getData()
             //   self.$message('编辑成功')
@@ -275,7 +275,7 @@
         })
       },
       showData () {
-        var length = this.selectedRows.length
+        let length = this.selectedRows.length
         if (length !== 1) {
           this.$message('请选择一行代码类别信息。')
           return
@@ -312,7 +312,7 @@
         this.dialogType = dialogType
         if (dialogType === 'edit') {
           this.dialogTitle = '编辑代码类别'
-          var length = this.selectedRows.length
+          let length = this.selectedRows.length
           if (length !== 1) {
             this.$message('请选择一行代码类别信息。')
             return
