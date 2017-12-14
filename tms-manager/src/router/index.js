@@ -19,6 +19,8 @@ import Tranmdl from '@/components/run/Tranmdl'
 
 
 import AuthCenter from '@/components/system/AuthCenter'
+import AuthDataList from '@/components/system/AuthDataList'
+import AuthDataCompare from '@/components/system/AuthDataCompare'
 import Codedict from '@/components/system/Codedict'
 import CodedictInfo from '@/components/system/CodedictInfo'
 import Ipaddr from '@/components/system/Ipaddr'
@@ -42,7 +44,7 @@ export default new Router({
       name: 'Main',
       component: Main,
       meta: {
-        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+        requireAuth: true  // 添加该字段，表示进入这个路由是需要登录的
       },
       children: [
         {
@@ -79,6 +81,16 @@ export default new Router({
           path: 'authCenter',
           name: 'AuthCenter',
           component: AuthCenter
+        },
+        {
+          path: 'authDataCompare',
+          name: 'AuthDataCompare',
+          component: AuthDataCompare
+        },
+        {
+          path: 'authDataList',
+          name: 'AuthDataList',
+          component: AuthDataList
         },
         {
           path: 'codedict',

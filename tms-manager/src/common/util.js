@@ -184,8 +184,51 @@ function isEmpty(str) {
   }
 }
 
+function renderDate(v){
+  if (v == 0 || v =='undefined' || v==null || v=='') {
+    return ''
+  }
+  try{
+    var d = new Date(parseInt(v, 10));
+    var month = (d.getMonth() + 1).toString();
+    var year = (d.getFullYear()).toString();
+    var day = (d.getDate()).toString();
+    return [year,
+      (month.length < 2 ? "-0":"-"), month,
+      (day.length < 2 ? "-0":"-"), day
+    ].join("");
+  }catch(e){
+    return v;
+  }
+}
+function renderDateTime(v){
+  if (v == 0 || v =='undefined' || v==null || v=='') {
+    return ''
+  }
+  try{
+    var d = new Date(parseInt(v, 10));
+    var month = (d.getMonth() + 1).toString();
+    var year = (d.getFullYear()).toString();
+    var day = (d.getDate()).toString();
+    var hour = (d.getHours()).toString();
+    var min = (d.getMinutes()).toString();
+    var sec = (d.getSeconds()).toString();
+    return [year,
+      (month.length < 2 ? "-0":"-"), month,
+      (day.length < 2 ? "-0":"-"), day,
+      (hour.length < 2 ? " 0":" "), hour,
+      (min.length < 2 ? ":0":":"), min,
+      (sec.length < 2 ? ":0":":"), sec
+    ].join("");
+  }catch(e){
+    return v;
+  }
+}
+
 var util = {
   isFunction: isFunction,
+  renderDate: renderDate,
+  renderDateTime: renderDateTime,
   isArray: Array.isArray || isArray,
   isWindow: isWindow,
   isNumeric: isNumeric,
