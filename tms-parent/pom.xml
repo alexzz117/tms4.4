@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cn.com.higinet</groupId>
+	<artifactId>tms-parent</artifactId>
+	<version>4.3.0</version>
+	<packaging>pom</packaging>
+
+	<name>tms-parent</name>
+	<description>tms-parent</description>
+
+	<properties>
+		<!-- base setting -->
+		<project.version>4.3.0</project.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.7</java.version>
+		
+		<log4j.version>1.7.25</log4j.version>
+		<slf4j-api.versin>1.7.25</slf4j-api.versin>
+		<!-- build setting -->
+		<maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+		<maven-war-plugin.version>2.4</maven-war-plugin.version>
+		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
+		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+		<maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
+		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+		<wtpversion.version>2.0</wtpversion.version>
+		<jeeversion.version>5.0</jeeversion.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		    <version>${slf4j-api.versin}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-log4j12</artifactId>
+		    <version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <version>4.12</version>
+		    <scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!-- 发布release设置 -->
+	<distributionManagement>
+		<repository>
+			<id>sz-cloud-release</id>
+			<name> Nexus Release Repository</name>
+			<url>http://maven.higinet.net:9000/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>sz-cloud-snapshots</id>
+			<name> Nexus Snapshot Repository</name>
+			<url>http://maven.higinet.net:9000/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<build>
+			<plugins>
+				<!-- Compiler 插件, 设定JDK版本 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.6.0</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<showWarnings>true</showWarnings>
+					</configuration>
+				</plugin>
+				<!-- 新增发布插件与源码打包插件，让发布的jar包带源码 王兴2017-5-15 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</plugin>
+				<plugin>  
+	                <artifactId>maven-source-plugin</artifactId>  
+	                <configuration>  
+	                    <attach>true</attach>  
+	                </configuration>  
+	                <executions>  
+	                    <execution>  
+	                        <phase>compile</phase>  
+	                        <goals>  
+	                            <goal>jar</goal>  
+	                        </goals>  
+	                    </execution>  
+	                </executions>  
+	            </plugin>         
+	            <plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+				</plugin>
+			</plugins>
+	</build>
+
+
+	<modules>
+		<module>tms-core</module>
+		<module>tms-api</module>
+		<module>tms-common</module>
+	</modules>
+</project>

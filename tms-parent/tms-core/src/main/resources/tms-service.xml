@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<context:property-placeholder location="classpath:server.properties" />
+	<context:component-scan base-package="cn.com.higinet.tms35,cn.com.higinet.tms4.model" />
+	<bean id="tmsDataSource" class="cn.com.higinet.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${tms.jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${tms.jdbc.url}" />
+		<property name="user" value="${tms.jdbc.username}" />
+		<property name="password" value="${tms.jdbc.password}" />
+		<property name="maxPoolSize" value="${tms.jdbc.maxActive}" />
+		<property name="minPoolSize" value="${tms.jdbc.minActive}" />
+		<property name="initialPoolSize" value="${tms.jdbc.initialSize}" />
+		<property name="maxIdleTime" value="0" />
+		<property name="acquireIncrement" value="5" />
+		<property name="acquireRetryAttempts" value="30" />
+		<property name="acquireRetryDelay" value="100" />
+		<property name="autoCommitOnClose" value="false" />
+		<property name="breakAfterAcquireFailure" value="false" />
+		<property name="checkoutTimeout" value="0" />
+		<property name="forceIgnoreUnresolvedTransactions" value="true" />
+		<property name="idleConnectionTestPeriod" value="60" />
+		<property name="maxStatements" value="0" />
+		<property name="maxStatementsPerConnection" value="0" />
+		<property name="numHelperThreads" value="3" />
+		<property name="preferredTestQuery" value="${tms.preferred.testQuery}" />
+		<property name="testConnectionOnCheckin" value="false" />
+		<property name="testConnectionOnCheckout" value="false" />
+		<property name="usesTraditionalReflectiveProxies" value="false" />
+	</bean>
+
+	<bean id="tmsJdbcTemplate" name="tmsJdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="tmsDataSource"></property>
+	</bean>
+	
+	<bean id="tmsSimpleDao" name="timerSimpleDao"
+		class="cn.com.higinet.rapid.base.dao.impl.OracleSimpleDaoImpl">
+		<property name="jdbcTemplate" ref="tmsJdbcTemplate"></property>
+	</bean>
+	
+	<!-- 临时/离线库连接 -->
+	<bean id="tmpDataSource" class="cn.com.higinet.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${tmp.jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${tmp.jdbc.url}" />
+		<property name="user" value="${tmp.jdbc.username}" />
+		<property name="password" value="${tmp.jdbc.password}" />
+		<property name="maxPoolSize" value="${tmp.jdbc.maxActive}" />
+        <property name="minPoolSize" value="${tmp.jdbc.minActive}" />
+		<property name="initialPoolSize" value="${tmp.jdbc.initialSize}" />
+		<property name="maxIdleTime" value="0" />
+		<property name="acquireIncrement" value="5" />
+		<property name="acquireRetryAttempts" value="30" />
+		<property name="acquireRetryDelay" value="100" />
+		<property name="autoCommitOnClose" value="false" />
+		<property name="breakAfterAcquireFailure" value="false" />
+		<property name="checkoutTimeout" value="0" />
+		<property name="forceIgnoreUnresolvedTransactions" value="true" />
+		<property name="idleConnectionTestPeriod" value="1800" />
+		<property name="maxStatements" value="0" />
+		<property name="maxStatementsPerConnection" value="0" />
+		<property name="numHelperThreads" value="3" />
+		<property name="preferredTestQuery" value="${tmp.preferred.testQuery}" />
+		<property name="testConnectionOnCheckin" value="false" />
+		<property name="testConnectionOnCheckout" value="false" />
+		<property name="usesTraditionalReflectiveProxies" value="false" />
+	</bean>
+	
+	<bean id="tmpJdbcTemplate" name="tmpJdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="tmpDataSource"></property>
+	</bean>
+	
+    <bean id="tmpSimpleDao" name="tmpTimerSimpleDao"
+        class="cn.com.higinet.rapid.base.dao.impl.OracleSimpleDaoImpl">
+        <property name="jdbcTemplate" ref="tmpJdbcTemplate"></property>
+    </bean>
+	
+	<bean id="tmsSqlMap" class="cn.com.higinet.rapid.base.dao.SqlMap" >
+		<property name="dbtype" value="oracle" />
+		<property name="basenames">
+			<list>
+				<value>classpath:/tms-sql</value>
+			</list>
+		</property>
+	</bean>
+		<!-- 缓存管理类注入-->
+	<bean class="cn.com.higinet.tms.common.cache.CacheManager" destroy-method="stop">
+		<property name="description" value="缓存服务"></property>
+		<property name="envInitializer" ref="cn.com.higinet.tms.common.cache.EnvInitializer"></property>
+	</bean>
+		<!--配置文件初始化接口实现-->
+	<bean name="cn.com.higinet.tms.common.cache.EnvInitializer" class="cn.com.higinet.tms.common.cache.initializer.ConfigInitializer">
+		<property name="configPath" value="/server.properties"></property>
+		<property name="cachePrefix" value="tms.svc.cache."></property>
+	</bean>
+	<!-- 统计缓存类注入-->
+	<bean id="cn.com.higinet.tms35.core.persist.Stat" class="cn.com.higinet.tms35.core.persist.impl.CacheStatImpl">
+	</bean>
+</beans>

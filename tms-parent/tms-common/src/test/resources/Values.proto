@@ -1,0 +1,7 @@
+syntax="proto3";
+//option java_package="cn.com.higinet.tms.common";
+//option java_outer_classname="Value";
+
+message VMap{
+	map<string, string> myMap = 1;
+}

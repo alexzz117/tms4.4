@@ -1,0 +1,7 @@
+syntax="proto2";
+//option java_package="cn.com.higinet.tms.common";
+//option java_outer_classname="Value";
+
+message Value{
+	required string value = 1;
+}
