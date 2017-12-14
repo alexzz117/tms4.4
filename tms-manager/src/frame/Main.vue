@@ -32,7 +32,7 @@
             <router-link :to="{ name:'Role'}" tag="li" replace>
               <el-menu-item index="3-2">角色管理</el-menu-item>
             </router-link>
-            <router-link :to="{ name:'Function'}" tag="li" replace>
+            <router-link :to="{ name:'Func'}" tag="li" replace>
               <el-menu-item index="3-3">功能管理</el-menu-item>
             </router-link>
           </el-submenu>
