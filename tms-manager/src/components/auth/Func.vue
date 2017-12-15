@@ -157,7 +157,11 @@
     },
     methods: {
       renderContent (h, { node, data, store }) {
-        return (<span class="el-tree-node__label">{node.label}</span>)
+        if (node.data.flag === '0') {
+          return (<span class="el-tree-node__label disabledFlag">{node.label}</span>)
+        } else {
+          return (<span class="el-tree-node__label">{node.label}</span>)
+        }
       },
       selTree () {
         var self = this
@@ -370,5 +374,8 @@
 <style>
   .hidden {
     display: none;
+  }
+  .disabledFlag {
+    color: #dcdfe6;
   }
 </style>
