@@ -441,12 +441,10 @@
           info: data.info,
           islog: (data.islog === '1'),
           logconf: '', // 日志配置,
-          logurlMethod: data.logurlMethod, // 日志请求方式
+          logurlMethod: data.logurlmethod, // 日志请求方式
           loguri: data.loguri // 日子请求地址
         }
-        debugger
-        console.info(data['logurlMethod'],formData.logurlmethod,data.logurlMethod === '1')
-        switch (data.logurlMethod) {
+        switch (data.logurlmethod) {
           case '0' :
             formData.logconf = 'GET:' + data.loguri
             break
