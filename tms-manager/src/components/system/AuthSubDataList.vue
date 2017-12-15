@@ -2,9 +2,6 @@
   <div>
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
-      <el-button plain class="el-icon-tickets" @click="auth" :disabled="notSelectOne">授权</el-button>
-      <el-button plain class="el-icon-view" @click="showSub" :disabled="notSelectOne">查看子操作</el-button>
-      <el-button plain class="el-icon-view" @click="showLog()" :disabled="notSelectOne">查看日志</el-button>
     </div>
 
     <el-table
@@ -16,18 +13,16 @@
       <el-table-column type="selection" width="55" align="left"></el-table-column>
       <el-table-column label="操作数据" align="left">
         <template slot-scope="scope">
-          <a v-if="datavalueLink" href="javascript:void(0)" @click="toCompare(scope.row)">{{scope.row.datavalue}}</a>
-          <span v-else>{{scope.row.datavalue}}</span>
+          <a v-if="datavalueLink(scope.row)" href="javascript:void(0)" @click="toCompare(scope.row)">{{scope.row.operatedata_value}}</a>
+          <span v-else>{{scope.row.operatedata_value}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="auth_id" label="授权编号" align="left"></el-table-column>
-      <el-table-column v-if="txnnameRowShow" prop="txnname" label="所属交易" align="left"></el-table-column>
-      <el-table-column prop="operatename" label="操作名称" align="left"></el-table-column>
-      <el-table-column v-if="subOperateNumShow" prop="sub_operate_num" label="子操作个数" align="left"></el-table-column>
-      <el-table-column prop="real_name" label="提交授权人" align="left"></el-table-column>
-      <el-table-column label="提交授权时间" align="left">
+      <el-table-column prop="is_main" label="是否为初始操作" align="left"></el-table-column>
+      <el-table-column prop="operate_name" label="子操作名称" align="left"></el-table-column>
+      <el-table-column prop="real_name" label="操作人" align="left"></el-table-column>
+      <el-table-column label="操作时间" align="left">
         <template slot-scope="scope">
-          <span>{{scope.row.proposer_time | renderDateTime}}</span>
+          <span>{{scope.row.operate_time | renderDateTime}}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -52,20 +47,12 @@
     computed: {
       notSelectOne () {
         return this.selectedRows.length !== 1
-      },
-      txnnameRowShow () {
-        return this.modelName !== '名单管理'
-      },
-      subOperateNumShow () {
-        return this.modelName === '名单管理' || this.modelName === '交易配置'
-      },
-      datavalueLink () {
-        return !(this.modelName === '名单管理' || this.modelName === '交易配置')
       }
     },
     data () {
       return {
         modelName: '',
+        authId: '',
         tableData: [],
         dialogTitle: '',
         dictDialogVisible: false,
@@ -79,7 +66,8 @@
     },
     mounted: function () {
       this.$nextTick(function () {
-        this.modelName = this.$route.query.modelname
+        this.modelName = this.$route.query.modelName
+        this.authId = this.$route.query.authId
         this.getData()
       })
     },
@@ -103,10 +91,14 @@
         this.selectedRows = rows
       },
       bindGridData (data) {
+        console.log(data.page.list)
         this.tableData = data.page.list
         this.currentPage = data.page.index
         this.pageSize = data.page.size
         this.total = data.page.total
+      },
+      datavalueLink (row) {
+        return (row.table_name !== 'TMS_COM_MTRAIN')
       },
       // 点击标题的事件
       toCompare (row) {
@@ -125,12 +117,12 @@
       getData () {
         let self = this
         let paramsObj = {
-          modelName: this.modelName,
+          authId: this.authId,
           pageindex: this.currentPage,
           pagesize: this.pageSize
         }
         ajax.post({
-          url: '/tms/auth/authList',
+          url: '/tms/auth/listSubOperate',
           param: paramsObj,
           success: function (data) {
             if (data.page) {
@@ -138,33 +130,6 @@
             }
           }
         })
-      },
-      auth () {
-        console.log('auth')
-      },
-      showSub () {
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行授权信息。')
-          return
-        }
-        let params = {
-          authId: this.selectedRows[0].auth_id,
-          modelName: this.modelName
-        }
-        this.$router.push({name: 'AuthSubDataList', query: params})
-      },
-      showLog () {
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行授权信息。')
-          return
-        }
-        let params = {
-          authId: this.selectedRows[0].auth_id,
-          modelName: this.modelName
-        }
-        this.$router.push({name: 'AuthLogList', query: params})
       },
       back () {
         this.$router.go(-1)

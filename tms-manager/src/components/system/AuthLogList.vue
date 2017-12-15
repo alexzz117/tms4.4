@@ -2,9 +2,6 @@
   <div>
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
-      <el-button plain class="el-icon-tickets" @click="auth" :disabled="notSelectOne">授权</el-button>
-      <el-button plain class="el-icon-view" @click="showSub" :disabled="notSelectOne">查看子操作</el-button>
-      <el-button plain class="el-icon-view" @click="showLog()" :disabled="notSelectOne">查看日志</el-button>
     </div>
 
     <el-table
@@ -79,7 +76,7 @@
     },
     mounted: function () {
       this.$nextTick(function () {
-        this.modelName = this.$route.query.modelname
+        this.modelName = this.$route.query.modelName
         this.getData()
       })
     },
@@ -138,33 +135,6 @@
             }
           }
         })
-      },
-      auth () {
-        console.log('auth')
-      },
-      showSub () {
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行授权信息。')
-          return
-        }
-        let params = {
-          authId: this.selectedRows[0].auth_id,
-          modelName: this.modelName
-        }
-        this.$router.push({name: 'AuthSubDataList', query: params})
-      },
-      showLog () {
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行授权信息。')
-          return
-        }
-        let params = {
-          authId: this.selectedRows[0].auth_id,
-          modelName: this.modelName
-        }
-        this.$router.push({name: 'AuthLogList', query: params})
       },
       back () {
         this.$router.go(-1)

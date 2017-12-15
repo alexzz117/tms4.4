@@ -14,7 +14,7 @@
         <el-tree :data="treeData" node-key="id"
                  :default-expanded-keys="expendKey"
                  :props="defaultProps"
-                 highlight-current="true"
+                 :highlight-current=true
                  @node-click="handleNodeClick"
                  :render-content="renderContent"
                  style="height: 76vh;overflow-y: auto;">
@@ -156,7 +156,7 @@
     },
     methods: {
       renderContent (h, { node, data, store }) {
-        return '<span class="el-tree-node__label">运行监控</span>)'
+        return (<span class="el-tree-node__label">运行监控</span>)
       },
       selTree () {
         var self = this

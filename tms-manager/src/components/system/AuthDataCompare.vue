@@ -86,7 +86,8 @@
         })
       },
       back () {
-        this.$router.replace({name: 'AuthDataList', query: { modelname: this.modelName }})
+        console.log(123231)
+        this.$router.go(-1)
       }
     }
   }

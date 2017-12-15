@@ -20,6 +20,8 @@ import Tranmdl from '@/components/run/Tranmdl'
 
 import AuthCenter from '@/components/system/AuthCenter'
 import AuthDataList from '@/components/system/AuthDataList'
+import AuthLogList from '@/components/system/AuthLogList'
+import AuthSubDataList from '@/components/system/AuthSubDataList'
 import AuthDataCompare from '@/components/system/AuthDataCompare'
 import Codedict from '@/components/system/Codedict'
 import CodedictInfo from '@/components/system/CodedictInfo'
@@ -91,6 +93,16 @@ export default new Router({
           path: 'authDataList',
           name: 'AuthDataList',
           component: AuthDataList
+        },
+        {
+          path: 'authLogList',
+          name: 'AuthLogList',
+          component: AuthLogList
+        },
+        {
+          path: 'authSubDataList',
+          name: 'AuthSubDataList',
+          component: AuthSubDataList
         },
         {
           path: 'codedict',

@@ -274,7 +274,7 @@
         })
       },
       back () {
-        this.$router.replace({name: 'Codedict'})
+        this.$router.push({name: 'Codedict'})
       }
     }
   }

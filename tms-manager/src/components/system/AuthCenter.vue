@@ -49,7 +49,7 @@
         })
       },
       showData (modelname) {
-        this.$router.replace({name: 'AuthDataList', query: { modelname: modelname }})
+        this.$router.push({name: 'AuthDataList', query: { modelname: modelname }})
       }
     }
   }
