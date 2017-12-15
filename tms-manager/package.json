@@ -1,7 +1,7 @@
 {
   "name": "tms-manager",
   "version": "1.0.0",
-  "description": "A Vue.js project",
+  "description": "风险监控系统web管理终端",
   "author": "wuruiqi",
   "private": true,
   "scripts": {
