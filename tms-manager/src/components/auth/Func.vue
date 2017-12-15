@@ -456,6 +456,15 @@
         }
         self.funcForm = formData
       },
+      resetPage () {
+        this.funcFormVisible.form = true
+        this.breadcrumbData = []
+        this.toolBtn = { // 功能树操作按钮
+          addBtn: true, // 添加按钮
+          editBtn: true, // 编辑按钮
+          delBtn: true // 删除按钮
+        }
+      },
       // 添加功能事件处理
       addFunc () {
         this.$refs['funcForm'].resetFields()
@@ -472,6 +481,21 @@
       },
       // 删除功能事件处理
       delFunc () {
+        var self = this
+        var selectNode = self.$refs.tree.currentNode.node
+        var option = {
+          url: '/cmc/func/del',
+          param: {
+            funcId: selectNode.id,
+            rf: 'json'
+          },
+          success: function (data) {
+            selectNode.visible = false
+            self.resetPage()
+            self.$message('配置删除成功。')
+          }
+        }
+        ajax.post(option)
       }
     }
   }
