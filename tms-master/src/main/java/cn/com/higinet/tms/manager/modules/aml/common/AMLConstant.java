@@ -9,7 +9,7 @@ package cn.com.higinet.tms.manager.modules.aml.common;
 public class AMLConstant {
 
 	//反洗钱数据映射配置文件路径
-	public static final String AMLCONFIGXSDPATH = "/resources/config/amlConfig.xsd";
+	public static final String AMLCONFIGXSDPATH = "/config/amlConfig.xsd";
 	public static final String AMLCONFIGPATH = "AMLCONFIGPATH";
 	
 	public static final String NPS = "NPS";

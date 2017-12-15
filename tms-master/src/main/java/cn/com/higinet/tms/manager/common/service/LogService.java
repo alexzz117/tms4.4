@@ -42,10 +42,6 @@ public class LogService {
 	
 	@Autowired
 	private SimpleDao cmcSimpleDao;
-	
-	public void setCmcSimpleDao(SimpleDao cmcSimpleDao) {
-		this.cmcSimpleDao = cmcSimpleDao;
-	}
 
 	/**
 	 * 服务列表接口

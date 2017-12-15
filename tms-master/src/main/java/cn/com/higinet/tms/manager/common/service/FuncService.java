@@ -32,10 +32,6 @@ public class FuncService {
 	@Autowired
 	private SimpleDao cmcSimpleDao;
 
-	public void setCmcSimpleDao( SimpleDao cmcSimpleDao ) {
-		this.cmcSimpleDao = cmcSimpleDao;
-	}
-
 	/**
 	 * 获取功能树列表
 	 * @param conds 条件参数 （Map<列名称, 列值>）

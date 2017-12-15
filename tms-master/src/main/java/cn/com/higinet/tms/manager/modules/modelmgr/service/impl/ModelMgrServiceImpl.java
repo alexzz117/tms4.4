@@ -5,9 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.Order;
@@ -20,13 +19,13 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 /**
  * 模型管理服务类
  * @author zlq
+ * @author zhang.lei
  */
 @Service("modelMgrService")
 public class ModelMgrServiceImpl implements ModelMgrService {
 
-	private static Log log = LogFactory.getLog(ModelMgrServiceImpl.class);
-	
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao; 
 	
 	/**

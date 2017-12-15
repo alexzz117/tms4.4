@@ -37,7 +37,7 @@ public class AMLDataConfig {
 	}
 
 	private AMLDataConfig() {
-		String path = "/resources/config/amlConfig.xml";
+		String path = "/config/amlConfig.xml";
 		InputStream in = AMLDataConfig.class.getResourceAsStream(path);
 		if (in != null) {
 			amlConfigMap = new HashMap<String, Object>();

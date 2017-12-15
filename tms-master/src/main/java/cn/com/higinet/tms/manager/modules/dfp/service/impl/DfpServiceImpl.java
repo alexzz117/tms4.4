@@ -22,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,7 @@ public class DfpServiceImpl implements DfpService {
 	@Autowired
 	private SimpleDao tmsSimpleDao;
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 	@Autowired
 	private SimpleDao officialSimpleDao;

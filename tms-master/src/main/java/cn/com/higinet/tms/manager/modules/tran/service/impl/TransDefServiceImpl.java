@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +36,6 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 @Service("transDefService")
 public class TransDefServiceImpl implements TransDefService {
 
-	private static Log log = LogFactory.getLog(TransDefServiceImpl.class);
-
 	@Autowired
 	private SqlMap tmsSqlMap;
 
@@ -44,6 +43,7 @@ public class TransDefServiceImpl implements TransDefService {
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 
 	/**

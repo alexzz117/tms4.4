@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -34,11 +35,8 @@ public class Func {
 	private Set<String> enableFuncIds = new HashSet<String>();
 
 	@Autowired
+	@Qualifier("cmcSimpleDao")
 	private SimpleDao cmcSimpleDao;
-
-	public void setCmcSimpleDao( SimpleDao cmcSimpleDao ) {
-		this.cmcSimpleDao = cmcSimpleDao;
-	}
 
 	/**
 	 * 检查URI是否被权限保护

@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +30,8 @@ import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
 public class AlarmEventController {
 
 	@Autowired
-	private AlarmEventService alarmService;
+	@Qualifier("alarmEventService")
+	private AlarmEventService alarmEventService;
 
 	/**
 	 * 报警事件处理页面
@@ -50,9 +52,9 @@ public class AlarmEventController {
 	@RequestMapping(value = "/process", method = RequestMethod.POST)
 	public Model alarmProcessAction(@RequestParam Map<String, String> reqs) {
 		Model model = new Model();
-		Map<String, Object> txnMap = alarmService.getTrafficDataForAlarmProcessInfo(reqs);
+		Map<String, Object> txnMap = alarmEventService.getTrafficDataForAlarmProcessInfo(reqs);
 		reqs.put("AC_TYPE", "1");// 普通动作
-		List<Map<String, Object>> actList = alarmService.getAlarmProcessActions(reqs);
+		List<Map<String, Object>> actList = alarmEventService.getAlarmProcessActions(reqs);
 		model.set("txnMap", txnMap);
 		model.set("actList", actList);
 		return model;
@@ -67,7 +69,7 @@ public class AlarmEventController {
 	@RequestMapping(value = "/getAlarmHis", method = RequestMethod.POST)
 	public Model getAlarmHisActions(@RequestParam Map<String, String> reqs) {
 		Model model = new Model();
-		Page<Map<String, Object>> armHisPage = alarmService.getAlarmHisActions(reqs);
+		Page<Map<String, Object>> armHisPage = alarmEventService.getAlarmHisActions(reqs);
 		model.setPage(armHisPage);
 		return model;
 	}
@@ -84,11 +86,11 @@ public class AlarmEventController {
 		//alarmService.alarmProcess(reqs, request);
 		
 		// 通过客户号查询非挂起的待处理的交易
-		Map<String, Object> transMap1 = alarmService.getTrafficDataForAlarmProcessInfo(reqs);
+		Map<String, Object> transMap1 = alarmEventService.getTrafficDataForAlarmProcessInfo(reqs);
 
 		// 挂起
 		if ("PS04".equals(MapUtil.getString(transMap1, "DISPOSAL"))) {
-			alarmService.alarmProcess(reqs, request);
+			alarmEventService.alarmProcess(reqs, request);
 			return model;
 		}
 
@@ -99,10 +101,10 @@ public class AlarmEventController {
 			transMap1.put("OPERID", operId);
 		}
 		
-		List<Map<String, Object>> user_trans = alarmService.getTrafficDataByUserid(transMap1);
+		List<Map<String, Object>> user_trans = alarmEventService.getTrafficDataByUserid(transMap1);
 		for (Map<String, Object> map1 : user_trans) {
 			reqs.put("TXN_CODE", MapUtil.getString(map1, "TXNCODE"));
-			alarmService.alarmProcess(reqs, request);
+			alarmEventService.alarmProcess(reqs, request);
 		}
 		
 		return model;
@@ -117,7 +119,7 @@ public class AlarmEventController {
 	@RequestMapping(value = "/shortActionList", method = RequestMethod.POST)
 	public Model shortActionList(@RequestParam Map<String, String> reqs) {
 		Model model = new Model();
-		model.setList(alarmService.shortActionList(reqs));
+		model.setList(alarmEventService.shortActionList(reqs));
 		return model;
 	}
 
@@ -130,7 +132,7 @@ public class AlarmEventController {
 	public Model addAlarmPsActAction(@RequestParam Map<String, String> reqs) {
 		Model model = new Model();
 		reqs.put("AC_TYPE", "1");
-		model.setRow(alarmService.addAlarmProcessAction(reqs));
+		model.setRow(alarmEventService.addAlarmProcessAction(reqs));
 		return model;
 	}
 
@@ -142,7 +144,7 @@ public class AlarmEventController {
 	@RequestMapping(value = "/delPsAct", method = RequestMethod.POST)
 	public Model delAlarmPsActAction(@RequestParam Map<String, String> reqs) {
 		Model model = new Model();
-		alarmService.delAlarmProcessAction(reqs);
+		alarmEventService.delAlarmProcessAction(reqs);
 		return model;
 	}
 
@@ -165,10 +167,10 @@ public class AlarmEventController {
 	@RequestMapping(value = "/audit", method = RequestMethod.POST)
 	public Model alarmAuditAction(@RequestParam Map<String, String> reqs, HttpServletRequest request) {
 		Model model = new Model();
-		Map<String, Object> txnMap = alarmService.getTrafficDataForAlarmProcessInfo(reqs);
+		Map<String, Object> txnMap = alarmEventService.getTrafficDataForAlarmProcessInfo(reqs);
 		reqs.put("AC_TYPE", "1");// 普通动作
-		List<Map<String, Object>> actList = alarmService.getAlarmProcessActions(reqs);
-		List<Map<String, Object>> psList = alarmService.getAlarmProcessInfoList(reqs);
+		List<Map<String, Object>> actList = alarmEventService.getAlarmProcessActions(reqs);
+		List<Map<String, Object>> psList = alarmEventService.getAlarmProcessInfoList(reqs);
 		model.set("txnMap", txnMap);
 		model.set("actList", actList);
 		model.set("psList", psList);
@@ -184,7 +186,7 @@ public class AlarmEventController {
 	@RequestMapping(value = "/saveAudit", method = RequestMethod.POST)
 	public Model saveAlarmAuditAction(@RequestParam Map<String, String> reqs, HttpServletRequest request) {
 		Model model = new Model();
-		int result = alarmService.alarmAudit(reqs, request);
+		int result = alarmEventService.alarmAudit(reqs, request);
 		model.addObject("result", result);
 		return model;
 	}
@@ -215,7 +217,7 @@ public class AlarmEventController {
 		// long timeout = MapUtil.getLong(paramMap, "STARTVALUE");
 		Map<String, Object> cond = new HashMap<String, Object>();
 		// cond.putAll(txnMap);
-		List<Map<String, Object>> operCapacityList = alarmService.getAlarmAssignOperCapacity(cond);
+		List<Map<String, Object>> operCapacityList = alarmEventService.getAlarmAssignOperCapacity(cond);
 		// String psStatus = MapUtil.getString(txnMap, "PSSTATUS");
 		// long assignTime = MapUtil.getLong(txnMap, "ASSIGNTIME");
 		// long auditTime = MapUtil.getLong(txnMap, "AUDITTIME");
@@ -224,7 +226,7 @@ public class AlarmEventController {
 		// isTimeout = 1;
 		// }
 
-		List<Map<String, Object>> list = alarmService.getAlarmProcessAuthorityOperators();
+		List<Map<String, Object>> list = alarmEventService.getAlarmProcessAuthorityOperators();
 		if (list == null || list.isEmpty()) {
 			throw new TmsMgrServiceException("没有拥有[报警事件处理]权限的人员, 请设置.");
 		}
@@ -237,7 +239,7 @@ public class AlarmEventController {
 			String[] codes = txnCodes.split(",");
 			if(1==codes.length){
 				reqs.put("TXN_CODE", codes[0]);
-				Map<String, Object> txnMap = alarmService.getTrafficDataForAlarmProcessInfo(reqs);
+				Map<String, Object> txnMap = alarmEventService.getTrafficDataForAlarmProcessInfo(reqs);
 				model.set("txnMap", txnMap);		
 			}
 		}	
@@ -265,7 +267,7 @@ public class AlarmEventController {
 			String[] codes = txnCodes.split(",");
 			for (String cd : codes) {
 				reqs.put("TXN_CODE", cd);
-				alarmService.alarmAssign(reqs, request);
+				alarmEventService.alarmAssign(reqs, request);
 			}
 		}
 
@@ -283,30 +285,30 @@ public class AlarmEventController {
 		String stId = MapUtil.getString(reqs, "stid");
 		String txnCode = MapUtil.getString(reqs, "txncode");
 		String txnType = MapUtil.getString(reqs, "txntype");
-		model.setRow(alarmService.getTransStrategy(stId));
-		model.setList(alarmService.getTransStrategyRuleEvalList(stId));
-		model.set("ruleList", alarmService.getTransHitRuleList(txnCode, txnType));
+		model.setRow(alarmEventService.getTransStrategy(stId));
+		model.setList(alarmEventService.getTransStrategyRuleEvalList(stId));
+		model.set("ruleList", alarmEventService.getTransHitRuleList(txnCode, txnType));
 		return model;
 	}
 
 	@RequestMapping(value = "/alarmAssignOpers", method = RequestMethod.POST)
 	public Model getAlarmAssignOpers(@RequestParam Map<String, String> reqs, HttpServletRequest request) {
 		Model model = new Model();
-		model.setList(alarmService.getAlarmAssingAuthorityOperators());
+		model.setList(alarmEventService.getAlarmAssingAuthorityOperators());
 		return model;
 	}
 
 	@RequestMapping(value = "/alarmProcessOpers", method = RequestMethod.POST)
 	public Model getAlarmProcessOpers(@RequestParam Map<String, String> reqs, HttpServletRequest request) {
 		Model model = new Model();
-		model.setList(alarmService.getAlarmProcessAuthorityOperators());
+		model.setList(alarmEventService.getAlarmProcessAuthorityOperators());
 		return model;
 	}
 
 	@RequestMapping(value = "/alarmAuditOpers", method = RequestMethod.POST)
 	public Model getAlarmAuditOpers(@RequestParam Map<String, String> reqs, HttpServletRequest request) {
 		Model model = new Model();
-		model.setList(alarmService.getAlarmAuditAuthorityOperators());
+		model.setList(alarmEventService.getAlarmAuditAuthorityOperators());
 		return model;
 	}
 }

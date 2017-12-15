@@ -20,9 +20,11 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
+import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
@@ -32,7 +34,6 @@ import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
-import cn.com.higinet.tms35.core.bean;
 import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc;
 import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc.row_fetch;
 import cn.com.higinet.tms35.core.dao.stmt.data_source;
@@ -54,6 +55,7 @@ public class SendRateMessage {
 	@Autowired
 	private SimpleDao tmsSimpleDao;
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 	@Autowired
 	private TaskExecutor taskExecutor;
@@ -512,7 +514,7 @@ public class SendRateMessage {
 		String txnCode = StringUtil.randomUUID();
 		String txnType = "";
 
-		String sqlSeqNext = ((SqlMap) bean.get( "tmsSqlMap" )).getSql( "tms.common.sequenceid" ).replaceFirst( "\\$\\{SEQUENCENAME\\}", "SEQ_TMS_RUN_RULETRIG_ID" );
+		String sqlSeqNext = ApplicationContextUtil.getBean( SqlMap.class ).getSql( "tms.common.sequenceid" ).replaceFirst( "\\$\\{SEQUENCENAME\\}", "SEQ_TMS_RUN_RULETRIG_ID" );
 		Map<String, Object> params = new HashMap<String, Object>();
 
 		for( Map<String, Object> ruleIdAndRuleScoreMap : ruleIdList ) {

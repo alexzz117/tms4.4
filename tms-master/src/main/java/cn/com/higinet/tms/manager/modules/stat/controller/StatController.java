@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -36,7 +36,6 @@ import cn.com.higinet.tms.manager.modules.stat.service.StatService;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransModelService;
 import cn.com.higinet.tms35.comm.web_tool;
-import cn.com.higinet.tms35.core.bean;
 import cn.com.higinet.tms35.core.cache.cache_init;
 import cn.com.higinet.tms35.core.cache.db_process;
 import cn.com.higinet.tms35.core.cache.db_rule;
@@ -628,8 +627,8 @@ public class StatController implements ApplicationContextAware{
 	 */
 	public void setApplicationContext(ApplicationContext ctx)
 			throws BeansException {
-		bean bean0 = ctx.getBean(bean.class);
+		/*bean bean0 = ctx.getBean(bean.class);
 		System.out.println(bean0.get("bean_fac"));
-		new bean().setApplicationContext(ctx);
+		new bean().setApplicationContext(ctx);*/
 	}
 }

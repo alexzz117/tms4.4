@@ -9,9 +9,8 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +19,7 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
-import cn.com.higinet.tms.manager.modules.alarm.service.AlarmQueueService;
 import cn.com.higinet.tms.manager.modules.alarm.service.MonitorStatService;
-import cn.com.higinet.tms.manager.modules.alarm.service.SendMessageService;
 import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
@@ -30,20 +27,16 @@ import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.mgr.service.RiskCaseService;
-import cn.com.higinet.tms.manager.modules.mgr.service.ServerService;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
-
-import com.sfpay.sypay.risk.proxy.SypayTransactionAuditService;
 
 @Service("alarmEventService")
 public class AlarmEventService {
-
-	private static Log log = LogFactory.getLog( AlarmEventService.class );
 
 	@Autowired
 	private HttpServletRequest request;
 
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 
 	@Autowired
@@ -59,24 +52,15 @@ public class AlarmEventService {
 	private MonitorStatService monitorStatService;
 
 	@Autowired
-	private AlarmQueueService alarmQueueService;
-
-	@Autowired
-	private SendMessageService sendMessageService;
-
-	@Autowired
-	private ServerService serverService;
-
-	@Autowired
 	private RiskCaseService riskCaseService;
 
-	@Autowired
-	private SypayTransactionAuditService sypayTransactionAuditService;
+	//@Autowired
+	//private SypayTransactionAuditService sypayTransactionAuditService;
 
 	private String alarmAssignFuncId;// 报警事件分派菜单ID
 	private String alarmProcessFuncId;// 报警事件处理菜单ID
 	private String alarmAuditFuncId;// 报警事件审核菜ID
-	
+
 	public static final String ALARM_PS_FUNC_ID = "tms.alarm.process.funcid";
 	public static final String ALARM_AS_FUNC_ID = "tms.alarm.assign.funcid";
 	public static final String ALARM_AD_FUNC_ID = "tms.alarm.audit.funcid";
@@ -392,7 +376,9 @@ public class AlarmEventService {
 	 * @param request
 	 * @return 
 	 */
-	@SuppressWarnings({ "unchecked", "serial" })
+	@SuppressWarnings({
+			"unchecked", "serial"
+	})
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public int alarmAudit( Map<String, String> cond, HttpServletRequest request ) {
 		int result = 1;// 默认返回成功
@@ -436,7 +422,7 @@ public class AlarmEventService {
 				String shortAction = (String) processMap.get( "SHORT_ACTION" );
 				if( null != shortAction ) {
 
-					log.info( "----调用前置接口----txncode=" + txncode + "  txnid=" + txnid );
+					/*log.info( "----调用前置接口----txncode=" + txncode + "  txnid=" + txnid );
 					try {
 						if( shortAction.contains( StaticParameters.SHORT_ACTION_PASS ) ) {// 放行
 							txnstatus = "1";
@@ -453,7 +439,7 @@ public class AlarmEventService {
 						result = 0;
 						log.error( "调用前置接口出错.", e );
 					}
-					log.info( "----调用前置接口返回结果:" + result );
+					log.info( "----调用前置接口返回结果:" + result );*/
 
 					// 禁用会员
 					// 冻结账户
@@ -480,7 +466,7 @@ public class AlarmEventService {
 			}
 
 			// 成功才发送交易确认
-			if( SypayTransactionAuditService.SUCCESS == result ) {
+			/*if( SypayTransactionAuditService.SUCCESS == result ) {
 				psStatus = "99";
 				List<Map<String, Object>> servList = serverService.listServer( new HashMap<String, String>() {
 					{
@@ -507,10 +493,10 @@ public class AlarmEventService {
 				monitorStatService.updateAlarmProcessOperatorStat( MapUtil.getString( transMap, "OPERID" ), MapUtil.getLong( transMap, "ASSIGNTIME" ),
 						CmcStringUtil.isBlank( MapUtil.getString( transMap, "ASSIGNID" ) ), false );
 				monitorStatService.modMonitorFraudTypeStat( transMap );
-
+			
 				String fraudType = MapUtil.getString( transMap, "FRAUD_TYPE" );
 				alarmQueueService.updateRiskStatus( ("00".equals( fraudType ) ? "0" : "1"), MapUtil.getString( transMap, "TXNCODE" ) );
-			}
+			}*/
 		}
 
 		return result;

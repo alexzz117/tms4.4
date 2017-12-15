@@ -10,7 +10,10 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +54,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	private static final Logger log = LoggerFactory.getLogger( AuthServiceImpl.class );
 	
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 
 	@Autowired
@@ -72,6 +76,15 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	private NameListService nameListService;
 
 	private int logOrder = 1;
+	
+	@Bean("refreshCacheExecutor")
+	public TaskExecutor refreshCacheExecutor() {
+		SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
+		simpleAsyncTaskExecutor.setDaemon( true );
+		simpleAsyncTaskExecutor.setConcurrencyLimit( 100 );
+		simpleAsyncTaskExecutor.setThreadNamePrefix( "refreshCacheTaskExecutor" );
+		return simpleAsyncTaskExecutor;
+	}
 
 	public List<Map<String, Object>> showCenter(Map<String, String> conds) {
 		List<Map<String, Object>> tdataList = new ArrayList<Map<String, Object>>();

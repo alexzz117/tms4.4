@@ -24,9 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -202,13 +200,7 @@ public class NameListController {
 		try {
 			request.setAttribute( "postData", objectMapper.writeValueAsString( modelMap ) );
 		}
-		catch( JsonGenerationException e ) {
-			e.printStackTrace();
-		}
-		catch( JsonMappingException e ) {
-			e.printStackTrace();
-		}
-		catch( IOException e ) {
+		catch( Exception e ) {
 			e.printStackTrace();
 		}
 
@@ -337,13 +329,7 @@ public class NameListController {
 		try {
 			request.setAttribute( "postData", objectMapper.writeValueAsString( formList ) );
 		}
-		catch( JsonGenerationException e ) {
-			e.printStackTrace();
-		}
-		catch( JsonMappingException e ) {
-			e.printStackTrace();
-		}
-		catch( IOException e ) {
+		catch( Exception e ) {
 			e.printStackTrace();
 		}
 		return model;

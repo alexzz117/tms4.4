@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 public class CodeDictService {
 
 	@Autowired
+	@Qualifier("cmcSimpleDao")
 	private SimpleDao cmcSimpleDao;
 
 	public List<Map<String, Object>> listCode( Map<String, String> conds ) {

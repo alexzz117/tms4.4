@@ -4,8 +4,6 @@
  */
 package cn.com.higinet.tms.manager.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /**
@@ -18,10 +16,7 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
  */
 public class DynamicDataSource extends AbstractRoutingDataSource {
 
-	private static Log log = LogFactory.getLog(DynamicDataSource.class);
-
 	protected Object determineCurrentLookupKey() {
-		
 		return DSContextHolder.getDSType();
 	}
 }

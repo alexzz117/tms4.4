@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 public class MonitorStatService {
 
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	protected SimpleDao tmpSimpleDao;
 
 	@Autowired
@@ -194,7 +196,7 @@ public class MonitorStatService {
 	 * @param isAutoAssign  是否自动分派
 	 * @param isProcess		是否处理
 	 */
-	
+
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void updateAlarmProcessOperatorStat( String operId, long assignTime, boolean isAutoAssign, boolean isProcess ) {
 		String sql = "update TMS_MGR_ALARM_OPERATOR_STAT set %s where OPERATOR_ID = ? and ASSIGN_TIME = ? and SRC_STATDATA = ?";
@@ -217,7 +219,7 @@ public class MonitorStatService {
 	 * @param newOperID			新处理人员
 	 * @param newAssignTime		新分派时间
 	 */
-	
+
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void updateAlarmAssignOperatorStat( String oldOperId, long oldAssignTime, boolean oldStatus, String newOperID, long newAssignTime ) {
 		String insert = "insert into TMS_MGR_ALARM_OPERATOR_STAT(OPERATOR_ID,ASSIGN_TIME,SRC_STATDATA,ASSIGN_NUMBER,"
@@ -253,7 +255,7 @@ public class MonitorStatService {
 	 * 更新实时统计中欺诈类型统计数据
 	 * @param txnCode
 	 */
-	
+
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void modMonitorFraudTypeStat( Map<String, Object> map ) {
 		synchronized (object) {

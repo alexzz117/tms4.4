@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -22,21 +24,10 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 @Service("codeDict")
 public class CodeDict {
 
+	@Autowired
+	@Qualifier("cmcSimpleDao")
 	private SimpleDao cmcSimpleDao;
-
-	public void setCmcSimpleDao( SimpleDao cmcSimpleDao ) {
-		this.cmcSimpleDao = cmcSimpleDao;
-	}
-
-	//	public String getCode(String key) {
-	//		if(key.indexOf(".") != -1){
-	//			int pos = key.lastIndexOf(".");
-	//			String category = key.substring(0, pos);
-	//			String code = key.substring(pos + 1);
-	//			return getCode(category, code);
-	//		}
-	//		return null;
-	//	}
+	
 
 	/**
 	 * 获取一个代码类别下代码键的值

@@ -13,9 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Controller;
@@ -38,41 +36,42 @@ import cn.com.higinet.tms.manager.modules.mgr.util.MgrDateConvertUtil;
  */
 @Controller("authController")
 @RequestMapping("/tms/auth")
-public class AuthController  extends ApplicationObjectSupport {
+public class AuthController extends ApplicationObjectSupport {
 	@Autowired
 	private AuthService authService;
 
 	@Autowired
 	private ObjectMapper objectMapper = null;
+
 	/**
 	 * 跳转到授权中心模块首页：待授权模块列表页面
 	 * @return
 	 */
-	@RequestMapping(value="/modelList",method=RequestMethod.GET)
-	public String centerView(){
+	@RequestMapping(value = "/modelList", method = RequestMethod.GET)
+	public String centerView() {
 		return "tms/auth/auth_center";
 	}
-	
+
 	/**
 	 * 显示待授权授权模块列表
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value="/modelList", method=RequestMethod.POST)
-	public Model centerActoin(@RequestParam Map<String,String> reqs){
+	@RequestMapping(value = "/modelList", method = RequestMethod.POST)
+	public Model centerActoin( @RequestParam Map<String, String> reqs ) {
 		Model model = new Model();
-		Page<Map<String,Object>> page = new Page<Map<String,Object>>();
-		page.setList(authService.showCenter(reqs));
-		model.setPage(page);
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>();
+		page.setList( authService.showCenter( reqs ) );
+		model.setPage( page );
 		return model;
 	}
-	
+
 	/**
 	 * 跳转到待授权列表
 	 * @return
 	 */
-	@RequestMapping(value="/authDataList",method=RequestMethod.GET)
-	public String dataListView(){
+	@RequestMapping(value = "/authDataList", method = RequestMethod.GET)
+	public String dataListView() {
 		return "tms/auth/auth_datalist";
 	}
 
@@ -81,222 +80,222 @@ public class AuthController  extends ApplicationObjectSupport {
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value="/authList",method=RequestMethod.POST)
-	public Model dataListActoin(@RequestParam Map<String,String> reqs){
+	@RequestMapping(value = "/authList", method = RequestMethod.POST)
+	public Model dataListActoin( @RequestParam Map<String, String> reqs ) {
 		Model model = new Model();
-		model.setPage(authService.dataList(reqs));
+		model.setPage( authService.dataList( reqs ) );
 		return model;
 	}
-	
+
 	/**
 	 * 跳转到数据对比页面
 	 * @return
 	 */
-	@RequestMapping(value="/dataCompare",method=RequestMethod.GET)
-	public String dataCompareView(){
+	@RequestMapping(value = "/dataCompare", method = RequestMethod.GET)
+	public String dataCompareView() {
 		return "tms/auth/auth_dataCompare";
 	}
-	
+
 	/**
 	 * 获取需要对比的新旧数据
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value="/dataCompare",method=RequestMethod.POST)
-	public Model dataCompareAction(@RequestParam Map<String,String> reqs){
+	@RequestMapping(value = "/dataCompare", method = RequestMethod.POST)
+	public Model dataCompareAction( @RequestParam Map<String, String> reqs ) {
 		Model model = new Model();
 		Page page = new Page();
-		page.setList(authService.getDataCompare(reqs));
-		model.setPage(page);
-		return model ;
+		page.setList( authService.getDataCompare( reqs ) );
+		model.setPage( page );
+		return model;
 	}
-	
-	
+
 	/**
 	 * 跳转到授权信息详细页面
 	 * @return
 	 */
-	@RequestMapping(value="/authOperate",method=RequestMethod.GET)
-	public String toAuthView(){
+	@RequestMapping(value = "/authOperate", method = RequestMethod.GET)
+	public String toAuthView() {
 		return "tms/auth/auth_operate";
 	}
-	
+
 	/**
 	 * 获取授权信息详细信息
 	 * @param reqs
 	 * @return
 	 */
-//	@RequestMapping(value="/getAuthDetail",method=RequestMethod.POST)
-//	public Model getAuthAction(@RequestParam String authIds){
-//		Model model = new Model();
-//		
-//		String[] authIdArr = authIds.split(",");
-//		List<Map<String, Object>> authList = authService.getAuthByAuthIds(authIdArr);
-//		Page page = new Page();
-//		page.setList(authList);
-//		model.setPage(page);
-//		
-//		return model;
-//	}
+	//	@RequestMapping(value="/getAuthDetail",method=RequestMethod.POST)
+	//	public Model getAuthAction(@RequestParam String authIds){
+	//		Model model = new Model();
+	//		
+	//		String[] authIdArr = authIds.split(",");
+	//		List<Map<String, Object>> authList = authService.getAuthByAuthIds(authIdArr);
+	//		Page page = new Page();
+	//		page.setList(authList);
+	//		model.setPage(page);
+	//		
+	//		return model;
+	//	}
 
 	/**
 	 * 更新授权信息
 	 * @param regs
 	 * @return
 	 */
-	@RequestMapping(value="/modAuth",method=RequestMethod.POST)
-	public Model updateAuthActoin(@RequestParam Map<String,String> reqs, HttpServletRequest request){
-		Model model  = new Model();
-		try{
-			authService.batchUpadteAuth(reqs);
-		} catch(TmsMgrAuthDataSyncException e){
-			model.addError("认证数据同步失败，信息为："+e.getMessage());
-		} catch(TmsMgrAuthDepException e){
-			e.printStackTrace();
-			model.addError("存在授权依赖，请单独对被依赖的授权记录进行授权，信息为："+e.getMessage());
+	@RequestMapping(value = "/modAuth", method = RequestMethod.POST)
+	public Model updateAuthActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+		Model model = new Model();
+		try {
+			authService.batchUpadteAuth( reqs );
 		}
-		
-		String authStatus = reqs.get("AUTH_STATUS");
-		if("1".equals(authStatus)){
+		catch( TmsMgrAuthDataSyncException e ) {
+			model.addError( "认证数据同步失败，信息为：" + e.getMessage() );
+		}
+		catch( TmsMgrAuthDepException e ) {
+			e.printStackTrace();
+			model.addError( "存在授权依赖，请单独对被依赖的授权记录进行授权，信息为：" + e.getMessage() );
+		}
+
+		String authStatus = reqs.get( "AUTH_STATUS" );
+		if( "1".equals( authStatus ) ) {
 			authStatus = "是";
-		}else{
+		}
+		else {
 			authStatus = "否";
 		}
-		String operateDataVal = reqs.get("OPERATEDATA_VALUE");
-		String funcName = reqs.get("FUNCNAME");
-		String operatename = reqs.get("OPERATENAME");
-		String txnname = reqs.get("TXNNAME");
-		if(null != operateDataVal && !operateDataVal.equals("") && null != funcName && !funcName.equals("")){
-			String[] operateDataValArr = operateDataVal.split("~");
-			String[] funcNameArr = funcName.split(",");
-			String[] operatenameArr = operatename.split(",");
-			String[] txnnameArr = txnname.split(",");
-			if(operateDataValArr.length > 0 && funcNameArr.length > 0 && operateDataValArr.length == funcNameArr.length){
+		String operateDataVal = reqs.get( "OPERATEDATA_VALUE" );
+		String funcName = reqs.get( "FUNCNAME" );
+		String operatename = reqs.get( "OPERATENAME" );
+		String txnname = reqs.get( "TXNNAME" );
+		if( null != operateDataVal && !operateDataVal.equals( "" ) && null != funcName && !funcName.equals( "" ) ) {
+			String[] operateDataValArr = operateDataVal.split( "~" );
+			String[] funcNameArr = funcName.split( "," );
+			String[] operatenameArr = operatename.split( "," );
+			String[] txnnameArr = txnname.split( "," );
+			if( operateDataValArr.length > 0 && funcNameArr.length > 0 && operateDataValArr.length == funcNameArr.length ) {
 				Map<String, List<Map<String, Object>>> formMap = new HashMap<String, List<Map<String, Object>>>();
 				List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-				for(int i=0;i<operateDataValArr.length;i++){
-					Map<String, Object> mapInfo = new HashMap<String, Object>(); 
-					mapInfo.put("OPERATEDATA_VALUE", operateDataValArr[i]);
-					mapInfo.put("FUNCNAME", funcNameArr[i]);
-					mapInfo.put("OPERATENAME", operatenameArr != null && operatenameArr.length>=i+1 ? operatenameArr[i] : "");
-					mapInfo.put("TXNNAME", txnnameArr != null && txnnameArr.length>=i+1 ? txnnameArr[i] : "");
-					mapInfo.put("AUTH_STATUS", authStatus);
-					mapInfo.put("AUTH_MSG", reqs.get("AUTH_MSG"));
-					list.add(mapInfo);
+				for( int i = 0; i < operateDataValArr.length; i++ ) {
+					Map<String, Object> mapInfo = new HashMap<String, Object>();
+					mapInfo.put( "OPERATEDATA_VALUE", operateDataValArr[i] );
+					mapInfo.put( "FUNCNAME", funcNameArr[i] );
+					mapInfo.put( "OPERATENAME", operatenameArr != null && operatenameArr.length >= i + 1 ? operatenameArr[i] : "" );
+					mapInfo.put( "TXNNAME", txnnameArr != null && txnnameArr.length >= i + 1 ? txnnameArr[i] : "" );
+					mapInfo.put( "AUTH_STATUS", authStatus );
+					mapInfo.put( "AUTH_MSG", reqs.get( "AUTH_MSG" ) );
+					list.add( mapInfo );
 				}
-				formMap.put("del", list);
-				
+				formMap.put( "del", list );
+
 				try {
-					request.setAttribute("postData", objectMapper.writeValueAsString(formMap));
-				} catch (JsonGenerationException e) {
-					e.printStackTrace();
-				} catch (JsonMappingException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
+					request.setAttribute( "postData", objectMapper.writeValueAsString( formMap ) );
+				}
+				catch( Exception e ) {
 					e.printStackTrace();
 				}
 			}
-			
+
 		}
 		return model;
 	}
-	
+
 	/**
 	 * 转向授权日志列表页面
 	 * @return
 	 */
-	@RequestMapping(value="/toLog",method=RequestMethod.GET)
-	public String toLogView(){
+	@RequestMapping(value = "/toLog", method = RequestMethod.GET)
+	public String toLogView() {
 		return "tms/auth/auth_loglist";
 	}
+
 	/**
 	 * 修改授权信息
 	 * @param regs
 	 * @return
 	 */
-	@RequestMapping(value="/toLog",method=RequestMethod.POST)
-	public Model toLogActoin(@RequestParam Map<String,String> reqs){
-		Model model  = new Model();
-		try{
-			model.setPage(authService.authLogList(reqs));
-		}catch(Exception e){
+	@RequestMapping(value = "/toLog", method = RequestMethod.POST)
+	public Model toLogActoin( @RequestParam Map<String, String> reqs ) {
+		Model model = new Model();
+		try {
+			model.setPage( authService.authLogList( reqs ) );
+		}
+		catch( Exception e ) {
 			e.printStackTrace();
-			model.addError("查询授权日志失败！"+e);
+			model.addError( "查询授权日志失败！" + e );
 		}
 		return model;
 	}
-	
-	@RequestMapping(value="/listSubOperate",method=RequestMethod.GET)
+
+	@RequestMapping(value = "/listSubOperate", method = RequestMethod.GET)
 	public String subOperateView() {
 		return "tms/auth/auth_subdatalist";
 	}
-	
-	@RequestMapping(value="/listSubOperate",method=RequestMethod.POST)
-	public Model subOperateAction(@RequestParam Map<String,String> reqs){
+
+	@RequestMapping(value = "/listSubOperate", method = RequestMethod.POST)
+	public Model subOperateAction( @RequestParam Map<String, String> reqs ) {
 		Model model = new Model();
-		model.setPage(authService.subDataList(reqs));
-		return model ;
+		model.setPage( authService.subDataList( reqs ) );
+		return model;
 	}
-	
+
 	/*/////////////////////////////////////授权查看模块////////////////////////////////////////*/
 	/**
 	 * 授权查看主页面，授权查看模块
 	 * @return
 	 */
-	@RequestMapping(value="/authQuery",method=RequestMethod.GET)
-	public String authQueryView(){
+	@RequestMapping(value = "/authQuery", method = RequestMethod.GET)
+	public String authQueryView() {
 		return "tms/auth/auth_query";
 	}
-	
-	
-	@RequestMapping(value="/authQuery",method=RequestMethod.POST)
-	public Model authQueryAction(){
+
+	@RequestMapping(value = "/authQuery", method = RequestMethod.POST)
+	public Model authQueryAction() {
 		Model model = new Model();
-		List<Map<String,Object>> list = authService.listAuthQueryModel();
-		Page<Map<String,Object>> page = new Page<Map<String,Object>>();
-		page.setList(list);
-		model.setPage(page);
-		return model ;
+		List<Map<String, Object>> list = authService.listAuthQueryModel();
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>();
+		page.setList( list );
+		model.setPage( page );
+		return model;
 	}
-	
+
 	/**
 	 * 转向授权信息列表页面
 	 * @return
 	 */
-	@RequestMapping(value="/dataquary",method=RequestMethod.GET)
-	public String dataQueryView(){
+	@RequestMapping(value = "/dataquary", method = RequestMethod.GET)
+	public String dataQueryView() {
 		return "tms/auth/auth_dataquary";
 	}
-
 
 	/**
 	 * 授权信息查询
 	 * @param regs
 	 * @return
 	 */
-	@RequestMapping(value="/dataquary",method=RequestMethod.POST)
-	public Model dataQueryActoin(@RequestParam Map<String,String> reqs,  HttpServletRequest request){
-		Model model  = new Model();
-		
-		try{
-			String[] time = request.getParameterValues("PROPOSER_TIME");
-			if(time!=null && time.length==1){
-				if(!CmcStringUtil.isBlank(time[0])){
-					reqs.put("START_TIME", time[0]);
+	@RequestMapping(value = "/dataquary", method = RequestMethod.POST)
+	public Model dataQueryActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+		Model model = new Model();
+
+		try {
+			String[] time = request.getParameterValues( "PROPOSER_TIME" );
+			if( time != null && time.length == 1 ) {
+				if( !CmcStringUtil.isBlank( time[0] ) ) {
+					reqs.put( "START_TIME", time[0] );
 				}
 			}
-			
-			if(time!=null && time.length==2){
-				if(!CmcStringUtil.isBlank(time[0])){
-					reqs.put("START_TIME", MgrDateConvertUtil.convert2Millisr(time[0], MgrDateConvertUtil.FORMATE1)+"");
+
+			if( time != null && time.length == 2 ) {
+				if( !CmcStringUtil.isBlank( time[0] ) ) {
+					reqs.put( "START_TIME", MgrDateConvertUtil.convert2Millisr( time[0], MgrDateConvertUtil.FORMATE1 ) + "" );
 				}
-				if(!CmcStringUtil.isBlank(time[1])){
-					reqs.put("END_TIME", MgrDateConvertUtil.convert2Millisr(time[1], MgrDateConvertUtil.FORMATE1)+"");
+				if( !CmcStringUtil.isBlank( time[1] ) ) {
+					reqs.put( "END_TIME", MgrDateConvertUtil.convert2Millisr( time[1], MgrDateConvertUtil.FORMATE1 ) + "" );
 				}
 			}
-			model.setPage(authService.historyDataList(reqs));
-		}catch(Exception e){
-			model.addError("查询授权信息失败！"+e);
+			model.setPage( authService.historyDataList( reqs ) );
+		}
+		catch( Exception e ) {
+			model.addError( "查询授权信息失败！" + e );
 		}
 		return model;
 	}

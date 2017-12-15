@@ -16,8 +16,6 @@ import cn.com.higinet.tms35.comm.MapUtil;
 public class DisposalServiceImpl implements DisposalService {
 	@Autowired
 	private SimpleDao tmsSimpleDao;
-	@Autowired
-	private SimpleDao tmpSimpleDao;
 	
 	private static final String DISPOSAL_TABLE_NAME = "tms_com_disposal";
 	

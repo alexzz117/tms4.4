@@ -23,11 +23,7 @@ public class CodeDictCache {
 	private long lastmodify = -1L;
 	private Object lock = new Object();
 
-	private SimpleDao cmcSimpleDao;
-
-	public void setCmcSimpleDao( SimpleDao cmcSimpleDao ) {
-		this.cmcSimpleDao = cmcSimpleDao;
-	}
+	private SimpleDao cmcSimpleDao = (SimpleDao)ApplicationContextUtil.getBean( "cmcSimpleDao" );
 
 	//	public String getCode(String key) {
 	//		if(key.indexOf(".") != -1){

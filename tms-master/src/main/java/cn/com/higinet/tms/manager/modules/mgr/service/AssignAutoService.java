@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.Order;
@@ -28,6 +29,7 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class AssignAutoService {
 
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 
 	@Autowired

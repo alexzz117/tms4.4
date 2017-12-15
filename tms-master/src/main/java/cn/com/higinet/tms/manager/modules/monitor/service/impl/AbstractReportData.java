@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Order;
@@ -23,6 +24,7 @@ public abstract class AbstractReportData implements ReportData {
 	SimpleDao officialSimpleDao;
 
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	SimpleDao tmpSimpleDao;
 	
 	@Autowired

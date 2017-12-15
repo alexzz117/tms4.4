@@ -10,13 +10,11 @@ public class ApplicationContextUtil implements ApplicationContextAware {
 
 	private static ApplicationContext applicationContext;
 	
-	@Override
-	public void setApplicationContext( ApplicationContext apCtx ) throws BeansException {
-		synchronized (applicationContext) {
-			ApplicationContextUtil.applicationContext = apCtx;
-		}
-	}
-	
+	@Override  
+    public void setApplicationContext(ApplicationContext context) throws BeansException {  
+		applicationContext = context;  
+    }
+
 	public static ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}
@@ -32,8 +30,8 @@ public class ApplicationContextUtil implements ApplicationContextAware {
 	public static <T> T getBean( String name, Class<T> classs ) {
 		return applicationContext.getBean( name, classs );
 	}
-	
-	public static boolean containsBean(String name) {
+
+	public static boolean containsBean( String name ) {
 		return applicationContext.containsBean( name );
 	}
 }

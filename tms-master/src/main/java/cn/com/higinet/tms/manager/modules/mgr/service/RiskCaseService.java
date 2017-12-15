@@ -8,12 +8,12 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.com.higinet.tms.base.util.CalendarUtil;
-import cn.com.higinet.tms.manager.common.service.CodeDictService;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -25,6 +25,7 @@ import cn.com.higinet.tms.manager.modules.common.SequenceService;
 public class RiskCaseService {
 
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 
 	@Autowired
@@ -32,9 +33,6 @@ public class RiskCaseService {
 
 	@Autowired
 	private DataSource tmpTmsDataSource;
-
-	@Autowired
-	private CodeDictService codeDictService;
 
 	public Page<Map<String, Object>> getRiskCaseList( Map<String, String> reqs ) {
 		StringBuilder sql = new StringBuilder();

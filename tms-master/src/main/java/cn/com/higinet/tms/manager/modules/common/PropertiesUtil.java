@@ -11,7 +11,7 @@ public class PropertiesUtil {
 	private static final Log log = LogFactory.getLog(PropertiesUtil.class);
 
 //	private String path = File.separator + "resources" + File.separator + "config" + File.separator + "conf.properties";
-	private String path = "/resources/config/conf.properties";
+	private String path = "config/conf.properties";
 	private static PropertiesUtil instance = null;
 	private Properties prop = null;
 	public PropertiesUtil(){}

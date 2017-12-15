@@ -18,18 +18,16 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
-import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.IPLocationService;
-import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
@@ -40,10 +38,6 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 import cn.com.higinet.tms.manager.modules.userpattern.service.UserPatternService;
 import cn.com.higinet.tms35.comm.utf8_split;
-import cn.com.higinet.tms35.core.cache.cache_init;
-import cn.com.higinet.tms35.core.cache.db_cache;
-import cn.com.higinet.tms35.core.cache.db_stat;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 /**
  * 功能/模块:
@@ -57,20 +51,15 @@ public class UserPatternServiceImpl implements UserPatternService {
 
 	private static Log log = LogFactory.getLog(UserPatternServiceImpl.class);
 
-	@Autowired
-	private DataSourceTransactionManager officialTransactionManager;
 
 	private static final String split_1 = "#";
 	@Autowired
 	private SimpleDao tmsSimpleDao;
 	@Autowired
+	@Qualifier("tmpSimpleDao")
 	private SimpleDao tmpSimpleDao;
 	@Autowired
 	private SimpleDao officialSimpleDao;
-	@Autowired
-	private StatService statService;
-	@Autowired
-	private SqlMap tmsSqlMap;
 	@Autowired
 	private TransDefService transDefService;
 	@Autowired

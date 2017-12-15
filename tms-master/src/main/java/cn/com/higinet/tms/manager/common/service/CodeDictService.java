@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,11 +34,8 @@ import cn.com.higinet.tms.manager.dao.util.MapWrap;
 public class CodeDictService {
 
 	@Autowired
+	@Qualifier("cmcSimpleDao")
 	private SimpleDao cmcSimpleDao;
-	
-	public void setCmcSimpleDao(SimpleDao cmcSimpleDao) {
-		this.cmcSimpleDao = cmcSimpleDao;
-	}
 	
 	/**
 	 * 分页查询代码类别
