@@ -11,10 +11,11 @@
           <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
           </el-button>
         </div>
-        <el-tree :data="treeData" node-key="id"
+        <el-tree :data="treeData" node-key="id" ref="tree"
                  :default-expanded-keys="expendKey"
                  :props="defaultProps"
                  :highlight-current=true
+                 :expand-on-click-node="false"
                  @node-click="handleNodeClick"
                  :render-content="renderContent"
                  style="height: 76vh;overflow-y: auto;">
@@ -156,7 +157,7 @@
     },
     methods: {
       renderContent (h, { node, data, store }) {
-        return (<span class="el-tree-node__label">运行监控</span>)
+        return (<span class="el-tree-node__label">{node.label}</span>)
       },
       selTree () {
         var self = this
@@ -248,6 +249,8 @@
         }
         // 同步面包屑导航地址
         self.syncBreadcrumb(node)
+        // 功能表单为只读
+        self.funcFormReadonly = true
         self.showNodeAttr(node.data.func_type)
         self.showNodeValue(data)
         console.info(node)
@@ -349,9 +352,12 @@
       },
       addFunc () {
         var self = this
-        console.info(self.$refs)
         var selectNode = self.$refs.tree.getCurrentNode()
-        // self.showNodeAttr(node.data.func_type)
+        console.info(selectNode)
+        console.info(Number(selectNode.func_type) + 1)
+        // 功能表单为编辑状态
+        self.funcFormReadonly = false
+        self.showNodeAttr(Number(selectNode.func_type) + 1 + '')
       },
       editFunc () {
       },
