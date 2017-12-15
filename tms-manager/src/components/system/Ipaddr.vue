@@ -2,7 +2,7 @@
   <div>
     <h1>IP地址维护</h1>
 
-    <el-row style="margin-top:100px;">
+    <el-row class="ip-content-box">
       <el-alert
         class="time-tip"
         v-if="timeCountShow"
@@ -387,5 +387,8 @@
   }
   .time-tip{
     margin-bottom: 20px;
+  }
+  .ip-content-box{
+    margin-top: 10vh;
   }
 </style>

@@ -10,23 +10,17 @@
       border
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
-      <el-table-column label="操作数据" align="left">
+      <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
+      <el-table-column prop="real_name" label="操作员" align="left"></el-table-column>
+      <el-table-column prop="login_name" label="用户名" align="left"></el-table-column>
+      <el-table-column label="操作时间" align="left">
         <template slot-scope="scope">
-          <a v-if="datavalueLink" href="javascript:void(0)" @click="toCompare(scope.row)">{{scope.row.datavalue}}</a>
-          <span v-else>{{scope.row.datavalue}}</span>
+          <span>{{scope.row.operate_time | renderDateTime}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="auth_id" label="授权编号" align="left"></el-table-column>
-      <el-table-column v-if="txnnameRowShow" prop="txnname" label="所属交易" align="left"></el-table-column>
-      <el-table-column prop="operatename" label="操作名称" align="left"></el-table-column>
-      <el-table-column v-if="subOperateNumShow" prop="sub_operate_num" label="子操作个数" align="left"></el-table-column>
-      <el-table-column prop="real_name" label="提交授权人" align="left"></el-table-column>
-      <el-table-column label="提交授权时间" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.proposer_time | renderDateTime}}</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="func_name" label="所属功能" align="left"></el-table-column>
+      <el-table-column prop="operate_result" label="操作结果" align="left"></el-table-column>
+      <el-table-column prop="operate_data" label="操作数据" align="left"></el-table-column>
     </el-table>
     <el-pagination style="margin-top: 10px; text-align: right;"
                    :current-page="currentPage"
@@ -62,6 +56,7 @@
     },
     data () {
       return {
+        authId: '',
         modelName: '',
         tableData: [],
         dialogTitle: '',
@@ -77,6 +72,7 @@
     mounted: function () {
       this.$nextTick(function () {
         this.modelName = this.$route.query.modelName
+        this.authId = this.$route.query.authId
         this.getData()
       })
     },
@@ -105,29 +101,15 @@
         this.pageSize = data.page.size
         this.total = data.page.total
       },
-      // 点击标题的事件
-      toCompare (row) {
-        let params = {
-          operate_name: row.orig_operatename,
-          table_name: row.query_table_name,
-          table_pk: row.query_table_pk,
-          table_pkvalue: row.query_pkvalue,
-          auth_id: row.auth_id,
-          modelName: this.modelName,
-          flag: 1
-        }
-        this.$router.push({name: 'AuthDataCompare', query: params})
-        console.log(row)
-      },
       getData () {
         let self = this
         let paramsObj = {
-          modelName: this.modelName,
+          authId: this.authId,
           pageindex: this.currentPage,
           pagesize: this.pageSize
         }
         ajax.post({
-          url: '/tms/auth/authList',
+          url: '/tms/auth/toLog',
           param: paramsObj,
           success: function (data) {
             if (data.page) {

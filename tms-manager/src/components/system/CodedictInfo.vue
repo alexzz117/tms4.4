@@ -43,7 +43,7 @@
         <el-form-item label="顺序:" :label-width="formLabelWidth" prop="onum">
           <el-input v-model="dictDialogForm.onum" auto-complete="off" :maxlength=3></el-input>
         </el-form-item>
-        <el-form-item label="描述信息" :label-width="formLabelWidth" prop="info">
+        <el-form-item label="描述信息:" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="dictDialogForm.info"  :maxlength=200></el-input>
         </el-form-item>
       </el-form>

@@ -50,7 +50,7 @@
         <el-form-item label="代码类别sql:" :label-width="formLabelWidth" prop="category_sql">
           <el-input v-model="dictDialogForm.category_sql" auto-complete="off" :maxlength="50"></el-input>
         </el-form-item>
-        <el-form-item label="描述信息" :label-width="formLabelWidth" prop="info">
+        <el-form-item label="描述信息:" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="dictDialogForm.info" :maxlength="200"></el-input>
         </el-form-item>
       </el-form>
@@ -198,7 +198,6 @@
         })
       },
       addData (formName) {
-        console.log(123)
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let self = this

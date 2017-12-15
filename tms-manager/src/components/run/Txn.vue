@@ -7,10 +7,10 @@
       <!--&lt;!&ndash;用router-view渲染视图&ndash;&gt;-->
       <!--<router-view/>-->
       <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="交易定义" name="first"><trandef></trandef></el-tab-pane>
-        <el-tab-pane label="交易模型定义" name="second"><tranmdl></tranmdl></el-tab-pane>
-        <el-tab-pane label="交易统计" name="third"><stat></stat></el-tab-pane>
-        <el-tab-pane label="交易规则" name="fourth"><rule></rule></el-tab-pane>
+        <el-tab-pane label="交易定义" name="trandef"><trandef></trandef></el-tab-pane>
+        <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl></tranmdl></el-tab-pane>
+        <el-tab-pane label="交易统计" name="stat"><stat :txnId='txnId' :isVisibility="tabVisibility.statVisibility"></stat></el-tab-pane>
+        <el-tab-pane label="交易规则" name="rule"><rule></rule></el-tab-pane>
       </el-tabs>
     </el-main>
   </el-container>
@@ -23,8 +23,15 @@
   import Rule from '@/components/run/Rule'
 
   export default {
-    data() {
+    data () {
       return {
+        txnId: 'T0101',
+        tabVisibility: {
+          trandefVisibility: true,
+          tranmdlVisibility: false,
+          statVisibility: false,
+          ruleVisibility: false
+        },
         data: [{
           label: '一级 1',
           children: [{
@@ -66,18 +73,43 @@
           children: 'children',
           label: 'label'
         },
-        activeName: 'second'
+        activeName: 'trandef'
       };
     },
     methods: {
-      handleNodeClick(data) {
-        console.log(data);
+      handleNodeClick (data) {
+        console.log(data)
+        this.txnId = data.label
 //        if (!data.children || data.children.length === 0){
 //          this.$router.push(data.name);
 //        }
       },
-      handleClick(tab, event) {
-        console.log(tab, event);
+      handleClick (tab, event) {
+        this.tabVisibility.trandefVisibility = false
+        this.tabVisibility.tranmdlVisibility = false
+        this.tabVisibility.statVisibility = false
+        this.tabVisibility.ruleVisibility = false
+        switch (tab.name) {
+          case 'trandef': {
+            this.tabVisibility.trandefVisibility = true
+            break
+          }
+          case 'tranmdl': {
+            this.tabVisibility.tranmdlVisibility = true
+            break
+          }
+          case 'stat': {
+            this.tabVisibility.statVisibility = true
+            break
+          }
+          case 'rule': {
+            this.tabVisibility.ruleVisibility = true
+            break
+          }
+          default: {
+          }
+        }
+        // console.log(tab, event);
       }
     },
     components: {
