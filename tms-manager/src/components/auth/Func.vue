@@ -2,21 +2,26 @@
   <div>
 
     <el-row style="height: 100%;border: 1px solid #eee">
-      <el-col  :span="6" style="border-right: 1px solid #eee">
+      <el-col :span="6" style="border-right: 1px solid #eee">
         <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
-          <el-button plain class="el-icon-plus" @click="" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建</el-button>
-          <el-button plain class="el-icon-edit" @click="" :disabled="toolBtn.editBtn" style="margin-left: 0px;">编辑</el-button>
-          <el-button plain class="el-icon-delete" @click="" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除</el-button>
+          <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
+          </el-button>
+          <el-button plain class="el-icon-edit" @click="editFunc" :disabled="toolBtn.editBtn" style="margin-left: 0px;">编辑
+          </el-button>
+          <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
+          </el-button>
         </div>
         <el-tree :data="treeData" node-key="id"
                  :default-expanded-keys="expendKey"
                  :props="defaultProps"
+                 highlight-current="true"
                  @node-click="handleNodeClick"
+                 :render-content="renderContent"
                  style="height: 76vh;overflow-y: auto;">
         </el-tree>
       </el-col>
 
-      <el-col  :span="18">
+      <el-col :span="18">
         <div style="height:38px;width:100%;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
           <el-breadcrumb id="funcPath" separator=">" style="padding: 10px 15px;">
             <el-breadcrumb-item v-for="item in breadcrumbData">{{ item.text }}</el-breadcrumb-item>
@@ -49,7 +54,8 @@
               <el-input v-model="funcForm.ftype_name" auto-complete="off" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
             <el-form-item label="访问授权" prop="isgrant" v-bind:class="{hidden:funcFormVisible.isgrant}">
-              <el-checkbox label="需要授权" name="type" v-model="funcForm.isgrant" :disabled="funcFormReadonly"></el-checkbox>
+              <el-checkbox label="需要授权" name="type" v-model="funcForm.isgrant"
+                           :disabled="funcFormReadonly"></el-checkbox>
             </el-form-item>
             <el-form-item label="是否菜单" style="text-align: left;" v-bind:class="{hidden:funcFormVisible.menu}">
               <el-radio v-model="funcForm.menu" label="1" :disabled="funcFormReadonly">是</el-radio>
@@ -145,12 +151,13 @@
           logconf: ''
         },
         breadcrumbData: [],
-        rules: {
-
-        }
+        rules: {}
       }
     },
     methods: {
+      renderContent (h, { node, data, store }) {
+        return '<span class="el-tree-node__label">运行监控</span>)'
+      },
       selTree () {
         var self = this
         var option = {
@@ -195,6 +202,7 @@
           node.children = getChildren(list, node.id)
           tree.push(node)
         }
+
         // 递归查询节点的子节点
         function getChildren (list, id) {
           var childs = []
@@ -202,11 +210,13 @@
             var node = list[i]
             if (node.fid === id) {
               node.children = getChildren(list, node.id)
+              // node.icon = 'el-icon-message'
               childs.push(node)
             }
           }
           return childs
         }
+
         return tree  // 返回树结构Json
       },
       expendNodesByLevel (deep) {
@@ -327,7 +337,7 @@
           func_name: data.text,
           conf: data.conf,
           ftype_name: nodeTypes[data.func_type],
-          isgrant:(data.isgrant === '1' ? true : false),
+          isgrant: (data.isgrant === '1' ? true : false),
           menu: (data.menu ? data.menu : '1'),
           flag: (data.flag ? data.flag : '1'),
           onum: data.onum,
@@ -336,6 +346,16 @@
           logconf: data.logconf
         }
         self.funcForm = formData
+      },
+      addFunc () {
+        var self = this
+        console.info(self.$refs)
+        var selectNode = self.$refs.tree.getCurrentNode()
+        // self.showNodeAttr(node.data.func_type)
+      },
+      editFunc () {
+      },
+      delFunc () {
       }
     }
   }
