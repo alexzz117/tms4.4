@@ -79,8 +79,8 @@
               <el-input v-model="funcForm.logconf" auto-complete="off" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
             <el-form-item style="text-align: center" v-bind:class="{hidden:funcFormReadonly}">
-              <el-button type="primary" @click="">保 存</el-button>
-              <el-button @click="">取 消</el-button>
+              <el-button type="primary" @click="submitFunc">保 存</el-button>
+              <el-button @click="closeFuncForm">取 消</el-button>
             </el-form-item>
           </el-form>
         </el-main>
@@ -318,6 +318,7 @@
       },
       // 功能树节点点击事件
       handleNodeClick (data, node) {
+        console.info(node)
         var selectNode = this.funcForm
         // 重复点击同一节点判断
         if (selectNode.func_id === data.id) {
@@ -493,6 +494,51 @@
             selectNode.visible = false
             self.resetPage()
             self.$message('配置删除成功。')
+          }
+        }
+        ajax.post(option)
+      },
+      closeFuncForm () {
+        var self = this
+        if (self.funcForm.func_id === '') {
+          self.resetPage()
+        } else {
+          self.funcFormReadonly = true
+        }
+      },
+      submitFunc () {
+        var self = this
+        // var selectNode = self.$refs.tree.currentNode.node
+        var url = ''
+        if (self.funcForm.func_id === '') {
+          url = '/cmc/func/add'
+        } else {
+          url = '/cmc/func/mod'
+        }
+        var option = {
+          url: url,
+          param: self.funcForm,
+          success: function (data) {
+            // self.funcFormReadonly = true
+            // var nodeData = {
+            //   fid: self.funcForm.parent_id,
+            //   onum: self.funcForm.onum,
+            //   flag: self.funcForm.flag,
+            //   islog: self.funcForm.islog,
+            //   func_type: self.funcForm.func_type,
+            //   conf: self.funcForm.conf,
+            //   menu: self.funcForm.menu,
+            //   logurlMethod: self.funcForm.logurlMethod,
+            //   loguri: self.funcForm.loguri,
+            //   text: self.funcForm.text,
+            //   id: self.funcForm.func_id,
+            //   isgrant: self.funcForm.isgrant,
+            //   info: self.funcForm.info
+            // }
+            // self.$refs.tree.updateKeyChildren(selectNode.id, nodeData)
+            self.$message('操作成功。')
+            self.selTree()
+            self.resetPage()
           }
         }
         ajax.post(option)
