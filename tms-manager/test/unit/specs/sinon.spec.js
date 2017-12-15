@@ -10,7 +10,7 @@ describe('sinon', () => {
 
     user.setName("name1")
 
-    console.log(setNameSpy.callCount);
+    // console.log(setNameSpy.callCount);
 
     user.setName("name2")
     expect(setNameSpy.callCount).to.equal(2)

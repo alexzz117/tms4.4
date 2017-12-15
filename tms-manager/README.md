@@ -1,4 +1,4 @@
-# my-project
+# tms-manager
 
 > A Vue.js project
 
