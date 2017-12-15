@@ -39,6 +39,10 @@ public final class DbType {
 	 */
 	public static final DbType POSTGRESQL = createSingleton("postgresql", "");
 	/**
+	 * 预定义数据库类型：POSTGRESQL 
+	 */
+	public static final DbType MYSQL = createSingleton("mysql", "");
+	/**
 	 * 预定义数据库类型：默认类型
 	 */
 	public static final DbType ROOT = createSingleton("", "");

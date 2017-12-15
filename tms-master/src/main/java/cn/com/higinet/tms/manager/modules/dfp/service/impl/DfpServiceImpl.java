@@ -47,6 +47,7 @@ import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
 @Service("dfpService")
 public class DfpServiceImpl implements DfpService {
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	@Qualifier("tmpSimpleDao")

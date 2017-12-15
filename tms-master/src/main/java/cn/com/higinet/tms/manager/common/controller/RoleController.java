@@ -7,13 +7,13 @@ package cn.com.higinet.tms.manager.common.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,21 +23,24 @@ import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.service.FuncService;
 import cn.com.higinet.tms.manager.common.service.RoleService;
-import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
 
 /**
  * 角色管理控制类
  * @author chenr
  * @version 2.0.0, 2011-6-30
+ * 
+ * @author zhang.lei
  */
 @Controller("cmcRoleController")
 @RequestMapping("/cmc/role")
 public class RoleController {
 	
 	@Autowired
+	@Qualifier("cmcRoleService")
 	private RoleService roleService;
 	
 	@Autowired
+	@Qualifier("cmcFuncService")
 	private FuncService funcService;
 
 	public void setRoleService(RoleService roleService) {

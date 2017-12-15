@@ -10,15 +10,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import cn.com.higinet.tms.manager.common.service.LogService;
 import cn.com.higinet.tms.manager.common.util.AuthDataBusUtil;
 import cn.com.higinet.tms.manager.common.util.CmcMacUtil;
@@ -33,7 +31,7 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
  */
 @Service("operateLogFactory")
 public class OperateLogFactory {
-	private final Log logger = LogFactory.getLog( OperateLogFactory.class );
+	private static final Logger logger = LoggerFactory.getLogger( OperateLogFactory.class );
 
 	@Autowired
 	Func cmcFunc;
@@ -45,6 +43,7 @@ public class OperateLogFactory {
 	private ObjectMapper objectMapper;
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	/**
@@ -395,19 +394,19 @@ public class OperateLogFactory {
 
 		return tmsSimpleDao.queryForList( sb.toString() );
 	}
-	
+
 	/*
 	 * 交易表id是有规则的
 	 * 所以可以把传入的交易主键 把txnid切分成数组
 	 * 每一个都是一个交易主键,包括自己
 	 */
-	public String[] cutToIds(String txnid) {
+	public String[] cutToIds( String txnid ) {
 
 		String[] txnids = new String[txnid.length() / 2 + 1];
 		int offset = 0;
 
-		for (int i = 0; i < txnids.length; i++) {
-			txnids[i] = txnid.substring(0, 1 + offset);
+		for( int i = 0; i < txnids.length; i++ ) {
+			txnids[i] = txnid.substring( 0, 1 + offset );
 			offset += 2;
 		}
 
@@ -417,14 +416,14 @@ public class OperateLogFactory {
 	/*
 	 * make sql commond like 'a', 'b', 'c'
 	 */
-	public String cutToIdsForSql(String txnid) {
+	public String cutToIdsForSql( String txnid ) {
 
-		String[] txnids = cutToIds(txnid);
+		String[] txnids = cutToIds( txnid );
 		StringBuffer id_sb = new StringBuffer();
-		for(int i = 0; i < txnids.length; i++){
-			id_sb.append("'").append(txnids[i]).append("',");
+		for( int i = 0; i < txnids.length; i++ ) {
+			id_sb.append( "'" ).append( txnids[i] ).append( "'," );
 		}
-		id_sb.setCharAt(id_sb.lastIndexOf(","), ' ');
+		id_sb.setCharAt( id_sb.lastIndexOf( "," ), ' ' );
 		return id_sb.toString();
 	}
 }

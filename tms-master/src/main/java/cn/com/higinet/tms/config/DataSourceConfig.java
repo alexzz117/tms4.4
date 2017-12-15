@@ -34,8 +34,8 @@ public class DataSourceConfig {
 	}
 
 	/**
-	* 离线库数据源配置
-	*/
+	 * 离线库数据源配置
+	 */
 	@Primary
 	@Bean(name = "offlineDataSource")
 	@ConfigurationProperties(prefix = "spring.datasource.offline")

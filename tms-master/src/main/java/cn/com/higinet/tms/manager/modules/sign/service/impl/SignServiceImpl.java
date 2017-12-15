@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -19,11 +20,15 @@ import cn.com.higinet.tms.manager.modules.sign.common.jaxb.JaxbObjectAndXmlUtil;
 import cn.com.higinet.tms.manager.modules.sign.model.MerchantRiskInfo;
 import cn.com.higinet.tms.manager.modules.sign.service.SignService;
 
+/**
+ * @author zhang.lei
+ */
 @Service("signService")
 public class SignServiceImpl implements SignService {
 	private static final int SEND_TIMES = 3;// 发送次数
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	private ServerService ServerService;

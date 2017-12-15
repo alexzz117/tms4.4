@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * 双审
  * @author yangk
+ * @author zhang.lei
  */
 @Controller
 public class DualAuditController {

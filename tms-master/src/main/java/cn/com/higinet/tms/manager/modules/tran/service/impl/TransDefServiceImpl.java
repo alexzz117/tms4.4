@@ -40,6 +40,7 @@ public class TransDefServiceImpl implements TransDefService {
 	private SqlMap tmsSqlMap;
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired

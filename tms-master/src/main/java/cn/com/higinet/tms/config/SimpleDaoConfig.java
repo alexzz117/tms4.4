@@ -12,10 +12,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
-import com.google.common.collect.Maps;
-
-import cn.com.higinet.tms.manager.common.DSType;
-import cn.com.higinet.tms.manager.common.DynamicDataSource;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.impl.MysqlSimpleDaoImpl;
@@ -35,12 +31,10 @@ public class SimpleDaoConfig {
 	@Autowired
 	@Qualifier("offlineDataSource")
 	DataSource offlineDataSource;
-	
+
 	@Autowired
 	@Qualifier("dynamicDataSource")
 	DataSource dynamicDataSource;
-
-	
 
 	@Bean("cmcSimpleDao")
 	public SimpleDao cmcSimpleDao() {
@@ -72,7 +66,7 @@ public class SimpleDaoConfig {
 		simpleDao.setJdbcTemplate( jdbcTemplate );
 		return simpleDao;
 	}
-	
+
 	@Bean("officialSimpleDao")
 	public SimpleDao officialSimpleDao() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
@@ -104,7 +98,7 @@ public class SimpleDaoConfig {
 		SqlMap sqlmap = new SqlMap();
 		sqlmap.setDbtype( "mysql" );
 		sqlmap.setBasenames( new String[] {
-				"dbsql/tmsweb-sql"
+				"classpath:/dbsql/tmsweb-sql"
 		} );
 		return sqlmap;
 	}

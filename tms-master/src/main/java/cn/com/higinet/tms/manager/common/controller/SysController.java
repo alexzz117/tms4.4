@@ -17,7 +17,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,22 +45,15 @@ import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
  */
 @Controller("cmcSysController")
 public class SysController {
-	
-	private final static Log logger = LogFactory.getLog(SysController.class);
-	
-	@Autowired
-	private SysService sysService;
-	
-	public void setSysService(SysService sysService) {
-		this.sysService = sysService;
-	}
+	private static final Logger logger = LoggerFactory.getLogger( SysController.class );
 	
 	@Autowired
-	private OperatorService operatorService;
+	@Qualifier("cmcSysService")
+	private SysService cmcSysService;
 	
-	public void setOperatorService(OperatorService operatorService) {
-		this.operatorService = operatorService;
-	}
+	@Autowired
+	@Qualifier("cmcOperatorService")
+	private OperatorService cmcOperatorService;
 
 	/**
 	 * 主界面视图
@@ -102,7 +98,7 @@ public class SysController {
 		//TODO 防止重复登录
 		
 		Model model = new Model();
-		Map<String, Object> operator = sysService.getOperator(username, password);
+		Map<String, Object> operator = cmcSysService.getOperator(username, password);
 		if( null == operator || operator.size() == 0){
 			model.addError("用户名不存在!");
 		}else{
@@ -132,11 +128,11 @@ public class SysController {
 				
 				//将func编号缓存到会话中
 				String operatorId = (String)operator.get(DBConstant.CMC_OPERATOR_OPERATOR_ID);
-				String[] funcIds = sysService.getOperatorFuncIds(operatorId);
+				String[] funcIds = cmcSysService.getOperatorFuncIds(operatorId);
 				session.setAttribute(Constant.SESSION_KEY_FUNCIDS, funcIds);
 				//登陆成功后，更新操作员最后登录时间
 				operator.put("LAST_LOGIN", new Date());
-				operatorService.updateOperator(operator);
+				cmcOperatorService.updateOperator(operator);
 				request.setAttribute(DBConstant.CMC_OPERATOR_LOGIN_NAME, (String)operator.get(DBConstant.CMC_OPERATOR_LOGIN_NAME));
 				
 				if(logger.isDebugEnabled()){
@@ -203,7 +199,7 @@ public class SysController {
 		Model model = new Model();
 		Map<String, Object> operator = (Map<String, Object>)session.getAttribute(Constant.SESSION_KEY_OPERATOR);
 		String operatorId = (String) operator.get(DBConstant.CMC_OPERATOR_OPERATOR_ID);
-		List<Map<String, Object>> menu = sysService.getOperatorMenu(operatorId);
+		List<Map<String, Object>> menu = cmcSysService.getOperatorMenu(operatorId);
 		List<Map<String, Object>> menu2 = new ArrayList<Map<String,Object>>();
 		for(int i = 0; i < menu.size(); i++){
 			Map<String, Object> func = menu.get(i);
@@ -247,14 +243,14 @@ public class SysController {
 	public Model updatePwdAction(@RequestParam Map<String,String> reqs,HttpSession session, HttpServletRequest request){
 		Model model = new Model();
 		Map<String, Object> opr =(Map<String,Object>)session.getAttribute(Constant.SESSION_KEY_OPERATOR);
-		Map<String, Object> operator = operatorService.getOperator((String)opr.get("OPERATOR_ID"));
+		Map<String, Object> operator = cmcOperatorService.getOperator((String)opr.get("OPERATOR_ID"));
 		request.setAttribute("LOGIN_NAME", opr.get("LOGIN_NAME"));
 		if(!operator.get("PASSWORD").toString().equals(reqs.get("old_password"))){
 			return  model.addError("旧密码输入错误");
 		}else{
 			operator.put("PASSWORD", reqs.get("new_password"));
 			operator.put("LAST_PWD", new Date());
-			operatorService.updateOperator(operator);
+			cmcOperatorService.updateOperator(operator);
 		}
 		return model;
 	}
@@ -310,7 +306,7 @@ public class SysController {
 		request.setAttribute("LOGIN_NAME", opr.get("LOGIN_NAME"));
 		String conf = "pagesize:"+pagesize+";maxpanel:"+maxpanel;
 		opr.put("CONF", conf);
-		operatorService.updateOperator(opr);
+		cmcOperatorService.updateOperator(opr);
 		//刷新session中的操作员配置信息
 		Map<String, String> profile = (Map<String, String>)session.getAttribute(Constant.SESSION_KEY_PROFILE);
 		if(profile == null){

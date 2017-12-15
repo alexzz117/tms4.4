@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
@@ -34,6 +35,7 @@ import cn.com.higinet.tms.manager.modules.query.service.QueryService;
 public abstract class AbstractSqlProcessImpl extends QueryDataProcessCommon {
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	protected SimpleDao tmsSimpleDao;
 
 	@Autowired

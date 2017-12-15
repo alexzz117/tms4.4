@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
@@ -48,6 +49,7 @@ public class JsonDataProcessImpl extends QueryDataProcessCommon {
 	private QueryService queryService;
 	
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	
 	private static final String FIELD_TAB_ALIAS = "TAB_ALIAS";

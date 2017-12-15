@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +25,15 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
  * 功能管理实现类
  * @author chenr
  * @version 2.0.0, 2011-6-30
+ * 
+ * @author zhang.lei
  */
 @Transactional
 @Service("cmcFuncService")
 public class FuncService {
 
 	@Autowired
+	@Qualifier("cmcSimpleDao")
 	private SimpleDao cmcSimpleDao;
 
 	/**
@@ -108,7 +112,7 @@ public class FuncService {
 	 */
 	public void listAllFuncsSort( List<Map<String, Object>> funcOptList ) {
 
-		String sql = "select func_id, func_name, func_type, parent_id, onum " + " from CMC_FUNC t order by func_type, onum  asc";
+		String sql = "select func_id, func_name, func_type, parent_id, onum from CMC_FUNC t order by func_type, onum  asc";
 		List<Map<String, Object>> list = cmcSimpleDao.queryForList( sql );
 		if( list != null && list.size() > 0 ) {
 			getOptList( "-1", funcOptList, list );

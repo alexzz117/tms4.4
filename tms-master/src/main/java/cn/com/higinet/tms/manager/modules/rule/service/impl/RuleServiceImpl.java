@@ -54,6 +54,7 @@ public class RuleServiceImpl implements RuleService {
 	@Autowired
 	private DataSource dynamicDataSource;
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	@Qualifier("tmpSimpleDao")

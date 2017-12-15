@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +19,10 @@ import cn.com.higinet.tms.manager.modules.monitor.service.AlarmService;
 public class AlarmServiceImpl implements AlarmService { 
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	private IPLocationService ipLocationService;
-	
-	public void setCmcSimpleDao(SimpleDao tmsSimpleDao) {
-		this.tmsSimpleDao = tmsSimpleDao;
-	}
 
 	/**
 	 * 查询所有国家

@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +63,7 @@ public class AntiMoneyLaunderingService {
 
 	private static Pattern checkQueryParam = Pattern.compile( "(=\\s*:\\s*([\\w$\\.]+))", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE );
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	private SimpleDao officialSimpleDao;

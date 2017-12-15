@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.common.Constant;
@@ -21,6 +22,7 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class SafeDeviceService  {
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	public Page<Map<String, Object>> getSafeDeviceList(Map<String, String> reqs) {

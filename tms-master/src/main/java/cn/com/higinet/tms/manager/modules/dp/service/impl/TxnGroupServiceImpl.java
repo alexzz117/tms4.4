@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.Order;
@@ -22,11 +23,14 @@ import cn.com.higinet.tms.manager.modules.dp.service.TxnGroupService;
  * @author zhangfg
  * @date 2011-7-7 
  * @version 2.0.0
+ * 
+ * @author zhang.lei
  */
 @Service("tmsTxnGroupService")
 public class TxnGroupServiceImpl implements TxnGroupService {
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	/**

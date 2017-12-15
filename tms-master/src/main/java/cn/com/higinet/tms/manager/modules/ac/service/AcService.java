@@ -12,7 +12,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +41,11 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
  */
 @Service("actionService35")
 public class AcService {
-
-	private static Log log = LogFactory.getLog( AcService.class );
+	
+	private static final Logger log = LoggerFactory.getLogger( AcService.class );
+	
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	private DataSource dynamicDataSource;
@@ -231,7 +236,7 @@ public class AcService {
 				isTrue = web_tool.compile_expr( txnid, ac_cond, error );
 			}
 			catch( Exception e ) {
-				log.error( e );
+				log.error( e.getMessage(), e );
 				throw new TmsMgrServiceException( "条件表达式不合法，由于" + "条件[" + ac_desc + "]" + e.getLocalizedMessage() );
 			}
 			// 不正确弹出错误信息
@@ -246,7 +251,7 @@ public class AcService {
 				isTrue = web_tool.compile_expr( txnid, ac_expr, error );
 			}
 			catch( Exception e ) {
-				log.error( e );
+				log.error( e.getMessage(), e );
 				throw new TmsMgrServiceException( "条件表达式不合法，由于" + "条件[" + ac_desc + "]" + e.getLocalizedMessage() );
 			}
 			// 不正确弹出错误信息
@@ -298,7 +303,7 @@ public class AcService {
 			cache_init.init( new data_source( dynamicDataSource ) );
 		}
 		catch( Exception e ) {
-			log.error( e );
+			log.error( e.getMessage(), e );
 			throw new TmsMgrServiceException( "条件初始化错误，由于" + e.getLocalizedMessage() );
 		}
 	}

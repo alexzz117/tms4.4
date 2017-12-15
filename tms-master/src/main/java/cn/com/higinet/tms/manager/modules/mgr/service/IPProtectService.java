@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -47,6 +48,7 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class IPProtectService extends ApplicationObjectSupport   {
 
     @Autowired
+    @Qualifier("tmsSimpleDao")
     private SimpleDao tmsSimpleDao;
     @Autowired
     private JdbcTemplate tmsJdbcTemplate;

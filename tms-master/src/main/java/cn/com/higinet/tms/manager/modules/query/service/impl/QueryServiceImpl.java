@@ -55,7 +55,9 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 @Service("queryService")
 @Transactional
 public class QueryServiceImpl extends ApplicationObjectSupport implements QueryService {
+	
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired

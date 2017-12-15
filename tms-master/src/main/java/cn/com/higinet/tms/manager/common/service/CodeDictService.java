@@ -28,6 +28,8 @@ import cn.com.higinet.tms.manager.dao.util.MapWrap;
  * 字典管理实现类
  * @author chenr
  * @version 2.0.0, 2011-6-30
+ * 
+ * @author zhang.lei
  */
 @Transactional
 @Service("cmcCodeDictService")

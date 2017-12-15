@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +32,12 @@ public class ProcessServiceImpl implements ProcessService{
 	@Autowired
 	private CommonCheckService commonCheckService;
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	private TransDefService transDefService;
 	@Autowired
+	@Qualifier("tmsSqlMap")
 	private SqlMap tmsSqlMap;
 	@Autowired
 	private SequenceService sequenceService;

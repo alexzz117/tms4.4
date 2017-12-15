@@ -78,6 +78,7 @@ public class TransModelServiceImpl implements TransModelService {
 	private CommonCheckService commonCheckService;
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired

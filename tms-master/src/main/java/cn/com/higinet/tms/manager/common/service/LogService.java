@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,8 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
  * 日志实现类
  * @author zhangfg
  * @version 2.0.0, 2011-6-30
+ * 
+ * @author zhang.lei
  */
 @Transactional
 @Service("cmcLogService")
@@ -41,6 +44,7 @@ public class LogService {
 	private static final Log logger = LogFactory.getLog(LogService.class);
 	
 	@Autowired
+	@Qualifier("cmcSimpleDao")
 	private SimpleDao cmcSimpleDao;
 
 	/**

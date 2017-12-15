@@ -53,6 +53,7 @@ public class SendRateMessage {
 	private final static Logger log = LoggerFactory.getLogger( SendRateMessage.class );
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	@Qualifier("tmpSimpleDao")

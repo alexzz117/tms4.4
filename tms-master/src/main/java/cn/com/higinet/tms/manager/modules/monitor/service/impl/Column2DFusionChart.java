@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -18,13 +19,15 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.monitor.model.FusionChartVO;
 import cn.com.higinet.tms.manager.modules.monitor.service.FusionChart;
 
-/*
+/**
  * 交易运行监控、top5
+ * @author zhang.lei
  */
 @Service("column2DFusionChart")
 public class Column2DFusionChart implements FusionChart{
 	
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	SimpleDao tmsSimpleDao;
 	@Autowired
 	private IPLocationService ipLocationService;

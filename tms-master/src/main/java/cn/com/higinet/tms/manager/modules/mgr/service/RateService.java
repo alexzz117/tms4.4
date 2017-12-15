@@ -43,6 +43,7 @@ public class RateService {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired

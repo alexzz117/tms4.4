@@ -18,6 +18,7 @@ import cn.com.higinet.tms.manager.modules.monitor.service.ReportData;
 public abstract class AbstractReportData implements ReportData {
 
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	SimpleDao tmsSimpleDao;
 
 	@Autowired
@@ -28,6 +29,7 @@ public abstract class AbstractReportData implements ReportData {
 	SimpleDao tmpSimpleDao;
 	
 	@Autowired
+	@Qualifier("tmsSqlMap")
 	SqlMap tmsSqlMap;
 	/**
 	 * 

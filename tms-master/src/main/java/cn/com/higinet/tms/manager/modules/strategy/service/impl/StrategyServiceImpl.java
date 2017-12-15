@@ -54,6 +54,7 @@ public class StrategyServiceImpl implements StrategyService {
 	private DataSource tmpTmsDataSource;
 	
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
 	@Qualifier("tmpSimpleDao")

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -15,6 +16,7 @@ import cn.com.higinet.tms35.comm.MapUtil;
 @Service("disposalService")
 public class DisposalServiceImpl implements DisposalService {
 	@Autowired
+	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	
 	private static final String DISPOSAL_TABLE_NAME = "tms_com_disposal";
