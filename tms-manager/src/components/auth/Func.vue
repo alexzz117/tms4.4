@@ -434,15 +434,27 @@
           func_name: data.text,
           conf: data.conf,
           ftype_name: nodeTypes[data.func_type],
-          isgrant: (data.isgrant === '1' ? true : false),
+          isgrant: (data.isgrant === '1'),
           menu: (data.menu ? data.menu : '1'),
           flag: (data.flag ? data.flag : '1'),
           onum: data.onum,
           info: data.info,
-          islog: (data.islog === '1' ? true : false),
-          logconf: (data.logurlMethod === '0' ? 'GET:' : 'POST:') + data.loguri, // 日志配置,
+          islog: (data.islog === '1'),
+          logconf: '', // 日志配置,
           logurlMethod: data.logurlMethod, // 日志请求方式
           loguri: data.loguri // 日子请求地址
+        }
+        debugger
+        console.info(data['logurlMethod'],formData.logurlmethod,data.logurlMethod === '1')
+        switch (data.logurlMethod) {
+          case '0' :
+            formData.logconf = 'GET:' + data.loguri
+            break
+          case '1' :
+            formData.logconf = 'POST:' + data.loguri
+            break
+          default :
+            break
         }
         self.funcForm = formData
       },
