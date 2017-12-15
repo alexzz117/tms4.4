@@ -115,7 +115,6 @@
       var checkFunctionOnum = (rule, value, callback) => {
         var self = this
         var currentNode = self.$refs.tree.currentNode.node
-        console.info(currentNode)
         var funcInfo = self.funcForm
         if (funcInfo.func_id === '') { // 添加功能节点
           var childs = currentNode.childNodes
@@ -131,6 +130,20 @@
               return callback(new Error('[顺序]不能重复'))
             }
           }
+        }
+        return callback()
+      }
+      // 日志配置校验
+      var checkFunctionLogConf = (rule, value, callback) => {
+        var self = this
+        if (value.indexOf('GET:') === 0) {
+          self.funcForm.logurlMethod = '0'
+          self.funcForm.loguri = value.substring(4)
+        } else if (value.indexOf('POST:') === 0) {
+          self.funcForm.logurlMethod = '1'
+          self.funcForm.loguri = value.substring(5)
+        } else {
+          return callback(new Error('[日志记录配置]只支持GET: 或POST:开头'))
         }
         return callback()
       }
@@ -186,7 +199,9 @@
           onum: '', // 排序
           info: '', // 备注
           islog: '', // 记录日志
-          logconf: '' // 日志配置
+          logconf: '', // 日志配置,
+          logurlMethod: '', // 日志请求方式
+          loguri: '' // 日子请求地址
         },
         breadcrumbData: [], // 地址路径数组
         rules: { // 表单校验
@@ -206,6 +221,9 @@
           ],
           info: [
             {max: 300, message: '长度在300个字符以内', trigger: 'blur'}
+          ],
+          logconf: [
+            {validator: checkFunctionLogConf, trigger: 'blur'} // 日志配置校验
           ]
         }
       }
@@ -327,7 +345,6 @@
         self.funcFormReadonly = true
         self.showNodeAttr(node.data.func_type)
         self.showNodeValue(data)
-        console.info(node)
       },
       // 同步地址栏显示
       syncBreadcrumb (node) {
@@ -423,7 +440,9 @@
           onum: data.onum,
           info: data.info,
           islog: (data.islog === '1' ? true : false),
-          logconf: data.logconf
+          logconf: (data.logurlMethod === '0' ? 'GET:' : 'POST:') + data.loguri, // 日志配置,
+          logurlMethod: data.logurlMethod, // 日志请求方式
+          loguri: data.loguri // 日子请求地址
         }
         self.funcForm = formData
       },
