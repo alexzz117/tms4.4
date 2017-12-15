@@ -25,7 +25,7 @@
       <el-col :span="18">
         <div style="height:38px;width:100%;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
           <el-breadcrumb id="funcPath" separator=">" style="padding: 10px 15px;">
-            <el-breadcrumb-item v-for="item in breadcrumbData">{{ item.text }}</el-breadcrumb-item>
+            <el-breadcrumb-item v-for="(item,index) in breadcrumbData" :keys="index">{{ item.text }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <el-main style="max-height: 76vh;overflow-y: auto;">
@@ -58,16 +58,16 @@
               <el-checkbox label="需要授权" name="type" v-model="funcForm.isgrant"
                            :disabled="funcFormReadonly"></el-checkbox>
             </el-form-item>
-            <el-form-item label="是否菜单" style="text-align: left;" v-bind:class="{hidden:funcFormVisible.menu}">
+            <el-form-item label="是否菜单" v-bind:class="{hidden:funcFormVisible.menu}">
               <el-radio v-model="funcForm.menu" label="1" :disabled="funcFormReadonly">是</el-radio>
               <el-radio v-model="funcForm.menu" label="0" :disabled="funcFormReadonly">否</el-radio>
             </el-form-item>
-            <el-form-item label="状态" style="text-align: left;" v-bind:class="{hidden:funcFormVisible.flag}">
+            <el-form-item label="状态" v-bind:class="{hidden:funcFormVisible.flag}">
               <el-radio v-model="funcForm.flag" label="1" :disabled="funcFormReadonly">正常</el-radio>
               <el-radio v-model="funcForm.flag" label="0" :disabled="funcFormReadonly">停用</el-radio>
             </el-form-item>
             <el-form-item label="顺序" prop="onum" v-bind:class="{hidden:funcFormVisible.onum}">
-              <el-input v-model="funcForm.onum" auto-complete="off" :readonly="funcFormReadonly"></el-input>
+              <el-input v-model.number="funcForm.onum" auto-complete="off" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
             <el-form-item label="描述信息" prop="info" v-bind:class="{hidden:funcFormVisible.info}">
               <el-input type="textarea" v-model="funcForm.info" :readonly="funcFormReadonly"></el-input>
@@ -91,6 +91,7 @@
 
 
 <script>
+  import check from '@/common/check'
   import ajax from '@/common/ajax'
 
   export default {
@@ -98,13 +99,49 @@
       this.selTree()
     },
     data () {
+      // 功能名称重复校验
+      var checkFunctionName = (rule, value, callback) => {
+        var funcInfo = this.funcForm
+        var treeList = this.treeList
+        for (var i in treeList) {
+          var funcItem = treeList[i]
+          if (funcItem.text === value && funcItem.id !== funcInfo.func_id) {
+            return callback(new Error('[节点名称]不能重复'))
+          }
+        }
+        return callback()
+      }
+      // 功能顺序重复校验
+      var checkFunctionOnum = (rule, value, callback) => {
+        var self = this
+        var currentNode = self.$refs.tree.currentNode.node
+        console.info(currentNode)
+        var funcInfo = self.funcForm
+        if (funcInfo.func_id === '') { // 添加功能节点
+          var childs = currentNode.childNodes
+          for (var i in childs) {
+            if (childs[i].data.onum === value) {
+              return callback(new Error('[顺序]不能重复'))
+            }
+          }
+        } else { // 编辑功能节点
+          var siblings = currentNode.parent.childNodes
+          for (var j in siblings) {
+            if (siblings[j].data.onum === value && siblings[j].data.id !== funcInfo.func_id) {
+              return callback(new Error('[顺序]不能重复'))
+            }
+          }
+        }
+        return callback()
+      }
       return {
-        toolBtn: {
-          addBtn: true,
-          editBtn: true,
-          delBtn: true
+        toolBtn: { // 功能树操作按钮
+          addBtn: true, // 添加按钮
+          editBtn: true, // 编辑按钮
+          delBtn: true // 删除按钮
         },
-        treeData: [{
+        treeList: [], // 树节点数据List
+        treeData: [{ // 树节点Json数据
           id: '-1',
           func_type: '-1',
           flag: '1',
@@ -117,60 +154,81 @@
           children: 'children',
           label: 'text'
         },
-        expendKey: ['-1'],
+        expendKey: ['-1'], // 默认展开的功能节点id
         formLabelWidth: '120px',
-        funcFormReadonly: true,
-        funcFormVisible: {
-          form: true,
-          func_id: true,
-          parent_id: true,
-          func_type: true,
-          func_name: true,
-          conf: true,
-          ftype_name: true,
-          isgrant: true,
-          menu: true,
-          flag: true,
-          onum: true,
-          info: true,
-          islog: true,
-          logconf: true
+        funcFormReadonly: true, // 功能信息表单只读标识
+        funcFormVisible: { // 功能表单中条目显隐标志配置
+          form: true, // 表单整体显示
+          func_id: true, // 功能id
+          parent_id: true, // 父功能id
+          func_type: true, // 功能类型
+          func_name: true, // 功能名称
+          conf: true, // 配置
+          ftype_name: true, // 功能类型名称
+          isgrant: true, // 授权
+          menu: true, // 菜单
+          flag: true, // 状态
+          onum: true, // 排序
+          info: true, // 备注
+          islog: true, // 记录日志
+          logconf: true // 日志配置
         },
         funcForm: {
-          func_id: '',
-          parent_id: '',
-          func_type: '',
-          func_name: '',
-          conf: '',
-          ftype_name: '',
-          isgrant: '',
-          menu: '1',
-          flag: '1',
-          onum: '',
-          info: '',
-          islog: '',
-          logconf: ''
+          func_id: '', // 功能id
+          parent_id: '', // 父功能id
+          func_type: '', // 功能类型
+          func_name: '', // 功能名称
+          conf: '', // 配置
+          ftype_name: '', // 功能类型名称
+          isgrant: '', // 授权
+          menu: '1', // 菜单
+          flag: '1', // 状态
+          onum: '', // 排序
+          info: '', // 备注
+          islog: '', // 记录日志
+          logconf: '' // 日志配置
         },
-        breadcrumbData: [],
-        rules: {}
+        breadcrumbData: [], // 地址路径数组
+        rules: { // 表单校验
+          func_name: [
+            {required: true, message: '请输入节点名称', trigger: 'blur'},
+            {max: 32, message: '长度在32个字符以内', trigger: 'blur'},
+            {validator: check.checkFormSpecialCode, trigger: 'blur'}, // 特殊字符校验
+            {validator: checkFunctionName, trigger: 'blur'} // 功能名称重复校验
+          ],
+          conf: [
+            {max: 500, message: '长度在500个字符以内', trigger: 'blur'}
+          ],
+          onum: [
+            {required: true, message: '请输入节点名称', trigger: 'blur'},
+            {type: 'number', max: 100, min: 0, message: '年龄必须为小于100的正整数', trigger: 'blur'},
+            {validator: checkFunctionOnum, trigger: 'blur'} // 功能顺序重复校验
+          ],
+          info: [
+            {max: 300, message: '长度在300个字符以内', trigger: 'blur'}
+          ]
+        }
       }
     },
     methods: {
+      // 功能树渲染方法
       renderContent (h, { node, data, store }) {
-        if (node.data.flag === '0') {
+        if (node.data.flag === '0') { // 功能节点状态禁用
           return (<span class="el-tree-node__label disabledFlag">{node.label}</span>)
-        } else {
+        } else { // 功能节点状态正常
           return (<span class="el-tree-node__label">{node.label}</span>)
         }
       },
+      // 查询树结构
       selTree () {
         var self = this
         var option = {
           url: '/cmc/func/tree',
           success: function (data) {
             if (data.list) {
-              var rootNodes = {
+              var rootNodes = { // 根节点
                 id: '-1',
+                fid: '',
                 func_type: '-1',
                 flag: '1',
                 ftype_name: '',
@@ -180,6 +238,7 @@
               }
               var treeList = [rootNodes]
               treeList = treeList.concat(data.list)
+              self.treeList = treeList
               self.treeData = self.formatTreeData(treeList)
               self.expendNodesByLevel(2)
             }
@@ -187,6 +246,7 @@
         }
         ajax.post(option)
       },
+      // 把功能节点列表格式化为树形Json结构
       formatTreeData (list, rootNodes) {
         var tree = []
         // 如果根节点数组不存在，则取fid不存在或为空字符的节点为父节点
@@ -198,10 +258,12 @@
             }
           }
         }
+        // 根节点不存在判断
         if (rootNodes.length === 0) {
           console.error('根节点不存在，请确认树结构是否正确')
           console.info('树结构的根节点是fid不存在（或为空）的节点，否则需手动添加指定得根节点（参数）')
         }
+        // 根据根节点遍历组装数据
         for (var r in rootNodes) {
           var node = rootNodes[r]
           node.children = getChildren(list, node.id)
@@ -224,6 +286,7 @@
 
         return tree  // 返回树结构Json
       },
+      // 展开前几层功能树
       expendNodesByLevel (deep) {
         var expendNodeIds = []
         var treeNode = this.treeData[0]
@@ -235,7 +298,14 @@
         }
         this.expendKey = expendNodeIds
       },
+      // 功能树节点点击事件
       handleNodeClick (data, node) {
+        var selectNode = this.funcForm
+        // 重复点击同一节点判断
+        if (selectNode.func_id === data.id) {
+          return
+        }
+        this.$refs['funcForm'].clearValidate()
         var self = this
         var ftype = data.func_type // 功能类型（节点类型）
         // 设置可操作按键
@@ -259,6 +329,7 @@
         self.showNodeValue(data)
         console.info(node)
       },
+      // 同步地址栏显示
       syncBreadcrumb (node) {
         var self = this
         var nodePath = []
@@ -268,6 +339,7 @@
         }
         self.breadcrumbData = nodePath
       },
+      // 功能信息表单条目显示处理（根据功能类型不同）
       showNodeAttr (ftype) {
         var self = this
         var visible = {
@@ -334,12 +406,13 @@
           }
         }
       },
+      //  功能信息表单条目数据展示
       showNodeValue (data) {
         var nodeTypes = ['子系统', '模块', '功能', '子功能']
         var self = this
         var formData = {
-          func_id: data.func_id,
-          parent_id: data.parent_id,
+          func_id: data.id,
+          parent_id: data.fid,
           func_type: data.func_type,
           func_name: data.text,
           conf: data.conf,
@@ -354,17 +427,21 @@
         }
         self.funcForm = formData
       },
+      // 添加功能事件处理
       addFunc () {
+        this.$refs['funcForm'].resetFields()
         var self = this
         var selectNode = self.$refs.tree.getCurrentNode()
-        console.info(selectNode)
-        console.info(Number(selectNode.func_type) + 1)
         // 功能表单为编辑状态
         self.funcFormReadonly = false
         self.showNodeAttr(Number(selectNode.func_type) + 1 + '')
       },
+      // 编辑功能事件处理
       editFunc () {
+        // 功能表单为编辑状态
+        this.funcFormReadonly = false
       },
+      // 删除功能事件处理
       delFunc () {
       }
     }
