@@ -47,14 +47,19 @@ import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
  */
 @Service("dfpService")
 public class DfpService {
+	
 	@Autowired
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
+	
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
+	
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
+	
 	@Autowired
 	private SequenceService sequenceService;
 
@@ -813,7 +818,7 @@ public class DfpService {
 	 */
 	public void unbindUserDeviceRel( List<Map<String, ?>> list ) {
 		String sql = "delete from TMS_DFP_USER_DEVICE where DEVICE_ID = :DEVICE_ID and USER_ID = :USERID";
-		tmpSimpleDao.batchUpdate( sql, list );
-		officialSimpleDao.batchUpdate( sql, list );
+		offlineSimpleDao.batchUpdate( sql, list );
+		onlineSimpleDao.batchUpdate( sql, list );
 	}
 }

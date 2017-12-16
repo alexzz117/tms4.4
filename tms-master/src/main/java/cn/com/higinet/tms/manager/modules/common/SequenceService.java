@@ -3,6 +3,7 @@ package cn.com.higinet.tms.manager.modules.common;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import cn.com.higinet.tms.manager.dao.SqlMap;
@@ -13,7 +14,9 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
 public class SequenceService {
 	
 	@Autowired
+	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
+	
 	@Autowired
 	private SqlMap tmsSqlMap;
 	

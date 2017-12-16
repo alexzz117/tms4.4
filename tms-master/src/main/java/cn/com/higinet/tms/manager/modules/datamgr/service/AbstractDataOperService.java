@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.ApplicationObjectSupport;
@@ -14,26 +14,26 @@ import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
-import cn.com.higinet.tms.manager.modules.auth.common.AuthStaticParameters;
 import cn.com.higinet.tms.manager.modules.auth.exception.TmsMgrAuthDataSyncException;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.datamgr.common.ConfigAttrabute;
 import cn.com.higinet.tms.manager.modules.datamgr.common.DataConfig;
-import cn.com.higinet.tms.manager.modules.rule.service.RuleService;
 
 /**
  * 数据操作服务公用实现服务
  * @author zhangfg
  * @version 1.0.0 2012-09-19
+ * 
+ * @author zhang.lei
  */
 @Service("abstractDataOperService")
 public class AbstractDataOperService extends ApplicationObjectSupport implements DataOperService {
 
-	private final static Log logger = LogFactory.getLog( AbstractDataOperService.class );
+	private static final Logger logger = LoggerFactory.getLogger( AbstractDataOperService.class );
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	/**
 	 * 数据同步
@@ -157,7 +157,7 @@ public class AbstractDataOperService extends ApplicationObjectSupport implements
 		conds.put( "IS_MAIN", "1" );
 		conds.put( "TABLE_NAME", tableName );
 
-		Map<String, Object> authRecordMap = tmpSimpleDao.retrieve( "TMS_MGR_AUTHRECORD", conds );// 授权已转移到里线库
+		Map<String, Object> authRecordMap = offlineSimpleDao.retrieve( "TMS_MGR_AUTHRECORD", conds );// 授权已转移到里线库
 
 		String realOper = CmcMapUtil.getString( authRecordMap, "REAL_OPER" );
 		String realOper2 = "";

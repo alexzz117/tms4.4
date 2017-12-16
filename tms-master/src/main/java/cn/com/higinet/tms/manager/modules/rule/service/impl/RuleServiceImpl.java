@@ -40,27 +40,32 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
  * 功能/模块:
  * 
  * @author 张立群
- * @version 1.0 May 22, 2013 类描述: 修订历史: 日期 作者 参考 描述
- *
+ * @version 1.0 May 22, 2013 
+ * 类描述: 
+ * 修订历史: 日期 作者 参考 描述
  */
 @Service("ruleService35")
 @Transactional
 public class RuleServiceImpl implements RuleService {
 
 	@Autowired
-	private DataSource officialTmsDataSource;
+	@Qualifier("onlineDataSource")
+	private DataSource onlineDataSource;
 	@Autowired
-	private DataSource tmpTmsDataSource;
+	@Qualifier("offlineDataSource")
+	private DataSource offlineDataSource;
 	@Autowired
+	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
 	@Autowired
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 	@Autowired
 	private SqlMap tmsSqlMap;
 	@Autowired
@@ -69,7 +74,6 @@ public class RuleServiceImpl implements RuleService {
 	private CommonCheckService commonCheckService;
 	@Autowired
 	private SequenceService sequenceService;
-
 	@Autowired
 	private AcService scService;
 
@@ -101,8 +105,8 @@ public class RuleServiceImpl implements RuleService {
 			Map<String, Object> sqlConds = new HashMap<String, Object>();
 			sqlConds.putAll(txnIdsMap);
 			sqlConds.put("stId", st_id);
-			List<Map<String, Object>> oc_list = officialSimpleDao.queryForList(rule_sql, sqlConds);
-			List<Map<String, Object>> tmp_list = tmpSimpleDao.queryForList(rule_sql, sqlConds);
+			List<Map<String, Object>> oc_list = onlineSimpleDao.queryForList(rule_sql, sqlConds);
+			List<Map<String, Object>> tmp_list = offlineSimpleDao.queryForList(rule_sql, sqlConds);
 			rule_list = new ArrayList<Map<String, Object>>();
 
 			if (oc_list == null || oc_list.size() == 0 || oc_list == null || oc_list.size() == 0)
@@ -155,7 +159,7 @@ public class RuleServiceImpl implements RuleService {
 			for (Map<String, Object> map : delList) {
 				String sql = "select * from tms_com_strategy_rule_rel where rule_id=?";
 				long t_strategy_rule = tmsSimpleDao.count(sql, MapUtil.getString(map, DBConstant.TMS_COM_RULE_RULE_ID));
-				long o_strategy_rule = officialSimpleDao.count(sql, MapUtil.getString(map, DBConstant.TMS_COM_RULE_RULE_ID));
+				long o_strategy_rule = onlineSimpleDao.count(sql, MapUtil.getString(map, DBConstant.TMS_COM_RULE_RULE_ID));
 				if (t_strategy_rule > 0) {
 					throw new TmsMgrServiceException("规则[" + MapUtil.getString(map, DBConstant.TMS_COM_RULE_RULE_SHORTDESC) + "]被策略引用");
 				}
@@ -297,7 +301,7 @@ public class RuleServiceImpl implements RuleService {
 		tmsSimpleDao.update("TMS_COM_RULE", ruleData, condData);
 		
 		ruleData.put("UPDATE_DATE", sysdate);
-		tmpSimpleDao.update("TMS_COM_RULE_TEMP", ruleData,condData);
+		offlineSimpleDao.update("TMS_COM_RULE_TEMP", ruleData,condData);
 
 		return ruleData;
 	}
@@ -377,8 +381,8 @@ public class RuleServiceImpl implements RuleService {
 		String txnId = MapUtil.getString(map, "RULE_TXN");
 		// 添加新增规则
 		String sql = tmsSqlMap.getSql("tms.rule.queryMaxRuleName");
-		List<Map<String, Object>> maxList = tmpSimpleDao.queryForList(sql, txnId);
-		List<Map<String, Object>> maxOnList = officialSimpleDao.queryForList(sql, txnId);
+		List<Map<String, Object>> maxList = offlineSimpleDao.queryForList(sql, txnId);
+		List<Map<String, Object>> maxOnList = onlineSimpleDao.queryForList(sql, txnId);
 		String rule_name = MapUtil.getString(maxList.get(0), "maxRuleName");
 		String rule_on_name = MapUtil.getString(maxOnList.get(0), "maxRuleName");
 		
@@ -411,7 +415,7 @@ public class RuleServiceImpl implements RuleService {
 		tmsSimpleDao.create("TMS_COM_RULE", ruleData);
 		
 		ruleData.put("UPDATE_DATE", sysdate);
-		tmpSimpleDao.create("TMS_COM_RULE_TEMP", ruleData);
+		offlineSimpleDao.create("TMS_COM_RULE_TEMP", ruleData);
 		
 		map.put(DBConstant.TMS_COM_RULE_RULE_ID, sequenceId);
 
@@ -450,16 +454,16 @@ public class RuleServiceImpl implements RuleService {
 		if (operate.equals("add")) { // 新增规则审核
 			if (result) { // 审核通过
 
-				Map<String, Object> tempRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, Long.valueOf(ruleId)).getMap());
-				officialSimpleDao.create("TMS_COM_RULE", tempRuleMap); // 添加规则到正式表
+				Map<String, Object> tempRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, Long.valueOf(ruleId)).getMap());
+				onlineSimpleDao.create("TMS_COM_RULE", tempRuleMap); // 添加规则到正式表
 
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn " + "where tab_name like :tabName";
 				String tabName = "'" + MapUtil.getString(tempRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 				Map<String, Object> sqlConds = new HashMap<String, Object>();
 				sqlConds.put("tabName", tabName);
 
-				List<Map<String, Object>> officialRelationList = officialSimpleDao.queryForList(sql, sqlConds);
-				List<Map<String, Object>> tempRelationList = tmpSimpleDao.queryForList(sql);
+				List<Map<String, Object>> officialRelationList = onlineSimpleDao.queryForList(sql, sqlConds);
+				List<Map<String, Object>> tempRelationList = offlineSimpleDao.queryForList(sql);
 
 				for (Map<String, Object> tempRelationMap : tempRelationList) {
 					String tempMetadataJson = MapUtil.getString(tempRelationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
@@ -498,28 +502,28 @@ public class RuleServiceImpl implements RuleService {
 								officialRelationMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_TXN, MapUtil.getString(tempRelationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_TXN));
 								officialRelationMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, newJson);
 
-								officialSimpleDao.create("TMS_COM_RULERELATION", officialRelationMap);
+								onlineSimpleDao.create("TMS_COM_RULERELATION", officialRelationMap);
 							} else {
 								String officialMetadataJson = MapUtil.getString(officialRelationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
 								officialMetadataJson = officialMetadataJson.substring(0, officialMetadataJson.length() - 1) + "," + officialJson + "]";
 								officialRelationMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, officialMetadataJson);
 
-								officialSimpleDao.update("TMS_COM_RULERELATION", officialRelationMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(officialRelationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+								onlineSimpleDao.update("TMS_COM_RULERELATION", officialRelationMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(officialRelationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 							}
 						}
 					}
 				}
 			} else { // 审核未通过
-				Map<String, Object> tempRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				Map<String, Object> tempRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 
-				tmpSimpleDao.delete("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				offlineSimpleDao.delete("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn " + "where tab_name like :tabName";
 				String tabName = "'" + MapUtil.getString(tempRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 				Map<String, Object> conds = new HashMap<String, Object>();
 				conds.put("tabName", tabName);
 
-				List<Map<String, Object>> tempRelationList = tmpSimpleDao.queryForList(sql, conds);
+				List<Map<String, Object>> tempRelationList = offlineSimpleDao.queryForList(sql, conds);
 				for (Map<String, Object> map : tempRelationList) {
 
 					String tempMetadataJson = MapUtil.getString(map, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
@@ -527,13 +531,13 @@ public class RuleServiceImpl implements RuleService {
 					oldMetadataMaps.remove(ruleId);
 
 					if (oldMetadataMaps.isEmpty()) {
-						tmpSimpleDao.delete("TMS_COM_RULERELATION", MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(map, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+						offlineSimpleDao.delete("TMS_COM_RULERELATION", MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(map, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 					} else {
 
 						String newMetadataMaps = RuleJsonUtil.maps2Json(oldMetadataMaps);
 						map.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, newMetadataMaps);
 						map.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
-						tmpSimpleDao.update("TMS_COM_RULERELATION", map, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(map, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+						offlineSimpleDao.update("TMS_COM_RULERELATION", map, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(map, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 					}
 				}
 			}
@@ -541,49 +545,49 @@ public class RuleServiceImpl implements RuleService {
 
 		if (operate.equals("mod")) { // 修改规则审核
 			if (result) { // 审核通过
-				Map<String, Object> tempRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
-				officialSimpleDao.update("TMS_COM_RULE", tempRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap()); // 更新规则到正式表
+				Map<String, Object> tempRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				onlineSimpleDao.update("TMS_COM_RULE", tempRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap()); // 更新规则到正式表
 			} else { // 审核未通过
-				Map<String, Object> officialRuleMap = officialSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
-				tmpSimpleDao.update("TMS_COM_RULE", officialRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				Map<String, Object> officialRuleMap = onlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				offlineSimpleDao.update("TMS_COM_RULE", officialRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 			}
 		}
 		if (operate.equals("valid-y")) { // 启用规则审核
 			if (result) { // 审核通过
-				Map<String, Object> tempRuleMap = officialSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				Map<String, Object> tempRuleMap = onlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 				tempRuleMap.put(DBConstant.TMS_COM_RULE_RULE_ENABLE, 1);
-				officialSimpleDao.update("TMS_COM_RULE", tempRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap()); // 更新规则到正式表
+				onlineSimpleDao.update("TMS_COM_RULE", tempRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap()); // 更新规则到正式表
 			} else { // 审核未通过
-				Map<String, Object> officialRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				Map<String, Object> officialRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 				officialRuleMap.put(DBConstant.TMS_COM_RULE_RULE_ENABLE, 0);
-				tmpSimpleDao.update("TMS_COM_RULE", officialRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				offlineSimpleDao.update("TMS_COM_RULE", officialRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 			}
 		}
 		if (operate.equals("valid-n")) { // 停用规则审核
 			if (result) { // 审核通过
-				Map<String, Object> tempRuleMap = officialSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				Map<String, Object> tempRuleMap = onlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 				tempRuleMap.put(DBConstant.TMS_COM_RULE_RULE_ENABLE, 0);
-				officialSimpleDao.update("TMS_COM_RULE", tempRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap()); // 更新规则到正式表
+				onlineSimpleDao.update("TMS_COM_RULE", tempRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap()); // 更新规则到正式表
 			} else { // 审核未通过
-				Map<String, Object> officialRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				Map<String, Object> officialRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 				officialRuleMap.put(DBConstant.TMS_COM_RULE_RULE_ENABLE, 1);
-				tmpSimpleDao.update("TMS_COM_RULE", officialRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				offlineSimpleDao.update("TMS_COM_RULE", officialRuleMap, MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 			}
 		}
 
 		if (operate.equals("del")) { // 删除规则审核
 			if (result) { // 审核通过
 				// 查询当前规则的父规则
-				List<Map<String, Object>> parentRuleList = tmpSimpleDao.queryForList("select * from tms_com_rule_child where child_id=?", ruleId_l);
+				List<Map<String, Object>> parentRuleList = offlineSimpleDao.queryForList("select * from tms_com_rule_child where child_id=?", ruleId_l);
 
-				Map<String, Object> tempRuleMap = officialSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				Map<String, Object> tempRuleMap = onlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn where tab_name like :tabName";
 				String tabName = "'" + MapUtil.getString(tempRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 				Map<String, Object> conds = new HashMap<String, Object>();
 				conds.put("tabName", tabName);
-				List<Map<String, Object>> officialRelationList = officialSimpleDao.queryForList(sql, conds);
+				List<Map<String, Object>> officialRelationList = onlineSimpleDao.queryForList(sql, conds);
 
-				officialSimpleDao.delete("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				onlineSimpleDao.delete("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
 
 				for (Map<String, Object> relationMap : officialRelationList) {
 					if (StringUtil.isNotEmpty(MapUtil.getString(relationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID))) {
@@ -591,27 +595,27 @@ public class RuleServiceImpl implements RuleService {
 						Map<String, Map<String, Object>> oldMetadataMaps = RuleJsonUtil.json2Maps(officialMetadataJson);
 						oldMetadataMaps.remove(ruleId);
 						if (oldMetadataMaps.isEmpty()) {
-							officialSimpleDao.delete("TMS_COM_RULERELATION", MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(relationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+							onlineSimpleDao.delete("TMS_COM_RULERELATION", MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(relationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 						} else {
 							String newMetadataMaps = RuleJsonUtil.maps2Json(oldMetadataMaps);
 
 							relationMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, newMetadataMaps);
 							relationMap.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
-							officialSimpleDao.update("TMS_COM_RULERELATION", relationMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(relationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+							onlineSimpleDao.update("TMS_COM_RULERELATION", relationMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(relationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 						}
 					}
 				}
 			} else { // 审核未通过
-				Map<String, Object> officiaRuleMap = officialSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
-				tmpSimpleDao.create("TMS_COM_RULE", officiaRuleMap); // 添加规则到正式表
+				Map<String, Object> officiaRuleMap = onlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, ruleId_l).getMap());
+				offlineSimpleDao.create("TMS_COM_RULE", officiaRuleMap); // 添加规则到正式表
 
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn where tab_name like :tabName";
 				String tabName = "'" + MapUtil.getString(officiaRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 				Map<String, Object> conds = new HashMap<String, Object>();
 				conds.put("tabName", tabName);
 
-				List<Map<String, Object>> tempRelationList = tmpSimpleDao.queryForList(sql, conds);
-				List<Map<String, Object>> officialRelationList = officialSimpleDao.queryForList(sql, conds);
+				List<Map<String, Object>> tempRelationList = offlineSimpleDao.queryForList(sql, conds);
+				List<Map<String, Object>> officialRelationList = onlineSimpleDao.queryForList(sql, conds);
 				for (Map<String, Object> officialRelationMap : officialRelationList) {
 					if (StringUtil.isNotEmpty(MapUtil.getString(officialRelationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID))) {
 						String officialMetadataJson = MapUtil.getString(officialRelationMap, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
@@ -633,7 +637,7 @@ public class RuleServiceImpl implements RuleService {
 									map.put(DBConstant.TMS_COM_RULERELATION_RULEREL_TXN, MapUtil.getString(map, DBConstant.TMS_COM_TAB.TAB_NAME));
 									map.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, tempMetadataJson);
 									map.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
-									tmpSimpleDao.create("TMS_COM_RULERELATION", map);
+									offlineSimpleDao.create("TMS_COM_RULERELATION", map);
 								} else {
 									String tempMetadataJson = MapUtil.getString(map, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
 
@@ -641,7 +645,7 @@ public class RuleServiceImpl implements RuleService {
 
 									map.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, tempMetadataJson);
 									map.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
-									tmpSimpleDao.update("TMS_COM_RULERELATION", map, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(map, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+									offlineSimpleDao.update("TMS_COM_RULERELATION", map, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(map, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 								}
 							}
 						}
@@ -657,10 +661,10 @@ public class RuleServiceImpl implements RuleService {
 		long longId_l = Long.parseLong(lineId);
 		if (operate.equals("add")) { // 新增连接线审核
 			if (result) { // 审核通过
-				Map<String, Object> templineMap = tmpSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
-				officialSimpleDao.create("TMS_COM_RULE_CHILD", templineMap);
+				Map<String, Object> templineMap = offlineSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
+				onlineSimpleDao.create("TMS_COM_RULE_CHILD", templineMap);
 
-				Map<String, Object> tempRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(templineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
+				Map<String, Object> tempRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(templineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
 				// String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn " + "where tab_name like '" + MapUtil.getString(tempRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn " + "where tab_name like :tabName";
@@ -668,7 +672,7 @@ public class RuleServiceImpl implements RuleService {
 				Map<String, Object> conds = new HashMap<String, Object>();
 				conds.put("tabName", tabName);
 
-				List<Map<String, Object>> officialRelationList = officialSimpleDao.queryForList(sql, conds);
+				List<Map<String, Object>> officialRelationList = onlineSimpleDao.queryForList(sql, conds);
 
 				for (Map<String, Object> officialMap : officialRelationList) {
 					if (StringUtil.isNotEmpty(MapUtil.getString(officialMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID))) {
@@ -686,14 +690,14 @@ public class RuleServiceImpl implements RuleService {
 						officialMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, oldJson);
 						officialMap.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
 
-						officialSimpleDao.update("TMS_COM_RULERELATION", officialMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(officialMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+						onlineSimpleDao.update("TMS_COM_RULERELATION", officialMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(officialMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 					}
 				}
 			} else {
-				Map<String, Object> templineMap = tmpSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
-				tmpSimpleDao.delete("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
+				Map<String, Object> templineMap = offlineSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
+				offlineSimpleDao.delete("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
 
-				Map<String, Object> tempRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(templineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
+				Map<String, Object> tempRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(templineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
 				// String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn where tab_name like '" + MapUtil.getString(tempRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn " + "where tab_name like :tabName";
@@ -702,7 +706,7 @@ public class RuleServiceImpl implements RuleService {
 				conds.put("tabName", tabName);
 
 				// 更新relation
-				List<Map<String, Object>> tempRelationList = tmpSimpleDao.queryForList(sql, conds);
+				List<Map<String, Object>> tempRelationList = offlineSimpleDao.queryForList(sql, conds);
 				for (Map<String, Object> reMap : tempRelationList) {
 					if (StringUtil.isNotEmpty(MapUtil.getString(reMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID))) {
 						String oldJson = MapUtil.getString(reMap, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
@@ -719,7 +723,7 @@ public class RuleServiceImpl implements RuleService {
 						reMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, oldJson);
 						reMap.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
 
-						tmpSimpleDao.update("TMS_COM_RULERELATION", reMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(reMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+						offlineSimpleDao.update("TMS_COM_RULERELATION", reMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(reMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 					}
 				}
 			}
@@ -728,17 +732,17 @@ public class RuleServiceImpl implements RuleService {
 
 		if (operate.equals("del")) { // 删除连接线规则审核
 			if (result) { // 通过
-				Map<String, Object> officialLineMap = officialSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
-				officialSimpleDao.delete("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
+				Map<String, Object> officialLineMap = onlineSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
+				onlineSimpleDao.delete("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
 
-				Map<String, Object> officialRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(officialLineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
+				Map<String, Object> officialRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(officialLineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
 				//String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn where tab_name like '" + MapUtil.getString(officialRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn where tab_name like :tabName";
 				String tabName = "'" + MapUtil.getString(officialRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 				Map<String, Object> conds = new HashMap<String, Object>();
 				conds.put("tabName", tabName);
-				List<Map<String, Object>> officialRelationList = officialSimpleDao.queryForList(sql,conds);
+				List<Map<String, Object>> officialRelationList = onlineSimpleDao.queryForList(sql,conds);
 				for (Map<String, Object> offMap : officialRelationList) {
 					String oldJson = MapUtil.getString(offMap, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
 					// 在原来的基础上修改RuleId的指向
@@ -754,19 +758,19 @@ public class RuleServiceImpl implements RuleService {
 					offMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, oldJson);
 					offMap.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
 
-					officialSimpleDao.update("TMS_COM_RULERELATION", offMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(offMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+					onlineSimpleDao.update("TMS_COM_RULERELATION", offMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(offMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 				}
 
 			} else {
-				Map<String, Object> officialLineMap = officialSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
-				tmpSimpleDao.create("TMS_COM_RULE_CHILD", officialLineMap);
+				Map<String, Object> officialLineMap = onlineSimpleDao.retrieve("TMS_COM_RULE_CHILD", MapWrap.map(DBConstant.TMS_COM_RULE_CHILD_RC_ID, longId_l).getMap());
+				offlineSimpleDao.create("TMS_COM_RULE_CHILD", officialLineMap);
 
-				Map<String, Object> officialRuleMap = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(officialLineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
+				Map<String, Object> officialRuleMap = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, MapUtil.getLong(officialLineMap, DBConstant.TMS_COM_RULE_CHILD_RULE_ID)).getMap());
 				String sql = "select t.tab_name,r.* from tms_com_tab t left join tms_com_rulerelation r on t.tab_name=r.rulerel_txn where tab_name like :tabName";
 				String tabName = "'" + MapUtil.getString(officialRuleMap, DBConstant.TMS_COM_RULE_RULE_TXN) + "%'";
 				Map<String, Object> conds = new HashMap<String, Object>();
 				conds.put("tabName", tabName);
-				List<Map<String, Object>> tempRelationList = tmpSimpleDao.queryForList(sql,conds);
+				List<Map<String, Object>> tempRelationList = offlineSimpleDao.queryForList(sql,conds);
 				for (Map<String, Object> reMap : tempRelationList) {
 					String oldJson = MapUtil.getString(reMap, DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA);
 					// 在原来的基础上修改RuleId的指向
@@ -782,7 +786,7 @@ public class RuleServiceImpl implements RuleService {
 					reMap.put(DBConstant.TMS_COM_RULERELATION_RULEREL_METADATA, oldJson);
 					reMap.remove(DBConstant.TMS_COM_TAB.TAB_NAME);
 
-					tmpSimpleDao.update("TMS_COM_RULERELATION", reMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(reMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
+					offlineSimpleDao.update("TMS_COM_RULERELATION", reMap, MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_ID, MapUtil.getLong(reMap, DBConstant.TMS_COM_RULERELATION_RULEREL_ID)).getMap());
 				}
 			}
 		}
@@ -804,7 +808,7 @@ public class RuleServiceImpl implements RuleService {
 		// 校验条件有效性
 		if (StringUtil.isNotEmpty(cond)) {
 			// 初始化缓存
-			commonCheckService.initCache(tmpTmsDataSource);
+			commonCheckService.initCache(offlineDataSource);
 
 			commonCheckService.checkCond(reqs, "rule_cond", "ruleShortdesc", "txn_id");
 		}
@@ -825,7 +829,7 @@ public class RuleServiceImpl implements RuleService {
 
 		// 校验能否被引用
 		// 初始化缓存
-		commonCheckService.initCache(tmpTmsDataSource);
+		commonCheckService.initCache(offlineDataSource);
 		if ("del".equals(oper)) {
 			if (commonCheckService.find_ref_rule(txn_id, rule_name))
 				throw new TmsMgrServiceException("[" + ruleShortdesc + "]被引用，不能删除");
@@ -835,7 +839,7 @@ public class RuleServiceImpl implements RuleService {
 		}
 
 		// 初始化缓存
-		commonCheckService.initCache(officialTmsDataSource);
+		commonCheckService.initCache(onlineDataSource);
 		if ("del".equals(oper)) {
 			if (commonCheckService.find_ref_rule(txn_id, rule_name))
 				throw new TmsMgrServiceException("[" + ruleShortdesc + "]被未授权，不能删除");
@@ -852,9 +856,9 @@ public class RuleServiceImpl implements RuleService {
 	 */
 	public void batchCheckRef(String[] rule_ids, String oper) {
 		// 初始化临时库缓存
-		commonCheckService.initCache(tmpTmsDataSource);
+		commonCheckService.initCache(offlineDataSource);
 		for (String rule_id : rule_ids) {
-			Map<String, Object> ruleInfo = tmpSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, Long.parseLong(rule_id)).getMap());
+			Map<String, Object> ruleInfo = offlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, Long.parseLong(rule_id)).getMap());
 
 			if ("del".equals(oper)) {
 				if (commonCheckService.find_ref_rule(MapUtil.getString(ruleInfo, DBConstant.TMS_COM_RULE_RULE_TXN), MapUtil.getString(ruleInfo, DBConstant.TMS_COM_RULE_RULE_NAME)))
@@ -866,9 +870,9 @@ public class RuleServiceImpl implements RuleService {
 		}
 
 		// 初始化正式库缓存
-		commonCheckService.initCache(officialTmsDataSource);
+		commonCheckService.initCache(onlineDataSource);
 		for (String rule_id : rule_ids) {
-			Map<String, Object> ruleInfo = officialSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, Long.parseLong(rule_id)).getMap());
+			Map<String, Object> ruleInfo = onlineSimpleDao.retrieve("TMS_COM_RULE", MapWrap.map(DBConstant.TMS_COM_RULE_RULE_ID, Long.parseLong(rule_id)).getMap());
 
 			if ("del".equals(oper)) {
 				if (commonCheckService.find_ref_rule(MapUtil.getString(ruleInfo, DBConstant.TMS_COM_RULE_RULE_TXN), MapUtil.getString(ruleInfo, DBConstant.TMS_COM_RULE_RULE_NAME)))

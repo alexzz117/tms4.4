@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
@@ -22,7 +23,8 @@ public class TxnStatServiceProcessImpl implements QueryDataProcess {
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 
 	@Override
 	public Object dataProcess(Object... args) {
@@ -41,7 +43,7 @@ public class TxnStatServiceProcessImpl implements QueryDataProcess {
 					+ " and (" + DBConstant.TMS_COM_STAT_STORECOLUMN + " is not null"
 					+ " or " + DBConstant.TMS_COM_STAT_STORECOLUMN + " <> '')"
 					+ " order by " + DBConstant.TMS_COM_STAT_STAT_ID;
-			List<Map<String, Object>> statList = officialSimpleDao
+			List<Map<String, Object>> statList = onlineSimpleDao
 					.queryForList(sql);
 			for (Map<String, Object> statMap : statList) {
 				String column = CmcMapUtil.getString(statMap, DBConstant.TMS_COM_STAT_STORECOLUMN);

@@ -29,7 +29,6 @@ import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
-import cn.com.higinet.tms.manager.modules.stat.service.StatService;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 import cn.com.higinet.tms.manager.modules.userpattern.service.UserPatternService;
@@ -51,10 +50,11 @@ public class UserPatternServiceImpl implements UserPatternService {
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 	@Autowired
 	private TransDefService transDefService;
 	@Autowired
@@ -501,13 +501,13 @@ public class UserPatternServiceImpl implements UserPatternService {
 					up_name = a != null && a.size() > 0 ? MapUtil.getString( a.get( 0 ), "CODE_VALUE" ) : "";
 				}
 				else if( data_fd.equalsIgnoreCase( "CITYCODE" ) ) {
-					List<Map<String, Object>> re_list = officialSimpleDao.queryForList( "select c.CITYCODE,c.CITYNAME,r.REGIONNAME,r.REGIONCODE,co.COUNTRYNAME,co.COUNTRYCODE from " + ipLocationService.getLocationCurrName( "TMS_MGR_CITY" ) + " c ," + ipLocationService.getLocationCurrName( "TMS_MGR_REGION" ) + " r," + ipLocationService.getLocationCurrName( "TMS_MGR_COUNTRY" )
+					List<Map<String, Object>> re_list = onlineSimpleDao.queryForList( "select c.CITYCODE,c.CITYNAME,r.REGIONNAME,r.REGIONCODE,co.COUNTRYNAME,co.COUNTRYCODE from " + ipLocationService.getLocationCurrName( "TMS_MGR_CITY" ) + " c ," + ipLocationService.getLocationCurrName( "TMS_MGR_REGION" ) + " r," + ipLocationService.getLocationCurrName( "TMS_MGR_COUNTRY" )
 							+ " co where c.REGIONCODE=r.REGIONCODE and c.COUNTRYCODE = co.COUNTRYCODE and r.COUNTRYCODE=co.COUNTRYCODE and c.CITYCODE = ?", up_value );
 					up_name = re_list != null && re_list.size() > 0 ? MapUtil.getString( re_list.get( 0 ), "COUNTRYNAME" ) + "-" + MapUtil.getString( re_list.get( 0 ), "REGIONNAME" ) + "-" + MapUtil.getString( re_list.get( 0 ), "CITYNAME" ) : "";
 					up_value_t = re_list != null && re_list.size() > 0 ? MapUtil.getString( re_list.get( 0 ), "COUNTRYCODE" ) + "|" + MapUtil.getString( re_list.get( 0 ), "REGIONCODE" ) + "|" + MapUtil.getString( re_list.get( 0 ), "CITYCODE" ) : "";
 				}
 				else if( data_fd.equalsIgnoreCase( "REGIONCODE" ) ) {
-					List<Map<String, Object>> re_list = officialSimpleDao.queryForList( "select c.COUNTRYNAME,c.COUNTRYCODE,r.REGIONCODE,r.REGIONNAME from " + ipLocationService.getLocationCurrName( "TMS_MGR_REGION" ) + " r," + ipLocationService.getLocationCurrName( "TMS_MGR_COUNTRY" ) + " c where r.COUNTRYCODE=c.COUNTRYCODE and r.REGIONCODE = ?", up_value );
+					List<Map<String, Object>> re_list = onlineSimpleDao.queryForList( "select c.COUNTRYNAME,c.COUNTRYCODE,r.REGIONCODE,r.REGIONNAME from " + ipLocationService.getLocationCurrName( "TMS_MGR_REGION" ) + " r," + ipLocationService.getLocationCurrName( "TMS_MGR_COUNTRY" ) + " c where r.COUNTRYCODE=c.COUNTRYCODE and r.REGIONCODE = ?", up_value );
 					up_name = re_list != null && re_list.size() > 0 ? MapUtil.getString( re_list.get( 0 ), "COUNTRYNAME" ) + "-" + MapUtil.getString( re_list.get( 0 ), "REGIONNAME" ) : "";
 					up_value_t = re_list != null && re_list.size() > 0 ? MapUtil.getString( re_list.get( 0 ), "COUNTRYCODE" ) + "|" + MapUtil.getString( re_list.get( 0 ), "REGIONCODE" ) : "";
 				}
@@ -577,8 +577,8 @@ public class UserPatternServiceImpl implements UserPatternService {
 	 */
 	public void synUserPatternData( String userId, String statId, String patternId, String operate, boolean isPass ) {
 
-		Map<String, Object> tmp_p = tmpSimpleDao.retrieve( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
-		Map<String, Object> off_p = officialSimpleDao.retrieve( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
+		Map<String, Object> tmp_p = offlineSimpleDao.retrieve( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
+		Map<String, Object> off_p = onlineSimpleDao.retrieve( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
 
 		// 查找临时库中的数据
 		Map<String, List<String[]>> up_map_t = this.userPattern2Map( MapUtil.getString( tmp_p, "USER_PATTERN" ) + MapUtil.getString( tmp_p, "USER_PATTERN_1" ) + MapUtil.getString( tmp_p, "USER_PATTERN_C" ) );
@@ -627,7 +627,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 					in_db.put( "USER_PATTERN", up_value[0] );
 					in_db.put( "USER_PATTERN_1", up_value[1] );
 					in_db.put( "USER_PATTERN_C", up_value[2] );
-					officialSimpleDao.create( "TMS_COM_USERPATTERN", in_db );
+					onlineSimpleDao.create( "TMS_COM_USERPATTERN", in_db );
 				}
 				else {
 					// 更新正式库
@@ -640,7 +640,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 					in_db.put( "USER_PATTERN_1", up_value[1] );
 					in_db.put( "USER_PATTERN_C", up_value[2] );
 
-					officialSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
+					onlineSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
 				}
 			}
 			else {
@@ -650,7 +650,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 
 				if( MapUtil.isEmpty( up_map_t ) ) {
 					// 删除临时库
-					tmpSimpleDao.delete( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
+					offlineSimpleDao.delete( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
 				}
 				else {
 					// 更新临时库
@@ -664,7 +664,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 					in_db.put( "USER_PATTERN_1", up_value[1] );
 					in_db.put( "USER_PATTERN_C", up_value[2] );
 
-					tmpSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
+					offlineSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
 				}
 
 			}
@@ -697,7 +697,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 				in_db.put( "USER_PATTERN_1", up_value[1] );
 				in_db.put( "USER_PATTERN_C", up_value[2] );
 
-				officialSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
+				onlineSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
 			}
 			else {
 				// 授权不通过，正式库同步到临时库
@@ -719,7 +719,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 				in_db.put( "USER_PATTERN_1", up_value[1] );
 				in_db.put( "USER_PATTERN_C", up_value[2] );
 
-				tmpSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
+				offlineSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
 			}
 		}
 		else if( "del".equals( operate ) ) {
@@ -734,7 +734,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 
 				if( MapUtil.isEmpty( up_map_o ) ) {
 					// 删除临时库
-					officialSimpleDao.delete( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
+					onlineSimpleDao.delete( "TMS_COM_USERPATTERN", MapWrap.map( "USERID", userId ).getMap() );
 				}
 				else {
 					// 更新临时库
@@ -748,7 +748,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 					in_db.put( "USER_PATTERN_1", up_value[1] );
 					in_db.put( "USER_PATTERN_C", up_value[2] );
 
-					officialSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
+					onlineSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
 				}
 			}
 			else {
@@ -767,7 +767,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 					in_db.put( "USER_PATTERN", up_value[0] );
 					in_db.put( "USER_PATTERN_1", up_value[1] );
 					in_db.put( "USER_PATTERN_C", up_value[2] );
-					tmpSimpleDao.create( "TMS_COM_USERPATTERN", in_db );
+					offlineSimpleDao.create( "TMS_COM_USERPATTERN", in_db );
 				}
 				else {
 					// 更新正式库
@@ -780,7 +780,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 					in_db.put( "USER_PATTERN_1", up_value[1] );
 					in_db.put( "USER_PATTERN_C", up_value[2] );
 
-					tmpSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
+					offlineSimpleDao.update( "TMS_COM_USERPATTERN", in_db, cond_db );
 				}
 			}
 		}
@@ -803,7 +803,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 			c.put( "countrycode", country_code );
 		}
 		sql.append( " order by COUNTRYNAME" );
-		return officialSimpleDao.queryForList( sql.toString(), c );
+		return onlineSimpleDao.queryForList( sql.toString(), c );
 	}
 
 	/*
@@ -830,7 +830,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 			c.put( "citycode", city_code );
 		}
 		sql.append( " order by CITYNAME" );
-		return officialSimpleDao.queryForList( sql.toString(), c );
+		return onlineSimpleDao.queryForList( sql.toString(), c );
 	}
 
 	/*
@@ -847,7 +847,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 			c.put( "countrycode", country_code );
 		}
 		sql.append( " order by REGIONNAME" );
-		return officialSimpleDao.queryForList( sql.toString(), c );
+		return onlineSimpleDao.queryForList( sql.toString(), c );
 	}
 
 }

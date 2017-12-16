@@ -22,11 +22,12 @@ public abstract class AbstractReportData implements ReportData {
 	SimpleDao tmsSimpleDao;
 
 	@Autowired
-	SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	SimpleDao onlineSimpleDao;
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	SimpleDao offlineSimpleDao;
 	
 	@Autowired
 	@Qualifier("tmsSqlMap")
@@ -53,18 +54,18 @@ public abstract class AbstractReportData implements ReportData {
 		}
 		if (dataVO.isUseTmp()) {
 			if(isPage){
-				Page<Map<String,Object>> pageData = tmpSimpleDao.pageQuery(strSql, conds, new Order());
+				Page<Map<String,Object>> pageData = offlineSimpleDao.pageQuery(strSql, conds, new Order());
 				dataVO.setData(pageData);
 			}else{
-				List<Map<String,Object>> dataList =  tmpSimpleDao.queryForList(strSql, conds);
+				List<Map<String,Object>> dataList =  offlineSimpleDao.queryForList(strSql, conds);
 				dataVO.setData(dataList);
 			}
 		}else{
 			if(isPage){
-				Page<Map<String,Object>> pageData = officialSimpleDao.pageQuery(strSql, conds, new Order());
+				Page<Map<String,Object>> pageData = onlineSimpleDao.pageQuery(strSql, conds, new Order());
 				dataVO.setData(pageData);
 			}else{
-				List<Map<String,Object>> dataList =  officialSimpleDao.queryForList(strSql, conds);
+				List<Map<String,Object>> dataList =  onlineSimpleDao.queryForList(strSql, conds);
 				dataVO.setData(dataList);
 			}
 		}

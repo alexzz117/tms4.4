@@ -1,6 +1,5 @@
 package cn.com.higinet.tms.manager.modules.tran.service.impl;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
@@ -12,14 +11,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -37,23 +34,15 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.modules.common.CommonCheckService;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
-import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
-import cn.com.higinet.tms.manager.modules.common.SequenceService;
-import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_FD;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_REFFD;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_REFTAB;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
-import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
+import cn.com.higinet.tms.manager.modules.common.SequenceService;
+import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
-import cn.com.higinet.tms.manager.modules.query.common.model.Column;
-import cn.com.higinet.tms.manager.modules.query.common.model.Custom;
-import cn.com.higinet.tms.manager.modules.query.common.model.JsonDataProcess;
-import cn.com.higinet.tms.manager.modules.query.common.model.Result;
-import cn.com.higinet.tms.manager.modules.query.service.process.QueryDataProcess;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 import cn.com.higinet.tms.manager.modules.tran.service.TransModelService;
@@ -62,7 +51,6 @@ import cn.com.higinet.tms35.core.cache.db_rule;
 import cn.com.higinet.tms35.core.cache.db_rule_action;
 import cn.com.higinet.tms35.core.cache.db_stat;
 import cn.com.higinet.tms35.core.cache.db_strategy;
-import cn.com.higinet.tms35.core.cache.db_sw;
 
 /**
  *
@@ -82,8 +70,8 @@ public class TransModelServiceImpl implements TransModelService {
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	@Autowired
 	private SqlMap tmsSqlMap;
@@ -1355,11 +1343,11 @@ public class TransModelServiceImpl implements TransModelService {
 		Order order = new Order().desc( "TXNTIME" );
 		Page<Map<String, Object>> trafficDataPage = null;
 		if( isPage ) {
-			trafficDataPage = tmpSimpleDao.pageQuery( strsql.toString(), conds, order );
+			trafficDataPage = offlineSimpleDao.pageQuery( strsql.toString(), conds, order );
 		}
 		else {
 			// 每页查询10000条
-			trafficDataPage = tmpSimpleDao.pageQuery( strsql.toString(), conds, 1, 10000, order );
+			trafficDataPage = offlineSimpleDao.pageQuery( strsql.toString(), conds, 1, 10000, order );
 		}
 		return trafficDataPage;
 	}

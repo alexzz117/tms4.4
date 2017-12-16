@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
@@ -32,6 +33,7 @@ public class CommonCheckService {
 	private static Log log = LogFactory.getLog(CommonCheckService.class);
 	
 	@Autowired
+	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
 
 	public void checkCond(String cond, String desc, String txnid) {

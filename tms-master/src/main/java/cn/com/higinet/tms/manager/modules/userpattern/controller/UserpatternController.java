@@ -9,12 +9,14 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -47,10 +49,11 @@ public class UserpatternController {
 	private StatService statService;
 	
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 	
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 	/**
 	 * 方法描述:查询列表
 	 * @param reqs
@@ -116,7 +119,7 @@ public class UserpatternController {
 		
 		Long stat_id = MapUtil.getLong(reqs, "stat_id");
 		
-		Map<String,Object> statInfo = officialSimpleDao.retrieve("TMS_COM_STAT", MapWrap.map(DBConstant.TMS_COM_STAT_STAT_ID, stat_id).getMap());//statService.getOneStat(stat_id);
+		Map<String,Object> statInfo = onlineSimpleDao.retrieve("TMS_COM_STAT", MapWrap.map(DBConstant.TMS_COM_STAT_STAT_ID, stat_id).getMap());//statService.getOneStat(stat_id);
 		
 		Model model = new Model();
 		

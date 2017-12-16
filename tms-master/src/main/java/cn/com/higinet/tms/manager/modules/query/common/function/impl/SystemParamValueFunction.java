@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -19,7 +20,8 @@ public class SystemParamValueFunction implements Function {
 			"ENDVALUE from TMS_MGR_SYSPARAM where SYSPARAMNAME = ?";
 	
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 	
 	@Override
 	public Object execute(Object... args) {
@@ -27,7 +29,7 @@ public class SystemParamValueFunction implements Function {
 		try {
 			String[] params = (String[]) args[1];
 			String paramName = params[0];
-			List<Map<String, Object>> list = officialSimpleDao.queryForList(SQL, paramName);
+			List<Map<String, Object>> list = onlineSimpleDao.queryForList(SQL, paramName);
 			if (list == null || list.isEmpty())
 				return null;
 			return list.get(0).get("STARTVALUE");

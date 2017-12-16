@@ -36,18 +36,18 @@ import cn.com.higinet.tms.manager.dao.ConditionUtil;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
+import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
 import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
-import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.query.common.model.Column;
 import cn.com.higinet.tms.manager.modules.query.common.model.Custom;
+import cn.com.higinet.tms.manager.modules.query.common.model.Custom.Effect;
 import cn.com.higinet.tms.manager.modules.query.common.model.JsonDataProcess;
 import cn.com.higinet.tms.manager.modules.query.common.model.Result;
-import cn.com.higinet.tms.manager.modules.query.common.model.Custom.Effect;
 import cn.com.higinet.tms.manager.modules.query.service.QueryService;
 import cn.com.higinet.tms.manager.modules.query.service.process.QueryDataProcess;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
@@ -65,7 +65,8 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 	private SimpleDao cmcSimpleDao;
 
 	@Autowired
-	private SimpleDao officialSimpleDao;// 自定义查询配置信息使用正式库数据源
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 
 	@Autowired
 	private QueryDataProcess jsonDataProcess;
@@ -88,7 +89,7 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 		sql += ConditionUtil.where(where);
 		// sql += " order by " + DBConstant.TMS_COM_QUERY_CTIME + ", tcq." + DBConstant.TMS_COM_QUERY_QUERY_ID;
 		sql += " order by QUERY_ID";
-		return officialSimpleDao.queryForList(sql, conds);
+		return onlineSimpleDao.queryForList(sql, conds);
 	}
 
 	public List<Map<String, Object>> listQueryGroup(Map<String, String> conds) {
@@ -99,7 +100,7 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 		String where = ConditionUtil.and(conds, new String[][] { { "=", "GROUP_ID", "GROUP_ID" }, { "like", "GROUP_NAME", "GROUP_NAME" }, { "=", "PARENT_ID", "PARENT_ID" } });
 		sql += ConditionUtil.where(where);
 		sql += " order by ORDERBY";
-		return officialSimpleDao.queryForList(sql, conds);
+		return onlineSimpleDao.queryForList(sql, conds);
 	}
 
 	/**
@@ -107,7 +108,7 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 	 */
 	public Map<String, Object> getQueryById(long id) {
 		String sql = "select * from " + DBConstant.TMS_COM_QUERY + " tcq where tcq." + DBConstant.TMS_COM_QUERY_QUERY_ID + " = ?";
-		List<Map<String, Object>> list = officialSimpleDao.queryForList(sql, id);
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList(sql, id);
 		Map<String, Object> map = null;
 		if (list != null && list.size() == 1) {
 			map = list.get(0);
@@ -119,14 +120,14 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 		long queryId = sequenceService.getSequenceId(DBConstant.SEQ_TMS_COM_QUERY_ID);
 		query.put(DBConstant.TMS_COM_QUERY_QUERY_ID, queryId);
 		query.put(DBConstant.TMS_COM_QUERY_CTIME, CalendarUtil.parseStringToDate(CalendarUtil.getCurrentDateTime(), CalendarUtil.FORMAT14));
-		officialSimpleDao.create(DBConstant.TMS_COM_QUERY, query);
+		onlineSimpleDao.create(DBConstant.TMS_COM_QUERY, query);
 		return query;
 	}
 
 	public void updateQuery(Map<String, Object> query) {
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put(DBConstant.TMS_COM_QUERY_QUERY_ID, MapUtil.getLong(query, DBConstant.TMS_COM_QUERY_QUERY_ID));
-		officialSimpleDao.update(DBConstant.TMS_COM_QUERY, query, conds);
+		onlineSimpleDao.update(DBConstant.TMS_COM_QUERY, query, conds);
 	}
 
 	public void deleteQuery(long queryId, HttpServletRequest request) {
@@ -136,21 +137,21 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 			throw new TmsMgrServiceException("此查询与系统菜单存在引用关系：" + error.toString());
 		} else {
 			String sql = "delete from " + DBConstant.TMS_COM_QUERY + " where " + DBConstant.TMS_COM_QUERY_QUERY_ID + " = ?";
-			officialSimpleDao.executeUpdate(sql, queryId);
+			onlineSimpleDao.executeUpdate(sql, queryId);
 		}
 	}
 
 	public Map<String, Object> createQueryGroup(Map<String, Object> group) {
 		String groupId = sequenceService.getSequenceIdToString(DBConstant.SEQ_TMS_COM_QUERY_ID);
 		group.put(DBConstant.TMS_COM_QUERY_GROUP_GROUP_ID, groupId);
-		officialSimpleDao.create(DBConstant.TMS_COM_QUERY_GROUP, group);
+		onlineSimpleDao.create(DBConstant.TMS_COM_QUERY_GROUP, group);
 		return group;
 	}
 
 	public void updateQueryGroup(Map<String, Object> group) {
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put(DBConstant.TMS_COM_QUERY_GROUP_GROUP_ID, group.get(DBConstant.TMS_COM_QUERY_GROUP_GROUP_ID));
-		officialSimpleDao.update(DBConstant.TMS_COM_QUERY_GROUP, group, conds);
+		onlineSimpleDao.update(DBConstant.TMS_COM_QUERY_GROUP, group, conds);
 	}
 
 	public void deleteQueryGroup(long groupId, HttpServletRequest request) {
@@ -174,8 +175,8 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 	public void deleteQueryAndGroup(long groupId) {
 		String qsql = "delete from " + DBConstant.TMS_COM_QUERY + " where " + DBConstant.TMS_COM_QUERY_GROUP_ID + " = ?";
 		String gsql = "delete from " + DBConstant.TMS_COM_QUERY_GROUP + " where " + DBConstant.TMS_COM_QUERY_GROUP_GROUP_ID + " = ?";
-		officialSimpleDao.executeUpdate(qsql, groupId);
-		officialSimpleDao.executeUpdate(gsql, groupId);
+		onlineSimpleDao.executeUpdate(qsql, groupId);
+		onlineSimpleDao.executeUpdate(gsql, groupId);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -331,7 +332,7 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 	 */
 	public Map<String, Object> getQueryTableByTabName(String tabName) {
 		String tabSql = "select * from " + TMS_COM_TAB.TABLE_NAME + " tab where tab." + TMS_COM_TAB.TAB_NAME + " = ?";// 查询表信息
-		List<Map<String, Object>> tabList = officialSimpleDao.queryForList(tabSql, tabName);
+		List<Map<String, Object>> tabList = onlineSimpleDao.queryForList(tabSql, tabName);
 		Map<String, Object> tabMap = null;
 		if (tabList != null && tabList.size() > 0) {
 			tabMap = tabList.get(0);
@@ -341,7 +342,7 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 				if (CmcStringUtil.isBlank(basetab)) {
 					String parentSql = "select q.tab_name, q.tab_type, q.view_cond, q.base_tab, q.parent_tab from tms_com_tab q where q.tab_name in (" + TransCommon.arr2str(TransCommon.cutToIds(tabName)) + ")";
 					parentSql = "select distinct t." + TMS_COM_TAB.BASE_TAB + " from (" + parentSql + ") t where t." + TMS_COM_TAB.BASE_TAB + " is not null";
-					List<Map<String, Object>> list = officialSimpleDao.queryForList(parentSql);
+					List<Map<String, Object>> list = onlineSimpleDao.queryForList(parentSql);
 					basetab = MapUtil.getString(list.get(0), TMS_COM_TAB.BASE_TAB);
 					tabMap.put(TMS_COM_TAB.BASE_TAB, basetab);
 				}
@@ -354,13 +355,13 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 		String sql = null;
 		if (tabType.equals(StaticParameters.TAB_TYPE_1)) {
 			sql = "select * from " + DBConstant.TMS_COM_FD + " fd where fd." + DBConstant.TMS_COM_FD_TAB_NAME + " = ? and (fd." + DBConstant.TMS_COM_FD_FD_NAME + " is not null or fd." + DBConstant.TMS_COM_FD_FD_NAME + " <> '') order by fd." + DBConstant.TMS_COM_FD_ORDERBY;
-			return officialSimpleDao.queryForList(sql, tabName);
+			return onlineSimpleDao.queryForList(sql, tabName);
 		} else {
 			String parentSql = "select q.tab_name, q.tab_type, q.view_cond, q.base_tab, q.parent_tab from tms_com_tab q where q.tab_name in (" + TransCommon.arr2str(TransCommon.cutToIds(tabName)) + ")";
 			parentSql = "select t." + TMS_COM_TAB.TAB_NAME + " from (" + parentSql + ") t";
 			sql = "select * from " + DBConstant.TMS_COM_FD + " fd where fd." + DBConstant.TMS_COM_FD_TAB_NAME + " in (" + parentSql + ")" + " and (fd." + DBConstant.TMS_COM_FD_FD_NAME + " is not null or fd." + DBConstant.TMS_COM_FD_FD_NAME + " <> '')" + " order by fd."
 					+ DBConstant.TMS_COM_FD_TAB_NAME + ", fd." + DBConstant.TMS_COM_FD_ORDERBY;// 查询表字段及其父表字段信息
-			return officialSimpleDao.queryForList(sql);
+			return onlineSimpleDao.queryForList(sql);
 		}
 	}
 

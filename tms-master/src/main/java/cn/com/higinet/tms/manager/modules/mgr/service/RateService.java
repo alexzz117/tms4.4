@@ -11,7 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,16 +41,16 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
  */
 @Service("rateService")
 public class RateService {
-
-	private final Logger log = LoggerFactory.getLogger( this.getClass() );
+	
+	private static final Logger log = LoggerFactory.getLogger( RateService.class );
 
 	@Autowired
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	@Autowired
 	private TransDefService transDefService;
@@ -691,7 +693,7 @@ public class RateService {
 
 	public List<Map<String, Object>> getTransHitRuleList( String txnCode, String txnType ) {
 		String ruleHitsql = "select TRIGID, TXNCODE, TXNTYPE, RULEID, MESSAGE, NUMTIMES, " + "CREATETIME, RULE_SCORE from TMS_RUN_RULETRIG where TXNCODE = ?";
-		List<Map<String, Object>> trigList = tmpSimpleDao.queryForList( ruleHitsql, txnCode );
+		List<Map<String, Object>> trigList = offlineSimpleDao.queryForList( ruleHitsql, txnCode );
 		if( trigList == null || trigList.isEmpty() ) {
 			return null;
 		}
@@ -721,7 +723,7 @@ public class RateService {
 		if( totalTrigRules != trigList.size() ) {
 			ruleTempSql = "select RULE_ID, RULE_NAME, RULE_DESC, RULE_COND, RULE_COND_IN, " + "RULE_SHORTDESC, EVAL_TYPE, DISPOSAL from TMS_COM_RULE_TEMP where RULE_TXN in ("
 					+ TransCommon.arr2str( TransCommon.cutToIds( txnType ) ) + ")";
-			List<Map<String, Object>> ruleTempList = tmpSimpleDao.queryForList( ruleTempSql );
+			List<Map<String, Object>> ruleTempList = offlineSimpleDao.queryForList( ruleTempSql );
 			if( !ruleTempList.isEmpty() ) {
 				for( int i = 0, len = trigList.size(); i < len; i++ ) {
 					Map<String, Object> trigMap = trigList.get( i );
@@ -754,7 +756,7 @@ public class RateService {
 		if( !StringUtil.isEmpty( userId ) ) {
 			sql.append( " and userid=" + "'" + userId + "'" );
 		}
-		Page<Map<String, Object>> rateHistoryListPage = tmpSimpleDao.pageQuery( sql.toString(), reqs, new Order() );
+		Page<Map<String, Object>> rateHistoryListPage = offlineSimpleDao.pageQuery( sql.toString(), reqs, new Order() );
 		return rateHistoryListPage;
 	}
 

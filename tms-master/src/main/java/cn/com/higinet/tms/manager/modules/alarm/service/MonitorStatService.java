@@ -17,17 +17,20 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
-import cn.com.higinet.tms.manager.modules.alarm.service.MonitorStatService;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
+
+/**
+ * @author zhang.lei
+ */
 
 @Service("monitorStatService")
 public class MonitorStatService {
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	protected SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	protected SimpleDao offlineSimpleDao;
 
 	@Autowired
 	protected SqlMap sqlMap;
@@ -57,7 +60,7 @@ public class MonitorStatService {
 
 		Map<String, Object> txnConds = getTxnStatCondsMap( traffic );// 组织不带地区交易统计的查询条件Map
 		Map<String, Object> txnAreaConds = getTxnAreaStatCondsMap( traffic, txnConds );// 组织带地区交易统计的查询条件Map
-		Map<String, Object> txnAreaStatMap = tmpSimpleDao.retrieve( "TMS_MONITOR_TXN_AREA_STAT", txnAreaConds );
+		Map<String, Object> txnAreaStatMap = offlineSimpleDao.retrieve( "TMS_MONITOR_TXN_AREA_STAT", txnAreaConds );
 
 		String disposal = MapUtil.getString( traffic, DBConstant.TMS_RUN_TRAFFICDATA_DISPOSAL );// 处置方式
 		String correct = MapUtil.getString( traffic, DBConstant.TMS_RUN_TRAFFICDATA_ISCORRECT );// 是否认证通过
@@ -127,12 +130,12 @@ public class MonitorStatService {
 
 		if( MapUtil.isEmpty( txnAreaStatMap ) ) {
 			txnAreaConds.putAll( newStatMap );
-			tmpSimpleDao.create( "TMS_MONITOR_TXN_AREA_STAT", txnAreaConds );
+			offlineSimpleDao.create( "TMS_MONITOR_TXN_AREA_STAT", txnAreaConds );
 		}
 		else {
 			monitorStatReCalculate( txnAreaStatMap, modelrisk_authpass_confirmrisk_number, modelrisk_authpass_confirmnorisk_number, modelrisk_authnotpass_confirmrisk_number,
 					modelrisk_authnotpass_confirmnorisk_number, modelnorisk_confirmrisk_number, modelnorisk_confirmnorisk_number );
-			tmpSimpleDao.update( "TMS_MONITOR_TXN_AREA_STAT", txnAreaStatMap, txnAreaConds );
+			offlineSimpleDao.update( "TMS_MONITOR_TXN_AREA_STAT", txnAreaStatMap, txnAreaConds );
 		}
 	}
 
@@ -176,7 +179,7 @@ public class MonitorStatService {
 
 	private long getMonitorStatTime( long txntime ) {
 		String sql = "select s.TIME from TMS_MONITOR_TXN_AREA_STAT s " + "where s.TIME <= " + txntime + " order by s.TIME desc";
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList( sql );
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList( sql );
 		if( list == null || list.isEmpty() ) return txntime;
 		return Long.valueOf( String.valueOf( list.get( 0 ).get( "TIME" ) ) );
 	}
@@ -208,7 +211,7 @@ public class MonitorStatService {
 			tmp = "PROCESS_NUMBER=PROCESS_NUMBER-1, UNPROCESS_NUMBER=UNPROCESS_NUMBER+1";
 		}
 		String _assignTime = CalendarUtil.parseTimeMillisToDateTime( assignTime, CalendarUtil.FORMAT19.toPattern() );
-		tmpSimpleDao.executeUpdate( String.format( sql, tmp ), operId, _assignTime, (isAutoAssign ? "0" : "1") );
+		offlineSimpleDao.executeUpdate( String.format( sql, tmp ), operId, _assignTime, (isAutoAssign ? "0" : "1") );
 	}
 
 	/**
@@ -228,26 +231,26 @@ public class MonitorStatService {
 		if( oldStatus ) {
 			// 已进行过分派
 			String _oldAssignTime = CalendarUtil.parseTimeMillisToDateTime( oldAssignTime, CalendarUtil.FORMAT19.toPattern() );
-			Map<String, Object> oldOper = tmpSimpleDao.retrieve( "TMS_MGR_ALARM_OPERATOR_STAT",
+			Map<String, Object> oldOper = offlineSimpleDao.retrieve( "TMS_MGR_ALARM_OPERATOR_STAT",
 					MapWrap.map( "OPERATOR_ID", oldOperId ).put( "ASSIGN_TIME", _oldAssignTime ).put( "SRC_STATDATA", "1" ).getMap() );
 			if( MapUtil.isEmpty( oldOper ) ) {
-				tmpSimpleDao.executeUpdate( insert, oldOperId, _oldAssignTime, "1", -1, 0, -1, null, null, null );
+				offlineSimpleDao.executeUpdate( insert, oldOperId, _oldAssignTime, "1", -1, 0, -1, null, null, null );
 			}
 			else {
 				String tmp = "ASSIGN_NUMBER=ASSIGN_NUMBER-1, UNPROCESS_NUMBER=UNPROCESS_NUMBER-1";
-				tmpSimpleDao.executeUpdate( String.format( update, tmp ), oldOperId, _oldAssignTime, "1" );
+				offlineSimpleDao.executeUpdate( String.format( update, tmp ), oldOperId, _oldAssignTime, "1" );
 			}
 		}
 		//查询新处理人员是否存在记录
 		String _newAssignTime = CalendarUtil.parseTimeMillisToDateTime( newAssignTime, CalendarUtil.FORMAT19.toPattern() );
-		Map<String, Object> newOper = tmpSimpleDao.retrieve( "TMS_MGR_ALARM_OPERATOR_STAT",
+		Map<String, Object> newOper = offlineSimpleDao.retrieve( "TMS_MGR_ALARM_OPERATOR_STAT",
 				MapWrap.map( "OPERATOR_ID", newOperID ).put( "ASSIGN_TIME", _newAssignTime ).put( "SRC_STATDATA", "1" ).getMap() );
 		if( MapUtil.isEmpty( newOper ) ) {
-			tmpSimpleDao.executeUpdate( insert, newOperID, _newAssignTime, "1", 1, 0, 1, null, null, null );
+			offlineSimpleDao.executeUpdate( insert, newOperID, _newAssignTime, "1", 1, 0, 1, null, null, null );
 		}
 		else {
 			String tmp = "ASSIGN_NUMBER=ASSIGN_NUMBER+1, UNPROCESS_NUMBER=UNPROCESS_NUMBER+1";
-			tmpSimpleDao.executeUpdate( String.format( update, tmp ), newOperID, _newAssignTime, "1" );
+			offlineSimpleDao.executeUpdate( String.format( update, tmp ), newOperID, _newAssignTime, "1" );
 		}
 	}
 
@@ -273,7 +276,7 @@ public class MonitorStatService {
 			String readSql = "select count(*) STAT_SIZE from TMS_MONITOR_TXN_FRAUD_STAT t where t.COUNTRYCODE = :COUNTRYCODE "
 					+ "and t.REGIONCODE = :REGIONCODE and t.CITYCODE = :CITYCODE and t.CHANNELID = :CHANCODE "
 					+ "and t.TXNID = :TXNTYPE and t.TIME = :TIME and t.MODEL_ID = :MODELID and t.DISPOSAL = :DISPOSAL " + "and t.FRAUD_TYPE = :FRAUD_TYPE";
-			List<Map<String, Object>> list = tmpSimpleDao.queryForList( readSql, map );
+			List<Map<String, Object>> list = offlineSimpleDao.queryForList( readSql, map );
 			Map<String, Object> statMap = list.get( 0 );
 			long statSize = MapUtil.getLong( statMap, "STAT_SIZE" );
 			String sql = null;
@@ -289,7 +292,7 @@ public class MonitorStatService {
 						+ ":CITYCODE, :CHANCODE, :TXNTYPE, :TIME, :MODTIME, :MODELID, :DISPOSAL, :FRAUD_TYPE, 1)";
 			}
 			map.put( "MODTIME", System.currentTimeMillis() );
-			tmpSimpleDao.executeUpdate( sql, map );
+			offlineSimpleDao.executeUpdate( sql, map );
 		}
 	}
 }

@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -23,13 +23,15 @@ import cn.com.higinet.tms.manager.modules.datamgr.common.DataConfig;
 @Service("commonTableOperService")
 public class CommonTableOperService implements TableOperService {
 
-	private final static Log logger = LogFactory.getLog( CommonTableOperService.class );
+	private static final Logger logger = LoggerFactory.getLogger( CommonTableOperService.class );
+	
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	@Autowired
 	private SqlMap tmsSqlMap;
@@ -81,14 +83,14 @@ public class CommonTableOperService implements TableOperService {
 
 		if( StaticParameters.AUTH_STATUS_1.equals( authFlag ) ) {
 			//如果授权通过查询新数据，用于更新旧(正式表)数据
-			dataList = tmpSimpleDao.queryForList( sql );
+			dataList = offlineSimpleDao.queryForList( sql );
 			syncDataNewToOld( dataList, tableName, whereSql );
 		}
 		else if( StaticParameters.AUTH_STATUS_2.equals( authFlag ) ) {
 
 			//如果授权未通过查询旧数据，用于将新(临时表)数据覆盖
 			//先查询正式表
-			dataList = officialSimpleDao.queryForList( sql );
+			dataList = onlineSimpleDao.queryForList( sql );
 			if( dataList != null && !dataList.isEmpty() ) {
 				//如果存在记录那么将新(临时表)数据覆盖
 				syncDataOldToNew( dataList, tableName, whereSql );
@@ -96,13 +98,13 @@ public class CommonTableOperService implements TableOperService {
 			else {
 				//如果不存在记录，如果是主表说明新数据是新增的，则将其状态改为删除；如果是从表则不能配置状态字段
 				if( !StringUtil.isEmpty( tableConfig.getStatusKey() ) ) {
-					List<Map<String, Object>> newDataList = tmpSimpleDao.queryForList( sql );
+					List<Map<String, Object>> newDataList = offlineSimpleDao.queryForList( sql );
 					for( int i = 0; i < newDataList.size(); i++ ) {
 						Map<String, Object> data = newDataList.get( i );
 						data.put( tableConfig.getStatusKey(), ConfigAttrabute.STATUSDEL );
 						Map<String, String> conds = new HashMap<String, String>();
 						conds.put( pk, StringUtil.parseToString( data.get( pk ) ) );
-						tmpSimpleDao.update( tableName, data, conds );
+						offlineSimpleDao.update( tableName, data, conds );
 					}
 				}
 				else {
@@ -232,11 +234,11 @@ public class CommonTableOperService implements TableOperService {
 	private void syncDataNewToOld( List<Map<String, Object>> dataList, String tableName, String whereSql ) {
 		try {
 			String delSql = "delete from " + tableName + " where " + whereSql;
-			int i = officialSimpleDao.executeUpdate( delSql );
+			int i = onlineSimpleDao.executeUpdate( delSql );
 			if( i > -1 ) {
 				if( dataList != null && dataList.size() > 0 ) {
 					for( Map<String, Object> data : dataList ) {
-						officialSimpleDao.create( tableName, data );
+						onlineSimpleDao.create( tableName, data );
 					}
 				}
 			}
@@ -258,10 +260,10 @@ public class CommonTableOperService implements TableOperService {
 		if( dataList != null ) {
 			try {
 				String delSql = "delete from " + tableName + " where " + whereSql;
-				int i = tmpSimpleDao.executeUpdate( delSql );
+				int i = offlineSimpleDao.executeUpdate( delSql );
 				if( i > -1 ) {
 					for( Map<String, Object> data : dataList ) {
-						tmpSimpleDao.create( tableName, data );
+						offlineSimpleDao.create( tableName, data );
 					}
 				}
 			}

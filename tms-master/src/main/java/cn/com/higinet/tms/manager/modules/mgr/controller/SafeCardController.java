@@ -17,6 +17,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.SafeCardService;
 @Controller("safeCardController")
 @RequestMapping("/tms/safeCard")
 public class SafeCardController {
+	
 	@Autowired
 	private SafeCardService safeCardService;
 		

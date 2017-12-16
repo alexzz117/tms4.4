@@ -7,7 +7,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.Query;
 
-public class IPAddressKowalski {
+public class IPAddressUtil {
 
 	public static int getTomcatPort() {
 		try {
@@ -18,7 +18,7 @@ public class IPAddressKowalski {
 		}
 		catch( Exception e ) {
 			e.printStackTrace();
-			return 8081;
+			return 8080;
 		}
 
 	}

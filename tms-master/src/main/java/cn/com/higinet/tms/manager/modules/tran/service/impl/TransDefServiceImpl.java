@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -18,9 +16,9 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.modules.auth.exception.TmsMgrAuthDepException;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
-import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.ROOT_NODE;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
+import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
@@ -44,8 +42,8 @@ public class TransDefServiceImpl implements TransDefService {
 	private SimpleDao tmsSimpleDao;
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	/**
 	 * 返回全部可用交易
@@ -162,7 +160,7 @@ public class TransDefServiceImpl implements TransDefService {
 		 * String sql = "select auth.*,record.real_oper from tms_mgr_authinfo auth,tms_mgr_authrecord record" + " where record.auth_id = convert(varchar,auth.auth_id) and query_pkvalue = '"+tab_name+"' and module_id='tranConf' and auth_status='0'" + " and record.real_oper = 'd' and record.is_main = '1'";
 		 */
 		String sql = tmsSqlMap.getSql("tms.auth.query");
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList(sql, tab_name);// 授权的表都在离线库
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, tab_name);// 授权的表都在离线库
 
 		StringBuffer sb = new StringBuffer();
 		for (Map<String, Object> depInfoMap : list) {

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +26,14 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 /**
  * 实时运行监控服务类
  * @author wangsch modified since 2013-05-24
+ * @author zhang.lei
  */
 @Service("monitorService")
 public class MonitorServiceImpl extends ApplicationObjectSupport implements MonitorService{
-	@Autowired
-	private SimpleDao officialSimpleDao;
 	
-	public void setOfficialSimpleDao(SimpleDao officialSimpleDao) {
-		this.officialSimpleDao = officialSimpleDao;
-	}
+	@Autowired
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 
 	public DataVO getDataList(DataVO dataVO, boolean isPage) {
 		String dataType = dataVO.getDataType();
@@ -88,7 +88,7 @@ public class MonitorServiceImpl extends ApplicationObjectSupport implements Moni
 		
 		sb.append("select " + TMS_COM_TAB.TAB_NAME +", " + TMS_COM_TAB.TAB_DESC +" from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_NAME + " in("+TransCommon.arr2str(TransCommon.cutToIds(txnid))+") ORDER BY TAB_NAME desc");
 		
-		List<Map<String, Object>> fartherTranDef = officialSimpleDao.queryForList(sb.toString());
+		List<Map<String, Object>> fartherTranDef = onlineSimpleDao.queryForList(sb.toString());
 		
 		//交易名称，全路径
 		String txnName = "";

@@ -10,8 +10,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +39,14 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
  */
 @Service("actionService35")
 public class AcService {
-	
+
 	private static final Logger log = LoggerFactory.getLogger( AcService.class );
-	
+
 	@Autowired
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
+	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
 	@Autowired
 	private SequenceService sequenceService;

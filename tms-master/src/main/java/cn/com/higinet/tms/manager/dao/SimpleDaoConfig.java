@@ -1,6 +1,7 @@
 package cn.com.higinet.tms.manager.dao;
 
 import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +43,8 @@ public class SimpleDaoConfig {
 	}
 
 	@Primary
-	@Bean("tmpSimpleDao")
-	public SimpleDao tmpSimpleDao() {
+	@Bean("offlineSimpleDao")
+	public SimpleDao offlineSimpleDao() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
 		jdbcTemplate.setDataSource( offlineDataSource );
 
@@ -62,8 +63,8 @@ public class SimpleDaoConfig {
 		return simpleDao;
 	}
 
-	@Bean("officialSimpleDao")
-	public SimpleDao officialSimpleDao() {
+	@Bean("onlineSimpleDao")
+	public SimpleDao onlineSimpleDao() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
 		jdbcTemplate.setDataSource( onlineDataSource );
 

@@ -15,8 +15,6 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -26,6 +24,8 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -37,10 +37,10 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
-import cn.com.higinet.tms.manager.modules.common.SequenceService;
-import cn.com.higinet.tms.manager.modules.common.SqlWhereHelper;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_FD;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
+import cn.com.higinet.tms.manager.modules.common.SequenceService;
+import cn.com.higinet.tms.manager.modules.common.SqlWhereHelper;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
@@ -59,25 +59,22 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
 /**
  * 名单管理、查看服务类
  * @author zlq
+ * @author zhang.lei
  */
 @Service("nameListService")
 public class NameListService {
-
-	private static Log log = LogFactory.getLog( NameListService.class );
+	private static final Logger log = LoggerFactory.getLogger( NameListService.class );
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	public SimpleDao getSimpleDao() {
-		return tmpSimpleDao;
+		return offlineSimpleDao;
 	}
 
 	@Autowired
 	private DataSource officialTmsDataSource;
-
-	//	@Autowired
-	//	private DataSource tmpTmsDataSource;
 
 	@Autowired
 	private SequenceService sequenceService;
@@ -91,9 +88,7 @@ public class NameListService {
 	 */
 	public Page<Map<String, Object>> listNameList( Map<String, String> conds ) {
 		StringBuilder sql = new StringBuilder();
-		sql.append( "SELECT ROSTER.ROSTERID,ROSTER.ROSTERTYPE, ROSTER.DATATYPE, ROSTER.ROSTERNAME, ROSTER.ROSTERDESC, ROSTER.ISCACHE, ROSTER.CREATETIME, ROSTER.REMARK, "
-				+ "(SELECT COUNT(1) FROM TMS_MGR_ROSTERVALUE ROSTERVALUE WHERE ROSTERVALUE.ROSTERID=ROSTER.ROSTERID) VALUECOUNT " + "FROM TMS_MGR_ROSTER ROSTER "
-				+ "WHERE STATUS!='2'" );
+		sql.append( "SELECT ROSTER.ROSTERID,ROSTER.ROSTERTYPE, ROSTER.DATATYPE, ROSTER.ROSTERNAME, ROSTER.ROSTERDESC, ROSTER.ISCACHE, ROSTER.CREATETIME, ROSTER.REMARK, " + "(SELECT COUNT(1) FROM TMS_MGR_ROSTERVALUE ROSTERVALUE WHERE ROSTERVALUE.ROSTERID=ROSTER.ROSTERID) VALUECOUNT " + "FROM TMS_MGR_ROSTER ROSTER " + "WHERE STATUS!='2'" );
 		if( !StringUtil.isEmpty( conds.get( "DATATYPE" ) ) ) {
 			sql.append( " AND ROSTER.DATATYPE=:DATATYPE" );
 		}
@@ -253,8 +248,7 @@ public class NameListService {
 		rosterIds = rosterIds.substring( 1 );
 
 		// 删除名单列表SQL
-		String rosterSql = "UPDATE " + DBConstant.TMS_MGR_ROSTER + " SET " + DBConstant.TMS_MGR_ROSTER_STATUS + "='2', " + DBConstant.TMS_MGR_ROSTER_MODIFYTIME + "="
-				+ System.currentTimeMillis() + " WHERE " + DBConstant.TMS_MGR_ROSTER_ROSTERID + " IN (" + rosterIds + ")";
+		String rosterSql = "UPDATE " + DBConstant.TMS_MGR_ROSTER + " SET " + DBConstant.TMS_MGR_ROSTER_STATUS + "='2', " + DBConstant.TMS_MGR_ROSTER_MODIFYTIME + "=" + System.currentTimeMillis() + " WHERE " + DBConstant.TMS_MGR_ROSTER_ROSTERID + " IN (" + rosterIds + ")";
 		// 删除名单值列表SQL
 		String rosterValueSql = "DELETE FROM " + DBConstant.TMS_MGR_ROSTERVALUE + " WHERE " + DBConstant.TMS_MGR_ROSTER_ROSTERID + " IN (" + rosterIds + ")";
 
@@ -567,8 +561,7 @@ public class NameListService {
 
 	public long getRosterListForExist( Map<String, Object> conds ) {
 		String strSql = "SELECT 1 FROM TMS_MGR_ROSTERVALUE WHERE ROSTERID = ? AND  ? >= TO_NUMBER(NUMSTART) AND ? <= TO_NUMBER(NUMEND)";
-		return getSimpleDao().count( strSql, conds.get( DBConstant.TMS_MGR_ROSTERVALUE_ROSTERID ), conds.get( DBConstant.TMS_MGR_ROSTERVALUE_NUMSTART ),
-				conds.get( DBConstant.TMS_MGR_ROSTERVALUE_NUMSTART ) );
+		return getSimpleDao().count( strSql, conds.get( DBConstant.TMS_MGR_ROSTERVALUE_ROSTERID ), conds.get( DBConstant.TMS_MGR_ROSTERVALUE_NUMSTART ), conds.get( DBConstant.TMS_MGR_ROSTERVALUE_NUMSTART ) );
 	}
 
 	/**
@@ -776,7 +769,7 @@ public class NameListService {
 			}
 		}
 		catch( Exception e ) {
-			log.error( e );
+			log.error( e.getMessage(), e );
 			return e.getMessage();
 		}
 		return rosterValueList.size();
@@ -1128,8 +1121,7 @@ public class NameListService {
 	 * @return 查询到的名单值列表
 	 */
 	public List<Map<String, Object>> listValueListById( Map<String, String> conds ) {
-		String sql = "SELECT ROSTER.ROSTERDESC,ROSTERVALUE.ROSTERVALUE,ROSTERVALUE.ENABLETIME,ROSTERVALUE.DISABLETIME,ROSTERVALUE.REMARK"
-				+ " FROM TMS_MGR_ROSTERVALUE ROSTERVALUE,TMS_MGR_ROSTER ROSTER" + " WHERE ROSTERVALUE.ROSTERID=ROSTER.ROSTERID AND ROSTERVALUE.ROSTERID=" + conds.get( "rosterId" );
+		String sql = "SELECT ROSTER.ROSTERDESC,ROSTERVALUE.ROSTERVALUE,ROSTERVALUE.ENABLETIME,ROSTERVALUE.DISABLETIME,ROSTERVALUE.REMARK" + " FROM TMS_MGR_ROSTERVALUE ROSTERVALUE,TMS_MGR_ROSTER ROSTER" + " WHERE ROSTERVALUE.ROSTERID=ROSTER.ROSTERID AND ROSTERVALUE.ROSTERID=" + conds.get( "rosterId" );
 
 		List<Map<String, Object>> rosterValueList = getSimpleDao().queryForList( sql );
 		for( Map<String, Object> rosterValue : rosterValueList ) {
@@ -1182,8 +1174,7 @@ public class NameListService {
 	 * @return boolean 重复:true,不重复:false
 	 */
 	public boolean isDuplicateByRosterAndTransAttr( String rosterName ) {
-		String sql = "select 1 from " + TMS_COM_FD.TABLE_NAME + " fd inner join " + TMS_COM_TAB.TABLE_NAME + " tab on fd." + TMS_COM_FD.TAB_NAME + " = tab." + TMS_COM_TAB.TAB_NAME
-				+ " where fd." + TMS_COM_FD.REF_NAME + " = ? and tab." + TMS_COM_TAB.TAB_TYPE + " = '4'";
+		String sql = "select 1 from " + TMS_COM_FD.TABLE_NAME + " fd inner join " + TMS_COM_TAB.TABLE_NAME + " tab on fd." + TMS_COM_FD.TAB_NAME + " = tab." + TMS_COM_TAB.TAB_NAME + " where fd." + TMS_COM_FD.REF_NAME + " = ? and tab." + TMS_COM_TAB.TAB_TYPE + " = '4'";
 		long dupCount = getSimpleDao().count( sql, rosterName.toUpperCase() );
 		return dupCount > 0;
 	}

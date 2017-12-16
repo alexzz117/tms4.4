@@ -19,7 +19,6 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
-import cn.com.higinet.tms.manager.modules.alarm.service.MonitorStatService;
 import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
@@ -36,14 +35,16 @@ public class AlarmEventService {
 	private HttpServletRequest request;
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	@Autowired
+	@Qualifier("offlineDataSource")
 	private DataSource tmpTmsDataSource;
 
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 
 	@Autowired
 	private SequenceService sequenceService;
@@ -83,7 +84,7 @@ public class AlarmEventService {
 		String sql = "select TXNCODE, CHANCODE, TXNID, TXNTYPE, USERID, COUNTRYCODE, REGIONCODE, CITYCODE, TXNTIME, "
 				+ "DISPOSAL, MODELID, STRATEGY, PSSTATUS, ASSIGNID, ASSIGNTIME, OPERID, OPERTIME, AUDITID, AUDITTIME, "
 				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE = :TXN_CODE";
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList( sql, cond );
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList( sql, cond );
 		if( list == null || list.isEmpty() ) return null;
 		return list.get( 0 );
 	}
@@ -92,7 +93,7 @@ public class AlarmEventService {
 		String sql = "select TXNCODE, CHANCODE, TXNID, TXNTYPE, USERID, COUNTRYCODE, REGIONCODE, CITYCODE, TXNTIME, "
 				+ "DISPOSAL, MODELID, STRATEGY, PSSTATUS, ASSIGNID, ASSIGNTIME, OPERID, OPERTIME, AUDITID, AUDITTIME, "
 				+ "FRAUD_TYPE from TMS_RUN_TRAFFICDATA t where (t.psstatus = '02' or t.psstatus = '04') and t.DISPOSAL!='PS04' and USERID = :USERID and OPERID = :OPERID";
-		return tmpSimpleDao.queryForList( sql, cond );
+		return offlineSimpleDao.queryForList( sql, cond );
 	}
 
 	/**
@@ -140,7 +141,7 @@ public class AlarmEventService {
 		}
 		sb.append( " where TXNCODE = :TXN_CODE" );
 		sql += sb.toString();
-		tmpSimpleDao.executeUpdate( sql, cond );
+		offlineSimpleDao.executeUpdate( sql, cond );
 	}
 
 	/**
@@ -164,14 +165,14 @@ public class AlarmEventService {
 		map.put( "PS_TIME", System.currentTimeMillis() );
 		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME,FRAUD_TYPE,SHORT_ACTION)"
 				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME, :FRAUD_TYPE, :SHORT_ACTION)";
-		tmpSimpleDao.executeUpdate( sql, map );
+		offlineSimpleDao.executeUpdate( sql, map );
 		return map;
 	}
 
 	public List<Map<String, Object>> getAlarmProcessActions( Map<String, String> cond ) {
 		String sql = "select AC_ID, TXN_CODE, AC_NAME, AC_COND, AC_COND_IN, AC_EXPR, AC_EXPR_IN,AC_TYPE, CREATE_TIME, "
 				+ "EXECUE_TIME, EXECUE_RESULT, EXECUE_INFO from TMS_MGR_ALARM_ACTION where TXN_CODE = :TXN_CODE AND AC_TYPE =  :AC_TYPE";
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList( sql, cond );
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList( sql, cond );
 		if( list == null || list.isEmpty() ) return null;
 		return list;
 	}
@@ -189,13 +190,13 @@ public class AlarmEventService {
 		_map_.put( "CREATE_TIME", System.currentTimeMillis() );
 		String sql = "insert into TMS_MGR_ALARM_ACTION(AC_ID, TXN_CODE, AC_NAME, AC_COND, AC_COND_IN, AC_EXPR, AC_EXPR_IN, CREATE_TIME, AC_TYPE)"
 				+ "values(:AC_ID, :TXN_CODE, :AC_NAME, :AC_COND, :AC_COND_IN, :AC_EXPR, :AC_EXPR_IN, :CREATE_TIME, :AC_TYPE)";
-		tmpSimpleDao.executeUpdate( sql, _map_ );
+		offlineSimpleDao.executeUpdate( sql, _map_ );
 		return _map_;
 	}
 
 	public void delOneAlarmProcessAction( Map<String, String> cond ) {
 		String sql = "delete from TMS_MGR_ALARM_ACTION where AC_ID = ?";
-		tmpSimpleDao.executeUpdate( sql, MapUtil.getString( cond, "AC_ID" ) );
+		offlineSimpleDao.executeUpdate( sql, MapUtil.getString( cond, "AC_ID" ) );
 	}
 
 	/**
@@ -212,7 +213,7 @@ public class AlarmEventService {
 			map.put( "AC_ID", acId );
 			list.add( map );
 		}
-		tmpSimpleDao.batchUpdate( sql, list );
+		offlineSimpleDao.batchUpdate( sql, list );
 	}
 
 	/**
@@ -223,7 +224,7 @@ public class AlarmEventService {
 	public List<Map<String, Object>> getAlarmProcessInfoList( Map<String, String> cond ) {
 		String sql = "select p.PS_ID, p.TXN_CODE, p.PS_OPERID, p.PS_TYPE, p.PS_RESULT, p.PS_INFO, p.PS_TIME, p.SHORT_ACTION, o.LOGIN_NAME "
 				+ "from TMS_MGR_ALARM_PROCESS p left join CMC_OPERATOR o on p.PS_OPERID = o.OPERATOR_ID where p.TXN_CODE = :TXN_CODE order by p.PS_ID";
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList( sql, cond );
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList( sql, cond );
 		if( list == null || list.isEmpty() ) return null;
 
 		List<Map<String, Object>> func_list = shortActionList( null );
@@ -523,7 +524,7 @@ public class AlarmEventService {
 	 */
 	private Map<String, Object> getLastAlarmProcessInfo( String txncode ) {
 		String sql = "SELECT PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME, SHORT_ACTION, FRAUD_TYPE FROM TMS_MGR_ALARM_PROCESS  WHERE TXN_CODE = ? ORDER BY PS_TIME DESC";
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList( sql, txncode );
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList( sql, txncode );
 		if( list == null || list.isEmpty() ) return null;
 		return list.get( 0 );
 	}
@@ -538,7 +539,7 @@ public class AlarmEventService {
 	private String getUserMobile( String userId ) {
 		String mobile = null;
 		String sql = "select MOBILE from TMS_RUN_USER u where u.USERID = ?";
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList( sql, userId );
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList( sql, userId );
 		if( null != list && list.size() > 0 ) {
 			Map<String, Object> m = list.get( 0 );
 			mobile = (String) m.get( "MOBILE" );
@@ -556,7 +557,7 @@ public class AlarmEventService {
 	public List<Map<String, Object>> getAlarmProcessActionList( String txnCode ) {
 		String sql = "select AC_ID, TXN_CODE, AC_NAME, AC_COND, AC_EXPR from TMS_MGR_ALARM_ACTION " + "where TXN_CODE = ? and (EXECUE_RESULT is null or EXECUE_RESULT = '0')";
 		sql = "select AC_ID, TXN_CODE, AC_NAME, AC_COND, AC_EXPR from TMS_MGR_ALARM_ACTION where TXN_CODE = ?";
-		return tmpSimpleDao.queryForList( sql, txnCode );
+		return offlineSimpleDao.queryForList( sql, txnCode );
 	}
 
 	/**
@@ -602,7 +603,7 @@ public class AlarmEventService {
 		String operId = MapUtil.getString( cond, "OPERID" );// 当前交易的处理人员
 		String sql = "select OPERATOR_ID, sum(ASSIGN_NUMBER) ASSIGN_NUMBER, sum(PROCESS_NUMBER) PROCESS_NUMBER, "
 				+ "sum(UNPROCESS_NUMBER) UNPROCESS_NUMBER from TMS_MGR_ALARM_OPERATOR_STAT group by OPERATOR_ID order by assign_number,unprocess_number";
-		List<Map<String, Object>> statList = tmpSimpleDao.queryForList( sql );
+		List<Map<String, Object>> statList = offlineSimpleDao.queryForList( sql );
 		for( Map<String, Object> operMap : list ) {
 			String operatorId = MapUtil.getString( operMap, "OPERATOR_ID" );
 			if( operId.equals( operatorId ) ) {
@@ -640,7 +641,7 @@ public class AlarmEventService {
 	 */
 	public Map<String, Object> getSystemParam( String paramName ) {
 		String sql = "select DATATYPE, VALUETYPE, STARTVALUE, ENDVALUE from TMS_MGR_SYSPARAM where SYSPARAMNAME = ?";
-		List<Map<String, Object>> list = officialSimpleDao.queryForList( sql, paramName );
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql, paramName );
 		if( list == null || list.isEmpty() ) return null;
 		return list.get( 0 );
 	}
@@ -679,7 +680,7 @@ public class AlarmEventService {
 		// "WHERE co.OPERATOR_ID = corr.OPERATOR_ID AND corr.ROLE_ID = crfr.ROLE_ID AND co.FLAG = '1' AND crfr.FUNC_ID = ?";
 		// List<Map<String, Object>> list = tmpSimpleDao.queryForList(sql, funcId);
 		String sql = "SELECT co.OPERATOR_ID, co.LOGIN_NAME FROM cmc_operator co where login_name!='admin'";
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList( sql );
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList( sql );
 		return list;
 	}
 
@@ -691,7 +692,7 @@ public class AlarmEventService {
 	public Map<String, Object> getTransStrategy( String stId ) {
 		String sql = "select ST_ID, ST_TXN, ST_NAME, EVAL_COND, EVAL_COND_IN, EVAL_MODE, RULE_EXEC_MODE, "
 				+ "ST_ENABLE, CREATETIME, MODIFYTIME from TMS_COM_STRATEGY where ST_ID = ?";
-		List<Map<String, Object>> list = officialSimpleDao.queryForList( sql, stId );
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql, stId );
 		if( list == null || list.isEmpty() ) {
 			return null;
 		}
@@ -707,7 +708,7 @@ public class AlarmEventService {
 	 */
 	public List<Map<String, Object>> getTransStrategyRuleEvalList( String stId ) {
 		String sql = "select SRE_ID, ST_ID, EVAL_TYPE, EVAL_MECH, DIS_STRATEGY, STAT_FUNC, PS_SCORE " + "from TMS_COM_STRATEGY_RULE_EVAL where ST_ID = ? order by EVAL_TYPE";
-		return officialSimpleDao.queryForList( sql, stId );
+		return onlineSimpleDao.queryForList( sql, stId );
 	}
 
 	/**
@@ -718,13 +719,13 @@ public class AlarmEventService {
 	 */
 	public List<Map<String, Object>> getTransHitRuleList( String txnCode, String txnType ) {
 		String ruleHitsql = "select TRIGID, TXNCODE, TXNTYPE, RULEID, MESSAGE, NUMTIMES, " + "CREATETIME, RULE_SCORE from TMS_RUN_RULETRIG where TXNCODE = ?";
-		List<Map<String, Object>> trigList = tmpSimpleDao.queryForList( ruleHitsql, txnCode );
+		List<Map<String, Object>> trigList = offlineSimpleDao.queryForList( ruleHitsql, txnCode );
 		if( trigList == null || trigList.isEmpty() ) {
 			return null;
 		}
 		String ruleSql = "select RULE_ID, RULE_NAME, RULE_DESC, RULE_COND, RULE_COND_IN, " + "RULE_SHORTDESC, EVAL_TYPE, DISPOSAL from TMS_COM_RULE where RULE_TXN in ("
 				+ TransCommon.arr2str( TransCommon.cutToIds( txnType ) ) + ")";
-		List<Map<String, Object>> ruleList = officialSimpleDao.queryForList( ruleSql );
+		List<Map<String, Object>> ruleList = onlineSimpleDao.queryForList( ruleSql );
 		if( ruleList == null || ruleList.isEmpty() ) {
 			return null;
 		}
@@ -759,7 +760,7 @@ public class AlarmEventService {
 			// Map<String, Object> m = new HashMap<String, Object>();
 			reqs.put( "OPERID", operator.get( "OPERATOR_ID" ) );
 			reqs.put( "pagesize", "10" );
-			Page<Map<String, Object>> pageQuery = tmpSimpleDao.pageQuery( sql, reqs, new Order().desc( "ps_time" ) );
+			Page<Map<String, Object>> pageQuery = offlineSimpleDao.pageQuery( sql, reqs, new Order().desc( "ps_time" ) );
 			if( pageQuery == null ) return null;
 			List<Map<String, Object>> func_list = shortActionList( null );
 			Map<String, String> func_map = new HashMap<String, String>();
@@ -790,6 +791,6 @@ public class AlarmEventService {
 	*/
 	public List<Map<String, Object>> shortActionList( Map<String, String> reqs ) {
 		String sql = "select func_name text,func_code value from tms_com_func where func_catalog = '8' order by func_orderby";
-		return tmpSimpleDao.queryForList( sql );
+		return offlineSimpleDao.queryForList( sql );
 	}
 }

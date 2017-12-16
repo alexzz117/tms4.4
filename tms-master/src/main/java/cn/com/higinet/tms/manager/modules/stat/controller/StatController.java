@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +23,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -62,8 +63,9 @@ public class StatController implements ApplicationContextAware{
 	@Autowired
 	private StatService statService;
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 	@Autowired
+	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
 	@Autowired
 	private CommonCheckService commonCheckService;
@@ -85,7 +87,6 @@ public class StatController implements ApplicationContextAware{
 	 */
 	@RequestMapping(value="/list",method=RequestMethod.POST)
 	public Model listStatAction(@RequestParam Map<String,Object> reqs) {
-		
 		Model model = new Model();
 		List<Map<String,Object>> statList = statService.statList(reqs);
 		model.setRow(statList);
@@ -101,7 +102,6 @@ public class StatController implements ApplicationContextAware{
 	 */
 	@RequestMapping(value="/save",method=RequestMethod.POST)
 	public Model saveStatAction(@RequestParam Map<String,Object> reqs) {
-		
 		String json = MapUtil.getString(reqs, "postData");
 		
 		Map<String,List<Map<String, ?>>> formList = null;

@@ -75,7 +75,8 @@ public class StatServiceImpl implements StatService {
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 
 	@Autowired
 	private SqlMap tmsSqlMap;
@@ -452,7 +453,7 @@ public class StatServiceImpl implements StatService {
 		// 查询当前交易下最大的统计名称
 		String sql = tmsSqlMap.getSql("tms.stat.queryMaxStatName");
 		List<Map<String, Object>> maxList = tmsSimpleDao.queryForList(sql);
-		List<Map<String, Object>> maxOnList = officialSimpleDao.queryForList(sql);
+		List<Map<String, Object>> maxOnList = onlineSimpleDao.queryForList(sql);
 		Map<String,Object> stat = new HashMap<String, Object>();
 		stat.put(DBConstant.TMS_COM_STAT_STAT_ID, Long.parseLong(sequenceId));
 		String stat_name = MapUtil.getString(maxList.get(0), "maxStatName");

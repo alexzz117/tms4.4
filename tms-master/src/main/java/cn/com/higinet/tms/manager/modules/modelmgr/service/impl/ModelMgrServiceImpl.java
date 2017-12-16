@@ -25,8 +25,8 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 public class ModelMgrServiceImpl implements ModelMgrService {
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao; 
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao; 
 	
 	/**
 	 * 分页获取所有模型
@@ -36,7 +36,7 @@ public class ModelMgrServiceImpl implements ModelMgrService {
 		StringBuilder sql = new StringBuilder();
 		sql.append("select * from  TMS_COM_TAB WHERE modelused in ('1','2')");
 		
-		Page<Map<String, Object>> modelPage = tmpSimpleDao.pageQuery(sql.toString(),conds, new Order().asc("TAB_NAME"));
+		Page<Map<String, Object>> modelPage = offlineSimpleDao.pageQuery(sql.toString(),conds, new Order().asc("TAB_NAME"));
 		
 		List<Map<String,Object>> modelList = modelPage.getList();
 		for (Map<String, Object> map : modelList) {
@@ -53,7 +53,7 @@ public class ModelMgrServiceImpl implements ModelMgrService {
 	 */
 	public Page<Map<String, Object>> modelHisList(Map<String, String> reqs) {
 		String sql = "select TRAINID,TXNID,TRAINDATE,MODELUSED,STARTTIME,ENDTIME,EXECSTATE,MODELDESC,F1SCORE,STARTDATE,TRAINTYPE from TMS_COM_MTRAINHIS where TXNID=:txn_id";
-		Page<Map<String, Object>> modelPage =  tmpSimpleDao.pageQuery(sql, reqs, new Order().desc("STARTTIME"));
+		Page<Map<String, Object>> modelPage =  offlineSimpleDao.pageQuery(sql, reqs, new Order().desc("STARTTIME"));
 		List<Map<String,Object>> modelList = modelPage.getList();
 		String tab_name = MapUtil.getString(reqs, "txn_id");
 		String txnName = fullTxnDescPath(tab_name);
@@ -66,7 +66,7 @@ public class ModelMgrServiceImpl implements ModelMgrService {
 	
 	private String fullTxnDescPath(String tab_name) {
 		String sql1 = "select * from TMS_COM_TAB where tab_name in ("+TransCommon.arr2str(TransCommon.cutToIds(tab_name))+") order by tab_name";
-		List<Map<String,Object>> fullPathList = tmpSimpleDao.queryForList(sql1);
+		List<Map<String,Object>> fullPathList = offlineSimpleDao.queryForList(sql1);
 		String txnName = "";
 		for (Map<String, Object> map2 : fullPathList) {
 			String parentTxnName = MapUtil.getString(map2, "tab_desc");
@@ -96,7 +96,7 @@ public class ModelMgrServiceImpl implements ModelMgrService {
 			+" UNION "
 			+" SELECT TAB_NAME, FD_NAME,NAME FEATURENAME FROM TMS_COM_FD  WHERE TAB_NAME in ("+txnids+")) FD ON H.FEATURECODE=FD.FD_NAME"
 			+" WHERE R.ISCHOICE='1' AND H.FEATURECODE!='class' AND H.TRAINID=?";
-		List<Map<String, Object>> queryForList = tmpSimpleDao.queryForList(sql, trainid);
+		List<Map<String, Object>> queryForList = offlineSimpleDao.queryForList(sql, trainid);
 		
 		for (Map<String, Object> map : queryForList) {
 			String fval = MapUtil.getString(map, "FVAL");

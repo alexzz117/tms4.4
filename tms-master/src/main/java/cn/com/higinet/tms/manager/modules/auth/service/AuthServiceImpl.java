@@ -30,8 +30,8 @@ import cn.com.higinet.tms.manager.modules.auth.common.AuthStaticParameters;
 import cn.com.higinet.tms.manager.modules.auth.common.ParseTableConfigXML;
 import cn.com.higinet.tms.manager.modules.auth.common.TableConfig;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
-import cn.com.higinet.tms.manager.modules.common.SqlWhereHelper;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
+import cn.com.higinet.tms.manager.modules.common.SqlWhereHelper;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.datamgr.DataOperCenter;
@@ -54,11 +54,12 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	private static final Logger log = LoggerFactory.getLogger( AuthServiceImpl.class );
 	
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 
 	@Autowired
 	private UserPatternService userPatternService35;
@@ -97,7 +98,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		}
 
 		String sql = "SELECT AUTHINFO.MODULE_NAME MODELNAME,COUNT(*) COUNT FROM TMS_MGR_AUTHINFO AUTHINFO WHERE AUTHINFO.AUTH_STATUS = '0' GROUP BY AUTHINFO.MODULE_NAME";
-		List<Map<String, Object>> dataList = tmpSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> dataList = offlineSimpleDao.queryForList(sql, conds);
 		if (dataList != null && !dataList.isEmpty()) {
 			for (Map<String, Object> data : dataList) {
 				for (Map<String, Object> tdata : tdataList) {
@@ -125,7 +126,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 				+ "(SELECT COUNT(*) FROM TMS_MGR_AUTHRECORD AUTHRECORD WHERE AUTHRECORD.AUTH_ID = AUTH.AUTH_ID) SUB_OPERATE_NUM, "
 				+ "OPERATOR.REAL_NAME FROM TMS_MGR_AUTHINFO AUTH LEFT JOIN CMC_OPERATOR OPERATOR ON AUTH.PROPOSER_ID = OPERATOR.OPERATOR_ID WHERE AUTH.AUTH_STATUS='0' AND AUTH.MODULE_NAME = :modelName";
 
-		Page<Map<String, Object>> page = tmpSimpleDao.pageQuery(sql, conds, new Order().asc("PROPOSER_TIME"));
+		Page<Map<String, Object>> page = offlineSimpleDao.pageQuery(sql, conds, new Order().asc("PROPOSER_TIME"));
 
 		List<Map<String, Object>> dataList = page.getList();
 		for (Map<String, Object> data : dataList) {
@@ -151,10 +152,10 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 
 		sb.append("select " + TMS_COM_TAB.TAB_NAME + ", " + TMS_COM_TAB.TAB_DESC + " from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_NAME + " in(" + TransCommon.arr2str(TransCommon.cutToIds(authTxn)) + ") order by TAB_NAME DESC");
 
-		List<Map<String, Object>> fartherTranDef = tmpSimpleDao.queryForList(sb.toString());
+		List<Map<String, Object>> fartherTranDef = offlineSimpleDao.queryForList(sb.toString());
 
 		if (fartherTranDef.size() == 0) {
-			fartherTranDef = officialSimpleDao.queryForList(sb.toString());
+			fartherTranDef = onlineSimpleDao.queryForList(sb.toString());
 		}
 
 		String txnName = "";
@@ -171,7 +172,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	public Map<String, Object> getAuthInfoById(String authId) {
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put("AUTH_ID", authId);
-		return tmpSimpleDao.retrieve(DBConstant.TMS_MGR_AUTHINFO, conds);
+		return offlineSimpleDao.retrieve(DBConstant.TMS_MGR_AUTHINFO, conds);
 	}
 
 	/**
@@ -183,14 +184,14 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	public void aopCreateAuthInfo(Map<String, Object> authInfo) {
 		Integer maxAuthId = getMaxAuthId();
 		authInfo.put("AUTH_ID", maxAuthId + 1);
-		tmpSimpleDao.create("TMS_MGR_AUTHINFO", authInfo);
+		offlineSimpleDao.create("TMS_MGR_AUTHINFO", authInfo);
 	}
 
 	public Integer getNextLogOrder(String authId) {
 		String sql = "SELECT MAX(LOG_ORDER) MAX_LOG_ORDER FROM TMS_MGR_AUTHLOG WHERE AUTH_ID =:authId";
 		Map<String, Object> sqlConds = new HashMap<String, Object>();
 		sqlConds.put("authId", authId);
-		Map<String, Object> idMap = tmpSimpleDao.queryForList(sql, sqlConds).get(0);
+		Map<String, Object> idMap = offlineSimpleDao.queryForList(sql, sqlConds).get(0);
 		String maxLogOrder = MapUtil.getString(idMap, "MAX_LOG_ORDER");
 		if (StringUtil.isEmpty(maxLogOrder)) {
 			return new Integer(1);
@@ -200,7 +201,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 
 	private Integer getMaxAuthId() {
 		String sql = "SELECT MAX(AUTH_ID) MAX_AUTH_ID FROM TMS_MGR_AUTHINFO";
-		Map<String, Object> idMap = tmpSimpleDao.queryForList(sql).get(0);
+		Map<String, Object> idMap = offlineSimpleDao.queryForList(sql).get(0);
 		if (StringUtil.isEmpty(MapUtil.getString(idMap, "MAX_AUTH_ID"))) {
 			return new Integer(1);
 		}
@@ -216,7 +217,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 * @return
 	 */
 	public void aopCreateAuthLog(Map<String, Object> logMap) {
-		tmpSimpleDao.create("TMS_MGR_AUTHLOG ", logMap);
+		offlineSimpleDao.create("TMS_MGR_AUTHLOG ", logMap);
 	}
 
 	/**
@@ -231,7 +232,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put("AUTH_ID", StringUtil.parseToString(reqs.get("authId")));
 
-		Page<Map<String, Object>> authLogPage = tmpSimpleDao.pageQuery(sql, conds, new Order().desc("OPERATE_TIME"));
+		Page<Map<String, Object>> authLogPage = offlineSimpleDao.pageQuery(sql, conds, new Order().desc("OPERATE_TIME"));
 		return authLogPage;
 	}
 
@@ -262,7 +263,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			}
 		}
 
-		Page<Map<String, Object>> page = tmpSimpleDao.pageQuery(sql, conds, new Order().desc("PROPOSER_TIME"));
+		Page<Map<String, Object>> page = offlineSimpleDao.pageQuery(sql, conds, new Order().desc("PROPOSER_TIME"));
 
 		List<Map<String, Object>> dataList = page.getList();
 		for (Map<String, Object> data : dataList) {
@@ -285,7 +286,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 */
 	public List<Map<String, Object>> queryOldData(String tableName, String pk, String pkValue) {
 		String sql = " SELECT * FROM " + tableName + " where " + pk + "='" + pkValue.split(",")[0] + "'";
-		List<Map<String, Object>> dataList = officialSimpleDao.queryForList(sql);
+		List<Map<String, Object>> dataList = onlineSimpleDao.queryForList(sql);
 		return dataList;
 	}
 
@@ -322,8 +323,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			if (split.length == 3) {
 				conds2.put(table_pk, split[0]);
 			}
-			newMap = tmpSimpleDao.retrieve(table_name, conds2);
-			oldMap = officialSimpleDao.retrieve(table_name, conds2);
+			newMap = offlineSimpleDao.retrieve(table_name, conds2);
+			oldMap = onlineSimpleDao.retrieve(table_name, conds2);
 			list = parseUpDBRecord(newMap, oldMap, table_pkvalue);
 		} /*
 		 * else if("TMS_COM_STRATEGY_RULE_REL".equals(table_name)){ List<Map<String,Object>> new_list = tmpSimpleDao.queryForList("select * from TMS_COM_STRATEGY_RULE_REL where st_id=?", table_pkvalue); List<Map<String,Object>> old_list = officialSimpleDao.queryForList("select * from TMS_COM_STRATEGY_RULE_REL where st_id=?", table_pkvalue);
@@ -336,8 +337,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		 * 
 		 * int i = 1; for (Map<String, Object> map2 : list) { map2.put("COL_NUM", i++); } }
 		 */else {
-			newMap = tmpSimpleDao.retrieve(table_name, conds);
-			oldMap = officialSimpleDao.retrieve(table_name, conds);
+			newMap = offlineSimpleDao.retrieve(table_name, conds);
+			oldMap = onlineSimpleDao.retrieve(table_name, conds);
 			list = parseDBRecord(newMap, oldMap, table_name);
 		}
 
@@ -441,7 +442,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 								Map<String, Object> conds = new HashMap<String, Object>();
 								conds.put("codeKey", String.valueOf(newMap.get(key)));
 								conds.put("fieldCode", fieldCode);
-								List<Map<String, Object>> codeValueList = tmpSimpleDao.queryForList(sql, conds);
+								List<Map<String, Object>> codeValueList = offlineSimpleDao.queryForList(sql, conds);
 								if (codeValueList != null) {
 									row.put("NEW_VALUE", codeValueList.get(0).get("code_value"));
 								}
@@ -467,7 +468,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 								Map<String, Object> conds = new HashMap<String, Object>();
 								conds.put("codeKey", String.valueOf(oldMap.get(key)));
 								conds.put("fieldCode", fieldCode);
-								List<Map<String, Object>> codeValueList = tmpSimpleDao.queryForList(sql, conds);
+								List<Map<String, Object>> codeValueList = offlineSimpleDao.queryForList(sql, conds);
 								if (codeValueList != null && codeValueList.size() > 0) {
 									row.put("OLD_VALUE", codeValueList.get(0).get("code_value"));
 								}
@@ -585,7 +586,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			}
 
 			if ("new".equals(flag)) {
-				List<Map<String, Object>> newValueList = tmpSimpleDao.queryForList(sql);
+				List<Map<String, Object>> newValueList = offlineSimpleDao.queryForList(sql);
 				if (newValueList != null && newValueList.size() != 0) {
 					String newValue = "";
 					for (Map<String, Object> map : newValueList) {
@@ -594,7 +595,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 					row.put("NEW_VALUE", newValue.substring(0, newValue.length() - 1));
 				}
 			} else if ("old".equals(flag)) {
-				List<Map<String, Object>> oldValueList = officialSimpleDao.queryForList(sql);
+				List<Map<String, Object>> oldValueList = onlineSimpleDao.queryForList(sql);
 				if (oldValueList != null && oldValueList.size() != 0) {
 					String oldValue = "";
 					for (Map<String, Object> map : oldValueList) {
@@ -620,7 +621,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			String authIdsStr = SqlWhereHelper.getInWhere(authIds.split(","));
 			String sql = "UPDATE TMS_MGR_AUTHINFO SET AUTH_MSG = '" + authMsg + "'" + ",AUTH_STATUS = " + authStatus + " WHERE AUTH_ID in (" + authIdsStr + ")";
 
-			tmpSimpleDao.executeUpdate(sql);
+			offlineSimpleDao.executeUpdate(sql);
 		}
 
 	}
@@ -656,7 +657,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			sql += tablePk + "=:" + tablePk;
 		}
 
-		List<Map<String, Object>> oldDataList = officialSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> oldDataList = onlineSimpleDao.queryForList(sql, conds);
 		Map<String, Object> oldDataMap = oldDataList.size() != 0 ? oldDataList.get(0) : null;
 
 		String operDataValue = null; // 操作数据，从正式表中获取
@@ -670,12 +671,12 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	public void aopUpdateAuthInfo(Map<String, Object> authInfo) {
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put(DBConstant.TMS_MGR_AUTHINFO_AUTH_ID, authInfo.get(DBConstant.TMS_MGR_AUTHINFO_AUTH_ID));
-		tmpSimpleDao.update(DBConstant.TMS_MGR_AUTHINFO, authInfo, conds);
+		offlineSimpleDao.update(DBConstant.TMS_MGR_AUTHINFO, authInfo, conds);
 	}
 
 	public void aopCreateAuthRecord(Map<String, Object> authRecord) {
 		authRecord.put("RECORD_ID", Stringz.randomUUID().toUpperCase());
-		tmpSimpleDao.create("TMS_MGR_AUTHRECORD", authRecord);
+		offlineSimpleDao.create("TMS_MGR_AUTHRECORD", authRecord);
 	}
 
 	public void aopDeleteAuthInfo(String authId, String authStatus) {
@@ -689,12 +690,12 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		Map<String, Object> cond1 = new HashMap<String, Object>();
 		cond1.put("authStatus", authStatus);
 		cond1.put("authId", authId);
-		tmpSimpleDao.executeUpdate(sql, cond1);
+		offlineSimpleDao.executeUpdate(sql, cond1);
 
 		String sql2 = "delete from tms_mgr_authrecord where auth_id =:authId";
 		Map<String, Object> cond2 = new HashMap<String, Object>();
 		cond2.put("authId", authId);
-		tmpSimpleDao.executeUpdate(sql2, cond2);
+		offlineSimpleDao.executeUpdate(sql2, cond2);
 	}
 
 	public Page<Map<String, Object>> subDataList(Map<String, String> reqs) {
@@ -702,7 +703,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql2 = "SELECT AUTHRECORD.*,OPER.REAL_NAME FROM TMS_MGR_AUTHRECORD AUTHRECORD LEFT JOIN CMC_OPERATOR OPER ON AUTHRECORD.OPERATOR_ID = OPER.OPERATOR_ID WHERE AUTHRECORD.AUTH_ID = :AUTH_ID";
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put("AUTH_ID", authId);
-		return tmpSimpleDao.pageQuery(sql2, conds, new Order().desc("OPERATE_TIME"));
+		return offlineSimpleDao.pageQuery(sql2, conds, new Order().desc("OPERATE_TIME"));
 	}
 
 	public Map<String, Object> getAuthInfoByQueryPkValue(String queryPkvalue, MethodConfig mc) {
@@ -716,7 +717,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		conds.put("QUERY_PKVALUE", queryPkvalue);
 		conds.put("QUERY_TABLE_NAME", mc.getQueryTableName());
 		conds.put("QUERY_TABLE_PK", mc.getQueryTablePk());
-		List<Map<String, Object>> authInfoList = tmpSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> authInfoList = offlineSimpleDao.queryForList(sql, conds);
 		return authInfoList.size() == 0 ? null : authInfoList.get(0);
 	}
 
@@ -732,7 +733,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		if (queryMain) {
 			sql += " AND IS_MAIN='1'";
 		}
-		List<Map<String, Object>> l = tmpSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> l = offlineSimpleDao.queryForList(sql, conds);
 		if (l == null || l.size() == 0) {
 			return null;
 		}
@@ -742,14 +743,14 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	public void aopUpdateAuthRecord(Map<String, Object> authRecord) {
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put("RECORD_ID", MapUtil.getString(authRecord, "RECORD_ID"));
-		tmpSimpleDao.update("TMS_MGR_AUTHRECORD", authRecord, conds);
+		offlineSimpleDao.update("TMS_MGR_AUTHRECORD", authRecord, conds);
 	}
 
 	public String getDependencyInfo(String authId) {
 		// 根据授权信息ID，获取授权信息
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put("AUTH_ID", authId);
-		Map<String, Object> authInfo = tmpSimpleDao.retrieve("TMS_MGR_AUTHINFO", conds);
+		Map<String, Object> authInfo = offlineSimpleDao.retrieve("TMS_MGR_AUTHINFO", conds);
 
 		List<Map<String, Object>> depInfoList = null; // 依赖信息List
 
@@ -764,7 +765,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 				String fatherTxnStr = SqlWhereHelper.getInWhere(txnFullPath.split("-"));// 上级交易组成的字符串，用在过滤条件的in子句中
 				String sql = "SELECT MODULE_NAME, AUTH_ID " + "FROM TMS_MGR_AUTHINFO " + "WHERE MODULE_ID = 'tranConf' AND AUTH_STATUS = '0' and QUERY_PKVALUE in (" + fatherTxnStr + ")";
 
-				depInfoList = tmpSimpleDao.queryForList(sql);
+				depInfoList = offlineSimpleDao.queryForList(sql);
 			}
 
 		} else { // 其他模块的依赖
@@ -780,7 +781,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			String depModulesInWhere = SqlWhereHelper.getInWhere(depModuleArr);
 
 			String sql = "SELECT MODULE_NAME, AUTH_ID FROM TMS_MGR_AUTHINFO" + " WHERE AUTH_STATUS = '0' AND QUERY_PKVALUE IN (" + depValuesInWhere + ")" + " AND MODULE_ID IN (" + depModulesInWhere + ")";
-			depInfoList = tmpSimpleDao.queryForList(sql);
+			depInfoList = offlineSimpleDao.queryForList(sql);
 		}
 
 		// 构造依赖信息
@@ -804,7 +805,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			String sql = "select * from tms_mgr_authinfo where QUERY_PKVALUE =:QUERY_PKVALUE and MODULE_ID='tranConf'";
 			Map<String, String> conds = new HashMap<String, String>();
 			conds.put("QUERY_PKVALUE", tabName);
-			List<Map<String, Object>> list = tmpSimpleDao.queryForList(sql, conds);
+			List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, conds);
 
 			StringBuffer sb = new StringBuffer();
 			for (Map<String, Object> depInfoMap : list) {
@@ -823,7 +824,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put("AUTHID", authId);
-		List<Map<String, Object>> authRecordList = tmpSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> authRecordList = offlineSimpleDao.queryForList(sql, conds);
 		return authRecordList;
 	}
 
@@ -833,14 +834,14 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql = "select * from tms_mgr_authrecord where auth_id =:AUTHID and TABLE_NAME = 'TMS_MGR_ROSTER' ";
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put("AUTHID", authId);
-		List<Map<String, Object>> authRecordList = tmpSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> authRecordList = offlineSimpleDao.queryForList(sql, conds);
 		return authRecordList;
 	}
 
 	/* ////////////////////////授权查看模块///////////////////////////// */
 	public List<Map<String, Object>> listAuthQueryModel() {
 		String sql = "SELECT AUTHINFO.MODULE_NAME MODELNAME,COUNT(*) COUNT FROM TMS_MGR_AUTHINFO AUTHINFO GROUP BY AUTHINFO.MODULE_NAME";
-		List<Map<String, Object>> dataList = tmpSimpleDao.queryForList(sql);
+		List<Map<String, Object>> dataList = offlineSimpleDao.queryForList(sql);
 
 		List<Map<String, Object>> tdataList = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < AuthStaticParameters.TABLENAME.length; i++) {
@@ -868,7 +869,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql = "delete from tms_mgr_authrecord where record_id =:recordId";
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put("recordId", recordId);
-		tmpSimpleDao.executeUpdate(sql, conds);
+		offlineSimpleDao.executeUpdate(sql, conds);
 	}
 
 	private void aopdeleteAuthInfo(String recordId, String authId) {
@@ -877,7 +878,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put("recordId", recordId);
 		conds.put("authId", authId);
-		tmpSimpleDao.executeUpdate(sql, conds);
+		offlineSimpleDao.executeUpdate(sql, conds);
 	}
 
 	public String[] getLogByLogId(String logId) {
@@ -885,7 +886,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql = "SELECT PRIMARY_KEY_ID FROM CMC_OPERATE_LOG WHERE LOG_ID =:logId";
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put("logId", logId);
-		List<Map<String, Object>> logList = tmpSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> logList = offlineSimpleDao.queryForList(sql, conds);
 
 		String[] lIds = new String[logList.size()];
 		int i = 0;
@@ -906,12 +907,12 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql = "SELECT CUSNAME FROM TMS_RUN_USER WHERE USERID =:userId";
 		Map<String, String> conds1 = new HashMap<String, String>();
 		conds1.put("userId", userId);
-		List<Map<String, Object>> userList = officialSimpleDao.queryForList(sql, conds1);
+		List<Map<String, Object>> userList = onlineSimpleDao.queryForList(sql, conds1);
 
 		String sql2 = "SELECT STAT_DESC,STAT_TXN FROM TMS_COM_STAT WHERE STAT_ID =:statId";
 		Map<String, String> conds2 = new HashMap<String, String>();
 		conds2.put("statId", statId);
-		List<Map<String, Object>> statList = officialSimpleDao.queryForList(sql2, conds2);
+		List<Map<String, Object>> statList = onlineSimpleDao.queryForList(sql2, conds2);
 
 		String statdesc = "";
 		String statTxn = "";
@@ -934,12 +935,12 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql = "SELECT CUSNAME FROM TMS_RUN_USER WHERE USERID =:userId";
 		Map<String, String> conds1 = new HashMap<String, String>();
 		conds1.put("userId", userid);
-		List<Map<String, Object>> userList = officialSimpleDao.queryForList(sql, conds1);
+		List<Map<String, Object>> userList = onlineSimpleDao.queryForList(sql, conds1);
 
 		String sql2 = "SELECT STAT_DESC,STAT_TXN FROM TMS_COM_STAT WHERE STAT_ID =:statId";
 		Map<String, String> conds2 = new HashMap<String, String>();
 		conds2.put("statId", statid);
-		List<Map<String, Object>> statList = officialSimpleDao.queryForList(sql2, conds2);
+		List<Map<String, Object>> statList = onlineSimpleDao.queryForList(sql2, conds2);
 		String statdesc = "";
 		if (userList != null && userList.size() == 1) {
 			statdesc = MapUtil.getString(statList.get(0), "STAT_DESC");
@@ -948,7 +949,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql3 = "SELECT USER_PATTERN FROM TMS_COM_USERPATTERN WHERE USERID = :userId";
 		Map<String, String> conds3 = new HashMap<String, String>();
 		conds2.put("userId", userid);
-		List<Map<String, Object>> upList = officialSimpleDao.queryForList(sql3, conds3);
+		List<Map<String, Object>> upList = onlineSimpleDao.queryForList(sql3, conds3);
 		String up_s = "";
 		if (upList != null && upList.size() == 1) {
 			up_s = MapUtil.getString(upList.get(0), "USER_PATTERN");
@@ -979,12 +980,12 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		String sql = "select t.rule_shortdesc from tms_com_rule t where t.rule_id =:ruleId";// 起点
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put("ruleId", rIds[0]);
-		List<Map<String, Object>> list = tmpSimpleDao.queryForList(sql, conds);
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, conds);
 
 		String sql2 = "select t.rule_shortdesc from tms_com_rule t where t.rule_id =:ruleId";// 终点
 		Map<String, Object> conds2 = new HashMap<String, Object>();
 		conds2.put("ruleId", rIds[1]);
-		List<Map<String, Object>> list2 = tmpSimpleDao.queryForList(sql2, conds2);
+		List<Map<String, Object>> list2 = offlineSimpleDao.queryForList(sql2, conds2);
 		
 		if (list.size() == 1 && list2.size() == 1) {
 			String fName = MapUtil.getString(list.get(0), "rule_shortdesc");
@@ -1442,7 +1443,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 
 		String sql = "select table_pkvalue,real_oper from TMS_MGR_AUTHRECORD where table_pk = 'ROSTERVALUEID' and AUTH_ID = ? ";
 
-		List<Map<String, Object>> listMap = tmpSimpleDao.queryForList(sql, authId);
+		List<Map<String, Object>> listMap = offlineSimpleDao.queryForList(sql, authId);
 
 		String rosterId = (String) authInfo.get("QUERY_PKVALUE");
 
@@ -1479,7 +1480,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		List<Map<String, Object>> _listMap = new ArrayList<Map<String, Object>>();
 		String sql = "select table_pkvalue,real_oper from TMS_MGR_AUTHRECORD where table_pk = 'ROSTERID' and AUTH_ID = ? ";
 
-		List<Map<String, Object>> listMap = tmpSimpleDao.queryForList(sql, authId);
+		List<Map<String, Object>> listMap = offlineSimpleDao.queryForList(sql, authId);
 
 		for (int i = 0; i < listMap.size(); i++) {
 			Map<String, Object> _map = new HashMap<String, Object>();
@@ -1703,7 +1704,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			if (!StringUtil.isBlank(msg) && msg.indexOf("TMS_COM") != -1) {
 				// 交易模型相关修改, 变更版本号和更新时间
 				String paramName = "transModelVersion";
-				officialSimpleDao.executeUpdate("update TMS_MGR_SYSPARAM set STARTVALUE=STARTVALUE+1 where SYSPARAMNAME=?", paramName);
+				onlineSimpleDao.executeUpdate("update TMS_MGR_SYSPARAM set STARTVALUE=STARTVALUE+1 where SYSPARAMNAME=?", paramName);
 			}
 			refreshCacheExecutor.execute(new RefreshCacheTask(refreshService, mc.getRefreshMsg(), authInfo));
 		}

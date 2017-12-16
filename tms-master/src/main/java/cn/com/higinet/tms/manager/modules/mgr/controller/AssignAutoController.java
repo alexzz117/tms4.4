@@ -3,14 +3,15 @@ package cn.com.higinet.tms.manager.modules.mgr.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.dao.Page;
@@ -26,13 +27,13 @@ import cn.com.higinet.tms.manager.modules.mgr.service.AssignAutoService;
 @RequestMapping("/tms/assignAuto")
 public class AssignAutoController {
 	
-	private static Log log = LogFactory.getLog(AssignAutoController.class);
+	private static final Logger log = LoggerFactory.getLogger( AssignAutoController.class );
 	
 	@Autowired
 	private AssignAutoService assignAutoService;
 
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 
 	
 	@RequestMapping(value="/eventType", method= RequestMethod.POST)

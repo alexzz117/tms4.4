@@ -10,9 +10,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,9 +44,10 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
 @RequestMapping("/tms/action")
 public class AcController {
 	
-	private static Log log = LogFactory.getLog(AcController.class);
+	private static final Logger log = LoggerFactory.getLogger( AcController.class );
 	
 	@Autowired
+	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
 	
 	@Autowired
@@ -55,7 +57,7 @@ public class AcController {
 	StatService statService;
 	
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 
 	/**
 	* 方法描述:动作列表页面（已废弃）
@@ -91,7 +93,7 @@ public class AcController {
 		try {
 			formList = objectMapper.readValue(json, Map.class);
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage(), e);
 			throw new TmsMgrWebException("保存动作Json数据解析异常");
 		} 
 		Model m = new Model();

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.collections.list.SynchronizedList;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -45,19 +44,20 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
  * 类描述:
  * 修订历史:
  * 日期  作者  参考  描述
+ * 
+ * @author zhang.lei
  *
  */
 @Service("sendRateMessage")
 public class SendRateMessage {
-
-	private final static Logger log = LoggerFactory.getLogger( SendRateMessage.class );
+	private static final Logger log = LoggerFactory.getLogger( SendRateMessage.class );
 
 	@Autowired
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 	@Autowired
 	private TaskExecutor taskExecutor;
 	@Autowired
@@ -243,7 +243,7 @@ public class SendRateMessage {
 		paramMap.put( "CREATED_DATE", System.currentTimeMillis() );
 		paramMap.put( "txnCode", txnCode );
 		paramMap.put( "txnType", txnType );
-		tmpSimpleDao.create( "TMS_USERRATE_LOG", paramMap );
+		offlineSimpleDao.create( "TMS_USERRATE_LOG", paramMap );
 	}
 
 	public String sendMessage( String user_id, Map<Integer, Map<String, Object>> ser_map, String head, String body, int index ) {
@@ -538,7 +538,7 @@ public class SendRateMessage {
 			condsMap.put( "NUMTIMES", numTimes );
 			condsMap.put( "CREATETIME", createTime );
 			condsMap.put( "RULE_SCORE", ruleScore );
-			tmpSimpleDao.create( "TMS_RUN_RULETRIG", condsMap );
+			offlineSimpleDao.create( "TMS_RUN_RULETRIG", condsMap );
 
 		}
 		this.saveTmsUserratelog( user_id, score, level, txnCode, txnType );

@@ -25,14 +25,15 @@ import cn.com.higinet.tms.manager.modules.common.SequenceService;
 public class RiskCaseService {
 
 	@Autowired
-	@Qualifier("tmpSimpleDao")
-	private SimpleDao tmpSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 
 	@Autowired
 	private SequenceService sequenceService;
 
 	@Autowired
-	private DataSource tmpTmsDataSource;
+	@Qualifier("offlineDataSource")
+	private DataSource offlineDataSource;
 
 	public Page<Map<String, Object>> getRiskCaseList( Map<String, String> reqs ) {
 		StringBuilder sql = new StringBuilder();
@@ -117,7 +118,7 @@ public class RiskCaseService {
 		map.put( "pagesize", reqs.get( "pagesize" ) );
 		map.put( "pageindex", reqs.get( "pageindex" ) );
 
-		Page<Map<String, Object>> riskCasePage = tmpSimpleDao.pageQuery( sql.toString(), map, new Order().desc( "CREATED_DATE" ) );
+		Page<Map<String, Object>> riskCasePage = offlineSimpleDao.pageQuery( sql.toString(), map, new Order().desc( "CREATED_DATE" ) );
 		for( Map<String, Object> operMap : riskCasePage.getList() ) {
 			operMap.put( "OPERATOR", operMap.get( "REAL_NAME" ) + "(" + operMap.get( "login_name" ) + ")" );
 			operMap.put( "OPER_HISTORY",
@@ -139,7 +140,7 @@ public class RiskCaseService {
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void addRiskCase( Map<String, String> map ) {
 		// 从离线库取序列号SEQ_TMS_MGR_RISK_CASE_ID
-		String caseNo = sequenceService.getSequenceIdToString( DBConstant.SEQ_TMS_MGR_RISK_CASE_ID, tmpTmsDataSource );
+		String caseNo = sequenceService.getSequenceIdToString( DBConstant.SEQ_TMS_MGR_RISK_CASE_ID, offlineDataSource );
 		String caseUuid = UUID.randomUUID().toString();
 
 		Map<String, Object> riskCaseMap = new HashMap();
@@ -154,7 +155,7 @@ public class RiskCaseService {
 		riskCaseMap.put( "SRC_TYPE", map.get( "SRC_TYPE" ) );
 		riskCaseMap.put( "CREATED_BY", map.get( "OPERATOR_ID" ) );
 		riskCaseMap.put( "CREATED_DATE", Long.toString( System.currentTimeMillis() ) );
-		tmpSimpleDao.create( "TMS_MGR_RISK_CASE", riskCaseMap );
+		offlineSimpleDao.create( "TMS_MGR_RISK_CASE", riskCaseMap );
 
 		Map<String, Object> caseTxnMap = new HashMap();
 		caseTxnMap.put( "UUID", UUID.randomUUID().toString() );
@@ -165,11 +166,11 @@ public class RiskCaseService {
 		caseTxnMap.put( "MOBILE", map.get( "MOBILE" ) );
 		caseTxnMap.put( "DESCR", map.get( "DESCR" ) );
 		caseTxnMap.put( "AMOUNT", map.get( "AMOUNT" ) );
-		tmpSimpleDao.create( "TMS_MGR_RISK_CASE_TXN", caseTxnMap );
+		offlineSimpleDao.create( "TMS_MGR_RISK_CASE_TXN", caseTxnMap );
 	}
 
 	public Map<String, Object> getTableMap( String tableName, String cond, String value ) {
-		Map<String, Object> map = tmpSimpleDao.retrieve( tableName, MapWrap.map( cond, value ).getMap() );
+		Map<String, Object> map = offlineSimpleDao.retrieve( tableName, MapWrap.map( cond, value ).getMap() );
 		return map;
 	}
 
@@ -182,15 +183,15 @@ public class RiskCaseService {
 	public void delRiskCase( String uuid ) {
 		Map<String, String> invstMap = new HashMap<String, String>();
 		invstMap.put( "CASE_UUID", uuid );
-		tmpSimpleDao.delete( "TMS_MGR_RISK_CASE_INVST", invstMap );
+		offlineSimpleDao.delete( "TMS_MGR_RISK_CASE_INVST", invstMap );
 
 		Map<String, String> txnMap = new HashMap<String, String>();
 		txnMap.put( "CASE_UUID", uuid );
-		tmpSimpleDao.delete( "TMS_MGR_RISK_CASE_TXN", txnMap );
+		offlineSimpleDao.delete( "TMS_MGR_RISK_CASE_TXN", txnMap );
 
 		Map<String, String> caseMap = new HashMap<String, String>();
 		caseMap.put( "UUID", uuid );
-		tmpSimpleDao.delete( "TMS_MGR_RISK_CASE", caseMap );
+		offlineSimpleDao.delete( "TMS_MGR_RISK_CASE", caseMap );
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -218,7 +219,7 @@ public class RiskCaseService {
 		riskCaseMap.put( "UPDATED_DATE", Long.toString( System.currentTimeMillis() ) );
 		Map<String, Object> riskCaseCondMap = new HashMap();
 		riskCaseCondMap.put( "UUID", caseUuid );
-		tmpSimpleDao.update( "TMS_MGR_RISK_CASE", riskCaseMap, riskCaseCondMap );
+		offlineSimpleDao.update( "TMS_MGR_RISK_CASE", riskCaseMap, riskCaseCondMap );
 
 		Map<String, Object> caseTxnMap = new HashMap();
 		caseTxnMap.put( "TXNCODE", map.get( "TXNCODE" ) );
@@ -230,7 +231,7 @@ public class RiskCaseService {
 
 		Map<String, Object> caseTxnCondMap = new HashMap();
 		caseTxnCondMap.put( "CASE_UUID", caseUuid );
-		tmpSimpleDao.update( "TMS_MGR_RISK_CASE_TXN", caseTxnMap, caseTxnCondMap );
+		offlineSimpleDao.update( "TMS_MGR_RISK_CASE_TXN", caseTxnMap, caseTxnCondMap );
 	}
 
 	public void updateRiskCaseTxn( Map<String, String> riskCaseMapTxn ) {
@@ -244,7 +245,7 @@ public class RiskCaseService {
 
 		StringBuffer sql = new StringBuffer();
 		sql.append( "update TMS_MGR_RISK_CASE r set r.STATUS='1'  where r.UUID=:RISK_CASE_ID" );
-		tmpSimpleDao.executeUpdate( sql.toString(), uuid );
+		offlineSimpleDao.executeUpdate( sql.toString(), uuid );
 	}
 
 	public void addRiskCaseInvst( Map<String, String> map ) {
@@ -268,7 +269,7 @@ public class RiskCaseService {
 		// sql.append("insert into TMS_MGR_RISK_CASE_INVST(UUID,CASE_UUID,IS_AMOUNT_CORRECT,IS_BANK_PROVE,FILE_UUID,IS_PHONE_CHECK,IS_OWNER,FINAL_DECISION,DISPOSAL,DESCR,CREATED_BY,CREATED_DATE) values(:UUID,:RISK_CASE_ID,:IS_AMOUNT_CORRECT,:IS_BANK_PROVE,:FILE_UUID,:IS_PHONE_CHECK,:IS_OWNER,:FINAL_DECISION,:DISPOSAL,:DESCR,:CREATED_BY,:CREATED_DATE)");
 		// tmpSimpleDao.executeUpdate(sql.toString(), riskCaseInvstMap);
 		// tmpSimpleDao.create("TMS_MGR_RISK_CASE_INVST", riskCaseInvstMap);
-		tmpSimpleDao.executeUpdate(
+		offlineSimpleDao.executeUpdate(
 				"MERGE INTO TMS_MGR_RISK_CASE_INVST T USING( SELECT :UUID AS UUID,:CASE_UUID AS CASE_UUID,:IS_AMOUNT_CORRECT AS IS_AMOUNT_CORRECT,:IS_BANK_PROVE AS IS_BANK_PROVE,:FILE_UUID AS FILE_UUID,:IS_PHONE_CHECK AS IS_PHONE_CHECK,:IS_OWNER AS IS_OWNER,:FINAL_DECISION AS FINAL_DECISION,:DISPOSAL AS DISPOSAL,:DESCR AS DESCR,:CREATED_DATE AS CREATED_DATE,:CREATED_BY AS CREATED_BY,:UPDATED_DATE AS UPDATED_DATE,:UPDATED_BY AS UPDATED_BY FROM DUAL) S  "
 						+ "ON (T.CASE_UUID=S.CASE_UUID) "
 						+ "WHEN MATCHED THEN    UPDATE SET IS_AMOUNT_CORRECT = S.IS_AMOUNT_CORRECT,IS_BANK_PROVE = S.IS_BANK_PROVE,FILE_UUID = S.FILE_UUID,IS_PHONE_CHECK = S.IS_PHONE_CHECK,IS_OWNER = S.IS_OWNER,FINAL_DECISION = S.FINAL_DECISION,DISPOSAL = S.DISPOSAL,DESCR = S.DESCR,UPDATED_DATE = S.UPDATED_DATE,UPDATED_BY = S.UPDATED_BY "
@@ -279,7 +280,7 @@ public class RiskCaseService {
 	public Map<String, Object> getRiskCaseInvst( String caseUuid ) {
 		Map<String, Object> riskCaseInvstMap = new HashMap();
 		riskCaseInvstMap.put( "CASE_UUID", caseUuid );
-		Map<String, Object> map = tmpSimpleDao.retrieve( "TMS_MGR_RISK_CASE_INVST", riskCaseInvstMap );
+		Map<String, Object> map = offlineSimpleDao.retrieve( "TMS_MGR_RISK_CASE_INVST", riskCaseInvstMap );
 		return map;
 	}
 
@@ -366,7 +367,7 @@ public class RiskCaseService {
 		map.put( "pagesize", reqs.get( "pagesize" ) );
 		map.put( "pageindex", reqs.get( "pageindex" ) );
 
-		Page<Map<String, Object>> riskCasePage = tmpSimpleDao.pageQuery( sql.toString(), map, new Order().desc( "CREATED_DATE" ) );
+		Page<Map<String, Object>> riskCasePage = offlineSimpleDao.pageQuery( sql.toString(), map, new Order().desc( "CREATED_DATE" ) );
 		for( Map<String, Object> operMap : riskCasePage.getList() ) {
 			// operMap.put("OPERATOR", operMap.get("REAL_NAME") + "(" + operMap.get("login_name") + ")");
 			// operMap.put("OPER_HISTORY", "<a href=\"#'+(new Date().getTime())+'\" onclick=\"jcl.go('/tms/riskCase/getInfo?risk_case_id=" + operMap.get("uuid") + "')\">处理历史</a>");

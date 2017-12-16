@@ -65,8 +65,11 @@ public class AntiMoneyLaunderingService {
 	@Autowired
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;
+	
 	@Autowired
-	private SimpleDao officialSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
+	
 	@Autowired
 	private SqlMap tmsSqlMap;
 
@@ -86,7 +89,7 @@ public class AntiMoneyLaunderingService {
 		String tabName = MapUtil.getString( reqs, TMS_AML_CONFIG.TAB_NAME );
 		String sql = "select * from " + TMS_COM_FD.TABLE_NAME + " t where t." + TMS_COM_FD.TAB_NAME + " in (" + TransCommon.cutToIdsForSql( tabName ) + ")" + " order by t."
 				+ TMS_COM_FD.TAB_NAME + ", t." + TMS_COM_FD.TXN_ORDER + ", t." + TMS_COM_FD.REF_NAME;
-		return officialSimpleDao.queryForList( sql );
+		return onlineSimpleDao.queryForList( sql );
 	}
 
 	/**
@@ -102,7 +105,7 @@ public class AntiMoneyLaunderingService {
 		//List<Map<String, Object>> list = officialSimpleDao.queryForList(sql);
 
 		Map<String, Object> sqlConds = TransCommon.cutToMapIdsForSqlInj( tabName );
-		List<Map<String, Object>> list = officialSimpleDao.queryForList( sql, sqlConds );
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql, sqlConds );
 
 		Map<String, Object> resMap = new HashMap<String, Object>();
 		resMap.put( TMS_AML_CONFIG.TAB_NAME, tabName );
@@ -145,7 +148,7 @@ public class AntiMoneyLaunderingService {
 				value
 		});
 		String sql = "select 1 from " + TMS_AML_CONFIG.TABLE_NAME + " where " + TMS_AML_CONFIG.TAB_NAME + " = ?";
-		List<Map<String, Object>> list = officialSimpleDao.queryForList( sql, tab_name );
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql, tab_name );
 		StringBuffer sb1 = new StringBuffer();
 		StringBuffer sb2 = new StringBuffer();
 		Object[] params = new Object[cols.length + 1];
@@ -175,7 +178,7 @@ public class AntiMoneyLaunderingService {
 			params[params.length - 1] = tab_name;
 		}
 		sql = String.format( sql, sb1.toString(), sb2.toString() );
-		officialSimpleDao.executeUpdate( sql, params );
+		onlineSimpleDao.executeUpdate( sql, params );
 		return true;
 	}
 
@@ -184,13 +187,13 @@ public class AntiMoneyLaunderingService {
 	 */
 	protected Map<String, List<Map<String, Object>>> getTransModeConfig() {
 		String sql = "select * from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_TYPE + " = '4' order by " + TMS_COM_TAB.TAB_NAME;
-		List<Map<String, Object>> tabList = officialSimpleDao.queryForList( sql );
+		List<Map<String, Object>> tabList = onlineSimpleDao.queryForList( sql );
 		Map<String, List<Map<String, Object>>> transModeMap = new HashMap<String, List<Map<String, Object>>>();
 		if( tabList != null && !tabList.isEmpty() ) {
 			sql = "select * from " + TMS_COM_FD.TABLE_NAME + " where " + TMS_COM_FD.TAB_NAME + " = ?";
 			for( Map<String, Object> tabMap : tabList ) {
 				String tabName = MapUtil.getString( tabMap, TMS_COM_TAB.TAB_NAME );
-				List<Map<String, Object>> fdList = officialSimpleDao.queryForList( sql, tabName );
+				List<Map<String, Object>> fdList = onlineSimpleDao.queryForList( sql, tabName );
 				String parentTab = MapUtil.getString( tabMap, TMS_COM_TAB.PARENT_TAB );
 				if( !StringUtil.isBlank( parentTab ) ) {
 					List<Map<String, Object>> list = transModeMap.get( parentTab );
@@ -213,7 +216,7 @@ public class AntiMoneyLaunderingService {
 				+ TMS_COM_TAB.TAB_DESC + ", t." + TMS_COM_TAB.PARENT_TAB + ", t." + TMS_COM_TAB.TXNID + " from " + TMS_COM_TAB.TABLE_NAME + " t left join "
 				+ TMS_AML_CONFIG.TABLE_NAME + " c on t." + TMS_COM_TAB.TAB_NAME + " = c." + TMS_AML_CONFIG.TAB_NAME + " where t." + TMS_COM_TAB.TAB_TYPE + " = '4' order by t."
 				+ TMS_COM_TAB.TAB_NAME;
-		List<Map<String, Object>> list = officialSimpleDao.queryForList( sql );
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql );
 		if( list == null || list.isEmpty() ) return null;
 		Map<String, Map<String, Object>> allAmlConfigMap = new HashMap<String, Map<String, Object>>();
 		for( Map<String, Object> map : list ) {
@@ -250,7 +253,7 @@ public class AntiMoneyLaunderingService {
 
 	public Page<Map<String, Object>> queryExportList( Map<String, Object> reqs ) {
 		String sql = "SELECT * FROM " + TMS_AML_MESSAGE.TABLE_NAME + " WHERE " + TMS_AML_MESSAGE.GROUPID + " = :groupId";
-		return officialSimpleDao.pageQuery( sql, reqs, new Order().desc( "TTNM" ) );
+		return onlineSimpleDao.pageQuery( sql, reqs, new Order().desc( "TTNM" ) );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -337,7 +340,7 @@ public class AntiMoneyLaunderingService {
 					amlMessage.put( TMS_AML_MESSAGE.CREATETIME, createTime );
 					amlMessage.put( TMS_AML_MESSAGE.MODIFYTIME, createTime );
 					amlMessage.put( TMS_AML_MESSAGE.ISEXPORT, "0" );
-					officialSimpleDao.create( TMS_AML_MESSAGE.TABLE_NAME, amlMessage );
+					onlineSimpleDao.create( TMS_AML_MESSAGE.TABLE_NAME, amlMessage );
 				}
 			}
 		}
@@ -597,7 +600,7 @@ public class AntiMoneyLaunderingService {
 			String groupId = MapUtil.getString( reqs, "groupId" );
 			String path = MapUtil.getString( common, AMLConstant.PATH );
 			String sql = "SELECT * FROM " + TMS_AML_MESSAGE.TABLE_NAME + " WHERE " + TMS_AML_MESSAGE.GROUPID + " = ?";
-			List<Map<String, Object>> msgList = officialSimpleDao.queryForList( sql, groupId );
+			List<Map<String, Object>> msgList = onlineSimpleDao.queryForList( sql, groupId );
 
 			String rootfilePath = this.getClass().getClassLoader().getResource( "" ).getPath().replace( "%20", " " );
 			String fPath = toFilepath( rootfilePath + path );
@@ -710,7 +713,7 @@ public class AntiMoneyLaunderingService {
 			String firc = MapUtil.getString( reqs, "FIRC" );
 
 			String sql = "SELECT * FROM " + TMS_AML_MESSAGE.TABLE_NAME + " WHERE " + TMS_AML_MESSAGE.MESSAGEID + " in (" + messageIds + ")";
-			List<Map<String, Object>> list = officialSimpleDao.queryForList( sql );
+			List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql );
 			String modifyTime = CalendarUtil.FORMAT9.format( new Date() );
 			for( Map<String, Object> map : list ) {
 				String messageId = MapUtil.getString( map, TMS_AML_MESSAGE.MESSAGEID );
@@ -765,7 +768,7 @@ public class AntiMoneyLaunderingService {
 				map.put( TMS_AML_MESSAGE.MODIFYTIME, modifyTime );
 				Map<String, Object> cond = new HashMap<String, Object>();
 				cond.put( TMS_AML_MESSAGE.MESSAGEID, messageId );
-				officialSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, map, cond );
+				onlineSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, map, cond );
 			}
 		}
 		catch( Exception e ) {
@@ -820,7 +823,7 @@ public class AntiMoneyLaunderingService {
 					CalendarUtil.FORMAT10.toPattern() ) );
 		}
 
-		return officialSimpleDao.pageQuery( sql, sqlConds, new Order().desc( TMS_AML_MESSAGE.TTNM ) );
+		return onlineSimpleDao.pageQuery( sql, sqlConds, new Order().desc( TMS_AML_MESSAGE.TTNM ) );
 	}
 
 	private String getZipName( Map<String, Object> common, String msgType ) {
@@ -833,7 +836,7 @@ public class AntiMoneyLaunderingService {
 		String pZipName = packetType + ficd + "-" + date;
 		String sql = "SELECT * FROM " + TMS_AML_MESSAGE.TABLE_NAME + " WHERE " + TMS_AML_MESSAGE.ISEXPORT + " = '1'" + " AND " + TMS_AML_MESSAGE.ZIPNAME + " like '" + pZipName
 				+ "%'" + " order by " + TMS_AML_MESSAGE.ZIPNAME + " desc";
-		List<Map<String, Object>> list = officialSimpleDao.queryForList( sql );
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql );
 		if( list == null || list.size() == 0 ) {
 			zipName = pZipName + "-0001.zip";
 		}
@@ -874,12 +877,12 @@ public class AntiMoneyLaunderingService {
 		msg.put( TMS_AML_MESSAGE.MODIFYTIME, modifyTime );
 		Map<String, Object> cond = new HashMap<String, Object>();
 		cond.put( TMS_AML_MESSAGE.MESSAGEID, messageId );
-		officialSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, msg, cond );
+		onlineSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, msg, cond );
 	}
 
 	private String getTxnFdByTxnType( String tabName, String refName ) {
 		String sql = "select * from  tms_com_fd f where f.ref_name = '" + refName + "' and " + "f.tab_name in (" + TransCommon.cutToIdsForSql( tabName ) + ")";
-		List<Map<String, Object>> list = officialSimpleDao.queryForList( sql );
+		List<Map<String, Object>> list = onlineSimpleDao.queryForList( sql );
 		if( list != null && list.size() > 0 ) {
 			return MapUtil.getString( list.get( 0 ), "FD_NAME" );
 		}
@@ -1091,7 +1094,7 @@ public class AntiMoneyLaunderingService {
 	private Map<String, Object> queryMessageById( String messageId ) {
 		Map<String, Object> cond = new HashMap<String, Object>();
 		cond.put( TMS_AML_MESSAGE.MESSAGEID, messageId );
-		return officialSimpleDao.retrieve( TMS_AML_MESSAGE.TABLE_NAME, cond );
+		return onlineSimpleDao.retrieve( TMS_AML_MESSAGE.TABLE_NAME, cond );
 	}
 
 	public boolean updateAmlMessage( Map<String, Object> reqs ) {
@@ -1205,7 +1208,7 @@ public class AntiMoneyLaunderingService {
 			msg.put( TMS_AML_MESSAGE.MODIFYTIME, modifyTime );
 			Map<String, Object> cond = new HashMap<String, Object>();
 			cond.put( TMS_AML_MESSAGE.MESSAGEID, messageId );
-			officialSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, msg, cond );
+			onlineSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, msg, cond );
 			return true;
 		}
 		catch( Exception e ) {
@@ -1371,7 +1374,7 @@ public class AntiMoneyLaunderingService {
 			msg.put( TMS_AML_MESSAGE.MODIFYTIME, modifyTime );
 			Map<String, Object> cond = new HashMap<String, Object>();
 			cond.put( TMS_AML_MESSAGE.MESSAGEID, messageId );
-			officialSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, msg, cond );
+			onlineSimpleDao.update( TMS_AML_MESSAGE.TABLE_NAME, msg, cond );
 			return true;
 		}
 		catch( Exception e ) {
@@ -1392,7 +1395,7 @@ public class AntiMoneyLaunderingService {
 			Map<String, Object> cond = new HashMap<String, Object>();
 			cond.put( "groupId", groupId );
 			cond.put( "modifyTime", modifyTime );
-			officialSimpleDao.executeUpdate( sql, cond );
+			onlineSimpleDao.executeUpdate( sql, cond );
 			return groupId;
 		}
 		catch( Exception e ) {
