@@ -10,13 +10,24 @@ public class Stringz extends StringUtils {
 	public static boolean isNotEmpty( Object str ) {
 		return !isEmpty( str );
 	}
+	
+	public static boolean isNotEmpty( Object... strings ) {
+		return !isEmpty( strings );
+	}
+
+	public static boolean isEmpty( Object... strings ) {
+		for( Object str : strings ) {
+			if( isEmpty( str ) ) return true;
+		}
+		return false;
+	}
 
 	public static String randomUUID() {
 		return UUID.randomUUID().toString().replace( "-", "" );
 	}
 
 	public static boolean isNumeric( String str ) {
-		if( Stringz.isEmpty( str ) ) return false;
+		if( isEmpty( str ) ) return false;
 		Pattern pattern = Pattern.compile( "[0-9]*" );
 		return pattern.matcher( str ).matches();
 	}
