@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import cn.com.higinet.tms.base.util.Mapz;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
-import cn.com.higinet.tms35.comm.MapUtil;
 
 @Service("disposalService")
 public class DisposalServiceImpl implements DisposalService {
@@ -50,7 +50,7 @@ public class DisposalServiceImpl implements DisposalService {
 			String txnid_last = txnids[txnids.length-1];
 			String txn_dis_sql = "SELECT TAB_DISPOSAL FROM TMS_COM_TAB  WHERE TAB_NAME= ? ";
 			List<Map<String,Object>> txn_dis_list = tmsSimpleDao.queryForList(txn_dis_sql,txnid_last);
-			tab_disposal = txn_dis_list!=null && txn_dis_list.size()>0?MapUtil.getString(txn_dis_list.get(0),"TAB_DISPOSAL"):"xxx";
+			tab_disposal = txn_dis_list!=null && txn_dis_list.size()>0?Mapz.getString(txn_dis_list.get(0),"TAB_DISPOSAL"):"xxx";
 		}
 		
 		if(tab_disposal.length()>0) {

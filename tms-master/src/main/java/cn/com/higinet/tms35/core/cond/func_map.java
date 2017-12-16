@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import cn.com.higinet.tms.base.util.Arrayz;
 import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
-import cn.com.higinet.tms35.comm.array_tool;
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.comm.tm_tool;
 import cn.com.higinet.tms35.comm.tms_exception;
@@ -211,7 +211,7 @@ public class func_map
 			map_function mf = new map_function(
 					op.func_, //
 					str_tool.upper_case(rsf.getString("FUNC_CODE")), //
-					array_tool.copyOf(param, param_p), //
+					Arrayz.copyOf(param, param_p), //
 					op.name2type(str_tool.upper_case(rsf.getString("FUNC_TYPE"))),
 					load_class(cls_name));
 			m.add(mf);

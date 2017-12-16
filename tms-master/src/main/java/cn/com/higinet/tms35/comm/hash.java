@@ -1,7 +1,6 @@
 package cn.com.higinet.tms35.comm;
 
-public class hash
-{
+public class hash {
 	// static int[] PRIME = new int[] { 2087, 2089, 2137, 2153, 2221, 2281,
 	// 2297, 2311, 2381, 2393,
 	// 4153, 4153, 4201, 4201, 4217, 4217, 4231, 4231, 4327, 4327, 4391, 4391,
@@ -62,38 +61,34 @@ public class hash
 	// 536871719, 536871721,
 	// 536871757, 1073741831, 1073741993, 1073742073, 1073742169, 1073742233,
 	// 1073742343,1073742361, 1073742391, 1073742583, 1073742713 };
-	
-	final int[] a={536871757, 1073741831, 1073741993, 1073742073, 1073742169, 1073742233,1073742343,1073742361, 1073742391, 1073742583, 1073742713};
-	
-	int id(int h,int i)
-	{
-		return h*a[i]%10;
+
+	final int[] a = {
+			536871757, 1073741831, 1073741993, 1073742073, 1073742169, 1073742233, 1073742343, 1073742361, 1073742391, 1073742583, 1073742713
+	};
+
+	int id( int h, int i ) {
+		return h * a[i] % 10;
 	}
 
-	static final public int clac(final String s)
-	{
-		return clac(s, 16777337);
-	}
-	
-	static final public int hash_id(String name, int m)
-	{
-		return hash.clac(name, 134218327) % 2297 % m;
+	static final public int clac( final String s ) {
+		return clac( s, 16777337 );
 	}
 
-	static final public int clac(final String s, int prime)
-	{
+	static final public int hash_id( String name, int m ) {
+		return hash.clac( name, 134218327 ) % 2297 % m;
+	}
+
+	static final public int clac( final String s, int prime ) {
 		int h = 0;
-		for (int i = 0, len = s.length(); i < len; i++)
-		{
+		for( int i = 0, len = s.length(); i < len; i++ ) {
 			h *= prime;
-			h ^= 0xff & s.charAt(i);
+			h ^= 0xff & s.charAt( i );
 		}
 
 		return h & 0x7FFFFFFF;
 	}
 
-	static final public int clac(int id)
-	{
+	static final public int clac( int id ) {
 		int h = 0;
 
 		h = (id & 0xff) ^ h;
@@ -113,37 +108,34 @@ public class hash
 		return h & 0x7FFFFFFF;
 	}
 
-	static double norm(int[] d)
-	{
+	static double norm( int[] d ) {
 		long sum = 0;
-		for (int i : d)
+		for( int i : d )
 			sum += i;
 
 		double avg = 1. * sum / d.length;
 
 		double x = 0;
-		for (int i : d)
+		for( int i : d )
 			x += (i - avg) * (i - avg) / d.length / d.length;
 
-		x = Math.sqrt((x));
+		x = Math.sqrt( (x) );
 
 		// System.out.print(String.format("%.3f,", x));
 		return x;
 
 	}
 
-	static interface cc
-	{
-		String go(int i);
+	static interface cc {
+		String go( int i );
 	}
 
-	public static double test(int pp, int c, cc cc)
-	{
+	public static double test( int pp, int c, cc cc ) {
 		int[] pr = new int[c];
-		for (int i = 0; i < 100 * c; i++)
-			pr[hash.clac(cc.go(i), pp) % c]++;
+		for( int i = 0; i < 100 * c; i++ )
+			pr[hash.clac( cc.go( i ), pp ) % c]++;
 		int sum = 0;
-		for (int i : pr)
+		for( int i : pr )
 			sum += i;
 
 		// for(int i:pr)
@@ -151,13 +143,12 @@ public class hash
 		// System.out.print(String.format("%.4f ", 1.*i/sum));
 		// }
 		// System.out.println();
-		return norm(pr);
+		return norm( pr );
 	}
 
 	static final String prefix = "USER0000000000000";
 
-	public static void main(String[] argv)
-	{
+	public static void main( String[] argv ) {
 		// for (int i = 0; i < PRIME.length; i++)
 		// {
 		// System.out.print(String.format("%d-%X\t", PRIME[i], PRIME[i]));
@@ -170,20 +161,19 @@ public class hash
 		int prime1 = 0x1000;
 		// for (int e = 10; e < 31; e++, prime1 = (1 << e))
 
-		int[] P = new int[] { 134218199, 134218327, 1048919, 134217943 };
-		for (int j = 0; j < P.length; j++)
-		{
+		int[] P = new int[] {
+				134218199, 134218327, 1048919, 134217943
+		};
+		for( int j = 0; j < P.length; j++ ) {
 			// prime1 = prime.get(prime1 + 1);
 			prime1 = P[j];
 			pp = 0;
-			for (int i = 1; i <= 6; i++)
-				pp += test(prime1, 1 << i, new cc()
-				{
-					final public String go(int i)
-					{
+			for( int i = 1; i <= 6; i++ )
+				pp += test( prime1, 1 << i, new cc() {
+					final public String go( int i ) {
 						return i + "";
 					}
-				});
+				} );
 
 			// // System.out.println("\n平均源00000000000000000");
 			// for (int i = 1; i <= 6; i++)
@@ -195,16 +185,14 @@ public class hash
 			// }
 			// });
 			// System.out.println("\n00000000000000000平均源");
-			for (int i = 1; i <= 6; i++)
-				pp += test(prime1, 1 << i, new cc()
-				{
-					final public String go(int i)
-					{
+			for( int i = 1; i <= 6; i++ )
+				pp += test( prime1, 1 << i, new cc() {
+					final public String go( int i ) {
 						return prefix + i;
 					}
-				});
+				} );
 
-			System.out.println(String.format("%d,%d,%X", (int) (pp * 1000), prime1, prime1));
+			System.out.println( String.format( "%d,%d,%X", (int) (pp * 1000), prime1, prime1 ) );
 		}
 	}
 }

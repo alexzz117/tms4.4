@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 
-import cn.com.higinet.tms.base.util.MapUtil;
+import cn.com.higinet.tms.base.util.Mapz;
 import cn.com.higinet.tms.base.util.Stringz;
 
 public class RequestModel extends ModelMap {
@@ -24,7 +24,7 @@ public class RequestModel extends ModelMap {
 	 * */
 	public <S> S getEntity( Class<S> beanClass ) {
 		try {
-			return (S) MapUtil.toEntity( this, beanClass );
+			return (S) Mapz.toEntity( this, beanClass );
 		}
 		catch( Exception e ) {
 			e.printStackTrace();

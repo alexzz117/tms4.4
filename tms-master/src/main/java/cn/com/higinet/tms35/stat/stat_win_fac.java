@@ -3,7 +3,7 @@ package cn.com.higinet.tms35.stat;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.com.higinet.tms35.comm.array_tool;
+import cn.com.higinet.tms.base.util.Arrayz;
 import cn.com.higinet.tms35.core.cache.db_stat;
 
 /*
@@ -165,7 +165,7 @@ public class stat_win_fac<E extends stat_win_base>
 			s = i + 1;
 		}
 
-		return array_tool.copyOf(ret, len);
+		return Arrayz.copyOf(ret, len);
 	}
 
 	final public E next()

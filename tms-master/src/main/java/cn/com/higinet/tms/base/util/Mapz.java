@@ -5,15 +5,12 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.Column;
-
-import org.springframework.util.StringUtils;
 
 @SuppressWarnings({
 		"unchecked", "rawtypes"
 })
-public class MapUtil {
+public class Mapz {
 
 	public static boolean objectIsEmpty( Map map, String key ) {
 		if( map.isEmpty() ) return true;
@@ -53,7 +50,7 @@ public class MapUtil {
 	}
 
 	public static Map<String, Object> getMap( Map map, String key ) {
-		if( map == null || map.isEmpty() || is_empty( key ) ) return null;
+		if( map == null || map.isEmpty() || Stringz.isEmpty( key ) ) return null;
 		if( !map.containsKey( key ) ) return null;
 		if( map.get( key ) == null ) return null;
 
@@ -61,7 +58,7 @@ public class MapUtil {
 	}
 
 	public static List<Map<String, Object>> getList( Map map, String key ) {
-		if( map == null || map.isEmpty() || StringUtils.isEmpty( key ) ) return null;
+		if( map == null || map.isEmpty() || Stringz.isEmpty( key ) ) return null;
 		if( !map.containsKey( key ) ) return null;
 		if( map.get( key ) == null ) return null;
 
@@ -69,14 +66,10 @@ public class MapUtil {
 	}
 
 	public static boolean getBoolean( Map map, String key ) {
-		if( map == null || map.isEmpty() || is_empty( key ) ) return false;
+		if( map == null || map.isEmpty() || Stringz.isEmpty( key ) ) return false;
 		if( !map.containsKey( key ) ) return false;
 		if( map.get( key ) == null ) return false;
 		return (Boolean) map.get( key );
-	}
-
-	private static boolean is_empty( String s ) {
-		return s == null || s.length() == 0;
 	}
 
 	public static <S> S toEntity( Map<String, Object> map, Class<S> beanClass ) throws Exception {
@@ -91,7 +84,7 @@ public class MapUtil {
 
 			String fieldName = null;
 			Column annotation = field.getAnnotation( Column.class );
-			if( null != annotation && !StringUtil.isEmpty( annotation.name() ) ) fieldName = annotation.name();
+			if( null != annotation && !Stringz.isEmpty( annotation.name() ) ) fieldName = annotation.name();
 			else fieldName = field.getName();
 
 			//大小写适配
@@ -123,4 +116,5 @@ public class MapUtil {
 		}
 		return (S) entity;
 	}
+
 }

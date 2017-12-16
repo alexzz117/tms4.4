@@ -16,7 +16,7 @@ public class Stringz extends StringUtils {
 	}
 
 	public static boolean isNumeric( String str ) {
-		if( StringUtil.isEmpty( str ) ) return false;
+		if( Stringz.isEmpty( str ) ) return false;
 		Pattern pattern = Pattern.compile( "[0-9]*" );
 		return pattern.matcher( str ).matches();
 	}

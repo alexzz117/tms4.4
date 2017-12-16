@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.tms35.comm.array_tool;
+import cn.com.higinet.tms.base.util.Arrayz;
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.comm.tms_exception;
 import cn.com.higinet.tms35.core.cache.db_cache;
@@ -122,7 +122,7 @@ public class node {
 		if (child == null)
 			child = new node[] { n };
 		else {
-			child = array_tool.copyOf(child, child.length + 1);
+			child = Arrayz.copyOf(child, child.length + 1);
 			child[child.length - 1] = n;
 		}
 
@@ -132,7 +132,7 @@ public class node {
 		if (child == null)
 			child = n;
 		else {
-			child = array_tool.copyOf(child, child.length + n.length);
+			child = Arrayz.copyOf(child, child.length + n.length);
 			for (int i = child.length - n.length; i < child.length; i++)
 				child[i] = n[i - child.length + n.length];
 		}
@@ -143,7 +143,7 @@ public class node {
 		if (child == null)
 			child = new node[] { n1, n2 };
 		else {
-			child = array_tool.copyOf(child, child.length + 2);
+			child = Arrayz.copyOf(child, child.length + 2);
 			child[child.length - 2] = n1;
 			child[child.length - 1] = n1;
 		}
@@ -563,7 +563,7 @@ public class node {
 
 					param[ppos++] = child[i].n1;
 				}
-				txn.set_txn_ref(new txn_ref_stat(txn.get_tab().tab_name, n1, array_tool.copyOf(param, ppos)), st);
+				txn.set_txn_ref(new txn_ref_stat(txn.get_tab().tab_name, n1, Arrayz.copyOf(param, ppos)), st);
 			} else {
 				txn.set_txn_ref(new txn_ref_stat(txn.get_tab().tab_name, n1, new int[] {}), st);
 			}
@@ -645,7 +645,7 @@ public class node {
 					param[ppos++] = child[i].n1;
 				}
 
-				n1 = txn.get_stat_local_id(n1, array_tool.copyOf(param, ppos));
+				n1 = txn.get_stat_local_id(n1, Arrayz.copyOf(param, ppos));
 			}
 
 			if (n1 < 0)
