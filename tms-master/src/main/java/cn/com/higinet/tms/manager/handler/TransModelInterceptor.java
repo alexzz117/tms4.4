@@ -2,7 +2,7 @@
  * Copyright © 2016 Beijing HiGiNet Technology Co.,Ltd.
  * All right reserved.
  */
-package cn.com.higinet.tms.manager.modules.handler;
+package cn.com.higinet.tms.manager.handler;
 
 import java.io.IOException;
 import java.util.List;

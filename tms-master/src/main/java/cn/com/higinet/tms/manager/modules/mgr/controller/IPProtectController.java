@@ -9,8 +9,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +28,13 @@ import cn.com.higinet.tms.manager.modules.mgr.service.IPProtectService;
 
 /**
  * IP地址导入控制类
+ * @author zhang.lei
  */
 @Controller("tmsIPProtectController")
 @RequestMapping("/tms/ip")
 public class IPProtectController {
-	private static Log log = LogFactory.getLog(IPProtectController.class);
+	private static final Logger logger = LoggerFactory.getLogger( IPProtectController.class );
+	
 	@Autowired
 	private IPProtectService IPProtectService;
 	
@@ -84,10 +86,10 @@ public class IPProtectController {
 		boolean isLoad = false;
 		try {
 			
-			log.info("-------ipFile:"+ipFile);
-			log.info("-------cityFile:"+cityFile);
-			log.info("-------cardFile:"+cardFile);
-			log.info("-------mobileFile:"+mobileFile);
+			logger.info("-------ipFile:"+ipFile);
+			logger.info("-------cityFile:"+cityFile);
+			logger.info("-------cardFile:"+cardFile);
+			logger.info("-------mobileFile:"+mobileFile);
 			
 			if(ipFile == null || (ipFileLen = ipFile.getSize()) == 0){
 				throw new Exception("IP地址文件文件内容不能为空");
@@ -132,7 +134,7 @@ public class IPProtectController {
 			isLoad = true;
 		} catch(Exception e) {
 			error = e.getLocalizedMessage();
-			log.error(error, e);
+			logger.error(error, e);
 		} finally {
 			if (CmcStringUtil.isBlank(error) && !isLoad) {
 				error = "运行时错误，请查看日志！";

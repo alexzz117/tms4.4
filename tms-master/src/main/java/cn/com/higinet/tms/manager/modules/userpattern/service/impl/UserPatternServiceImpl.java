@@ -26,9 +26,9 @@ import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.IPLocationService;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 import cn.com.higinet.tms.manager.modules.userpattern.service.UserPatternService;
@@ -36,10 +36,9 @@ import cn.com.higinet.tms35.comm.utf8_split;
 
 /**
  * 功能/模块:
- * 
  * @author zhanglq
  * @version 1.0 Aug 29, 2013 类描述: 修订历史: 日期 作者 参考 描述
- *
+ * @author zhang.lei
  */
 @Service("userPatternService35")
 public class UserPatternServiceImpl implements UserPatternService {

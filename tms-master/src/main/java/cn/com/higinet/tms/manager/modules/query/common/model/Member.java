@@ -3,7 +3,7 @@ package cn.com.higinet.tms.manager.modules.query.common.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 
 /**
  * 查询子条件组成员

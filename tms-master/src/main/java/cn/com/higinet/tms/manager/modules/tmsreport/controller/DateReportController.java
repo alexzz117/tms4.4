@@ -9,6 +9,19 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.dao.Page;
+import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
+import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
+import cn.com.higinet.tms.manager.modules.tmsreport.common.ReportConstant;
+import cn.com.higinet.tms.manager.modules.tmsreport.service.DateReportService;
+import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.WritableCellFormat;
@@ -18,32 +31,19 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import cn.com.higinet.tms.base.entity.common.Model;
-import cn.com.higinet.tms.manager.dao.Page;
-import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
-import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.tmsreport.common.ReportConstant;
-import cn.com.higinet.tms.manager.modules.tmsreport.service.DateReportService;
-import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
+/**
+ * @author zhang.lei
+ */
 
 @Controller("dateReportController")
 @RequestMapping("/report/date")
 public class DateReportController {
+	
 	@Autowired
 	private DateReportService dateReportService ;
 
 	@Autowired
 	private DisposalService disposalService;
-	
-	public void setDateReportService(DateReportService dateReportService) {
-		this.dateReportService = dateReportService;
-	}
 
 	/**
 	 * 转向按日期汇总交易信息报表页面
@@ -60,21 +60,17 @@ public class DateReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/list", method=RequestMethod.POST)
-	public Model listReportAction(@RequestParam Map<String, String> reqs,HttpServletRequest request){
+	public Model listReportAction(@RequestBody Map<String, String> reqs,HttpServletRequest request){
 		Model model = new Model();
 		Page<Map<String, Object>>  page = dateReportService.listDateReport(reqs);
 		model.setPage(page);
-		
-		//model.set("CHARTDATA", dateReportService.getChartData(null,reqs));
 		return model;
 	}
 	/**
 	 * 通过前台图形展示的设置信息，查询相关数据
-	 * @param reqs
-	 * @return
 	 */
 	@RequestMapping(value="/showChart", method=RequestMethod.POST)
-	public Model showChartAction(@RequestParam Map<String, String> reqs,HttpServletRequest request){
+	public Model showChartAction(@RequestBody Map<String, String> reqs,HttpServletRequest request){
 		Model model = new Model();
 		model.set("CHARTDATA", dateReportService.getChartData(null,reqs));
 		return model;
@@ -82,14 +78,12 @@ public class DateReportController {
 
 	/**
 	 * 导出列表数据
-	 * @param reqs
-	 * @return
 	 */
 	@RequestMapping(value="/export", method=RequestMethod.GET)
-	public void exportListAction(@RequestParam Map<String, String> reqs,HttpServletRequest request,HttpServletResponse response){
+	public void exportListAction(@RequestBody Map<String, String> reqs,HttpServletRequest request,HttpServletResponse response){
 		List<Map<String, Object>>  dateList = dateReportService.exportList(reqs);
 		String titles [] = {"日 期","交易总数"};
-//		String colum [] = {"ALERTDATE","TXNNUMBER"};
+		//String colum [] = {"ALERTDATE","TXNNUMBER"};
 		List<String> colum = new ArrayList<String>();
 		colum.add("ALERTDATE");
 		colum.add("TXNNUMBER");
@@ -105,12 +99,9 @@ public class DateReportController {
 			
 			WritableWorkbook workbook = Workbook.createWorkbook(os);
 			if (workbook != null) {
-			
 				WritableSheet sheet = workbook.createSheet("日期报警信息", 0);
-				
 				// 设置标题 sheet.addCell(new jxl.write.Label(列(从0开始), 行(从0开始), 内容.)); 
 				try {
-					
 					WritableFont titleFont = new WritableFont(WritableFont.createFont("宋体"), 10, WritableFont.BOLD);     
 					WritableCellFormat titleFormat = new WritableCellFormat(titleFont);    
 					for(int i=0;i<titles.length;i++){

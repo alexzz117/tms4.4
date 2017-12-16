@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.manager.modules.exception;
+package cn.com.higinet.tms.manager.modules.common.exception;
 
 import cn.com.higinet.tms.manager.common.BaseServiceException;
 

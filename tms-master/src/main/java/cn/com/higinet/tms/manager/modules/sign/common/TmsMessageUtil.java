@@ -9,8 +9,8 @@ import cn.com.higinet.tms.manager.modules.aop.cache.CacheSynService;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters.ActionCode;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
 
 public class TmsMessageUtil {
 	public static final Charset UTF8 = Charset.forName("UTF-8");

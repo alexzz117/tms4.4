@@ -12,13 +12,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.util.Stringz;
@@ -36,7 +37,9 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
  * 日志拦截器
  * @author chenr
  * @version 2.0.0, 2011-6-30
+ * @author zhang.lei
  */
+
 @Component
 public class OperateLogInterceptor extends HandlerInterceptorAdapter {
 

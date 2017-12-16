@@ -1,6 +1,6 @@
 package cn.com.higinet.tms.manager.modules.auth.exception;
 
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 
 public class TmsMgrAuthDataSyncException extends TmsMgrServiceException {
 

@@ -5,7 +5,6 @@
  */
 package cn.com.higinet.tms.manager.modules.auth.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,13 +12,15 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
@@ -37,11 +38,12 @@ import cn.com.higinet.tms.manager.modules.mgr.util.MgrDateConvertUtil;
 @Controller("authController")
 @RequestMapping("/tms/auth")
 public class AuthController extends ApplicationObjectSupport {
+	
 	@Autowired
 	private AuthService authService;
 
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 
 	/**
 	 * 跳转到授权中心模块首页：待授权模块列表页面
@@ -58,7 +60,7 @@ public class AuthController extends ApplicationObjectSupport {
 	 * @return
 	 */
 	@RequestMapping(value = "/modelList", method = RequestMethod.POST)
-	public Model centerActoin( @RequestParam Map<String, String> reqs ) {
+	public Model centerActoin( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>();
 		page.setList( authService.showCenter( reqs ) );
@@ -81,7 +83,7 @@ public class AuthController extends ApplicationObjectSupport {
 	 * @return
 	 */
 	@RequestMapping(value = "/authList", method = RequestMethod.POST)
-	public Model dataListActoin( @RequestParam Map<String, String> reqs ) {
+	public Model dataListActoin( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		model.setPage( authService.dataList( reqs ) );
 		return model;
@@ -102,7 +104,7 @@ public class AuthController extends ApplicationObjectSupport {
 	 * @return
 	 */
 	@RequestMapping(value = "/dataCompare", method = RequestMethod.POST)
-	public Model dataCompareAction( @RequestParam Map<String, String> reqs ) {
+	public Model dataCompareAction( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		Page page = new Page();
 		page.setList( authService.getDataCompare( reqs ) );
@@ -143,7 +145,7 @@ public class AuthController extends ApplicationObjectSupport {
 	 * @return
 	 */
 	@RequestMapping(value = "/modAuth", method = RequestMethod.POST)
-	public Model updateAuthActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model updateAuthActoin( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 		try {
 			authService.batchUpadteAuth( reqs );
@@ -214,7 +216,7 @@ public class AuthController extends ApplicationObjectSupport {
 	 * @return
 	 */
 	@RequestMapping(value = "/toLog", method = RequestMethod.POST)
-	public Model toLogActoin( @RequestParam Map<String, String> reqs ) {
+	public Model toLogActoin( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		try {
 			model.setPage( authService.authLogList( reqs ) );

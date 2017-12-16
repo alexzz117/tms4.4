@@ -24,7 +24,6 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -35,17 +34,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
 
 /**
  * 名单管理控制类，包括名单的管理和名单值的管理
  * @author wangsch
+ * @author zhang.lei
  */
 @Controller("nameListController")
 @RequestMapping("/tms/mgr")
@@ -54,7 +56,7 @@ public class NameListController {
 	private NameListService nameListService;
 
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 
 	private String error = "";
 

@@ -6,17 +6,19 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.process.service.ProcessService;
 
 /**
@@ -24,13 +26,16 @@ import cn.com.higinet.tms.manager.modules.process.service.ProcessService;
  * @author yangk
  * @author zhang.lei
  */
+
 @Controller("processController")
 @RequestMapping("/tms/process")
 public class ProcessController {
+	
 	private static final Logger log = LoggerFactory.getLogger( ProcessController.class );
 	
 	@Autowired
 	private ProcessService processService;
+	
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -40,7 +45,7 @@ public class ProcessController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model listProcessAction( @RequestParam Map<String, Object> reqs ) {
+	public Model listProcessAction( @RequestBody Map<String, Object> reqs ) {
 
 		String txn_id = MapUtil.getString( reqs, "txnId" );
 		List<Map<String, Object>> process = processService.listAllProcessInOneTxn( txn_id );
@@ -64,7 +69,7 @@ public class ProcessController {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public Model addProcessAction( @RequestParam Map<String, Object> reqs ) {
+	public Model addProcessAction( @RequestBody Map<String, Object> reqs ) {
 
 		String txn_id = MapUtil.getString( reqs, "txnId" );
 		List<Map<String, Object>> process = processService.listAllProcessInOneTxn( txn_id );
@@ -83,7 +88,7 @@ public class ProcessController {
 	 */
 	@SuppressWarnings("all")
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public Model saveProcessAction( @RequestParam Map<String, Object> reqs ) {
+	public Model saveProcessAction( @RequestBody Map<String, Object> reqs ) {
 		String json = MapUtil.getString( reqs, "postData" );
 		Map<String, List<Map<String, ?>>> formMap = null;
 		try {

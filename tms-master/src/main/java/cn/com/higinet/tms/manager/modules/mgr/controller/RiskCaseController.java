@@ -7,28 +7,31 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.modules.common.FileUpLoadUtil;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.mgr.service.RiskCaseService;
 
 @Controller("riskCaseController")
 @RequestMapping("/tms/riskCase")
 public class RiskCaseController {
+	
 	@Autowired
 	private RiskCaseService riskCaseService;
 
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String riskCaseLisView() {
@@ -36,14 +39,14 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model riskCaseLisAction(@RequestParam Map<String, String> reqs) {
+	public Model riskCaseLisAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		model.setPage(riskCaseService.getRiskCaseList(reqs));
 		return model;
 	}
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public Model addRiskCaseAction(@RequestParam Map<String, String> reqs, HttpServletRequest request) {
+	public Model addRiskCaseAction(@RequestBody Map<String, String> reqs, HttpServletRequest request) {
 		Model model = new Model();
 		String userId = reqs.get("USERID");
 		// 校验用户是否存在
@@ -61,7 +64,7 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/del", method = RequestMethod.POST)
-	public Model delRiskCaseListAction(@RequestParam Map<String, String> reqs) {
+	public Model delRiskCaseListAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		String json = MapUtil.getString(reqs, "postData");
 		Map<String, List<Map<String, String>>> formList = null;
@@ -76,7 +79,7 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/get", method = RequestMethod.POST)
-	public Model getRiskCaseAction(@RequestParam Map<String, String> reqs) {
+	public Model getRiskCaseAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		Map<String, Object> caseMap = riskCaseService.getTableMap("TMS_MGR_RISK_CASE", "UUID", reqs.get("UUID"));
 		Timestamp curDate = (Timestamp) caseMap.get("CUR_DATE");
@@ -95,7 +98,7 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/mod", method = RequestMethod.POST)
-	public Model modRiskCaseAction(@RequestParam Map<String, String> reqs) {
+	public Model modRiskCaseAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		String userId = reqs.get("USERID");
 		// 校验用户是否存在
@@ -111,7 +114,7 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/modStatus", method = RequestMethod.POST)
-	public Model modStatusRiskCaseAction(@RequestParam Map<String, String> reqs) {
+	public Model modStatusRiskCaseAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		String uuid = reqs.get("CASE_UUID");
 		riskCaseService.resetRiskCaseStatus(uuid);
@@ -146,7 +149,7 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/addInfo", method = RequestMethod.POST)
-	public String addInfoRiskCaseAction(@RequestParam Map<String, String> reqs, HttpServletRequest request) {
+	public String addInfoRiskCaseAction(@RequestBody Map<String, String> reqs, HttpServletRequest request) {
 		String[] strArray = request.getParameterValues("DISPOSAL");
 		String disposal = "";
 		if (null != strArray && strArray.length > 0) {
@@ -172,7 +175,7 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/getInfo", method = RequestMethod.POST)
-	public Model getInfoRiskCaseAction(@RequestParam Map<String, String> reqs) {
+	public Model getInfoRiskCaseAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		String caseUuid = reqs.get("caseUuid");
 
@@ -192,10 +195,9 @@ public class RiskCaseController {
 	}
 
 	@RequestMapping(value = "/hisList", method = RequestMethod.POST)
-	public Model riskCaseHisLisAction(@RequestParam Map<String, String> reqs) {
+	public Model riskCaseHisLisAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		model.setPage(riskCaseService.getRiskCaseHisList(reqs));
 		return model;
 	}
-
 }

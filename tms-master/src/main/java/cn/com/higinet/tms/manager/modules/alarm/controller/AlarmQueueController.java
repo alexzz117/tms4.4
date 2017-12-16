@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.modules.alarm.service.AlarmQueueService;
@@ -31,7 +31,7 @@ public class AlarmQueueController {
 	 * @return
 	 */
 	@RequestMapping(value = "/confirmrisk", method = RequestMethod.POST)
-	public Model ArtConfirmRiskTraffic( @RequestParam Map<String, String> reqs ) {
+	public Model ArtConfirmRiskTraffic( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		String txncode = MapUtil.getString( reqs, "txncode" );
 		String status = MapUtil.getString( reqs, "status" );

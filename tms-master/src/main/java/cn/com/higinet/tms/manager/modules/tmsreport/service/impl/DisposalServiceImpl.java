@@ -15,6 +15,7 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 
 @Service("disposalService")
 public class DisposalServiceImpl implements DisposalService {
+	
 	@Autowired
 	@Qualifier("tmsSimpleDao")
 	private SimpleDao tmsSimpleDao;

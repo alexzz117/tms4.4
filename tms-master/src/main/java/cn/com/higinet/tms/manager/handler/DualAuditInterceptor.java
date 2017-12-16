@@ -23,6 +23,7 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 /**
  * 双审授权拦截器
  * @author yangk
+ * @author zhang.lei
  */
 @Component
 public class DualAuditInterceptor extends HandlerInterceptorAdapter {
@@ -48,7 +49,6 @@ public class DualAuditInterceptor extends HandlerInterceptorAdapter {
 			log.debug( "数据源切换到临时库" );
 			request.setAttribute( "readonly", "false" );
 			DSContextHolder.setDSType( DSType.DS_TEMP );
-
 		}
 		else {
 			log.debug( "数据源切换到正式库" );

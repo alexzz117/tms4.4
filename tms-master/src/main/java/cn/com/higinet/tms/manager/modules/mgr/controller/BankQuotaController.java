@@ -5,17 +5,17 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.modules.aop.cache.CacheRefresh;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.mgr.service.BankQuotaService;
 
 /**
@@ -51,7 +51,7 @@ public class BankQuotaController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model listBankQuotaListActoin(@RequestParam Map<String, String> reqs) {
+	public Model listBankQuotaListActoin(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		model.setPage(bankQuotaService.listBankQuotaPage(reqs));
 		return model;
@@ -63,7 +63,7 @@ public class BankQuotaController {
 	 * @return
 	 */
 	@RequestMapping(value = "/del", method = RequestMethod.POST)
-	public Model delBankQuotaListActoin(@RequestParam Map<String, String> reqs) {
+	public Model delBankQuotaListActoin(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		String json = MapUtil.getString(reqs, "postData");
 		Map<String, List<Map<String, String>>> formList = null;
@@ -84,7 +84,7 @@ public class BankQuotaController {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public Model addBankQuotaListActoin(@RequestParam Map<String, String> reqs) {
+	public Model addBankQuotaListActoin(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 
 		if (bankQuotaService.listBankQuotaPage(reqs).getTotal() > 0) {
@@ -107,7 +107,7 @@ public class BankQuotaController {
 	 * @return
 	 */
 	@RequestMapping(value = "/get", method = RequestMethod.POST)
-	public Model getBankQuotaById(@RequestParam Map<String, String> reqs) {
+	public Model getBankQuotaById(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		model.setRow(bankQuotaService.getBankQuotaById(reqs.get("ID")));
 		return model;
@@ -119,7 +119,7 @@ public class BankQuotaController {
 	 * @return
 	 */
 	@RequestMapping(value = "/mod", method = RequestMethod.POST)
-	public Model updateBankQuotaById(@RequestParam Map<String, String> reqs) {
+	public Model updateBankQuotaById(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		bankQuotaService.updateBankQuotaById(reqs);
 		refresh("TMS_BANK_QUOTA");

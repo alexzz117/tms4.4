@@ -3,7 +3,7 @@ package cn.com.higinet.tms.manager.modules.query.common.model;
 import java.util.Set;
 
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 
 /**
  * 数据表

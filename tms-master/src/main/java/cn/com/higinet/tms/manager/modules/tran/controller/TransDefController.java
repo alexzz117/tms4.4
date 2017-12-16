@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,8 +56,7 @@ public class TransDefController {
 	 * @throws SQLException 
 	 */
 	@RequestMapping(value = "/query", method = RequestMethod.POST)
-	public Model queryTranDefTree( HttpServletRequest request, @RequestParam Map<String, String> reqs ) throws SQLException {
-
+	public Model queryTranDefTree( HttpServletRequest request, @RequestBody Map<String, String> reqs ) throws SQLException {
 		Model model = new Model();
 		model.setList( getTranMdlTreeList() );
 		return model;
@@ -68,8 +68,7 @@ public class TransDefController {
 	 * @throws SQLException 
 	 */
 	@RequestMapping(value = "/queryRuleTree", method = RequestMethod.POST)
-	public Model queryTranRuleTree( HttpServletRequest request, @RequestParam Map<String, String> reqs ) throws SQLException {
-
+	public Model queryTranRuleTree( HttpServletRequest request, @RequestBody Map<String, String> reqs ) throws SQLException {
 		Model model = new Model();
 		model.setList( getTranRuleTreeList() );
 		return model;
@@ -80,7 +79,6 @@ public class TransDefController {
 	 * @return
 	 */
 	private List<Map<String, Object>> getTranRuleTreeList() {
-
 		List<Map<String, Object>> tranMdlList = transDefService.getTranDefs();
 		List<Map<String, Object>> tranRuleList = transDefService.getTranRules();
 		tranMdlList.addAll( tranRuleList );
@@ -117,7 +115,6 @@ public class TransDefController {
 
 	/**
 	 * 去交易模型树,渲染节点返回
-	 * @return
 	 */
 	private List<Map<String, Object>> getTranMdlTreeList() {
 
@@ -155,12 +152,9 @@ public class TransDefController {
 
 	/**
 	 * 初始化交易模型树
-	 * @return
-	 * @throws SQLException 
 	 */
 	@RequestMapping(value = "/queryTmp", method = RequestMethod.POST)
-	public Model queryTranDefTreeTmp( HttpServletRequest request, @RequestParam Map<String, String> reqs ) throws SQLException {
-
+	public Model queryTranDefTreeTmp( HttpServletRequest request, @RequestBody Map<String, String> reqs ) throws SQLException {
 		Model model = new Model();
 		model.setList( getTranMdlTreeList() );
 		return model;
@@ -168,11 +162,9 @@ public class TransDefController {
 
 	/**
 	 * 新建,保存交易模型
-	 * @return
 	 */
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public Model saveTran( HttpServletRequest req, @RequestParam Map<String, Object> reqs ) {
-
+	public Model saveTran( HttpServletRequest req, @RequestBody Map<String, Object> reqs ) {
 		formatReq( reqs );
 		Map<String, Object> p = new HashMap<String, Object>( reqs );
 		Map<String, List<Map<String, Object>>> formMap = new HashMap<String, List<Map<String, Object>>>();
@@ -214,7 +206,7 @@ public class TransDefController {
 	 * @return
 	 */
 	@RequestMapping(value = "/listChann", method = RequestMethod.POST)
-	public Model listAllChannel( @RequestParam Map<String, String> reqs ) {
+	public Model listAllChannel( @RequestBody Map<String, String> reqs ) {
 		List<Map<String, Object>> channellist = txnGroupService.listAllChannelWithOrder();
 		Model model = new Model();
 		model.set( "channelList", channellist );
@@ -226,7 +218,7 @@ public class TransDefController {
 	 * @return
 	 */
 	@RequestMapping(value = "/edit_prepare", method = RequestMethod.POST)
-	public Model editPrepareTran( @RequestParam Map<String, String> reqs ) {
+	public Model editPrepareTran( @RequestBody Map<String, String> reqs ) {
 
 		Model model = new Model();
 		model.set( "infos", transDefService.getNodeFullInfos( MapUtil.getString( reqs, "tab_name" ) ) );

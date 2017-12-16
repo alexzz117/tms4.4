@@ -2,13 +2,13 @@ package cn.com.higinet.tms.manager.modules.mgr.controller;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -17,13 +17,12 @@ import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
 /**
  * 名单管理业务类，包括名单的管理和名单值的管理
  * @author zhangfg
- *
+ * @author zhang.lei
  */
 @Controller("nameListViewController")
 @RequestMapping("/tms/mgrView")
 public class NameListViewController {
-
-	private static Log log = LogFactory.getLog(NameListViewController.class);
+	private static final Logger logger = LoggerFactory.getLogger( NameListViewController.class );
 	
 	@Autowired
 	private NameListService nameListViewService;
@@ -42,7 +41,7 @@ public class NameListViewController {
 	 * @return
 	 */
 	@RequestMapping(value="/list", method=RequestMethod.POST)
-	public Model listNameListActoin(@RequestParam Map<String, String> reqs){
+	public Model listNameListActoin(@RequestBody Map<String, String> reqs){
 		Model model = new Model();
 		model.setPage(nameListViewService.listNameList(reqs));
 		return model;
@@ -62,7 +61,7 @@ public class NameListViewController {
 	 * @return
 	 */
 	@RequestMapping(value="/get")
-	public Model getNameListActoin(@RequestParam String rosterId){
+	public Model getNameListActoin(@RequestBody String rosterId){
 		Model model = new Model();
 		model.setRow(nameListViewService.getOneNameList(rosterId));
 		return model;
@@ -83,9 +82,9 @@ public class NameListViewController {
 	 * @return
 	 */
 	@RequestMapping(value="/valuelist", method=RequestMethod.POST)
-	public Model listValueListActoin(@RequestParam Map<String, String> reqs){
+	public Model listValueListActoin(@RequestBody Map<String, String> reqs){
 		
-		log.debug("listValueListActoin inputNode ---> "+reqs);
+		logger.debug("listValueListActoin inputNode ---> "+reqs);
 		
 		String rosterId = reqs.get("rosterId");
 		
@@ -112,7 +111,7 @@ public class NameListViewController {
 	 * @return
 	 */
 	@RequestMapping(value="/valueget")
-	public Model getValueListActoin(@RequestParam Map<String, String> reqs){
+	public Model getValueListActoin(@RequestBody Map<String, String> reqs){
 		
 		String rosterValueId = reqs.get("rosterValueId");
 		

@@ -10,7 +10,7 @@ import java.util.GregorianCalendar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 
 /**
  * 当前系统日期各种格式处理帮助类

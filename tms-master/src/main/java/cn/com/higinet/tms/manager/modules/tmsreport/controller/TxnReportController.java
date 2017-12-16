@@ -8,6 +8,18 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
+import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
+import cn.com.higinet.tms.manager.modules.tmsreport.common.ReportConstant;
+import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
+import cn.com.higinet.tms.manager.modules.tmsreport.service.TxnReportService;
 import jxl.Workbook;
 import jxl.format.Alignment;
 import jxl.write.Label;
@@ -18,37 +30,22 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import cn.com.higinet.tms.base.entity.common.Model;
-import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
-import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.tmsreport.common.ReportConstant;
-import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
-import cn.com.higinet.tms.manager.modules.tmsreport.service.TxnReportService;
-
 
 /**
  * 交易告警信息报表控制类
  * @author zhangfg
  * @version 1.0.0,
  * @date 2011-12-20
+ * @author zhang.lei
  */
 @Controller("txnReportController")
 @RequestMapping("/report/txn")
 public class TxnReportController {
+	
 	@Autowired
 	private TxnReportService txnReportService ;
 	@Autowired
 	private DisposalService disposalService;
-
-	public void setTxnReportService(TxnReportService txnReportService) {
-		this.txnReportService = txnReportService;
-	}
 
 	/**
 	 * 转向交易告警信息汇总报表页面
@@ -65,7 +62,7 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/list", method=RequestMethod.POST)
-	public Model listReportAction(@RequestParam Map<String, String> reqs){
+	public Model listReportAction(@RequestBody Map<String, String> reqs){
 //		Page<Map<String, Object>>  page = txnReportService.listTxnReport(reqs);
 		Model model = new Model();
 		model.setPage(txnReportService.listTxnReport(reqs));
@@ -79,9 +76,7 @@ public class TxnReportController {
 	 */
 	@RequestMapping(value="/getPS", method=RequestMethod.POST)
 	public Model getPSAction(){
-//		Page<Map<String, Object>>  page = txnReportService.listTxnReport(reqs);
 		Model model = new Model();
-//		model.setPage(page);
 		model.setList(disposalService.queryList());
 		return model;
 	}
@@ -91,7 +86,7 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/showChart", method=RequestMethod.POST)
-	public Model showChartAction(@RequestParam Map<String, String> reqs){
+	public Model showChartAction(@RequestBody Map<String, String> reqs){
 		Model model = new Model();
 		String chartStr = txnReportService.getChartData(null,reqs);
 		model.set("CHARTDATA", chartStr);
@@ -105,7 +100,7 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/export", method=RequestMethod.GET)
-	public void exportListAction(@RequestParam Map<String, String> reqs, HttpServletResponse response){
+	public void exportListAction(@RequestBody Map<String, String> reqs, HttpServletResponse response){
 		List<Map<String, Object>>  txnList = txnReportService.exportList(reqs);
 		String titles [] = {"交易名称","交易总数"};
 		List<String> colum = new ArrayList<String>();
@@ -207,7 +202,7 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/getRegion", method=RequestMethod.POST)
-	public Model getAllRegion(@RequestParam String countryCode){
+	public Model getAllRegion(@RequestBody String countryCode){
 		Model model = new Model();
 		model.set("regList", txnReportService.getAllRegion(countryCode));
 		//根据国家代码获取所有省份列表
@@ -219,7 +214,7 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/getCity", method=RequestMethod.POST)
-	public Model getAllCity(@RequestParam String regionCode ){
+	public Model getAllCity(@RequestBody String regionCode ){
 		Model model = new Model();
 		if(regionCode.length() == 1){
 			regionCode = "0" + regionCode;

@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrWebException;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 
 /**
  * 数据库时间（毫秒数）和页面上时间（字符串）转换

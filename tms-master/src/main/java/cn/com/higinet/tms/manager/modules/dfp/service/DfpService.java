@@ -31,8 +31,8 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.exception.TmsMgrServiceException;
 
 /**
  * 功能/模块:
