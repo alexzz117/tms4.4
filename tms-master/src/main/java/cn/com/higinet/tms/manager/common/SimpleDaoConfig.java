@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.config;
+package cn.com.higinet.tms.manager.common;
 
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
