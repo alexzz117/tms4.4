@@ -13,11 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.common.Constant;
 import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.service.LogService;
@@ -31,7 +33,7 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 @Controller("cmcLogController")
 @RequestMapping("/cmc/log")
 public class LogController {
-	
+
 	@Autowired
 	@Qualifier("cmcLogService")
 	private LogService logService;
@@ -49,7 +51,7 @@ public class LogController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model listAction( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model listAction( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.putAll( reqs );
@@ -78,7 +80,10 @@ public class LogController {
 	 * @return
 	 */
 	@RequestMapping(value = "/get")
-	public Model getLogActoin( @RequestParam String logId ) {
+	public Model getLogActoin( @RequestBody RequestModel modelMap ) {
+		String logId = modelMap.getString( "logId" );
+		if( Stringz.isEmpty( logId ) ) return new Model().addError( "logId is empty" );
+
 		Model model = new Model();
 		model.setRow( logService.getLog( logId ) );
 		return model;

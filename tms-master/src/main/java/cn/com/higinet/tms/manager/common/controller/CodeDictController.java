@@ -58,7 +58,7 @@ public class CodeDictController {
 	 * @return
 	 */
 	@RequestMapping(value = "/category/list", method = RequestMethod.POST)
-	public Model categoreyListAction( @RequestParam Map<String, String> reqs ) {
+	public Model categoreyListAction( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		model.setPage( codeDictService.listCodeCategory( reqs ) );
 		return model;
@@ -135,10 +135,11 @@ public class CodeDictController {
 	 */
 	@RequestMapping(value = "/category/get", method = RequestMethod.POST)
 	public Model getCategoreyAction( @RequestBody RequestModel inData ) {
-		String categoryId = inData.getString( "categoryId" );
-		if(Stringz.isEmpty( categoryId )) return new Model().addError( "categoryId is empty" );
-		
 		Model model = new Model();
+		
+		String categoryId = inData.getString( "categoryId" );
+		if( Stringz.isEmpty( categoryId ) ) return model.addError( "categoryId is empty" );
+
 		model.setRow( codeDictService.getCodeCategory( categoryId ) );
 		return model;
 	}

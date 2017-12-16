@@ -5,8 +5,8 @@
  */
 package cn.com.higinet.tms.manager.common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Maps;
+
+import cn.com.higinet.tms.base.entity.common.DictCategory;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 
 /**
@@ -27,7 +30,6 @@ public class CodeDict {
 	@Autowired
 	@Qualifier("cmcSimpleDao")
 	private SimpleDao cmcSimpleDao;
-	
 
 	/**
 	 * 获取一个代码类别下代码键的值
@@ -65,23 +67,37 @@ public class CodeDict {
 	 * 获取所有代码定义
 	 * @return 存放代码的键值对的Map对象
 	 */
-	public Map<String, Map<String, String>> getAllCodes() {
+	public Map<String, DictCategory> getAllCodes() {
 		String sql = "SELECT * FROM CMC_CODE_CATEGORY";
 		List<Map<String, Object>> categorylist = cmcSimpleDao.queryForList( sql );
 		sql = "SELECT * FROM CMC_CODE ORDER BY CATEGORY_ID, ONUM";
 		List<Map<String, Object>> codelist = cmcSimpleDao.queryForList( sql );
 
-		Map<String, Map<String, String>> codes0 = new HashMap<String, Map<String, String>>();
+		Map<String, DictCategory> codes0 = new HashMap<String, DictCategory>();
 		for( Map<String, Object> category : categorylist ) {
 			String categoryId = (String) category.get( "CATEGORY_ID" );
-			codes0.put( categoryId, new LinkedHashMap<String, String>() );
+			String categoryName = (String) category.get( "CATEGORY_NAME" );
+			String categoryInfo = (String) category.get( "INFO" );
+
+			DictCategory dict = new DictCategory();
+			dict.setId( categoryId );
+			dict.setName( categoryName );
+			dict.setInfo( categoryInfo );
+			dict.setItems( new ArrayList<Map<String, Object>>() );
+
+			codes0.put( categoryId, dict );
 		}
 		for( Map<String, Object> code : codelist ) {
 			String categoryId = (String) code.get( "CATEGORY_ID" );
 			String codeKey = (String) code.get( "CODE_KEY" );
 			String codeValue = (String) code.get( "CODE_VALUE" );
+
+			Map<String, Object> item = Maps.newHashMap();
+			item.put( "key", codeKey );
+			item.put( "value", codeValue );
+
 			if( codes0.containsKey( categoryId ) ) {
-				codes0.get( categoryId ).put( codeKey, codeValue );
+				codes0.get( categoryId ).getItems().add( item );
 			}
 		}
 		return codes0;

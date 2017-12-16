@@ -18,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.common.CodeDict;
 import cn.com.higinet.tms.manager.common.Func;
 import cn.com.higinet.tms.manager.common.service.FuncService;
@@ -33,10 +35,6 @@ public class FuncController {
 
 	@Autowired
 	private FuncService funcService;
-
-	public void setFuncService( FuncService funcService ) {
-		this.funcService = funcService;
-	}
 
 	@Autowired
 	@Qualifier("cmcFunc")
@@ -61,7 +59,7 @@ public class FuncController {
 	 * @return
 	 */
 	@RequestMapping(value = "/tree", method = RequestMethod.POST)
-	public Model listAction( @RequestParam Map<String, String> reqs ) {
+	public Model listAction( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		List<Map<String, Object>> list = funcService.listAllFuncs( reqs );
 		List<Map<String, Object>> list2 = new ArrayList<Map<String, Object>>();
@@ -106,7 +104,7 @@ public class FuncController {
 	 * @return
 	 */
 	@RequestMapping("/add")
-	public Model addFuncAction( @RequestParam Map<String, Object> reqs ) {
+	public Model addFuncAction( @RequestBody RequestModel reqs ) {
 		Model model = new Model();
 		String code = codeDict.getCode( "common.model", "runmode" );
 		if( code != null && "development".equals( code ) ) {
@@ -144,7 +142,7 @@ public class FuncController {
 	 * @return
 	 */
 	@RequestMapping("/mod")
-	public Model modFuncAction( @RequestParam Map<String, Object> reqs ) {
+	public Model modFuncAction( @RequestBody RequestModel reqs ) {
 		Map<String, Object> func = new HashMap<String, Object>();
 		func.put( "FUNC_NAME", reqs.get( "func_name" ) );
 		func.put( "FUNC_ID", reqs.get( "func_id" ) );
@@ -181,7 +179,10 @@ public class FuncController {
 	 * @return
 	 */
 	@RequestMapping("/del")
-	public Model delFuncAction( @RequestParam String funcId, HttpServletRequest request ) {
+	public Model delFuncAction( @RequestBody RequestModel modelMap, HttpServletRequest request ) {
+		String funcId = modelMap.getString( "funcId" );
+		if( Stringz.isEmpty( funcId ) ) return Model.emptyModel().addError( "funcId is empty" );
+
 		Model model = Model.emptyModel();
 		String code = codeDict.getCode( "common.model", "runmode" );
 		String funcName = funcService.delFuncName( funcId );
@@ -200,12 +201,9 @@ public class FuncController {
 	}
 
 	@RequestMapping(value = "/getAll", method = RequestMethod.POST)
-	public Model getAllFuncAction( @RequestParam Map<String, String> reqs ) {
-		Model model = new Model();
-
+	public Model getAllFuncAction( @RequestBody RequestModel modelMap ) {
 		List<Map<String, Object>> funcOptList = new ArrayList<Map<String, Object>>();
 		funcService.listAllFuncsSort( funcOptList );
-		model.setRow( funcOptList );
-		return model;
+		return new Model().setRow( funcOptList );
 	}
 }

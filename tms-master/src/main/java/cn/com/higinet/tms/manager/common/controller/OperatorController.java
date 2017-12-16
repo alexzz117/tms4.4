@@ -14,11 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.common.Constant;
 import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.service.OperatorService;
@@ -58,7 +61,7 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model listActoin( @RequestParam Map<String, String> reqs ) {
+	public Model listActoin( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		model.setPage( operatorService.listOperator( reqs ) );
 		return model;
@@ -79,11 +82,11 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public Model addOperatorActoin( @RequestParam Map<String, Object> reqs, HttpServletRequest request ) {
+	public Model addOperatorActoin( @RequestBody Map<String, Object> reqs, HttpServletRequest request ) {
 
 		Model model = new Model();
 		String roleId = CmcMapUtil.getString( reqs, "role" );
-		Map map = operatorService.getRole( roleId );
+		Map<String, Object> map = operatorService.getRole( roleId );
 		request.setAttribute( DBConstant.CMC_ROLE_ROLE_NAME, map.get( DBConstant.CMC_ROLE_ROLE_NAME ) );
 		model.setRow( operatorService.createOperator( reqs ) );
 		return model;
@@ -95,7 +98,7 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/del")
-	public Model delOperatorAction( @RequestParam("operatorId") String[] operatorId, HttpServletRequest request ) {
+	public Model delOperatorAction( @RequestBody String[] operatorId, HttpServletRequest request ) {
 		Model model = new Model();
 		if( operatorId != null && operatorId.length > 0 ) {
 			Map map = operatorService.getOperator( operatorId[0] );
@@ -121,9 +124,10 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/get")
-	public Model getRoleActoin( @RequestParam String operatorId ) {
+	public Model getRoleActoin( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
-		model.setRow( operatorService.getOperator( operatorId ) );
+		if( Stringz.isEmpty( modelMap.getString( "operatorId" ) ) ) return model.addError( "operatorId is empty" );
+		model.setRow( operatorService.getOperator( modelMap.getString( "operatorId" ) ) );
 		return model;
 	}
 
@@ -133,15 +137,14 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/mod", method = RequestMethod.POST)
-	public Model updateOperatorActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model updateOperatorActoin( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Map<String, Object> operator = operatorService.getOperator( reqs.get( "operator_id" ) );
 		Model model = new Model();
 		//记录分配角色日志
 		String roleId = CmcMapUtil.getString( reqs, "role" );
-		Map map = operatorService.getRole( roleId );
+		Map<String, Object> map = operatorService.getRole( roleId );
 		request.setAttribute( DBConstant.CMC_OPERATOR_LOGIN_NAME, operator.get( DBConstant.CMC_OPERATOR_LOGIN_NAME ) );
 		request.setAttribute( DBConstant.CMC_ROLE_ROLE_NAME, map.get( DBConstant.CMC_ROLE_ROLE_NAME ) );
-		//		operator.put("LOGIN_NAME", reqs.get("login_name"));
 		if( !"".equals( reqs.get( "password" ) ) ) {
 			operator.put( "PASSWORD", reqs.get( "password" ) );
 		}
@@ -174,8 +177,10 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/granted", method = RequestMethod.POST)
-	public Model listRole( @RequestParam String operatorId ) {
+	public Model listRole( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
+		String operatorId = modelMap.getString( "operatorId" );
+		if( Stringz.isEmpty( operatorId ) ) return model.addError( "operatorId is empty" );
 		model.set( "olist", operatorService.listOperatorNotAssignRole( operatorId ) );
 		model.set( "slist", operatorService.listOperatorAssignRole( operatorId ) );
 		return model;
@@ -187,7 +192,7 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/grant", method = RequestMethod.POST)
-	public Model assignOperatorRoleActoin( @RequestParam Map<String, String> reqs ) {
+	public Model assignOperatorRoleActoin( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		String operatorId = reqs.get( "operator_id" );
 		String tarvalue = reqs.get( "tarvalue" );
@@ -204,8 +209,11 @@ public class OperatorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/check/username", method = RequestMethod.POST)
-	public Model checkUserNameAction( @RequestParam String username ) {
+	public Model checkUserNameAction( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
+		String username = modelMap.getString( "username" );
+		if( Stringz.isEmpty( username ) ) return model.addError( "username is empty" );
+
 		boolean flag = operatorService.hasUserName( username );
 		if( flag ) {
 			model.set( "checke_result", "false" );
@@ -217,8 +225,16 @@ public class OperatorController {
 	}
 
 	@RequestMapping(value = "/reset", method = RequestMethod.POST)
-	public Model resetPwd( @RequestParam String operatorId, String loginName, String passWord, HttpServletRequest request ) {
+	public Model resetPwd( @RequestBody RequestModel modelMap, HttpServletRequest request ) {
 		Model model = new Model();
+
+		String operatorId = modelMap.getString( "operatorId" );
+		String loginName = modelMap.getString( "loginName" );
+		String passWord = modelMap.getString( "passWord" );
+		if( Stringz.isEmpty( operatorId, loginName, passWord ) ) {
+			model.addError( "operatorId or loginName or passWord is empty" );
+		}
+
 		boolean flag = operatorService.resetPwd( operatorId, passWord );
 		request.setAttribute( DBConstant.CMC_OPERATOR_LOGIN_NAME, loginName );
 		if( flag ) {
