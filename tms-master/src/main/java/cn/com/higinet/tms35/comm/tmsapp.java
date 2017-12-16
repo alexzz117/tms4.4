@@ -13,7 +13,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.tms35.core.concurrent.tps_monitor;
 import cn.com.higinet.tms35.core.dao.dao_serv_live;
 import cn.com.higinet.tms35.core.dao.dao_serv_live.db_server;
 
@@ -25,13 +24,6 @@ public final class tmsapp
 	private static byte[] serv_ip_byte;
 	private static String serv_ip;
 	private static List<String> serv_ips;
-	private static tps_monitor g_monitor=new tps_monitor(10);
-	
-	
-	static public tps_monitor get_monitor()
-	{
-		return g_monitor;
-	}
 
 	final static long nanoMs()
 	{

@@ -16,7 +16,6 @@ import javax.sql.DataSource;
 import cn.com.higinet.tms35.comm.MD5Util;
 import cn.com.higinet.tms35.comm.comp_tool;
 import cn.com.higinet.tms35.comm.hash;
-import cn.com.higinet.tms35.comm.roster_refresh_worker;
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.comm.tms_exception;
 import cn.com.higinet.tms35.core.concurrent.rw_lock;
@@ -611,7 +610,7 @@ public final class db_roster
 			map.put("rosterValue", val);
 			map.put("enabletime", now_ms);
 			map.put("disabletime", 0);
-			roster_refresh_worker.worker().request(map);
+			//roster_refresh_worker.worker().request(map);
 		}
 
 		/**
