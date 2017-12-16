@@ -1,9 +1,6 @@
 package cn.com.higinet.tms.config;
 
-import java.util.Map;
-
 import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.impl.MysqlSimpleDaoImpl;
@@ -80,6 +76,11 @@ public class SimpleDaoConfig {
 	@Bean("transactionManager")
 	public DataSourceTransactionManager transactionManager() {
 		return new DataSourceTransactionManager( dynamicDataSource );
+	}
+
+	@Bean("officialTransactionManager")
+	public DataSourceTransactionManager officialTransactionManager() {
+		return new DataSourceTransactionManager( onlineDataSource );
 	}
 
 	@Bean("cmcTransactionManager")

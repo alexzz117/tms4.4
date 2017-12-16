@@ -18,7 +18,6 @@ import cn.com.higinet.tms35.comm.comp_tool;
 import cn.com.higinet.tms35.comm.hash;
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.comm.tms_exception;
-import cn.com.higinet.tms35.core.concurrent.rw_lock;
 import cn.com.higinet.tms35.core.cond.date_tool;
 import cn.com.higinet.tms35.core.cond.ip_tool;
 import cn.com.higinet.tms35.core.dao.dao_seq;
@@ -272,7 +271,7 @@ public final class db_roster
 			return val_in(p.intValue(), val, now_Ms);
 		}
 
-		public boolean val_in(int id, Object val, long now_Ms)
+		/*public boolean val_in(int id, Object val, long now_Ms)
 		{
 			if (val == null)
 				return false;
@@ -288,9 +287,9 @@ public final class db_roster
 				return val_in_db(dr, val, now_Ms);
 
 			return val_in_cache(dr, val, now_Ms);
-		}
+		}*/
 		
-		private boolean val_in_cache(db_roster dr, Object val, long now_ms)
+		/*private boolean val_in_cache(db_roster dr, Object val, long now_ms)
 		{
 			linear<value> lin = val_map.get(dr.id);
 			if (lin == null)
@@ -315,7 +314,7 @@ public final class db_roster
 			{
 				lock.done_read();
 			}
-		}
+		}*/
 		
 		private boolean find_in_cache(value v, long now, linear<value> lin)
 		{
@@ -395,7 +394,7 @@ public final class db_roster
 		 * 更新名单数据
 		 * @param list	名单数据
 		 */
-		public void update_roster(List<Map<String, String>> list)
+		/*public void update_roster(List<Map<String, String>> list)
 		{
 			if (list == null || list.isEmpty())
 				return;
@@ -464,10 +463,10 @@ public final class db_roster
 			{
 				lock.done_write();
 			}
-		}
+		}*/
 		
 		@SuppressWarnings("unchecked")
-		public void update_rostervalue(List<Map<String, Object>> list)
+		/*public void update_rostervalue(List<Map<String, Object>> list)
 		{
 			if (list == null || list.isEmpty())
 				return;
@@ -477,14 +476,14 @@ public final class db_roster
 				List<Map<String, String>> values = (List<Map<String, String>>) map.get("values");
 				update_rostervalue(roster_id, values);
 			}
-		}
+		}*/
 		
 		/**
 		 * 更新名单值数据
 		 * @param roster_id		名单ID
 		 * @param list			名单值数据
 		 */
-		private void update_rostervalue(int roster_id, List<Map<String, String>> list)
+		/*private void update_rostervalue(int roster_id, List<Map<String, String>> list)
 		{
 			if (list == null || list.isEmpty())
 				return;
@@ -552,7 +551,7 @@ public final class db_roster
 			{
 				lock.done_write();
 			}
-		}
+		}*/
 
 		/**
 		 * 添加名单值
@@ -560,14 +559,14 @@ public final class db_roster
 		 * @param val		名单值
 		 * @param now_ms	交易时间
 		 */
-		public void add_value(String name, Object val, long now_ms)
+		/*public void add_value(String name, Object val, long now_ms)
 		{
 			db_roster dr = name_map.get(name);
 			if (dr != null)
 			{
 				add_value(dr.id, val, now_ms);
 			}
-		}
+		}*/
 
 		/**
 		 * 添加名单值
@@ -575,7 +574,7 @@ public final class db_roster
 		 * @param val		名单值
 		 * @param now_ms	交易时间
 		 */
-		public void add_value(int id, Object val, long now_ms)
+		/*public void add_value(int id, Object val, long now_ms)
 		{
 			if (val == null)
 				return;
@@ -611,7 +610,7 @@ public final class db_roster
 			map.put("enabletime", now_ms);
 			map.put("disabletime", 0);
 			//roster_refresh_worker.worker().request(map);
-		}
+		}*/
 
 		/**
 		 * 向缓存中添加名单值
@@ -620,7 +619,7 @@ public final class db_roster
 		 * @param val		名单值
 		 * @param now_ms	交易时间
 		 */
-		private void insert_val_cache(db_roster dr, long id, Object val, long now_ms)
+		/*private void insert_val_cache(db_roster dr, long id, Object val, long now_ms)
 		{
 			linear<value> lin = val_map.get(dr.id);
 			rw_lock lock = rw_lock.get_sync_rw_lock(lin);
@@ -638,7 +637,7 @@ public final class db_roster
 			{
 				lock.done_write();
 			}
-		}
+		}*/
 
 		private static batch_stmt_jdbc stmt_insert_value = null;
 		private static batch_stmt_jdbc stmt_insert_value_tmp = null;

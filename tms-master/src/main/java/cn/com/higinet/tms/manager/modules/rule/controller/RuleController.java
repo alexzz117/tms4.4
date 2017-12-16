@@ -11,6 +11,9 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,7 +43,7 @@ import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
 @RequestMapping("/tms/rule")
 public class RuleController {
 	
-	private static Log log = LogFactory.getLog(RuleController.class);
+	private static final Logger log = LoggerFactory.getLogger( RuleController.class );
 	@Autowired
 	private RuleService ruleService35;
 	@Autowired
@@ -78,7 +81,7 @@ public class RuleController {
 		try {
 			formList = objectMapper.readValue(json, Map.class);
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage(), e);
 			throw new TmsMgrWebException("保存动作Json数据解析异常");
 		} 
 		Model m = new Model();

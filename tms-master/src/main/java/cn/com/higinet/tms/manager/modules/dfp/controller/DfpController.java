@@ -32,7 +32,7 @@ public class DfpController {
 	private static Log log = LogFactory.getLog(DfpController.class);
 	
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 
 	@Autowired
 	private DfpService dfpService;

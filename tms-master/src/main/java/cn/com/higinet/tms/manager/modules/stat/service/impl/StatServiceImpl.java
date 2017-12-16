@@ -47,10 +47,13 @@ import cn.com.higinet.tms35.core.cache.db_stat;
 @Service("statService")
 //@Transactional("tms")
 public class StatServiceImpl implements StatService {
+	
 	@Autowired
+	@Qualifier("officialTransactionManager")
 	private DataSourceTransactionManager officialTransactionManager;
 	
 	@Autowired
+	@Qualifier("tmpTransactionManager")
 	private DataSourceTransactionManager tmpTransactionManager;
 	
 	@Autowired
