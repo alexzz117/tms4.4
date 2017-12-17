@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import cn.com.higinet.tms.manager.common.Constant;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -63,7 +63,7 @@ public class SafeDeviceService  {
 	@SuppressWarnings("unchecked")
 	public void addSafeDeviceAction(Map<String, String> reqs,HttpServletRequest request) {
 		StringBuilder sql = new StringBuilder();
-		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute(Constant.SESSION_KEY_OPERATOR);
+		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute(ManagerConstants.SESSION_KEY_OPERATOR);
 		reqs.put("OPERATOR_ID", (String) operator.get("OPERATOR_ID"));
 		reqs.put("CREATED_DATE",  reqs.get("t"));
 		reqs.put("STATUS",  "1");
@@ -79,7 +79,7 @@ public class SafeDeviceService  {
 	@SuppressWarnings("unchecked")
 	public void updateSafeDeviceByUuid(Map<String, String> reqs,HttpServletRequest request) {
 		StringBuffer sql=new StringBuffer();
-		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute(Constant.SESSION_KEY_OPERATOR);
+		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute(ManagerConstants.SESSION_KEY_OPERATOR);
 		reqs.put("OPERATOR_ID", (String) operator.get("OPERATOR_ID"));
 		reqs.put("UPDATED_DATE",  reqs.get("t"));
 		sql.append("update TMS_MGR_SAFE_DEVICE s set s.STATUS=:STATUS,s.DESCR=:DESCR,s.UPDATED_DATE=:UPDATED_DATE,UPDATED_BY=:OPERATOR_ID where s.DEVICE_ID=:DEVICE_ID");

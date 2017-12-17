@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
 
@@ -22,7 +23,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
  */
 
 @RestController("nameListViewController")
-@RequestMapping("/tms/mgrView")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/mgrView")
 public class NameListViewController {
 
 	private static final Logger logger = LoggerFactory.getLogger( NameListViewController.class );

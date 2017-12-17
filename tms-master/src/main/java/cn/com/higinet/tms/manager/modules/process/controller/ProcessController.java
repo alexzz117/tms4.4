@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.process.service.ProcessService;
@@ -28,7 +29,7 @@ import cn.com.higinet.tms.manager.modules.process.service.ProcessService;
  */
 
 @RestController("processController")
-@RequestMapping("/tms/process")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/process")
 public class ProcessController {
 	
 	private static final Logger log = LoggerFactory.getLogger( ProcessController.class );

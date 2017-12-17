@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.util.Stringz;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.aop.cache.CacheRefresh;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
@@ -24,7 +25,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.BankQuotaService;
  */
 
 @RestController("bankQuotaController")
-@RequestMapping("/tms/bankQuota")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/bankQuota")
 public class BankQuotaController {
 
 	@Autowired

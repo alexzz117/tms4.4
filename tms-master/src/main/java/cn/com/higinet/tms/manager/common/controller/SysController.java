@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
-import cn.com.higinet.tms.manager.common.Constant;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.service.OperatorService;
 import cn.com.higinet.tms.manager.common.service.SysService;
@@ -95,7 +95,7 @@ public class SysController {
 
 		//MD5在前端加密，前端加密将使得密码加密失去意义
 		//System.out.println("username:"+username+", password:"+password);
-		//Object o = session.getAttribute(Constant.SESSION_KEY_OPERATOR);
+		//Object o = session.getAttribute(ManagerConstants.SESSION_KEY_OPERATOR);
 		//TODO 防止重复登录
 
 		Model model = new Model();
@@ -112,7 +112,7 @@ public class SysController {
 			}
 			else {
 				operator.remove( DBConstant.CMC_OPERATOR_PASSWORD );
-				session.setAttribute( Constant.SESSION_KEY_OPERATOR, operator );
+				session.setAttribute( ManagerConstants.SESSION_KEY_OPERATOR, operator );
 				//将操作员配置信息PROFILE放到session中
 				Map<String, String> profile = new HashMap<String, String>();
 				profile.put( "pagesize", "25" );
@@ -127,12 +127,12 @@ public class SysController {
 					}
 				}
 				profile.put( "username", (String) operator.get( DBConstant.CMC_OPERATOR_LOGIN_NAME ) );
-				session.setAttribute( Constant.SESSION_KEY_PROFILE, profile );
+				session.setAttribute( ManagerConstants.SESSION_KEY_PROFILE, profile );
 
 				//将func编号缓存到会话中
 				String operatorId = (String) operator.get( DBConstant.CMC_OPERATOR_OPERATOR_ID );
 				String[] funcIds = cmcSysService.getOperatorFuncIds( operatorId );
-				session.setAttribute( Constant.SESSION_KEY_FUNCIDS, funcIds );
+				session.setAttribute( ManagerConstants.SESSION_KEY_FUNCIDS, funcIds );
 				//登陆成功后，更新操作员最后登录时间
 				operator.put( "LAST_LOGIN", new Date() );
 				cmcOperatorService.updateOperator( operator );
@@ -158,7 +158,7 @@ public class SysController {
 	@RequestMapping(value = "/logout", method = RequestMethod.POST)
 	public Model logoutAction( HttpSession session ) {
 		Model model = new Model();
-		session.removeAttribute( Constant.SESSION_KEY_OPERATOR );
+		session.removeAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		return model;
 	}
 
@@ -180,10 +180,10 @@ public class SysController {
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public String logoutView( HttpServletRequest request ) {
 		HttpSession session = request.getSession();
-		Map<String, Object> opr = (Map<String, Object>) session.getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, Object> opr = (Map<String, Object>) session.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		request.setAttribute( "LOGIN_NAME", opr.get( "LOGIN_NAME" ) );
-		request.setAttribute( Constant.SESSION_KEY_OPERATOR, session.getAttribute( Constant.SESSION_KEY_OPERATOR ) );
-		session.removeAttribute( Constant.SESSION_KEY_OPERATOR );
+		request.setAttribute( ManagerConstants.SESSION_KEY_OPERATOR, session.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR ) );
+		session.removeAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		return "redirect:/login";
 	}
 
@@ -205,7 +205,7 @@ public class SysController {
 	@RequestMapping("/menu")
 	public Model menu( HttpSession session ) {
 		Model model = new Model();
-		Map<String, Object> operator = (Map<String, Object>) session.getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, Object> operator = (Map<String, Object>) session.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		String operatorId = (String) operator.get( DBConstant.CMC_OPERATOR_OPERATOR_ID );
 		List<Map<String, Object>> menu = cmcSysService.getOperatorMenu( operatorId );
 		List<Map<String, Object>> menu2 = new ArrayList<Map<String, Object>>();
@@ -252,7 +252,7 @@ public class SysController {
 	@RequestMapping(value = "/profile/pwd/update", method = RequestMethod.POST)
 	public Model updatePwdAction( @RequestBody Map<String, String> reqs, HttpSession session, HttpServletRequest request ) {
 		Model model = new Model();
-		Map<String, Object> opr = (Map<String, Object>) session.getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, Object> opr = (Map<String, Object>) session.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		Map<String, Object> operator = cmcOperatorService.getOperator( (String) opr.get( "OPERATOR_ID" ) );
 		request.setAttribute( "LOGIN_NAME", opr.get( "LOGIN_NAME" ) );
 		if( !operator.get( "PASSWORD" ).toString().equals( reqs.get( "old_password" ) ) ) {
@@ -283,7 +283,7 @@ public class SysController {
 	@RequestMapping(value = "/profile/get")
 	public Model getProfileAction( HttpSession session ) {
 		Model model = new Model();
-		Map<String, String> operator = (Map<String, String>) session.getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, String> operator = (Map<String, String>) session.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		String confStr = operator.get( "CONF" );
 		Map<String, String> profile = new HashMap<String, String>();
 		profile.put( "pagesize", "25" );
@@ -316,16 +316,16 @@ public class SysController {
 		if( !maxpanel.matches( "[0,1]" ) ) {
 			maxpanel = "0";
 		}
-		Map<String, Object> opr = (Map<String, Object>) session.getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, Object> opr = (Map<String, Object>) session.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		request.setAttribute( "LOGIN_NAME", opr.get( "LOGIN_NAME" ) );
 		String conf = "pagesize:" + pagesize + ";maxpanel:" + maxpanel;
 		opr.put( "CONF", conf );
 		cmcOperatorService.updateOperator( opr );
 		//刷新session中的操作员配置信息
-		Map<String, String> profile = (Map<String, String>) session.getAttribute( Constant.SESSION_KEY_PROFILE );
+		Map<String, String> profile = (Map<String, String>) session.getAttribute( ManagerConstants.SESSION_KEY_PROFILE );
 		if( profile == null ) {
 			profile = new HashMap<String, String>();
-			session.setAttribute( Constant.SESSION_KEY_PROFILE, profile );
+			session.setAttribute( ManagerConstants.SESSION_KEY_PROFILE, profile );
 		}
 		profile.put( "pagesize", pagesize );
 		profile.put( "maxpanel", maxpanel );

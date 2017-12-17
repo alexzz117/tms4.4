@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
@@ -24,7 +25,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.AssignAutoService;
  * @author tlh
  */
 @RestController("AssignAutoController")
-@RequestMapping("/tms/assignAuto")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/assignAuto")
 public class AssignAutoController {
 	
 	private static final Logger logger = LoggerFactory.getLogger( AssignAutoController.class );

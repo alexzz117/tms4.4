@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.auth.exception.TmsMgrAuthDataSyncException;
@@ -35,7 +36,7 @@ import cn.com.higinet.tms.manager.modules.mgr.util.MgrDateConvertUtil;
  * @version 1.0.0, 2012-9-6
  */
 @RestController("authController")
-@RequestMapping("/tms/auth")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/auth")
 public class AuthController extends ApplicationObjectSupport {
 	
 	@Autowired

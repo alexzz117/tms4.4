@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.alarm.service.AlarmQueueService;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
@@ -20,7 +21,7 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
  */
 
 @RestController("alarmQueueController")
-@RequestMapping("/tms/alarmqueue")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/alarmqueue")
 public class AlarmQueueController {
 
 	@Autowired

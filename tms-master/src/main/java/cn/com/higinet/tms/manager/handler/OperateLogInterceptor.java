@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.util.Stringz;
-import cn.com.higinet.tms.manager.common.Constant;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.Func;
 import cn.com.higinet.tms.manager.common.OperateLog;
@@ -83,10 +83,10 @@ public class OperateLogInterceptor extends HandlerInterceptorAdapter {
 			//将当前操作员的ID放入数据总线中，在生成待授权信息时使用
 			Map<String, String> operator = null;
 			if( uri.contains( "logout" ) ) { //用户退出操作
-				operator = (Map<String, String>) request.getAttribute( Constant.SESSION_KEY_OPERATOR );
+				operator = (Map<String, String>) request.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 			}
 			else {
-				operator = (Map<String, String>) request.getSession().getAttribute( Constant.SESSION_KEY_OPERATOR );
+				operator = (Map<String, String>) request.getSession().getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 			}
 			if( operator != null ) {
 				AuthDataBusUtil.put( DBConstant.CMC_OPERATOR_OPERATOR_ID, operator.get( DBConstant.CMC_OPERATOR_OPERATOR_ID ) );
@@ -133,7 +133,7 @@ public class OperateLogInterceptor extends HandlerInterceptorAdapter {
 		}
 		else {
 			try {
-				if( request.getAttribute( Constant.SESSION_KEY_OPERATOR ) != null || (modelAndView != null && modelAndView instanceof Model) ) {
+				if( request.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR ) != null || (modelAndView != null && modelAndView instanceof Model) ) {
 
 					String uri = operateuri.substring( request.getContextPath().length() );
 					String method = request.getMethod().toUpperCase();

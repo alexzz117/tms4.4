@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
@@ -51,7 +52,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
  */
 
 @RestController("nameListController")
-@RequestMapping("/tms/mgr")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/mgr")
 public class NameListController {
 	
 	@Autowired
@@ -448,7 +449,7 @@ public class NameListController {
 		}
 		else {
 			model.addError( this.error );
-			model.set( "url", "/tms/mgr/list" );
+			model.set( "url", ManagerConstants.URI_PREFIX + "/mgr/list" );
 		}
 		return model;
 	}

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.base.util.Stringz;
-import cn.com.higinet.tms.manager.common.Constant;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -80,7 +80,7 @@ public class BankSwitchService {
 	 */
 	public void addBankSwitch( Map<String, String> reqs, HttpServletRequest request ) {
 		StringBuilder sql = new StringBuilder();
-		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		reqs.put( "CREATOR_ID", (String) operator.get( "OPERATOR_ID" ) );
 		reqs.put( "CREATE_TIME", String.valueOf( System.currentTimeMillis() ) );
 		reqs.put( "STATUS", "0" );
@@ -112,7 +112,7 @@ public class BankSwitchService {
 		int status_new = (Integer.parseInt( String.valueOf( List.get( "STATUS" ) ) ) + 1) % 2;
 		req.put( "STATUS_NEW", String.valueOf( status_new ) );
 
-		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		req.put( "UPDATOR_ID", (String) operator.get( "LOGIN_NAME" ) );
 		req.put( "UPDATE_TIME", String.valueOf( System.currentTimeMillis() ) );
 

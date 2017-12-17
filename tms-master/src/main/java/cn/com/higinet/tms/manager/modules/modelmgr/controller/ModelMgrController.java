@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -27,7 +28,7 @@ import cn.com.higinet.tms.manager.modules.modelmgr.service.ModelMgrService;
  */
 
 @RestController("modelMgrController")
-@RequestMapping("/tms/modelmgr")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/modelmgr")
 public class ModelMgrController {
 
 	@Autowired

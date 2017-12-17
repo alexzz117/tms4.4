@@ -123,12 +123,12 @@ public class OperateLogFactory {
 			}
 
 			if( uri.contains( "logout" ) ) { //用户退出操作
-				operator = (Map<String, String>) request.getAttribute( Constant.SESSION_KEY_OPERATOR );
+				operator = (Map<String, String>) request.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 				//				operatedata+="username="+operator.get(DBConstant.CMC_OPERATOR_LOGIN_NAME)+" ";
 				//				operateLogData.append("username="+operator.get(DBConstant.CMC_OPERATOR_LOGIN_NAME)+" ");
 			}
 			else {
-				operator = (Map<String, String>) request.getSession().getAttribute( Constant.SESSION_KEY_OPERATOR );
+				operator = (Map<String, String>) request.getSession().getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 			}
 			if( operator != null && !operator.isEmpty() ) { //登录成功后的操作
 

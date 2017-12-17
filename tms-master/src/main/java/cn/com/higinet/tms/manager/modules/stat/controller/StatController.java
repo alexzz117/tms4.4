@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.modules.common.CommonCheckService;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -53,7 +54,7 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
  */
 
 @RestController("statController")
-@RequestMapping("/tms/stat")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/stat")
 public class StatController {
 
 	private static final Logger logger = LoggerFactory.getLogger( StatController.class );

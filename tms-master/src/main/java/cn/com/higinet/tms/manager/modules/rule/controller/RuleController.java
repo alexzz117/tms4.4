@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.RuleJsonUtil;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
@@ -36,7 +37,7 @@ import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
  */
 
 @RestController("ruleController35")
-@RequestMapping("/tms/rule")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/rule")
 public class RuleController {
 
 	private static final Logger log = LoggerFactory.getLogger( RuleController.class );

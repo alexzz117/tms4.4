@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
@@ -31,7 +32,7 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransModelService;
  * @author zhang.lei
  */
 @RestController
-@RequestMapping("/tms/tranmdl")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/tranmdl")
 public class TransModelController {
 
 	private static Log log = LogFactory.getLog( TransModelController.class );

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.aml.common.AMLConstant;
 import cn.com.higinet.tms.manager.modules.aml.service.AntiMoneyLaunderingService;
@@ -23,7 +24,7 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
  * 
  */
 @RestController("antiMoneyLaunderingController")
-@RequestMapping("/tms/aml")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/aml")
 public class AntiMoneyLaunderingController {
 
 	@Autowired

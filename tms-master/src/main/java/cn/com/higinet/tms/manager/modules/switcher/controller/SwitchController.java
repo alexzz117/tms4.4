@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.switcher.service.SwitchService;
@@ -28,7 +29,7 @@ import cn.com.higinet.tms.manager.modules.switcher.service.SwitchService;
  */
 
 @RestController("switchController")
-@RequestMapping("/tms/switch")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/switch")
 public class SwitchController {
 
 	private static final Logger logger = LoggerFactory.getLogger( SwitchController.class );

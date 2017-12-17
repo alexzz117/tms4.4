@@ -18,13 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.FileUpLoadUtil;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.mgr.service.RiskCaseService;
 
 @RestController("riskCaseController")
-@RequestMapping("/tms/riskCase")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/riskCase")
 public class RiskCaseController {
 	
 	@Autowired

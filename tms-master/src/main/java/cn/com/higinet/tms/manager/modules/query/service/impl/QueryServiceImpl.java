@@ -31,6 +31,7 @@ import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.ConditionUtil;
 import cn.com.higinet.tms.manager.dao.Page;
@@ -74,7 +75,7 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 	@Autowired
 	private SequenceService sequenceService;
 
-	private static final String QUERY_URL_PREFIX = "/tms/query/show";
+	private static final String QUERY_URL_PREFIX = ManagerConstants.URI_PREFIX + "/query/show";
 
 	/**
 	 * 查询自定义查询列表数据

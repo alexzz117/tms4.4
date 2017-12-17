@@ -20,7 +20,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
-import cn.com.higinet.tms.manager.common.Constant;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.Func;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 
@@ -67,15 +67,15 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		//放过公用资源部分
-		if( uri.startsWith( Constant.URI_STATIC_PREFIX ) ) return true;
+		if( uri.startsWith( ManagerConstants.URI_STATIC_PREFIX ) ) return true;
 		//登录界面放过
-		if( Constant.URI_LOGIN.equals( uri ) ) return true;
+		if( ManagerConstants.URI_LOGIN.equals( uri ) ) return true;
 
 		//会话超时
 		HttpSession session = request.getSession();
 
 		//会话超时
-		if( session.getAttribute( Constant.SESSION_KEY_OPERATOR ) == null ) {
+		if( session.getAttribute( ManagerConstants.SESSION_KEY_OPERATOR ) == null ) {
 			sessionTimeout( contextPath, request, response );
 			return false;
 		}
@@ -84,7 +84,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		if( func.isProtectedUri( uri ) ) {
 			
 			String[] funcIds = func.getEnableFuncIdsByUri( uri );
-			String[] funcIds0 = (String[]) session.getAttribute( Constant.SESSION_KEY_FUNCIDS );
+			String[] funcIds0 = (String[]) session.getAttribute( ManagerConstants.SESSION_KEY_FUNCIDS );
 			if( funcIds.length == 0 ) return true;
 			if( null == funcIds0 ) {
 				forbidden( request, response );
@@ -117,14 +117,14 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 		String method = request.getMethod();
 		//这里简要认为POST请求是数据请求， GET请求是视图类请求
 		if( GET.equalsIgnoreCase( method ) ) {
-			response.sendRedirect( contextPath + Constant.URI_LOGIN );
+			response.sendRedirect( contextPath + ManagerConstants.URI_LOGIN );
 		}
 		else if( POST.equalsIgnoreCase( method ) ) {
 			//如果会话丢失，应该返回一个需要登录的标记
 			//理论上解应该按照映射到的方法的具体返回类型来返回对应类型的消息
 			Model model = new Model();
 			model.addError( "error.cmc.nosession" );
-			model.set( "url", Constant.URI_LOGIN );
+			model.set( "url", ManagerConstants.URI_LOGIN );
 			ObjectMapper m = new ObjectMapper();
 			m.writeValue( response.getOutputStream(), model.getModel() );
 		}

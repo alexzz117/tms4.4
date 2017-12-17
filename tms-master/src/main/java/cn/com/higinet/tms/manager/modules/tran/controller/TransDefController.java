@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
@@ -32,7 +33,7 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
  */
 
 @RestController
-@RequestMapping("/tms/trandef")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/trandef")
 public class TransDefController {
 
 	@Autowired

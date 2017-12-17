@@ -21,6 +21,7 @@ import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.common.CodeDict;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.service.CodeDictService;
 
 /**
@@ -31,7 +32,7 @@ import cn.com.higinet.tms.manager.common.service.CodeDictService;
  */
 
 @RestController("cmcCodeDictController")
-@RequestMapping("/cmc/codedict")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/codedict")
 public class CodeDictController {
 
 	@Autowired

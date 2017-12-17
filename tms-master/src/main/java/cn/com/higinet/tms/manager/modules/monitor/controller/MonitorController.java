@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.common.CodeDict;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SqlMap;
@@ -41,7 +42,7 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
  */
 
 @RestController("monitorController")
-@RequestMapping("/tms/monitor")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/monitor")
 public class MonitorController extends ApplicationObjectSupport {
 
 	//用于控制交易运行监控中，显示前几个交易

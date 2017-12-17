@@ -6,7 +6,6 @@
 package cn.com.higinet.tms.manager.common.controller;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -19,13 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.DictCategory;
 import cn.com.higinet.tms.manager.common.CodeDict;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 
 /**
  * 公用环境参数Controller类
  * @author zhang.lei
  */
 @RestController
-@RequestMapping("/tms/common")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/common")
 public class EnvController {
 
 	private static final Logger logger = LoggerFactory.getLogger( EnvController.class );

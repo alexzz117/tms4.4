@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.base.util.Stringz;
-import cn.com.higinet.tms.manager.common.Constant;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.service.LogService;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
@@ -57,7 +57,7 @@ public class LogController {
 		map.putAll( reqs );
 
 		//zhangfg 2012-08-29 获取当前操作员，查询日志时除管理员外，只能查看自己的操作日志
-		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute( Constant.SESSION_KEY_OPERATOR );
+		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
 		String operId = CmcStringUtil.objToString( operator.get( DBConstant.CMC_OPERATOR_OPERATOR_ID ) );
 		map.put( DBConstant.CMC_OPERATOR_OPERATOR_ID, operId );
 

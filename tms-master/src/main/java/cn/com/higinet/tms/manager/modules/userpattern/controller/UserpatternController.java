@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -36,7 +37,7 @@ import cn.com.higinet.tms.manager.modules.userpattern.service.UserPatternService
  * @author zhang.lei
  */
 @RestController("userpatternController")
-@RequestMapping("/tms/userpattern")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/userpattern")
 public class UserpatternController {
 
 	private static final Logger logger = LoggerFactory.getLogger( UserpatternController.class );
@@ -59,30 +60,30 @@ public class UserpatternController {
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String listUserpatternAction() {
 		return "/tms/userpattern/stat_list";
-	}
+	}*/
 
 	/**
 	 * 方法描述:查询列表(已废弃）
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value = "/userList", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/userList", method = RequestMethod.GET)
 	public String userListAction() {
 		return "/tms/userpattern/user_list";
-	}
+	}*/
 
 	/**
 	 * 方法描述:查询列表（已废弃）
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value = "/userPatternList", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/userPatternList", method = RequestMethod.GET)
 	public String userPatternListAction() {
 		return "/tms/userpattern/userpattern_list";
-	}
+	}*/
 
 	/**
 	 * 方法描述:查询统计列表

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.sign.service.SignService;
 
@@ -19,7 +20,7 @@ import cn.com.higinet.tms.manager.modules.sign.service.SignService;
  */
 
 @RestController("signController")
-@RequestMapping("/tms/sign")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/sign")
 public class SignController {
 	
 	@Autowired

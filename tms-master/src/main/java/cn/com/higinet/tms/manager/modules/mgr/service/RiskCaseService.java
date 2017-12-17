@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.com.higinet.tms.base.util.CalendarUtil;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
@@ -37,9 +38,7 @@ public class RiskCaseService {
 
 	public Page<Map<String, Object>> getRiskCaseList( Map<String, String> reqs ) {
 		StringBuilder sql = new StringBuilder();
-		sql.append(
-				"select r.uuid,r.case_no,r.title,r.src_type,r.cur_date,r.is_re_check,r.created_date,o.login_name,o.real_name,u.userid,u.cusname,u.mobile,u.status  from TMS_MGR_RISK_CASE r left join TMS_MGR_RISK_CASE_TXN t on r.uuid=t.case_uuid "
-						+ "left join TMS_RUN_USER u on t.userid=u.userid left join CMC_OPERATOR o on o.operator_id=r.operator_id " );
+		sql.append( "select r.uuid,r.case_no,r.title,r.src_type,r.cur_date,r.is_re_check,r.created_date,o.login_name,o.real_name,u.userid,u.cusname,u.mobile,u.status  from TMS_MGR_RISK_CASE r left join TMS_MGR_RISK_CASE_TXN t on r.uuid=t.case_uuid " + "left join TMS_RUN_USER u on t.userid=u.userid left join CMC_OPERATOR o on o.operator_id=r.operator_id " );
 		sql.append( "where 1=1" );
 
 		String userId = reqs.get( "USERID" );
@@ -121,8 +120,7 @@ public class RiskCaseService {
 		Page<Map<String, Object>> riskCasePage = offlineSimpleDao.pageQuery( sql.toString(), map, new Order().desc( "CREATED_DATE" ) );
 		for( Map<String, Object> operMap : riskCasePage.getList() ) {
 			operMap.put( "OPERATOR", operMap.get( "REAL_NAME" ) + "(" + operMap.get( "login_name" ) + ")" );
-			operMap.put( "OPER_HISTORY",
-					"<a href=\"#'+(new Date().getTime())+'\" onclick=\"jcl.go('/tms/riskCase/getInfo?risk_case_id=" + operMap.get( "uuid" ) + "')\">处理历史</a>" );
+			operMap.put( "OPER_HISTORY", "<a href=\"#'+(new Date().getTime())+'\" onclick=\"jcl.go('" + ManagerConstants.URI_PREFIX + "/riskCase/getInfo?risk_case_id=" + operMap.get( "uuid" ) + "')\">处理历史</a>" );
 			String status = (String) operMap.get( "STATUS" );
 			if( null != status && status.trim().length() > 0 ) {
 				if( "NORMAL".equals( status ) ) {
@@ -271,8 +269,7 @@ public class RiskCaseService {
 		// tmpSimpleDao.create("TMS_MGR_RISK_CASE_INVST", riskCaseInvstMap);
 		offlineSimpleDao.executeUpdate(
 				"MERGE INTO TMS_MGR_RISK_CASE_INVST T USING( SELECT :UUID AS UUID,:CASE_UUID AS CASE_UUID,:IS_AMOUNT_CORRECT AS IS_AMOUNT_CORRECT,:IS_BANK_PROVE AS IS_BANK_PROVE,:FILE_UUID AS FILE_UUID,:IS_PHONE_CHECK AS IS_PHONE_CHECK,:IS_OWNER AS IS_OWNER,:FINAL_DECISION AS FINAL_DECISION,:DISPOSAL AS DISPOSAL,:DESCR AS DESCR,:CREATED_DATE AS CREATED_DATE,:CREATED_BY AS CREATED_BY,:UPDATED_DATE AS UPDATED_DATE,:UPDATED_BY AS UPDATED_BY FROM DUAL) S  "
-						+ "ON (T.CASE_UUID=S.CASE_UUID) "
-						+ "WHEN MATCHED THEN    UPDATE SET IS_AMOUNT_CORRECT = S.IS_AMOUNT_CORRECT,IS_BANK_PROVE = S.IS_BANK_PROVE,FILE_UUID = S.FILE_UUID,IS_PHONE_CHECK = S.IS_PHONE_CHECK,IS_OWNER = S.IS_OWNER,FINAL_DECISION = S.FINAL_DECISION,DISPOSAL = S.DISPOSAL,DESCR = S.DESCR,UPDATED_DATE = S.UPDATED_DATE,UPDATED_BY = S.UPDATED_BY "
+						+ "ON (T.CASE_UUID=S.CASE_UUID) " + "WHEN MATCHED THEN    UPDATE SET IS_AMOUNT_CORRECT = S.IS_AMOUNT_CORRECT,IS_BANK_PROVE = S.IS_BANK_PROVE,FILE_UUID = S.FILE_UUID,IS_PHONE_CHECK = S.IS_PHONE_CHECK,IS_OWNER = S.IS_OWNER,FINAL_DECISION = S.FINAL_DECISION,DISPOSAL = S.DISPOSAL,DESCR = S.DESCR,UPDATED_DATE = S.UPDATED_DATE,UPDATED_BY = S.UPDATED_BY "
 						+ "WHEN NOT MATCHED THEN INSERT(UUID, CASE_UUID, IS_AMOUNT_CORRECT, IS_BANK_PROVE, FILE_UUID, IS_PHONE_CHECK, IS_OWNER, FINAL_DECISION, DISPOSAL, DESCR, CREATED_DATE, CREATED_BY)VALUES(S.UUID, S.CASE_UUID, S.IS_AMOUNT_CORRECT, S.IS_BANK_PROVE, S.FILE_UUID, S.IS_PHONE_CHECK, S.IS_OWNER, S.FINAL_DECISION, S.DISPOSAL, S.DESCR, S.CREATED_DATE, S.CREATED_BY)",
 				riskCaseInvstMap );
 	}
@@ -286,9 +283,8 @@ public class RiskCaseService {
 
 	public Page<Map<String, Object>> getRiskCaseHisList( Map<String, String> reqs ) {
 		StringBuilder sql = new StringBuilder();
-		sql.append(
-				"select r.uuid,r.case_no,r.title,r.src_type,r.cur_date,r.is_re_check,r.created_date,o.login_name,o.real_name,u.userid,u.cusname,u.mobile,u.status,v.is_amount_correct,v.is_bank_prove,v.is_phone_check,v.is_owner,v.final_decision,v.disposal,v.descr,v.updated_by,v.updated_date  from TMS_MGR_RISK_CASE r left join TMS_MGR_RISK_CASE_TXN t on r.uuid=t.case_uuid "
-						+ "left join Tms_Mgr_Risk_Case_Invst v on r.uuid = v.case_uuid left join TMS_RUN_USER u on t.userid=u.userid left join CMC_OPERATOR o on o.operator_id=r.operator_id " );
+		sql.append( "select r.uuid,r.case_no,r.title,r.src_type,r.cur_date,r.is_re_check,r.created_date,o.login_name,o.real_name,u.userid,u.cusname,u.mobile,u.status,v.is_amount_correct,v.is_bank_prove,v.is_phone_check,v.is_owner,v.final_decision,v.disposal,v.descr,v.updated_by,v.updated_date  from TMS_MGR_RISK_CASE r left join TMS_MGR_RISK_CASE_TXN t on r.uuid=t.case_uuid "
+				+ "left join Tms_Mgr_Risk_Case_Invst v on r.uuid = v.case_uuid left join TMS_RUN_USER u on t.userid=u.userid left join CMC_OPERATOR o on o.operator_id=r.operator_id " );
 		sql.append( "where 1=1" );
 
 		String userId = reqs.get( "USERID" );
@@ -369,8 +365,6 @@ public class RiskCaseService {
 
 		Page<Map<String, Object>> riskCasePage = offlineSimpleDao.pageQuery( sql.toString(), map, new Order().desc( "CREATED_DATE" ) );
 		for( Map<String, Object> operMap : riskCasePage.getList() ) {
-			// operMap.put("OPERATOR", operMap.get("REAL_NAME") + "(" + operMap.get("login_name") + ")");
-			// operMap.put("OPER_HISTORY", "<a href=\"#'+(new Date().getTime())+'\" onclick=\"jcl.go('/tms/riskCase/getInfo?risk_case_id=" + operMap.get("uuid") + "')\">处理历史</a>");
 			String status = (String) operMap.get( "STATUS" );
 			if( null != status && status.trim().length() > 0 ) {
 				if( "NORMAL".equals( status ) ) {

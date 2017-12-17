@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.alarm.service.AlarmEventService;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
@@ -25,7 +26,7 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
  * @author zhang.lei
  */
 @RestController("alarmEventController")
-@RequestMapping("/tms/alarmevent")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/alarmevent")
 public class AlarmEventController {
 
 	@Autowired

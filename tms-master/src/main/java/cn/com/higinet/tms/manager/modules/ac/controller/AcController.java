@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.ac.service.AcService;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
@@ -43,7 +44,7 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
  *
  */
 @RestController("actionController35")
-@RequestMapping("/tms/action")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/action")
 public class AcController {
 
 	private static final Logger log = LoggerFactory.getLogger( AcController.class );

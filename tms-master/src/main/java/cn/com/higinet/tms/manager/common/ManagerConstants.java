@@ -9,7 +9,7 @@ package cn.com.higinet.tms.manager.common;
  * 常量类
  * @author zhang.lei
  */
-public class Constant {
+public class ManagerConstants {
 	
 	/**
 	 * 会话操作员登录信息对象的key名称
@@ -32,6 +32,11 @@ public class Constant {
 	 * 静态资源路径前缀 
 	 */
 	public final static String URI_STATIC_PREFIX = "/s/";
+	
+	/**
+	 * 主界面路径
+	 */
+	public final static String URI_PREFIX = "/manager";
 	
 	
 	//TODO: 统一错误信息的命名规范

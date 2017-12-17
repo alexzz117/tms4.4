@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.aop.cache.CacheRefresh;
 import cn.com.higinet.tms.manager.modules.mgr.service.SafeDeviceService;
 
@@ -19,7 +20,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.SafeDeviceService;
  */
 
 @RestController("safeDeviceController")
-@RequestMapping("/tms/safeDevice")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/safeDevice")
 public class SafeDeviceController {
 
 	@Autowired

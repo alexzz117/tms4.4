@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
@@ -32,7 +33,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.IPProtectService;
  */
 
 @RestController("tmsIPProtectController")
-@RequestMapping("/tms/ip")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/ip")
 public class IPProtectController {
 	
 	private static final Logger logger = LoggerFactory.getLogger( IPProtectController.class );

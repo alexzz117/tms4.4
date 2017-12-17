@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.aop.cache.CacheRefresh;
 import cn.com.higinet.tms.manager.modules.mgr.service.SafeCardService;
 
 @RestController("safeCardController")
-@RequestMapping("/tms/safeCard")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/safeCard")
 public class SafeCardController {
 
 	@Autowired
