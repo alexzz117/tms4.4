@@ -14,8 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
@@ -29,7 +32,7 @@ import cn.com.higinet.tms.manager.common.service.FuncService;
  * @author chenr
  * @version 2.0.0, 2011-6-30
  */
-@Controller("cmcFuncController")
+@RestController("cmcFuncController")
 @RequestMapping("/cmc/func")
 public class FuncController {
 
@@ -48,10 +51,10 @@ public class FuncController {
 	 * 功能管理功能主视图
 	 * @return
 	 */
-	@RequestMapping(value = "/tree", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/tree", method = RequestMethod.GET)
 	public String treeView() {
 		return "cmc/func/func_tree";
-	}
+	}*/
 
 	/**
 	 * 获取功能树列表

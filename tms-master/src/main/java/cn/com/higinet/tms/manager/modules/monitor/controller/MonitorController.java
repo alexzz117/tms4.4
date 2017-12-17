@@ -11,10 +11,10 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ApplicationObjectSupport;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.common.CodeDict;
@@ -39,7 +39,8 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
  * @date 2013-05-06
  * @author zhang.lei
  */
-@Controller("monitorController")
+
+@RestController("monitorController")
 @RequestMapping("/tms/monitor")
 public class MonitorController extends ApplicationObjectSupport {
 

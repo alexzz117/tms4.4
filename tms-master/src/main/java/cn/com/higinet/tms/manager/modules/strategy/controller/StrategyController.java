@@ -10,10 +10,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,7 +28,8 @@ import cn.com.higinet.tms.manager.modules.strategy.service.StrategyService;
  * @version 1.0  Mar 13, 2015
  * @author zhang.lei
  */
-@Controller("strategyController35")
+
+@RestController("strategyController35")
 @RequestMapping("/tms/strategy")
 public class StrategyController {
 	

@@ -14,11 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,7 +42,7 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
  * 日期  作者  参考  描述
  *
  */
-@Controller("actionController35")
+@RestController("actionController35")
 @RequestMapping("/tms/action")
 public class AcController {
 
@@ -65,10 +65,10 @@ public class AcController {
 	* 方法描述:动作列表页面（已废弃）
 	* @return
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String listActionView() {
 		return "tms35/action/action_list";
-	}
+	}*/
 
 	/**
 	* 方法描述:动作查询列表

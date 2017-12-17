@@ -10,10 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
 import cn.com.higinet.tms.base.entity.common.Model;
@@ -30,7 +30,7 @@ import cn.com.higinet.tms.manager.modules.query.service.QueryService;
  * @author zhang.lei
  */
 
-@Controller("queryController")
+@RestController("queryController")
 @RequestMapping("/tms/query")
 public class QueryController {
 

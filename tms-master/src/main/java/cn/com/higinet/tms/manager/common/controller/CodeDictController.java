@@ -11,11 +11,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
@@ -27,12 +27,12 @@ import cn.com.higinet.tms.manager.common.service.CodeDictService;
  * 字典管理控制类
  * @author chenr
  * @version 2.0.0, 2011-6-30
+ * @author zhang.lei
  */
-@Controller("cmcCodeDictController")
+
+@RestController("cmcCodeDictController")
 @RequestMapping("/cmc/codedict")
 public class CodeDictController {
-
-	//TODO: 需要设计
 
 	@Autowired
 	@Qualifier("cmcCodeDictService")
@@ -46,10 +46,10 @@ public class CodeDictController {
 	 * 转向类别列表视图
 	 * @return
 	 */
-	@RequestMapping(value = "/category/list", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/category/list", method = RequestMethod.GET)
 	public String categoreyListView() {
 		return "cmc/codedict/category_list";
-	}
+	}*/
 
 	/**
 	 * 获取类别列表
@@ -67,10 +67,10 @@ public class CodeDictController {
 	 * 转向添加视图
 	 * @return
 	 */
-	@RequestMapping("/category/add")
+	/*@RequestMapping("/category/add")
 	public String categoreyAddView() {
 		return "cmc/codedict/category_add";
-	}
+	}*/
 
 	/**
 	 * 添加代码类别操作
@@ -122,10 +122,10 @@ public class CodeDictController {
 	 * 转向修改视图
 	 * @return
 	 */
-	@RequestMapping("/category/mod")
+	/*@RequestMapping("/category/mod")
 	public String categoreyModView() {
 		return "cmc/codedict/category_mod";
-	}
+	}*/
 
 	/**
 	 * 获取编辑对象
@@ -170,10 +170,10 @@ public class CodeDictController {
 	 * 转向字典列表视图
 	 * @return
 	 */
-	@RequestMapping(value = "/category/codelist", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/category/codelist", method = RequestMethod.GET)
 	public String codeListView() {
 		return "cmc/codedict/code_list";
-	}
+	}*/
 
 	/**
 	 * 获取字典列表
@@ -191,10 +191,10 @@ public class CodeDictController {
 	 * 转向添加字典信息视图
 	 * @return
 	 */
-	@RequestMapping("/code/add")
+	/*@RequestMapping("/code/add")
 	public String codeAddView() {
 		return "cmc/codedict/code_add";
-	}
+	}*/
 
 	/**
 	 * 添加字典信息操作
@@ -245,10 +245,10 @@ public class CodeDictController {
 	 * 转向字典信息修改视图
 	 * @return
 	 */
-	@RequestMapping("/code/mod")
+	/*@RequestMapping("/code/mod")
 	public String codeModView() {
 		return "cmc/codedict/code_mod";
-	}
+	}*/
 
 	/**
 	 * 获取字典信息对象

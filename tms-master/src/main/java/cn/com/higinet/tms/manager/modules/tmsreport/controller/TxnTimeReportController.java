@@ -9,16 +9,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
 import cn.com.higinet.tms.manager.modules.tmsreport.service.TxnTimeReportService;
 import jxl.Workbook;
 import jxl.write.Label;
@@ -29,16 +28,12 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-@Controller("txnTimeReportController")
+@RestController("txnTimeReportController")
 @RequestMapping("/report/txnTime")
 public class TxnTimeReportController {
+	
 	@Autowired
 	private TxnTimeReportService txnTimeReportService ;
-	@Autowired
-	private DisposalService codeDictReportService;
-	public void setTxnTimeReportService(TxnTimeReportService txnTimeReportService) {
-		this.txnTimeReportService = txnTimeReportService;
-	}
 
 	/**
 	 * 转向按日期汇总交易信息报表页面

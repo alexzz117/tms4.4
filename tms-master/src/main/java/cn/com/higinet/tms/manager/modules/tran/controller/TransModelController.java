@@ -10,10 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,15 +23,14 @@ import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.mgr.service.CodeDictService;
-import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 import cn.com.higinet.tms.manager.modules.tran.service.TransModelService;
 
 /**
  * 交易定义控制器
  * @author yangk
+ * @author zhang.lei
  */
-@SuppressWarnings("all")
-@Controller
+@RestController
 @RequestMapping("/tms/tranmdl")
 public class TransModelController {
 
@@ -40,18 +39,15 @@ public class TransModelController {
 	@Autowired
 	private TransModelService transModelService;
 	@Autowired
-	private TransDefService transDefService;
-	@Autowired
 	private CodeDictService tmsCodeDictService;
 	@Autowired
-	private ObjectMapper objectMapper = null;
+	private ObjectMapper objectMapper;
 
 	/**
 	 * 初始化交易模型
 	 */
 	@RequestMapping(value = "/query", method = RequestMethod.POST)
 	public Model initTranModel( @RequestBody Map<String, String> reqs ) {
-
 		Model model = new Model();
 		String txnid = reqs.get( "tab_name" );
 		List<Map<String, Object>> tranMdlList = transModelService.getTranModels( txnid );

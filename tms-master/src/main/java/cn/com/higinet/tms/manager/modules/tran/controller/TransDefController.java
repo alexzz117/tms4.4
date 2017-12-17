@@ -11,10 +11,10 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,8 +28,10 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 /**
  * 交易模型控制器
  * @author yangk
+ * @author zhang.lei
  */
-@Controller
+
+@RestController
 @RequestMapping("/tms/trandef")
 public class TransDefController {
 

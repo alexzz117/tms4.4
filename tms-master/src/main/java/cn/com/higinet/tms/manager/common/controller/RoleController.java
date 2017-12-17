@@ -14,11 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
@@ -33,7 +34,7 @@ import cn.com.higinet.tms.manager.common.service.RoleService;
  * 
  * @author zhang.lei
  */
-@Controller("cmcRoleController")
+@RestController("cmcRoleController")
 @RequestMapping("/cmc/role")
 public class RoleController {
 
@@ -49,10 +50,10 @@ public class RoleController {
 	 * 角色信息列表视图
 	 * @return
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String listRoleView() {
 		return "cmc/role/role_list";
-	}
+	}*/
 
 	/**
 	 * 角色信息列表
@@ -71,6 +72,7 @@ public class RoleController {
 	 * @param reqs
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/listAll", method = RequestMethod.POST)
 	public Model listRole( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
@@ -94,10 +96,10 @@ public class RoleController {
 	 * 角色增加视图
 	 * @return
 	 */
-	@RequestMapping(value = "/add", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String addRoleView() {
 		return "cmc/role/role_add";
-	}
+	}*/
 
 	/**
 	 * 角色增加
@@ -143,10 +145,10 @@ public class RoleController {
 	 * 角色编辑视图
 	 * @return
 	 */
-	@RequestMapping(value = "/edit", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/edit", method = RequestMethod.GET)
 	public String editOperatorView() {
 		return "cmc/role/role_edit";
-	}
+	}*/
 
 	/**
 	 * 操作员编辑信息列表
@@ -180,10 +182,10 @@ public class RoleController {
 	 * 角色授权视图
 	 * @return
 	 */
-	@RequestMapping(value = "/grant/list", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/grant/list", method = RequestMethod.GET)
 	public String grantView() {
 		return "cmc/role/role_grant";
-	}
+	}*/
 
 	/**
 	 * 角色授权功能列表

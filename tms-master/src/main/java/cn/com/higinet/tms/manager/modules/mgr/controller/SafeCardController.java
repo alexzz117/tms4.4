@@ -5,16 +5,16 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.modules.aop.cache.CacheRefresh;
 import cn.com.higinet.tms.manager.modules.mgr.service.SafeCardService;
 
-@Controller("safeCardController")
+@RestController("safeCardController")
 @RequestMapping("/tms/safeCard")
 public class SafeCardController {
 

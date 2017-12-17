@@ -7,10 +7,10 @@ package cn.com.higinet.tms.manager.modules.claim.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.modules.ac.service.AcService;
@@ -24,7 +24,7 @@ import cn.com.higinet.tms.manager.modules.ac.service.AcService;
  * 日期  作者  参考  描述
  *
  */
-@Controller("claimController")
+@RestController("claimController")
 @RequestMapping("/tms/claim")
 public class ClaimController {
 

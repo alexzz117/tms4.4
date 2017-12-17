@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
@@ -23,8 +23,10 @@ import cn.com.higinet.tms.manager.modules.modelmgr.service.ModelMgrService;
 /**
  * 模型管理控制类
  * @author zlq
+ * @author zhang.lei
  */
-@Controller("modelMgrController")
+
+@RestController("modelMgrController")
 @RequestMapping("/tms/modelmgr")
 public class ModelMgrController {
 

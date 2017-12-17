@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.dao.Page;
@@ -26,7 +26,7 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
  * @author zhang.lei
  *
  */
-@Controller("alarmEventController")
+@RestController("alarmEventController")
 @RequestMapping("/tms/alarmevent")
 public class AlarmEventController {
 
@@ -39,10 +39,10 @@ public class AlarmEventController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/process", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/process", method = RequestMethod.GET)
 	public String alarmProcessView() {
 		return "tms/alarm/alarmevent_process";
-	}
+	}*/
 
 	/**
 	 * 获取报警事件处理信息
@@ -154,10 +154,10 @@ public class AlarmEventController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/audit", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/audit", method = RequestMethod.GET)
 	public String alarmAuditView() {
 		return "tms/alarm/alarmevent_audit";
-	}
+	}*/
 
 	/**
 	 * 获取报警事件审核信息
@@ -197,10 +197,10 @@ public class AlarmEventController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/assign", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/assign", method = RequestMethod.GET)
 	public String alarmAssignView() {
 		return "tms/alarm/alarmevent_assign";
-	}
+	}*/
 
 	/**
 	 * 获取报警事件分派信息
@@ -263,10 +263,10 @@ public class AlarmEventController {
 		return model;
 	}
 
-	@RequestMapping(value = "/alarmStrategy", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/alarmStrategy", method = RequestMethod.GET)
 	public String alarmStrategyView() {
 		return "tms/alarm/alarm_strategy";
-	}
+	}*/
 
 	@RequestMapping(value = "/alarmStrategy", method = RequestMethod.POST)
 	public Model alarmStrategyAction( @RequestBody Map<String, String> reqs ) {

@@ -12,17 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
@@ -34,18 +33,13 @@ import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
 
 /**
  * 系统主控制类
- * <ul>
- * 	<li>/ ： 系统根路径</li>
- *  <li>/login ：系统登录</li>
- *  <li>/menu ：系统菜单</li>
- * </ul>
  * @author chenr
  * @version 2.0.0, 2011-6-30
  * 
  * @author zhang.lei
  */
 
-@Controller("cmcSysController")
+@RestController("cmcSysController")
 public class SysController {
 	
 	private static final Logger logger = LoggerFactory.getLogger( SysController.class );
@@ -62,27 +56,27 @@ public class SysController {
 	 * 主界面视图
 	 * @return
 	 */
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String mainView( HttpServletResponse response ) {
 		//好像仅仅对IE有效果
 		response.setHeader( "Cache-Control", "no-cache" );
 		response.setHeader( "Pragma", "no-cache" );
 		response.setDateHeader( "Expires", 0 );
 		return "cmc/sys/main";
-	}
+	}*/
 
 	/**
 	 * 登录视图
 	 * @return
 	 */
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String loginView( HttpServletResponse response ) {
 		//好像仅仅对IE有效果
 		response.setHeader( "Cache-Control", "no-cache" );
 		response.setHeader( "Pragma", "no-cache" );
 		response.setDateHeader( "Expires", 0 );
 		return "cmc/sys/login";
-	}
+	}*/
 
 	/**
 	 * 登录处理
@@ -173,10 +167,10 @@ public class SysController {
 	 * @param session
 	 * @return
 	 */
-	@RequestMapping(value = "/help", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/help", method = RequestMethod.GET)
 	public String help( HttpSession session ) {
 		return "cmc/sys/help";
-	}
+	}*/
 
 	/**
 	 * 注销登录视图（直接跳转）
@@ -197,10 +191,10 @@ public class SysController {
 	 * 欢迎界面视图
 	 * @return
 	 */
-	@RequestMapping(value = "/welcome")
+	/*@RequestMapping(value = "/welcome")
 	public String welcomeView() {
 		return "cmc/sys/welcome";
-	}
+	}*/
 
 	/**
 	 * 根据登录用户，获取菜单信息
@@ -244,10 +238,10 @@ public class SysController {
 	 * 更新操作在OperatorController中
 	 * @return
 	 */
-	@RequestMapping(value = "/profile/pwd/mod", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/profile/pwd/mod", method = RequestMethod.GET)
 	public String modifyPwdView() {
 		return "cmc/sys/pwd_mod";
-	}
+	}*/
 
 	/**
 	 * 更新当前登录管理员密码
@@ -276,10 +270,10 @@ public class SysController {
 	 * 转向操作员配置页面
 	 * @return
 	 */
-	@RequestMapping(value = "/profile/mod", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/profile/mod", method = RequestMethod.GET)
 	public String modProfileView() {
 		return "cmc/sys/profile_mod";
-	}
+	}*/
 
 	/**
 	 * 获取操作员当前的配置

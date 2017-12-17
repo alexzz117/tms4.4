@@ -5,10 +5,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
@@ -20,7 +20,8 @@ import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
  * @author zhangfg
  * @author zhang.lei
  */
-@Controller("nameListViewController")
+
+@RestController("nameListViewController")
 @RequestMapping("/tms/mgrView")
 public class NameListViewController {
 
@@ -87,17 +88,12 @@ public class NameListViewController {
 	 */
 	@RequestMapping(value = "/valuelist", method = RequestMethod.POST)
 	public Model listValueListActoin( @RequestBody Map<String, String> reqs ) {
-
 		logger.debug( "listValueListActoin inputNode ---> " + reqs );
-
 		String rosterId = reqs.get( "rosterId" );
-
 		Model model = new Model();
 		// 查询条件
 		reqs.put( DBConstant.TMS_MGR_ROSTERVALUE_ROSTERID, rosterId );
-
 		model.setPage( nameListViewService.listValueListByPage( reqs ) );
-
 		return model;
 	}
 
@@ -117,14 +113,10 @@ public class NameListViewController {
 	 */
 	@RequestMapping(value = "/valueget")
 	public Model getValueListActoin( @RequestBody Map<String, String> reqs ) {
-
 		String rosterValueId = reqs.get( "rosterValueId" );
-
 		Model model = new Model();
-
 		// 通过名单值表的主键查询名单值信息
 		model.setRow( nameListViewService.getOneValueList( rosterValueId ) );
-
 		return model;
 	}
 

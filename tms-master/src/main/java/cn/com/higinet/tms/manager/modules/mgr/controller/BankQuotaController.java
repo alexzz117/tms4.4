@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,7 +23,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.BankQuotaService;
  * @author tlh
  */
 
-@Controller("bankQuotaController")
+@RestController("bankQuotaController")
 @RequestMapping("/tms/bankQuota")
 public class BankQuotaController {
 

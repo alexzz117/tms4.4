@@ -13,11 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
@@ -39,7 +38,7 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
  * @author chenr
  * @version 2.0.0, 2011-6-30
  */
-@Controller("cmcOperatorController")
+@RestController("cmcOperatorController")
 @RequestMapping("/cmc/operator")
 public class OperatorController {
 
@@ -51,10 +50,10 @@ public class OperatorController {
 	 * 操作员列表视图
 	 * @return
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String listView() {
 		return "cmc/operator/operator_list";
-	}
+	}*/
 
 	/**
 	 * 操作员列表
@@ -71,10 +70,10 @@ public class OperatorController {
 	 * 操作员添加视图
 	 * @return
 	 */
-	@RequestMapping(value = "/add", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String addOperatorView() {
 		return "cmc/operator/operator_add";
-	}
+	}*/
 
 	/**
 	 * 操作员添加
@@ -101,7 +100,7 @@ public class OperatorController {
 	public Model delOperatorAction( @RequestBody String[] operatorId, HttpServletRequest request ) {
 		Model model = new Model();
 		if( operatorId != null && operatorId.length > 0 ) {
-			Map map = operatorService.getOperator( operatorId[0] );
+			Map<String, Object> map = operatorService.getOperator( operatorId[0] );
 			request.setAttribute( DBConstant.CMC_OPERATOR_LOGIN_NAME, map.get( DBConstant.CMC_OPERATOR_LOGIN_NAME ) );
 		}
 		if( operatorId != null && operatorId.length > 0 ) {
@@ -114,10 +113,10 @@ public class OperatorController {
 	 * 操作员编辑视图
 	 * @return
 	 */
-	@RequestMapping(value = "/edit", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/edit", method = RequestMethod.GET)
 	public String editOperatorView() {
 		return "cmc/operator/operator_edit";
-	}
+	}*/
 
 	/**
 	 * 操作员编辑对象
@@ -166,10 +165,10 @@ public class OperatorController {
 	 * 分配操作员角色视图
 	 * @return
 	 */
-	@RequestMapping(value = "/grant", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/grant", method = RequestMethod.GET)
 	public String assignOperatorRoleView() {
 		return "cmc/operator/operator_grant";
-	}
+	}*/
 
 	/**
 	 * 获取操作员当期的授权情况

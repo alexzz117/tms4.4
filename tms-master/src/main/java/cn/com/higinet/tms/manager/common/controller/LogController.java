@@ -12,10 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
@@ -30,7 +30,7 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
  * @author zhangfg
  * @version 2.0.0, 2011-6-30
  */
-@Controller("cmcLogController")
+@RestController("cmcLogController")
 @RequestMapping("/cmc/log")
 public class LogController {
 
@@ -41,10 +41,10 @@ public class LogController {
 	/**	 * 转向日志列表页面
 	 * @return
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String listView() {
 		return "cmc/log/log_list";
-	}
+	}*/
 
 	/**
 	 * 日志列表数据
@@ -69,10 +69,10 @@ public class LogController {
 	 * 转向查看页面
 	 * @return
 	 */
-	@RequestMapping(value = "/view", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/view", method = RequestMethod.GET)
 	public String logView() {
 		return "cmc/log/log_view";
-	}
+	}*/
 
 	/**
 	 * 获取日志对象

@@ -11,10 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,12 +32,10 @@ import cn.com.higinet.tms.manager.modules.userpattern.service.UserPatternService
  * 功能/模块:
  * @author zhanglq
  * @version 1.0  Aug 29, 2013
- * 类描述:
- * 修订历史:
- * 日期  作者  参考  描述
  *
+ * @author zhang.lei
  */
-@Controller("userpatternController")
+@RestController("userpatternController")
 @RequestMapping("/tms/userpattern")
 public class UserpatternController {
 
