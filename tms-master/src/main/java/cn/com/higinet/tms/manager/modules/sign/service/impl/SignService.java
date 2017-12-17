@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.manager.modules.sign.service;
+package cn.com.higinet.tms.manager.modules.sign.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
