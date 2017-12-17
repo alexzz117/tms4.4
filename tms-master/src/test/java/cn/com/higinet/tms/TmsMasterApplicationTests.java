@@ -1,5 +1,5 @@
 package cn.com.higinet.tms;
-
+/*
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,4 +13,4 @@ public class TmsMasterApplicationTests {
 	public void contextLoads() {
 	}
 
-}
+}*/
