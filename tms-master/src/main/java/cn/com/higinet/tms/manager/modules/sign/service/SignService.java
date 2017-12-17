@@ -24,6 +24,7 @@ import cn.com.higinet.tms.manager.modules.sign.model.MerchantRiskInfo;
  */
 @Service("signService")
 public class SignService {
+	
 	private static final int SEND_TIMES = 3;// 发送次数
 
 	@Autowired
