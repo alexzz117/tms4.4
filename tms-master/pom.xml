@@ -164,20 +164,6 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<!-- 发布release设置 -->
-	<distributionManagement>
-		<repository>
-			<id>sz-cloud-release</id>
-			<name> Nexus Release Repository</name>
-			<url>http://maven.higinet.net:9000/repository/maven-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>sz-cloud-snapshots</id>
-			<name> Nexus Snapshot Repository</name>
-			<url>http://maven.higinet.net:9000/repository/maven-snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<build>
 		<plugins>
 			<plugin>
