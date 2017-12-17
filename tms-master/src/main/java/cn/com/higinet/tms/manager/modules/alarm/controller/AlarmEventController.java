@@ -21,10 +21,8 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 
 /**
  * 警报事件Controller
- * 
  * @author lining
  * @author zhang.lei
- *
  */
 @RestController("alarmEventController")
 @RequestMapping("/tms/alarmevent")
