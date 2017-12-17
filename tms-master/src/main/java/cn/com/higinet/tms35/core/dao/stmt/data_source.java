@@ -11,12 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
-import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms35.comm.tms_exception;
 
 public class data_source {
 	static Logger log = LoggerFactory.getLogger( data_source.class );
-	static String testConnSql = ((SqlMap) ApplicationContextUtil.getBean( "tmsSqlMap" )).getSql( "tms.common.testconnection" );
+	static String testConnSql = null; //((SqlMap) ApplicationContextUtil.getBean( "tmsSqlMap" )).getSql( "tms.common.testconnection" );
 
 	DataSource m_ds;
 	Connection m_conn;
