@@ -63,8 +63,8 @@ public class AntiMoneyLaunderingService {
 
 	private static Pattern checkQueryParam = Pattern.compile( "(=\\s*:\\s*([\\w$\\.]+))", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE );
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	
 	@Autowired
 	@Qualifier("onlineSimpleDao")
@@ -502,7 +502,7 @@ public class AntiMoneyLaunderingService {
 			}
 			String ds = MapUtil.getString( map, AMLConstant.DS );
 			if( StringUtil.isBlank( ds ) ) {
-				simpleDao = tmsSimpleDao;
+				simpleDao = dynamicSimpleDao;
 			}
 			else {
 				ds += "SimpleDao";
@@ -1033,7 +1033,7 @@ public class AntiMoneyLaunderingService {
 				sqlConds.put( "citycode", citycode );
 			}
 		}
-		return tmsSimpleDao.queryForList( sql );
+		return dynamicSimpleDao.queryForList( sql );
 	}
 
 	/**

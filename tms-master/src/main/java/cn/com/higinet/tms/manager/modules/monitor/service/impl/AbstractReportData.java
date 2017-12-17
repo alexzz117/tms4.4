@@ -18,8 +18,8 @@ import cn.com.higinet.tms.manager.modules.monitor.service.ReportData;
 public abstract class AbstractReportData implements ReportData {
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	@Qualifier("onlineSimpleDao")

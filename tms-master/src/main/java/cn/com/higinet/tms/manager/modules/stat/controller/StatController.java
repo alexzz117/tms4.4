@@ -66,8 +66,8 @@ public class StatController {
 	@Autowired
 	private CommonCheckService commonCheckService;
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	@Autowired
 	private TransModelService transModelService;
 
@@ -269,7 +269,7 @@ public class StatController {
 		Model model = new Model();
 		String stat_sql = "SELECT STAT_ID ID,STAT_TXN,STAT_NAME, stat_txn fid,STAT_DESC CODE_VALUE,'2' ftype,STAT_TXN FROM TMS_COM_STAT where STAT_VALID =1";
 		// 查询统计
-		List<Map<String, Object>> stat_list = tmsSimpleDao.queryForList( stat_sql );
+		List<Map<String, Object>> stat_list = dynamicSimpleDao.queryForList( stat_sql );
 
 		if( stat_list == null || stat_list.size() == 0 ) {
 			model.setRow( stat_list );
@@ -301,7 +301,7 @@ public class StatController {
 
 		String txn_sql = "SELECT TAB_NAME ID,M.TAB_NAME CODE_KEY,m.parent_tab fid,m.tab_desc CODE_VALUE ,'1' ftype, TAB_NAME STAT_TXN FROM TMS_COM_TAB M WHERE M.TAB_NAME in (" + txn_id + ") order by STAT_TXN";
 		// 查询交易树
-		List<Map<String, Object>> txn_list = tmsSimpleDao.queryForList( txn_sql );
+		List<Map<String, Object>> txn_list = dynamicSimpleDao.queryForList( txn_sql );
 
 		stat_list.addAll( txn_list );
 		model.setRow( stat_list );
@@ -319,7 +319,7 @@ public class StatController {
 		String txn_id = MapUtil.getString( reqs, "txn_id" );
 
 		String txn_rule_sql = "SELECT RULE_TXN,RULE_NAME, RULE_SHORTDESC CODE_VALUE,R.RULE_TXN P FROM TMS_COM_RULE R WHERE RULE_ENABLE = 1 AND RULE_TXN IN (" + TransCommon.arr2str( TransCommon.cutToIds( txn_id ) ) + ")  ORDER BY RULE_TXN";
-		List<Map<String, Object>> txn_rule_list = tmsSimpleDao.queryForList( txn_rule_sql );
+		List<Map<String, Object>> txn_rule_list = dynamicSimpleDao.queryForList( txn_rule_sql );
 
 		if( txn_rule_list != null && txn_rule_list.size() > 0 ) {
 			for( Map<String, Object> map : txn_rule_list ) {
@@ -345,7 +345,7 @@ public class StatController {
 		String txn_rule_sql = "SELECT CODE_KEY, CODE_VALUE, type, code fd_code FROM (SELECT REF_NAME CODE_KEY, NAME CODE_VALUE, type, code, TAB_NAME FROM TMS_COM_FD UNION SELECT crf.REF_NAME CODE_KEY, crf.REF_DESC CODE_VALUE, cf.type TYPE, cf.code code, crf.TAB_NAME from TMS_COM_REFFD crf left join tms_com_reftab crt on crf.ref_id = crt.ref_id left join tms_com_fd cf on crt.ref_tab_name = cf.tab_name and crf.ref_name = cf.fd_name) F where TAB_NAME in ("
 				+ TransCommon.arr2str( TransCommon.cutToIds( txn_id ) ) + ") ORDER BY TAB_NAME";
 
-		List<Map<String, Object>> txn_rule_list = tmsSimpleDao.queryForList( txn_rule_sql );
+		List<Map<String, Object>> txn_rule_list = dynamicSimpleDao.queryForList( txn_rule_sql );
 
 		model.setRow( txn_rule_list );
 		return model;

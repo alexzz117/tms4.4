@@ -36,11 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
+import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_MGR_IPLOG;
 import cn.com.higinet.tms.manager.modules.common.IPLocationService;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
-import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_MGR_IPLOG;
-import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 
 @SuppressWarnings("unused")
@@ -48,8 +47,8 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class IPProtectService extends ApplicationObjectSupport   {
 
     @Autowired
-    @Qualifier("tmsSimpleDao")
-    private SimpleDao tmsSimpleDao;
+    @Qualifier("dynamicSimpleDao")
+    private SimpleDao dynamicSimpleDao;
     @Autowired
     private JdbcTemplate tmsJdbcTemplate;
     @Autowired
@@ -150,7 +149,7 @@ public class IPProtectService extends ApplicationObjectSupport   {
         {
             for (int i = 0, len = sqls.length; i < len; i++)
             {
-                tmsSimpleDao.batchUpdate(sqls[i], lists[i]);
+                dynamicSimpleDao.batchUpdate(sqls[i], lists[i]);
             }
         }
     }
@@ -332,7 +331,7 @@ public class IPProtectService extends ApplicationObjectSupport   {
         String sql = "select max(" + TMS_MGR_IPLOG.IPLOG_ID + ") as " + TMS_MGR_IPLOG.IPLOG_ID + ", " + TMS_MGR_IPLOG.OPERATE_RESULT + ", "
                 + TMS_MGR_IPLOG.IS_SUFFIX + " from " + TMS_MGR_IPLOG.TABLE_NAME + " group by " + TMS_MGR_IPLOG.IS_SUFFIX + ", "
                 + TMS_MGR_IPLOG.OPERATE_RESULT;
-        List<Map<String, Object>> iplogList = tmsSimpleDao.queryForList(sql);
+        List<Map<String, Object>> iplogList = dynamicSimpleDao.queryForList(sql);
         if (iplogList == null || iplogList.size() == 0)
         {
             return null;
@@ -362,7 +361,7 @@ public class IPProtectService extends ApplicationObjectSupport   {
             log.put(TMS_MGR_IPLOG.IPLOG_ID, sequenceService.getSequenceId("SEQ_TMS_MGR_IPLOG_ID"));
         }
         log.put(TMS_MGR_IPLOG.OPERATE_TIME, System.currentTimeMillis());
-        tmsSimpleDao.create(TMS_MGR_IPLOG.TABLE_NAME, log);
+        dynamicSimpleDao.create(TMS_MGR_IPLOG.TABLE_NAME, log);
         return log;
     }
 
@@ -393,7 +392,7 @@ public class IPProtectService extends ApplicationObjectSupport   {
             {
                 String tabName = ipLocationService.getLocationOperName(this.tabName);
                 String truncateSql = getTruncateTableSql(tabName);
-                tmsSimpleDao.executeUpdate(truncateSql);
+                dynamicSimpleDao.executeUpdate(truncateSql);
                 ipFileBr = new BufferedReader(this.in, 10 * 1024 * 1024);
                 String sql = String.format(importSQL[0], tabName);
                 do
@@ -440,7 +439,7 @@ public class IPProtectService extends ApplicationObjectSupport   {
             {
                 String cityTabName = ipLocationService.getLocationOperName(this.tabName);
                 String cTruncateSql = getTruncateTableSql(cityTabName);
-                tmsSimpleDao.executeUpdate(cTruncateSql);
+                dynamicSimpleDao.executeUpdate(cTruncateSql);
                 cityFileBr = new BufferedReader(this.in, 10 * 1024 * 1024);
                 String cSql = String.format(importSQL[1], cityTabName);
                 do
@@ -498,7 +497,7 @@ public class IPProtectService extends ApplicationObjectSupport   {
             		String tabName = ipLocationService.getLocationOperName(this.tabNames[i]);
             		String cTruncateSql = getTruncateTableSql(tabName);
             		System.out.println("----------cTruncateSql----len:"+cTruncateSql);
-            		tmsSimpleDao.executeUpdate(cTruncateSql);
+            		dynamicSimpleDao.executeUpdate(cTruncateSql);
             		fileBr = new BufferedReader(this.ins[i], 5 * 1024 * 1024);
             		String sql = String.format(this.sqls[i], tabName);
             		Object[][] field = (Object[][]) fields[i];

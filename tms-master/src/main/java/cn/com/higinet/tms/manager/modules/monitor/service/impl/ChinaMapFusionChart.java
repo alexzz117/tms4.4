@@ -27,8 +27,9 @@ import cn.com.higinet.tms.manager.modules.monitor.service.FusionChart;
 public class ChinaMapFusionChart implements FusionChart{
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	SimpleDao dynamicSimpleDao;
+	
 	@Autowired
 	private IPLocationService ipLocationService;
 	
@@ -43,7 +44,7 @@ public class ChinaMapFusionChart implements FusionChart{
 					"from " + ipLocationService.getLocationCurrName("TMS_MGR_REGION") + " region, " +
 					ipLocationService.getLocationCurrName("TMS_MGR_COUNTRY") + " country " +
 					"where country.COUNTRYCODE = region.COUNTRYCODE and country.COUNTRYCODE = 'CN'";
-		List<Map<String,Object>> initData = tmsSimpleDao.queryForList(initStrSql);
+		List<Map<String,Object>> initData = dynamicSimpleDao.queryForList(initStrSql);
 		for(int i=0;i<initData.size();i++){
 			cnmap.put(MapUtil.getString(initData.get(i), "REGIONCODE"), MapUtil.getString(initData.get(i), "REGIONNAME"));
 			csmap.put(initData.get(i).get("REGIONCODE"),initData.get(i).get("REGIONCODE"));

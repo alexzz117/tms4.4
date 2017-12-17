@@ -18,9 +18,9 @@ import cn.com.higinet.tms.manager.modules.auth.exception.TmsMgrAuthDepException;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.ROOT_NODE;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
+import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
-import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
@@ -38,8 +38,8 @@ public class TransDefServiceImpl implements TransDefService {
 	private SqlMap tmsSqlMap;
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	@Qualifier("offlineSimpleDao")
@@ -80,7 +80,7 @@ public class TransDefServiceImpl implements TransDefService {
 		// 条件为:启用并且表类型为交易模型
 		cond.put(TMS_COM_TAB.IS_ENABLE, Integer.parseInt(StaticParameters.STATUS_1));
 		cond.put(TMS_COM_TAB.TAB_TYPE, StaticParameters.TAB_TYPE_4);
-		List<Map<String, Object>> sss = tmsSimpleDao.queryForList(sb.toString(), cond);
+		List<Map<String, Object>> sss = dynamicSimpleDao.queryForList(sb.toString(), cond);
 		return sss;
 	}
 
@@ -103,7 +103,7 @@ public class TransDefServiceImpl implements TransDefService {
 		sb.append(DBConstant.TMS_COM_RULE);
 		sb.append(" ORDER BY ").append(DBConstant.TMS_COM_RULE_RULE_RULE_ORDER);
 
-		List<Map<String, Object>> sss = tmsSimpleDao.queryForList(sb.toString(), cond);
+		List<Map<String, Object>> sss = dynamicSimpleDao.queryForList(sb.toString(), cond);
 		return sss;
 	}
 
@@ -172,7 +172,7 @@ public class TransDefServiceImpl implements TransDefService {
 			throw new TmsMgrAuthDepException("新建交易失败，请先完成必要的授权：" + sb.toString());
 		}
 
-		tmsSimpleDao.create(TMS_COM_TAB.TABLE_NAME, clms);
+		dynamicSimpleDao.create(TMS_COM_TAB.TABLE_NAME, clms);
 
 		return reqs;
 	}
@@ -255,7 +255,7 @@ public class TransDefServiceImpl implements TransDefService {
 			{
 				// 查询模型表，看交易是否存在模型。只有存在模型才能由模型学习期修改为运行期
 				String mTrain_sql = "SELECT * FROM TMS_COM_MTRAIN WHERE TXNID = ? AND TRAINDATE = ?";
-				List mtrain_list = tmsSimpleDao.queryForList(mTrain_sql, tab_name, traindate);
+				List mtrain_list = dynamicSimpleDao.queryForList(mTrain_sql, tab_name, traindate);
 				if (mtrain_list == null || mtrain_list.size() == 0)
 					throw new TmsMgrServiceException("只有存在风险模型，才能由模型学习期修改为模型运行期！");
 
@@ -270,7 +270,7 @@ public class TransDefServiceImpl implements TransDefService {
 
 		conds.put(TMS_COM_TAB.TAB_NAME, MapUtil.getString(reqs, "tab_name"));
 
-		tmsSimpleDao.update(TMS_COM_TAB.TABLE_NAME, row, conds);
+		dynamicSimpleDao.update(TMS_COM_TAB.TABLE_NAME, row, conds);
 
 		return reqs;
 	}
@@ -288,7 +288,7 @@ public class TransDefServiceImpl implements TransDefService {
 		cond.put("tabName", "'" + txnid + "%'");
 		cond.put("tabName1", txnid);
 
-		List<Map<String, Object>> child_txn = tmsSimpleDao.queryForList(child_sql, cond);
+		List<Map<String, Object>> child_txn = dynamicSimpleDao.queryForList(child_sql, cond);
 		for (int i = 0; child_txn != null && i < child_txn.size(); i++) {
 			Map<String, Object> child = child_txn.get(i);
 			String child_disposal = MapUtil.getString(child, "TAB_DISPOSAL");
@@ -313,7 +313,7 @@ public class TransDefServiceImpl implements TransDefService {
 		Map<String, Object> cond2 = new HashMap<String, Object>();
 		cond2.put("txnId1", txnid + "%");
 		cond2.put("txnId2", txnid);
-		if (tmsSimpleDao.count(rule_sql, cond2) > 0)
+		if (dynamicSimpleDao.count(rule_sql, cond2) > 0)
 			throw new TmsMgrWebException("处置策略已被规则使用！");
 
 	}
@@ -336,7 +336,7 @@ public class TransDefServiceImpl implements TransDefService {
 
 		// tmsSimpleDao.delete("TMS_COM_RULERELATION",MapWrap.map(DBConstant.TMS_COM_RULERELATION_RULEREL_TXN, tab_name).getMap());// 当前交易下规则全删除后，还会有父交易的规则图需要删除。
 
-		tmsSimpleDao.delete(TMS_COM_TAB.TABLE_NAME, conds);
+		dynamicSimpleDao.delete(TMS_COM_TAB.TABLE_NAME, conds);
 
 		return conds;
 	}
@@ -364,7 +364,7 @@ public class TransDefServiceImpl implements TransDefService {
 		cond.put(TMS_COM_TAB.TAB_TYPE, StaticParameters.TAB_TYPE_4);
 		cond.put(TMS_COM_TAB.PARENT_TAB, parent_tab);
 
-		long num = tmsSimpleDao.count(sb.toString(), cond);
+		long num = dynamicSimpleDao.count(sb.toString(), cond);
 
 		if (num > 0) {
 			throw new TmsMgrWebException(switchErrorMsg(method));
@@ -391,7 +391,7 @@ public class TransDefServiceImpl implements TransDefService {
 		sb.append(" left join tms_com_fd fd on fd.tab_name = tab.tab_name");
 		sb.append(" where tab.tab_name = ?");
 
-		List<Map<String, Object>> num = tmsSimpleDao.queryForList(sb.toString(), tab_name);
+		List<Map<String, Object>> num = dynamicSimpleDao.queryForList(sb.toString(), tab_name);
 
 		if (num.size() > 1) {
 			throw new TmsMgrServiceException("该交易下有属性,请先删除属性");
@@ -520,7 +520,7 @@ public class TransDefServiceImpl implements TransDefService {
 		cond.put(TMS_COM_TAB.TAB_NAME, par_name);
 		cond.put(TMS_COM_TAB.TAB_TYPE, StaticParameters.TAB_TYPE_4);
 
-		List<Map<String, Object>> list = tmsSimpleDao.queryForList(sb.toString(), cond);
+		List<Map<String, Object>> list = dynamicSimpleDao.queryForList(sb.toString(), cond);
 
 		List<Map<String, Object>> bro = new ArrayList<Map<String, Object>>();
 		List<Map<String, Object>> self = new ArrayList<Map<String, Object>>();
@@ -697,7 +697,7 @@ public class TransDefServiceImpl implements TransDefService {
 		sb.append(arg[0]).append(" x_desc FROM ").append(arg[1]).append(" WHERE ");
 		sb.append(arg[2]);
 
-		list = tmsSimpleDao.queryForList(sb.toString(), (Map) arg[3]);
+		list = dynamicSimpleDao.queryForList(sb.toString(), (Map) arg[3]);
 
 		String val = null;
 		if (list != null && list.size() > 0) {
@@ -741,7 +741,7 @@ public class TransDefServiceImpl implements TransDefService {
 			sb.append("%')");
 		}
 		// List<Map<String, Object>> immediateFamily = tmsSimpleDao.queryForList(sb.toString());
-		return tmsSimpleDao.queryForList(sb.toString());
+		return dynamicSimpleDao.queryForList(sb.toString());
 	}
 
 	private String[] getInfoDetailByType(String type) {
@@ -891,7 +891,7 @@ public class TransDefServiceImpl implements TransDefService {
 		cond.put(TMS_COM_TAB.TAB_TYPE, StaticParameters.TAB_TYPE_4);
 		cond.put(TMS_COM_TAB.PARENT_TAB, tab_name);
 
-		long count = tmsSimpleDao.count(sb.toString(), cond);
+		long count = dynamicSimpleDao.count(sb.toString(), cond);
 
 		if (count > 0) {
 			throw new TmsMgrWebException("当前交易有下级交易,不能修改交易类型,渠道或交易标识");
@@ -918,7 +918,7 @@ public class TransDefServiceImpl implements TransDefService {
 		cond.put(TMS_COM_TAB.TAB_TYPE, StaticParameters.TAB_TYPE_4);
 		// cond.put(TMS_COM_TAB.TAB_NAME, par_name);
 
-		List<Map<String, Object>> list = tmsSimpleDao.queryForList(sb.toString(), cond);
+		List<Map<String, Object>> list = dynamicSimpleDao.queryForList(sb.toString(), cond);
 
 		if (list.size() == 1 && isModify) {
 
@@ -984,7 +984,7 @@ public class TransDefServiceImpl implements TransDefService {
 
 		sb.append(switchSql(tab_name));
 
-		List<Map<String, Object>> rows = tmsSimpleDao.queryForList(sb.toString(), StaticParameters.STATUS_1, StaticParameters.TAB_TYPE_4, tab_name);
+		List<Map<String, Object>> rows = dynamicSimpleDao.queryForList(sb.toString(), StaticParameters.STATUS_1, StaticParameters.TAB_TYPE_4, tab_name);
 
 		if (rows != null && rows.size() != 1) {
 			throw new TmsMgrWebException("查询当前交易的所属交易出错");
@@ -1024,7 +1024,7 @@ public class TransDefServiceImpl implements TransDefService {
 		sb.append(" on son.PARENT_TAB= par.PAR_TAB_NAME where son.tab_name=? and son.TAB_TYPE='4' ");
 		// sb.append(" on son.PARENT_TAB= par.PAR_TAB_NAME where son.tab_name=? and son.TAB_TYPE='4' and son.is_enable='1'");
 
-		List<Map<String, Object>> rows = tmsSimpleDao.queryForList(sb.toString(), tab_name);
+		List<Map<String, Object>> rows = dynamicSimpleDao.queryForList(sb.toString(), tab_name);
 
 		if (rows != null && rows.size() != 1) {
 			throw new TmsMgrWebException("查询当前交易出错");
@@ -1063,7 +1063,7 @@ public class TransDefServiceImpl implements TransDefService {
 		StringBuffer sb = new StringBuffer();
 		sb.append("select * from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_NAME + " in (" + TransCommon.arr2str(TransCommon.cutToIds(txnid)) + ")");
 
-		return tmsSimpleDao.queryForList(sb.toString());
+		return dynamicSimpleDao.queryForList(sb.toString());
 	}
 
 	/**
@@ -1082,7 +1082,7 @@ public class TransDefServiceImpl implements TransDefService {
 		StringBuffer sb = new StringBuffer();
 		sb.append("select " + TMS_COM_TAB.TAB_NAME + ", " + TMS_COM_TAB.TAB_DESC + " from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_NAME + " in (" + TransCommon.arr2str(TransCommon.cutToIds(txnid)) + ")");
 
-		return tmsSimpleDao.queryForList(sb.toString());
+		return dynamicSimpleDao.queryForList(sb.toString());
 	}
 
 	public List<Map<String, Object>> getSelfAndParentTranDef(String tab_name) {
@@ -1094,7 +1094,7 @@ public class TransDefServiceImpl implements TransDefService {
 		sb.append(" in (").append(TransCommon.cutToIdsForSql(tab_name)).append(")");
 		sb.append(" order by ").append(TMS_COM_TAB.TAB_NAME);
 
-		return tmsSimpleDao.queryForList(sb.toString());
+		return dynamicSimpleDao.queryForList(sb.toString());
 	}
 
 	public String getSelfAndParentTranDefAsStr(String tab_name) {
@@ -1123,12 +1123,12 @@ public class TransDefServiceImpl implements TransDefService {
 		sb.append(txnColName).append(" in (").append(TransCommon.cutToIdsForSql(txnid)).append(")");
 		sb.append(" or ").append(txnColName).append(" like '").append(txnid).append("%'");
 
-		return tmsSimpleDao.queryForList(sb.toString());
+		return dynamicSimpleDao.queryForList(sb.toString());
 	}
 
 	public List<Map<String, Object>> getAllTxn() {
 		String sql = "select t.tab_name,t.tab_desc from tms_com_tab t where t.tab_type='4' order by t.tab_name";
-		return tmsSimpleDao.queryForList(sql);
+		return dynamicSimpleDao.queryForList(sql);
 	}
 
 	@Transactional

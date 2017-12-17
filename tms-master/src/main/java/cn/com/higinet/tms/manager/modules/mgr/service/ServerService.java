@@ -19,8 +19,8 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 public class ServerService {
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	@Qualifier("tmsSqlMap")
@@ -36,6 +36,6 @@ public class ServerService {
 
 		String sql2 = tmsSqlMap.getSql( "TMS.SERVER.LIST" );
 
-		return tmsSimpleDao.queryForList( sql2, servType );
+		return dynamicSimpleDao.queryForList( sql2, servType );
 	}
 }

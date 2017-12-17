@@ -45,8 +45,8 @@ public class RateService {
 	private static final Logger log = LoggerFactory.getLogger( RateService.class );
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	@Qualifier("offlineSimpleDao")
@@ -76,10 +76,10 @@ public class RateService {
 	*/
 	public List<Map<String, Object>> rateList( Map<String, String> conds ) {
 
-		List<Map<String, Object>> rosterPage = tmsSimpleDao.listAll( "TMS_MGR_RATESET", new Order().asc( "RS_ID" ) );
+		List<Map<String, Object>> rosterPage = dynamicSimpleDao.listAll( "TMS_MGR_RATESET", new Order().asc( "RS_ID" ) );
 
 		for( Map<String, Object> map : rosterPage ) {
-			Map<String, Object> tab_data = tmsSimpleDao.retrieve( DBConstant.TMS_COM_TAB.TABLE_NAME,
+			Map<String, Object> tab_data = dynamicSimpleDao.retrieve( DBConstant.TMS_COM_TAB.TABLE_NAME,
 					MapWrap.map( DBConstant.TMS_COM_TAB.TXNID, MapUtil.getString( map, "TXNID" ) ).getMap() );
 			if( tab_data == null || tab_data.isEmpty() ) {
 				continue;
@@ -97,7 +97,7 @@ public class RateService {
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put( "LEVEL_SCORE", MapUtil.getString( reqs, "LEVEL_SCORE" ) );
 		row.put( "MODTIME", System.currentTimeMillis() );
-		tmsSimpleDao.update( "TMS_MGR_RATESET", row, MapWrap.map( "RS_ID", MapUtil.getString( reqs, "RS_ID" ) ).getMap() );
+		dynamicSimpleDao.update( "TMS_MGR_RATESET", row, MapWrap.map( "RS_ID", MapUtil.getString( reqs, "RS_ID" ) ).getMap() );
 	}
 
 	public Page<Map<String, Object>> levelPage( Map<String, String> reqs ) {
@@ -163,7 +163,7 @@ public class RateService {
 
 			}
 			sql.append( " order by MODTIME desc" );
-			Page<Map<String, Object>> levelPage = tmsSimpleDao.pageQuery( sql.toString(), reqs, new Order() );
+			Page<Map<String, Object>> levelPage = dynamicSimpleDao.pageQuery( sql.toString(), reqs, new Order() );
 			return levelPage;
 		}
 		StringBuilder merchantSql = new StringBuilder();
@@ -217,7 +217,7 @@ public class RateService {
 			}
 
 			merchantSql.append( " order by MODTIME desc" );
-			Page<Map<String, Object>> levelPage = tmsSimpleDao.pageQuery( merchantSql.toString(), reqs, new Order() );
+			Page<Map<String, Object>> levelPage = dynamicSimpleDao.pageQuery( merchantSql.toString(), reqs, new Order() );
 			return levelPage;
 		}
 
@@ -272,7 +272,7 @@ public class RateService {
 			}
 
 			posMerchantSql.append( " order by MODTIME desc" );
-			Page<Map<String, Object>> levelPage = tmsSimpleDao.pageQuery( posMerchantSql.toString(), reqs, new Order() );
+			Page<Map<String, Object>> levelPage = dynamicSimpleDao.pageQuery( posMerchantSql.toString(), reqs, new Order() );
 			return levelPage;
 		}
 
@@ -295,7 +295,7 @@ public class RateService {
 		for( int i = 0; i < server_list.size(); i++ ) {
 			ser_map.put( i, server_list.get( i ) );
 		}
-		Map<String, Object> rate_set = tmsSimpleDao.retrieve( "TMS_MGR_RATESET", MapWrap.map( "TABLE_NAME", table_name ).getMap() );
+		Map<String, Object> rate_set = dynamicSimpleDao.retrieve( "TMS_MGR_RATESET", MapWrap.map( "TABLE_NAME", table_name ).getMap() );
 		Map<String, Object> transaction = new HashMap<String, Object>();
 		transaction.put( "RR_ID", MapUtil.getString( reqs, "RR_ID" ) );
 		transaction.put( "RS_ID", MapUtil.getString( rate_set, "RS_ID" ) );
@@ -531,7 +531,7 @@ public class RateService {
 
 		}
 		try {
-			rate_page = tmsSimpleDao.pageQuery( sql.toString(), new HashMap<String, Object>(), 1, pageSize, new Order() );
+			rate_page = dynamicSimpleDao.pageQuery( sql.toString(), new HashMap<String, Object>(), 1, pageSize, new Order() );
 			total = rate_page.getTotal();
 			if( total == 0 || ser_map == null || ser_map.isEmpty() ) {
 				totalMap.put( table_name + "_total", -1L );
@@ -543,7 +543,7 @@ public class RateService {
 			pageIndex = (int) (total % pageSize == 0 ? total / pageSize : (total / pageSize) + 1);
 			String signal = "single";
 			do {
-				rate_page = tmsSimpleDao.pageQuery( sql.toString(), new HashMap<String, Object>(), pageIndex, pageSize, new Order() );
+				rate_page = dynamicSimpleDao.pageQuery( sql.toString(), new HashMap<String, Object>(), pageIndex, pageSize, new Order() );
 				List<Map<String, Object>> rate_list = rate_page.getList();
 
 				for( Map<String, Object> transaction : rate_list ) {
@@ -598,7 +598,7 @@ public class RateService {
 		String sql = "SELECT A.LEVEL_SCORE LEVELSCORE FROM TMS_MGR_RATESET A ORDER BY A.RS_ID ";
 		String currentTimeSql = "SELECT sysdate as currentTime  FROM DUAL";
 
-		List<Map<String, Object>> levelScoreList = tmsSimpleDao.queryForList( sql );
+		List<Map<String, Object>> levelScoreList = dynamicSimpleDao.queryForList( sql );
 		if( levelScoreList == null || levelScoreList.size() == 0 ) {
 			return;
 		}
@@ -628,10 +628,10 @@ public class RateService {
 
 		conditons.put( "RATEKIND_ID", reqs.get( "RATEKIND_ID" ) );
 		conditons.put( "RS_ID", reqs.get( "RS_ID" ) );
-		tmsSimpleDao.update( "TMS_MGR_RATERESULT", row, conditons );
+		dynamicSimpleDao.update( "TMS_MGR_RATERESULT", row, conditons );
 
 		Map<String, Object> values = new HashMap<String, Object>();
-		List<Map<String, Object>> currentTimeList = tmsSimpleDao.queryForList( currentTimeSql );
+		List<Map<String, Object>> currentTimeList = dynamicSimpleDao.queryForList( currentTimeSql );
 		Map<String, Object> currentTimeMap = currentTimeList.get( 0 );
 		values.put( "RATING_LEVEL", riskLevel );
 
@@ -641,12 +641,12 @@ public class RateService {
 		if( userType.equals( "posMerchant" ) ) {
 			conditions.put( "MRCH_NO", reqs.get( "RATEKIND_ID" ) );
 			values.put( "UPDATE_TIME", currentTimeMap.get( "currentTime" ) );
-			tmsSimpleDao.update( "TMS_RUN_MERCHANT_POS", values, conditions );
+			dynamicSimpleDao.update( "TMS_RUN_MERCHANT_POS", values, conditions );
 		}
 		else {
 			conditions.put( "USERID", reqs.get( "RATEKIND_ID" ) );
 			values.put( "UPDATED_DATE", currentTimeMap.get( "currentTime" ) );
-			tmsSimpleDao.update( "TMS_RUN_USER", values, conditions );
+			dynamicSimpleDao.update( "TMS_RUN_USER", values, conditions );
 		}
 
 		String userId = (String) reqs.get( "USER_ID" );
@@ -701,7 +701,7 @@ public class RateService {
 		//先从规则表中查询规则，再从规则备份表中查询
 		String ruleSql = "select RULE_ID, RULE_NAME, RULE_DESC, RULE_COND, RULE_COND_IN, " + "RULE_SHORTDESC, EVAL_TYPE, DISPOSAL from TMS_COM_RULE where RULE_TXN in ("
 				+ TransCommon.arr2str( TransCommon.cutToIds( txnType ) ) + ")";
-		List<Map<String, Object>> ruleList = tmsSimpleDao.queryForList( ruleSql );
+		List<Map<String, Object>> ruleList = dynamicSimpleDao.queryForList( ruleSql );
 		String ruleTempSql = "";
 		int totalTrigRules = 0;//所有的规则命中数，如果totalTrigRules不等于trigList.size()说明规则表中的数据被删除，再从规则备份表中查询
 		if( !ruleList.isEmpty() ) {

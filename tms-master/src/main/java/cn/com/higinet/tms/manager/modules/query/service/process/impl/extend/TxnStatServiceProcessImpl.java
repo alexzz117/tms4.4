@@ -18,9 +18,12 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 
 @Service("txnStatQuery")
 public class TxnStatServiceProcessImpl implements QueryDataProcess {
+	
 	private static final String PARAM_NAME = "txncode";
+	
 	@Autowired
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	@Qualifier("onlineSimpleDao")
@@ -31,7 +34,7 @@ public class TxnStatServiceProcessImpl implements QueryDataProcess {
 		HttpServletRequest request = (HttpServletRequest) args[1];
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put(PARAM_NAME, request.getParameter(PARAM_NAME));
-		Map<String, Object> txnMap = tmsSimpleDao.retrieve(DBConstant.TMS_RUN_TRAFFICDATA, conds);
+		Map<String, Object> txnMap = dynamicSimpleDao.retrieve(DBConstant.TMS_RUN_TRAFFICDATA, conds);
 		if (!CmcMapUtil.isEmpty(txnMap)) {
 			String txnType = CmcMapUtil.getString(txnMap,
 					DBConstant.TMS_RUN_TRAFFICDATA_TXNTYPE);

@@ -15,10 +15,9 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.modules.common.CommonCheckService;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
-import cn.com.higinet.tms.manager.modules.common.SequenceService;
-import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_SWITCH;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
+import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.switcher.service.SwitchService;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
@@ -34,8 +33,8 @@ public class SwitchServiceImpl implements SwitchService{
 	@Autowired
 	private TransDefService transDefService;
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	@Autowired
 	private SqlMap tmsSqlMap;
 	@Autowired
@@ -51,7 +50,7 @@ public class SwitchServiceImpl implements SwitchService{
 		sql.append("sw.").append(TMS_COM_SWITCH.SW_TXN).append("=tab.").append(TMS_COM_TAB.TAB_NAME).append(" AND ");
 		sql.append("sw.").append(TMS_COM_SWITCH.SW_TXN);
 		sql.append("=? order by ").append(TMS_COM_SWITCH.SW_ORDER);
-		return tmsSimpleDao.queryForList(sql.toString(), txnid);
+		return dynamicSimpleDao.queryForList(sql.toString(), txnid);
 	}
 
 	@Transactional
@@ -106,7 +105,7 @@ public class SwitchServiceImpl implements SwitchService{
 			m.put(TMS_COM_SWITCH.SW_ENABLE, MapUtil.getLong(m, TMS_COM_SWITCH.SW_ENABLE));
 		}
 		
-		tmsSimpleDao.batchUpdate(buildAddSql(), add);
+		dynamicSimpleDao.batchUpdate(buildAddSql(), add);
 		return (Map) add.get(0);
 	}
 	/*
@@ -136,7 +135,7 @@ public class SwitchServiceImpl implements SwitchService{
 		}
 		
 		
-		tmsSimpleDao.batchUpdate(buildUpdateSql(), update);
+		dynamicSimpleDao.batchUpdate(buildUpdateSql(), update);
 		return (Map) update.get(0);
 	}
 	/*
@@ -144,7 +143,7 @@ public class SwitchServiceImpl implements SwitchService{
 	 */
 	private Map deleteRecord(List delete){
 		
-		tmsSimpleDao.executeUpdate(buildDeleteSql(delete));
+		dynamicSimpleDao.executeUpdate(buildDeleteSql(delete));
 		return null;
 	}
 	

@@ -28,8 +28,8 @@ public class SignServiceImpl implements SignService {
 	private static final int SEND_TIMES = 3;// 发送次数
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	@Autowired
 	private ServerService ServerService;
 
@@ -39,7 +39,7 @@ public class SignServiceImpl implements SignService {
 				+ "= c.citycode left join TMS_MGR_REGION r on c.regioncode = r.regioncode left join " + "TMS_MGR_COUNTRY co on c.countrycode = co.countrycode where m.mobile = substr(" + "u.mobile, 0, 7)) else '' end moble_location, a.BANK_MOBILE, case when length("
 				+ "a.bank_mobile) > 0 then (select nvl(co.countryname, '未知') || '-' || nvl(r.regionname, " + "'未知') || '-' || nvl(c.cityname, '未知') from tms_mgr_mobile m left join TMS_MGR_CITY c " + "on m.citycode = c.citycode left join TMS_MGR_REGION r on c.regioncode = r.regioncode "
 				+ "left join TMS_MGR_COUNTRY co on c.countrycode = co.countrycode where m.mobile = substr(" + "a.bank_mobile, 0, 7)) else '' end bank_moble_location from TMS_RUN_USER u left join " + "TMS_RUN_ACCOUNT a on u.USERID = a.USERID where u.USERID = ? and length(a.BANK_MOBILE) > 0";
-		return tmsSimpleDao.queryForList(sql, userId);
+		return dynamicSimpleDao.queryForList(sql, userId);
 	}
 
 	@Override

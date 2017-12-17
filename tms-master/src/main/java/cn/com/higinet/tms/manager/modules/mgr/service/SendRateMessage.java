@@ -53,8 +53,8 @@ public class SendRateMessage {
 	private static final Logger log = LoggerFactory.getLogger( SendRateMessage.class );
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	@Autowired
 	@Qualifier("offlineSimpleDao")
 	private SimpleDao offlineSimpleDao;
@@ -186,14 +186,14 @@ public class SendRateMessage {
 			row.put( "SCORE", score );
 			row.put( "RISKLEVEL", level );
 			row.put( "MODTIME", System.currentTimeMillis() );
-			tmsSimpleDao.create( "TMS_MGR_RATERESULT", row );
+			dynamicSimpleDao.create( "TMS_MGR_RATERESULT", row );
 		}
 		else {
 			Map<String, Object> row = new HashMap<String, Object>();
 			row.put( "SCORE", score );
 			row.put( "RISKLEVEL", level );
 			row.put( "MODTIME", System.currentTimeMillis() );
-			tmsSimpleDao.update( "TMS_MGR_RATERESULT", row, MapWrap.map( "RR_ID", MapUtil.getString( transaction, "RR_ID" ) ).getMap() );
+			dynamicSimpleDao.update( "TMS_MGR_RATERESULT", row, MapWrap.map( "RR_ID", MapUtil.getString( transaction, "RR_ID" ) ).getMap() );
 		}
 	}
 
@@ -205,7 +205,7 @@ public class SendRateMessage {
 			return;
 		}
 		String currentTimeSql = "SELECT sysdate as currentTime  FROM DUAL";
-		List<Map<String, Object>> currentTimeList = tmsSimpleDao.queryForList( currentTimeSql );
+		List<Map<String, Object>> currentTimeList = dynamicSimpleDao.queryForList( currentTimeSql );
 		Map<String, Object> currentTimeMap = currentTimeList.get( 0 );
 		Map<String, Object> valueMap = new HashMap<String, Object>();
 		valueMap.put( "RATING_LEVEL", level );
@@ -217,13 +217,13 @@ public class SendRateMessage {
 			valueMap.put( "UPDATE_TIME", currentTimeMap.get( "currentTime" ) );
 
 			conditionMap.put( "MRCH_NO", userId );
-			tmsSimpleDao.update( "TMS_RUN_MERCHANT_POS", valueMap, conditionMap );
+			dynamicSimpleDao.update( "TMS_RUN_MERCHANT_POS", valueMap, conditionMap );
 		}
 		else {
 			valueMap.put( "UPDATED_DATE", currentTimeMap.get( "currentTime" ) );
 
 			conditionMap.put( "USERID", userId );
-			tmsSimpleDao.update( "TMS_RUN_USER", valueMap, conditionMap );
+			dynamicSimpleDao.update( "TMS_RUN_USER", valueMap, conditionMap );
 
 		}
 
@@ -520,7 +520,7 @@ public class SendRateMessage {
 
 		for( Map<String, Object> ruleIdAndRuleScoreMap : ruleIdList ) {
 			//			dao_rule_hit dao_rule_hit = new dao_rule_hit();
-			List<Map<String, Object>> sequenceValueList = tmsSimpleDao.queryForList( sqlSeqNext, params );
+			List<Map<String, Object>> sequenceValueList = dynamicSimpleDao.queryForList( sqlSeqNext, params );
 			Map<String, Object> sequenceValueMap = sequenceValueList.get( 0 );
 			BigDecimal tmsRuleTrigId = (BigDecimal) sequenceValueMap.get( "SEQUENCEID" );
 			txnType = (String) ruleIdAndRuleScoreMap.get( "ruleTxn" );
@@ -604,7 +604,7 @@ public class SendRateMessage {
 		for( Map<String, Object> conditionMap : conditionListMap ) {
 			String sql = "SELECT A.RULE_ID ruleId,A.RULE_SCORE ruleScore  FROM TMS_COM_RULE A WHERE A.RULE_NAME=:ruleName AND A.RULE_TXN=:ruleTxn";
 
-			List<Map<String, Object>> ruleIdListMap = tmsSimpleDao.queryForList( sql, conditionMap );
+			List<Map<String, Object>> ruleIdListMap = dynamicSimpleDao.queryForList( sql, conditionMap );
 			if( ruleIdListMap != null && ruleIdListMap.size() > 0 ) {
 				Map<String, Object> ruleIdMap = ruleIdListMap.get( 0 );
 				BigDecimal ruleId = (BigDecimal) ruleIdMap.get( "ruleId" );

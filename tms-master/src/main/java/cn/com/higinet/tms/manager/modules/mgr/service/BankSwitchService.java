@@ -27,8 +27,8 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class BankSwitchService {
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	/**
 	 * 通道开关列表查询
@@ -48,7 +48,7 @@ public class BankSwitchService {
 		if( !StringUtil.isEmpty( conds.get( "TXNID" ) ) ) {
 			sql.append( " AND s.TXNID=:TXNID" );
 		}
-		Page<Map<String, Object>> bankSwitchPage = tmsSimpleDao.pageQuery( sql.toString(), conds, new Order().asc( "BANK_CODE" ) );
+		Page<Map<String, Object>> bankSwitchPage = dynamicSimpleDao.pageQuery( sql.toString(), conds, new Order().asc( "BANK_CODE" ) );
 		for( Map<String, Object> operMap : bankSwitchPage.getList() ) {
 			operMap.put( "OPER_HISTORY", "" );
 		}
@@ -66,11 +66,11 @@ public class BankSwitchService {
 		for( Map<String, String> delMap : delList ) {
 			Map<String, String> conds = new HashMap<String, String>();
 			conds.put( "ID", MapUtil.getString( delMap, "ID" ) );
-			tmsSimpleDao.delete( "TMS_RUN_BANK_SWITCH", conds );
+			dynamicSimpleDao.delete( "TMS_RUN_BANK_SWITCH", conds );
 
 			Map<String, String> reqs = new HashMap<String, String>();
 			reqs.put( "BANK_SWITCH_ID", MapUtil.getString( delMap, "ID" ) );
-			tmsSimpleDao.delete( "TMS_RUN_BANK_SWITCH_HIS", reqs );
+			dynamicSimpleDao.delete( "TMS_RUN_BANK_SWITCH_HIS", reqs );
 		}
 	}
 
@@ -86,7 +86,7 @@ public class BankSwitchService {
 		reqs.put( "STATUS", "0" );
 		sql.append(
 				"insert into TMS_RUN_BANK_SWITCH (ID,TXNID,BANK_CODE,RISK_LEVEL,STATUS,CREATOR_ID,CREATE_TIME) values (:ID,:TXNID,:BANK_CODE,:RISK_LEVEL,:STATUS,:CREATOR_ID,:CREATE_TIME)" );
-		tmsSimpleDao.executeUpdate( sql.toString(), reqs );
+		dynamicSimpleDao.executeUpdate( sql.toString(), reqs );
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class BankSwitchService {
 	 * @return 单条通道开关信息
 	 */
 	public Map<String, Object> getBankSwitchById( String id ) {
-		Map<String, Object> List = tmsSimpleDao.retrieve( "TMS_RUN_BANK_SWITCH", MapWrap.map( "ID", id ).getMap() );
+		Map<String, Object> List = dynamicSimpleDao.retrieve( "TMS_RUN_BANK_SWITCH", MapWrap.map( "ID", id ).getMap() );
 		return List;
 	}
 
@@ -117,12 +117,12 @@ public class BankSwitchService {
 		req.put( "UPDATE_TIME", String.valueOf( System.currentTimeMillis() ) );
 
 		sql.append( "update TMS_RUN_BANK_SWITCH set STATUS=:STATUS_NEW where ID=:ID" );
-		tmsSimpleDao.executeUpdate( sql.toString(), req );
+		dynamicSimpleDao.executeUpdate( sql.toString(), req );
 		sql.delete( 0, sql.length() );
 
 		sql.append(
 				"insert into TMS_RUN_BANK_SWITCH_HIS (ID,BANK_SWITCH_ID,STATUS_OLD,STATUS_NEW,UPDATOR_ID,UPDATE_TIME) values(:id,:BANK_SWITCH_ID,:STATUS_OLD,:STATUS_NEW,:UPDATOR_ID,:UPDATE_TIME)" );
-		tmsSimpleDao.executeUpdate( sql.toString(), req );
+		dynamicSimpleDao.executeUpdate( sql.toString(), req );
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class BankSwitchService {
 	public Page<Map<String, Object>> listBankSwitchHisByIdPage( Map<String, String> conds ) {
 		StringBuilder sql = new StringBuilder();
 		sql.append( "select ID,BANK_SWITCH_ID,STATUS_OLD,STATUS_NEW,UPDATOR_ID,UPDATE_TIME from TMS_RUN_BANK_SWITCH_HIS where BANK_SWITCH_ID=:ID" );
-		Page<Map<String, Object>> bankSwitchHisPage = tmsSimpleDao.pageQuery( sql.toString(), conds, new Order().desc( "UPDATE_TIME" ) );
+		Page<Map<String, Object>> bankSwitchHisPage = dynamicSimpleDao.pageQuery( sql.toString(), conds, new Order().desc( "UPDATE_TIME" ) );
 		return bankSwitchHisPage;
 	}
 }

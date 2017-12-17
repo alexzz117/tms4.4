@@ -30,15 +30,15 @@ import cn.com.higinet.tms.manager.modules.dp.service.TxnGroupService;
 public class TxnGroupServiceImpl implements TxnGroupService {
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	/**
 	 * 获得所有渠道信息
 	 * @return
 	 */
 	public List<Map<String, Object>> listAllChannel(Map<String, String> conds) {
-		List<Map<String, Object>> channellist = tmsSimpleDao
+		List<Map<String, Object>> channellist = dynamicSimpleDao
 				.listAll(DBConstant.TMS_DP_CHANNEL);
 		return channellist;
 	}
@@ -49,7 +49,7 @@ public class TxnGroupServiceImpl implements TxnGroupService {
 	 */
 	public List<Map<String, Object>> listAllChannelWithOrder() {
 		
-		List<Map<String, Object>> channellist = tmsSimpleDao.listAll(DBConstant.TMS_DP_CHANNEL, new Order().asc("ORDERBY"));
+		List<Map<String, Object>> channellist = dynamicSimpleDao.listAll(DBConstant.TMS_DP_CHANNEL, new Order().asc("ORDERBY"));
 		return channellist;
 	}
 

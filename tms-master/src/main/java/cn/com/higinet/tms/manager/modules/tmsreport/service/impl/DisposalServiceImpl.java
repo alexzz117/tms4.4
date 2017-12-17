@@ -17,15 +17,15 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 public class DisposalServiceImpl implements DisposalService {
 	
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	
 	private static final String DISPOSAL_TABLE_NAME = "tms_com_disposal";
 	
 	@Override
 	public Map<String, String> getDp() {
 		String sql = "select DP_CODE,DP_NAME from "+DISPOSAL_TABLE_NAME;
-		List<Map<String, Object>> codelist = tmsSimpleDao.queryForList(sql);
+		List<Map<String, Object>> codelist = dynamicSimpleDao.queryForList(sql);
 		Map<String, String> codemap = new HashMap<String, String>();
 		if(codelist.size() > 0){
 			for(Map<String, Object> code : codelist){
@@ -38,7 +38,7 @@ public class DisposalServiceImpl implements DisposalService {
 	@Override
 	public List<Map<String, Object>> queryList() {
 		String sql = "SELECT * FROM "+DISPOSAL_TABLE_NAME+" ORDER BY DP_ORDER ASC";
-		return tmsSimpleDao.queryForList(sql);
+		return dynamicSimpleDao.queryForList(sql);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class DisposalServiceImpl implements DisposalService {
 			String[] txnids = TransCommon.cutToIds(txnid);
 			String txnid_last = txnids[txnids.length-1];
 			String txn_dis_sql = "SELECT TAB_DISPOSAL FROM TMS_COM_TAB  WHERE TAB_NAME= ? ";
-			List<Map<String,Object>> txn_dis_list = tmsSimpleDao.queryForList(txn_dis_sql,txnid_last);
+			List<Map<String,Object>> txn_dis_list = dynamicSimpleDao.queryForList(txn_dis_sql,txnid_last);
 			tab_disposal = txn_dis_list!=null && txn_dis_list.size()>0?Mapz.getString(txn_dis_list.get(0),"TAB_DISPOSAL"):"xxx";
 		}
 		
@@ -68,6 +68,6 @@ public class DisposalServiceImpl implements DisposalService {
 		}
 		
 		sql += "ORDER BY DP_ORDER ASC";
-		return tmsSimpleDao.queryForList(sql);
+		return dynamicSimpleDao.queryForList(sql);
 	}
 }

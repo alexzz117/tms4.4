@@ -23,8 +23,8 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class BankQuotaService {
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	/**
 	 * 通道限额列表查询
@@ -46,7 +46,7 @@ public class BankQuotaService {
 		if( !StringUtil.isEmpty( conds.get( "BUSINESS_TYPE" ) ) ) {
 			sql.append( " AND BUSINESS_TYPE=:BUSINESS_TYPE" );
 		}
-		Page<Map<String, Object>> bankQuotaPage = tmsSimpleDao.pageQuery( sql.toString().replaceFirst( "AND", "WHERE" ), conds, new Order().asc( "BANK_CODE" ) );
+		Page<Map<String, Object>> bankQuotaPage = dynamicSimpleDao.pageQuery( sql.toString().replaceFirst( "AND", "WHERE" ), conds, new Order().asc( "BANK_CODE" ) );
 		return bankQuotaPage;
 	}
 
@@ -60,7 +60,7 @@ public class BankQuotaService {
 		for( Map<String, String> delMap : delList ) {
 			Map<String, String> conds = new HashMap<String, String>();
 			conds.put( "ID", MapUtil.getString( delMap, "ID" ) );
-			tmsSimpleDao.delete( "TMS_RUN_BANK_QUOTA", conds );
+			dynamicSimpleDao.delete( "TMS_RUN_BANK_QUOTA", conds );
 		}
 
 	}
@@ -73,7 +73,7 @@ public class BankQuotaService {
 		StringBuilder sql = new StringBuilder();
 		sql.append(
 				"insert into TMS_RUN_BANK_QUOTA (ID,BANK_CODE,CARD_TYPE, BUSINESS_TYPE,ONE_QUOTA,DAY_QUOTA,MONTH_QUOTA,DAY_TIMES,MONTH_TIMES) values (:ID,:BANK_CODE,:CARD_TYPE, :BUSINESS_TYPE,:ONE_QUOTA,:DAY_QUOTA,:MONTH_QUOTA,:DAY_TIMES,:MONTH_TIMES)" );
-		tmsSimpleDao.executeUpdate( sql.toString(), reqs );
+		dynamicSimpleDao.executeUpdate( sql.toString(), reqs );
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class BankQuotaService {
 	 * @return 单条通道限额信息
 	 */
 	public Map<String, Object> getBankQuotaById( String id ) {
-		Map<String, Object> List = tmsSimpleDao.retrieve( "TMS_RUN_BANK_QUOTA", MapWrap.map( "ID", id ).getMap() );
+		Map<String, Object> List = dynamicSimpleDao.retrieve( "TMS_RUN_BANK_QUOTA", MapWrap.map( "ID", id ).getMap() );
 		return List;
 	}
 
@@ -94,6 +94,6 @@ public class BankQuotaService {
 		StringBuilder sql = new StringBuilder();
 		sql.append(
 				"update TMS_RUN_BANK_QUOTA set BANK_CODE=:BANK_CODE,CARD_TYPE=:CARD_TYPE,BUSINESS_TYPE=:BUSINESS_TYPE,ONE_QUOTA=:ONE_QUOTA,DAY_QUOTA=:DAY_QUOTA,MONTH_QUOTA=:MONTH_QUOTA,DAY_TIMES=:DAY_TIMES,MONTH_TIMES=:MONTH_TIMES where ID=:ID" );
-		tmsSimpleDao.executeUpdate( sql.toString(), req );
+		dynamicSimpleDao.executeUpdate( sql.toString(), req );
 	}
 }

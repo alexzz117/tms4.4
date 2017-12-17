@@ -22,8 +22,8 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class SafeDeviceService  {
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	public Page<Map<String, Object>> getSafeDeviceList(Map<String, String> reqs) {
 		StringBuilder sql = new StringBuilder();
@@ -56,7 +56,7 @@ public class SafeDeviceService  {
 			reqs.put("endTime", String.valueOf(endTime.getTime()));
 			sql.append(" and s.created_date<= :endTime");
 		}
-		Page<Map<String, Object>> SafeDevicePage = tmsSimpleDao.pageQuery(sql.toString().replaceFirst("and", "where"),reqs, new Order().desc("UPDATED_DATE"));
+		Page<Map<String, Object>> SafeDevicePage = dynamicSimpleDao.pageQuery(sql.toString().replaceFirst("and", "where"),reqs, new Order().desc("UPDATED_DATE"));
 		return SafeDevicePage;
 	}
 
@@ -68,11 +68,11 @@ public class SafeDeviceService  {
 		reqs.put("CREATED_DATE",  reqs.get("t"));
 		reqs.put("STATUS",  "1");
 		sql.append("insert into TMS_MGR_SAFE_DEVICE(DEVICE_ID,STATUS,DESCR,CREATED_DATE,CREATED_BY,UPDATED_DATE,UPDATED_BY) values(:DEVICE_ID,:STATUS,:DESCR,:CREATED_DATE,:OPERATOR_ID,:CREATED_DATE,:OPERATOR_ID)");
-		tmsSimpleDao.executeUpdate(sql.toString(), reqs);
+		dynamicSimpleDao.executeUpdate(sql.toString(), reqs);
 	}
 
 	public Map<String, Object> getTableList(String tableName,String cond,String value) {
-		Map<String, Object> List = tmsSimpleDao.retrieve(tableName, MapWrap.map(cond, value).getMap());
+		Map<String, Object> List = dynamicSimpleDao.retrieve(tableName, MapWrap.map(cond, value).getMap());
 		return List;
 	}
 	
@@ -83,7 +83,7 @@ public class SafeDeviceService  {
 		reqs.put("OPERATOR_ID", (String) operator.get("OPERATOR_ID"));
 		reqs.put("UPDATED_DATE",  reqs.get("t"));
 		sql.append("update TMS_MGR_SAFE_DEVICE s set s.STATUS=:STATUS,s.DESCR=:DESCR,s.UPDATED_DATE=:UPDATED_DATE,UPDATED_BY=:OPERATOR_ID where s.DEVICE_ID=:DEVICE_ID");
-		tmsSimpleDao.executeUpdate(sql.toString(), reqs);	
+		dynamicSimpleDao.executeUpdate(sql.toString(), reqs);	
 	}
 
 		

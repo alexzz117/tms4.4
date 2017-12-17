@@ -10,13 +10,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cn.com.higinet.tms.manager.common.service.LogService;
 import cn.com.higinet.tms.manager.common.util.AuthDataBusUtil;
 import cn.com.higinet.tms.manager.common.util.CmcMacUtil;
@@ -43,8 +47,8 @@ public class OperateLogFactory {
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	/**
 	 * 获取操作日志记录类对象
@@ -143,7 +147,7 @@ public class OperateLogFactory {
 				if( username[0] != null && !"".equals( username[0] ) ) {
 					sql += " and login_name ='" + username[0] + "'";
 				}
-				List<Map<String, Object>> list = tmsSimpleDao.queryForList( sql );
+				List<Map<String, Object>> list = dynamicSimpleDao.queryForList( sql );
 				String operatorId = "";
 				if( list != null && list.size() > 0 ) {
 					operatorId = ((Map) list.get( 0 )).get( DBConstant.CMC_OPERATOR_OPERATOR_ID ).toString();
@@ -392,7 +396,7 @@ public class OperateLogFactory {
 		sb.append( " where " ).append( "TAB_NAME" );
 		sb.append( " in (" ).append( cutToIdsForSql( tab_name ) ).append( ")" );
 
-		return tmsSimpleDao.queryForList( sb.toString() );
+		return dynamicSimpleDao.queryForList( sb.toString() );
 	}
 
 	/*

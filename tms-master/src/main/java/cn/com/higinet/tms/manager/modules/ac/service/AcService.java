@@ -43,8 +43,8 @@ public class AcService {
 	private static final Logger log = LoggerFactory.getLogger( AcService.class );
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	@Autowired
 	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
@@ -57,7 +57,7 @@ public class AcService {
 	* @return
 	*/
 	public List<Map<String, Object>> listAction( Map<String, Object> reqs ) {
-		return tmsSimpleDao.queryForList( "SELECT a.* FROM TMS_COM_RULE_ACTION a WHERE RULE_ID=? ORDER BY ac_id DESC ", MapUtil.getString( reqs, "rule_id" ) );
+		return dynamicSimpleDao.queryForList( "SELECT a.* FROM TMS_COM_RULE_ACTION a WHERE RULE_ID=? ORDER BY ac_id DESC ", MapUtil.getString( reqs, "rule_id" ) );
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class AcService {
 		acData.put( DBConstant.TMS_COM_RULE_ACTION_AC_ENABLE, MapUtil.getLong( reqs, DBConstant.TMS_COM_RULE_ACTION_AC_ENABLE ) );
 
 		// 修改
-		tmsSimpleDao.update( "TMS_COM_RULE_ACTION", acData, condData );
+		dynamicSimpleDao.update( "TMS_COM_RULE_ACTION", acData, condData );
 		return acData;
 	}
 
@@ -186,7 +186,7 @@ public class AcService {
 		actionData.put( DBConstant.TMS_COM_RULE_ACTION_AC_EXPR, MapUtil.getString( reqs, DBConstant.TMS_COM_RULE_ACTION_AC_EXPR ) );
 		actionData.put( DBConstant.TMS_COM_RULE_ACTION_AC_EXPR_IN, MapUtil.getString( reqs, DBConstant.TMS_COM_RULE_ACTION_AC_EXPR_IN ) );
 		actionData.put( DBConstant.TMS_COM_RULE_ACTION_AC_ENABLE, MapUtil.getLong( reqs, DBConstant.TMS_COM_RULE_ACTION_AC_ENABLE ) );
-		tmsSimpleDao.create( "TMS_COM_RULE_ACTION", actionData );
+		dynamicSimpleDao.create( "TMS_COM_RULE_ACTION", actionData );
 
 		reqs.put( DBConstant.TMS_COM_RULE_ACTION_AC_ID, sequenceId );
 
@@ -205,7 +205,7 @@ public class AcService {
 			sql += " and AC_ID != " + acid;
 		}
 
-		List<Map<String, Object>> acList = tmsSimpleDao.queryForList( sql, ac_desc, rule_id );
+		List<Map<String, Object>> acList = dynamicSimpleDao.queryForList( sql, ac_desc, rule_id );
 		if( acList != null && acList.size() > 0 ) {
 			throw new TmsMgrServiceException( "动作名称重复" );
 		}
@@ -217,7 +217,7 @@ public class AcService {
 	 * @see cn.com.higinet.tms35.manage.action.controller.service.ActionService#delAc(java.lang.String[])
 	 */
 	private void deleteAc( Map<String, ?> input ) {
-		tmsSimpleDao.delete( "TMS_COM_RULE_ACTION", MapWrap.map( DBConstant.TMS_COM_RULE_ACTION_AC_ID, MapUtil.getLong( input, DBConstant.TMS_COM_RULE_ACTION_AC_ID ) ).getMap() );
+		dynamicSimpleDao.delete( "TMS_COM_RULE_ACTION", MapWrap.map( DBConstant.TMS_COM_RULE_ACTION_AC_ID, MapUtil.getLong( input, DBConstant.TMS_COM_RULE_ACTION_AC_ID ) ).getMap() );
 	}
 
 	// 校验动作条件表达式是否正确
@@ -266,7 +266,7 @@ public class AcService {
 	* @return
 	*/
 	public Map<String, Object> getOneAction( String actionId ) {
-		return tmsSimpleDao.retrieve( "TMS_COM_RULE_ACTION", MapWrap.map( DBConstant.TMS_COM_RULE_ACTION_AC_ID, Long.valueOf( actionId ) ).getMap() );
+		return dynamicSimpleDao.retrieve( "TMS_COM_RULE_ACTION", MapWrap.map( DBConstant.TMS_COM_RULE_ACTION_AC_ID, Long.valueOf( actionId ) ).getMap() );
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class AcService {
 			sqls[i] = "UPDATE TMS_COM_RULE_ACTION SET AC_ENABLE=" + stat_status + " WHERE AC_ID=" + stat_ids[i];
 		}
 
-		tmsSimpleDao.batchUpdate( sqls );
+		dynamicSimpleDao.batchUpdate( sqls );
 	}
 
 	/**
@@ -294,7 +294,7 @@ public class AcService {
 		input.remove( "AC_COND_COLUMN" );
 		input.put( "AC_ID", MapUtil.getLong( input, "AC_ID" ) );
 		String sql = "UPDATE TMS_COM_RULE_ACTION SET " + ac_cond_column + "=:AC_COND_VALUE WHERE AC_ID=:AC_ID";
-		tmsSimpleDao.executeUpdate( sql, input );
+		dynamicSimpleDao.executeUpdate( sql, input );
 	}
 
 	private void cacheInit() {

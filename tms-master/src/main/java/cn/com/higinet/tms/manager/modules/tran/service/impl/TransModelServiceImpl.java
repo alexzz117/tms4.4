@@ -38,9 +38,9 @@ import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_FD;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_REFFD;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_REFTAB;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
-import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
@@ -66,8 +66,8 @@ public class TransModelServiceImpl implements TransModelService {
 	private CommonCheckService commonCheckService;
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	@Qualifier("offlineSimpleDao")
@@ -87,7 +87,7 @@ public class TransModelServiceImpl implements TransModelService {
 		List<Map<String, Object>> txndef = transDefService.getFartherTranDef( txnid );
 		String[] ids = TransCommon.cutToIds( txnid );
 		String sql = buildUnionSql( ids.length );
-		List<Map<String, Object>> allFd = tmsSimpleDao.queryForList( sql, ids );
+		List<Map<String, Object>> allFd = dynamicSimpleDao.queryForList( sql, ids );
 
 		String[] idPlusName = addTxnName( ids, txndef );
 		List<Map<String, Object>> fd = new ArrayList<Map<String, Object>>();
@@ -182,7 +182,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb.append( "select " + TMS_COM_TAB.TAB_NAME + "," + TMS_COM_TAB.TAB_DESC + " from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_NAME + " in("
 				+ TransCommon.arr2str( TransCommon.cutToIds( txnid ) ) + ")" );
 
-		return tmsSimpleDao.queryForList( sb.toString(), txnid );
+		return dynamicSimpleDao.queryForList( sb.toString(), txnid );
 	}
 
 	/*
@@ -252,7 +252,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb.append( " on ref.tab_name=tab.tab_name " );
 		sb.append( " order by ref." ).append( TMS_COM_REFFD.TAB_NAME );
 
-		List<Map<String, Object>> allRefFd = tmsSimpleDao.queryForList( sb.toString() );
+		List<Map<String, Object>> allRefFd = dynamicSimpleDao.queryForList( sb.toString() );
 
 		return allRefFd;
 	}
@@ -274,7 +274,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb.append( "from " );
 		sb.append( TMS_COM_REFTAB.TABLE_NAME ).append( " tab " );
 
-		List<Map<String, Object>> allRefFd = tmsSimpleDao.queryForList( sb.toString() );
+		List<Map<String, Object>> allRefFd = dynamicSimpleDao.queryForList( sb.toString() );
 
 		return buildRefTab( allRefFd, txnid );
 	}
@@ -342,7 +342,7 @@ public class TransModelServiceImpl implements TransModelService {
 		// sb.append("fd.").append(TMS_COM_FD.IS_SYS).append(", ");
 		sb.append( "fd." ).append( TMS_COM_FD.TXN_ORDER );
 
-		return tmsSimpleDao.queryForList( sb.toString() );
+		return dynamicSimpleDao.queryForList( sb.toString() );
 	}
 
 	private List<Map<String, Object>> buildRefFd( List<Map<String, Object>> allRefFd, String txnid ) {
@@ -385,12 +385,12 @@ public class TransModelServiceImpl implements TransModelService {
 
 	public List<Map<String, Object>> getFunc() {
 
-		return tmsSimpleDao.queryForList( "select * from tms_com_func where FUNC_CATALOG='5' order by func_orderby" );
+		return dynamicSimpleDao.queryForList( "select * from tms_com_func where FUNC_CATALOG='5' order by func_orderby" );
 	}
 
 	public List<Map<String, Object>> getFuncParam() {
 
-		return tmsSimpleDao.queryForList(
+		return dynamicSimpleDao.queryForList(
 				"select pa.*, ss.FUNC_CODE from tms_com_funcparam pa,(select t.* from tms_com_func t where t.func_catalog='5') ss where pa.func_id = ss.func_id and pa.param_orderby > 0" );
 	}
 
@@ -462,7 +462,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb1.append( "='" ).append( tabName ).append( "'" );
 		sb1.append( " order by " ).append( TMS_COM_FD.TXN_ORDER );
 
-		return tmsSimpleDao.queryForList( sb1.toString() );
+		return dynamicSimpleDao.queryForList( sb1.toString() );
 	}
 
 	private String idsToSqlIn( String... ids ) {
@@ -531,7 +531,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb1.append( " where " ).append( TMS_COM_FD.TAB_NAME );
 		sb1.append( " in (" ).append( TransCommon.cutToIdsForSql( tab_name ) ).append( ")" );
 
-		return tmsSimpleDao.queryForList( sb1.toString() );
+		return dynamicSimpleDao.queryForList( sb1.toString() );
 
 	}
 
@@ -544,7 +544,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb1.append( " in (" ).append( TransCommon.cutToIdsForSql( tab_name ) ).append( ")" );
 		sb1.append( " or " ).append( TMS_COM_FD.TAB_NAME ).append( " like '" ).append( tab_name ).append( "%')" );
 
-		return tmsSimpleDao.queryForList( sb1.toString() );
+		return dynamicSimpleDao.queryForList( sb1.toString() );
 	}
 
 	public List<Map<String, Object>> getSelfAndSubRefFd( String tab_name ) {
@@ -556,7 +556,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb1.append( " in (" ).append( TransCommon.cutToIdsForSql( tab_name ) ).append( ")" );
 		sb1.append( " or " ).append( TMS_COM_REFFD.TAB_NAME ).append( " like '" ).append( tab_name ).append( "%')" );
 
-		return tmsSimpleDao.queryForList( sb1.toString() );
+		return dynamicSimpleDao.queryForList( sb1.toString() );
 	}
 
 	public List<Map<String, Object>> getSelfAndSubStatFd( String tab_name ) {
@@ -568,7 +568,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb1.append( " in (" ).append( TransCommon.cutToIdsForSql( tab_name ) ).append( ")" );
 		sb1.append( " or " ).append( "STAT_TXN" ).append( " like '" ).append( tab_name ).append( "%')" );
 
-		return tmsSimpleDao.queryForList( sb1.toString() );
+		return dynamicSimpleDao.queryForList( sb1.toString() );
 	}
 
 	@Transactional
@@ -627,7 +627,7 @@ public class TransModelServiceImpl implements TransModelService {
 		m.put( TMS_COM_REFTAB.REF_ID, ref_id.length() > 0 ? Long.parseLong( ref_id ) : ref_id );
 		m.put( TMS_COM_REFTAB.TXN_ORDER, txn_order.length() > 0 ? Long.parseLong( txn_order ) : 0 );
 
-		tmsSimpleDao.batchUpdate( buildUpdateRefModelSql(), update );
+		dynamicSimpleDao.batchUpdate( buildUpdateRefModelSql(), update );
 		return m;
 	}
 
@@ -657,7 +657,7 @@ public class TransModelServiceImpl implements TransModelService {
 
 		Long seqid = Long.parseLong( getSeqId( DBConstant.SEQ_TMS_COM_REFTAB_ID ) );
 		m.put( TMS_COM_REFTAB.REF_ID, seqid );
-		tmsSimpleDao.batchUpdate( buildAddRefModelSql(), add );
+		dynamicSimpleDao.batchUpdate( buildAddRefModelSql(), add );
 		return m;
 	}
 
@@ -687,7 +687,7 @@ public class TransModelServiceImpl implements TransModelService {
 			checkRefTabRefed( ref_id );
 		}
 
-		tmsSimpleDao.executeUpdate( buildDeleteRefModelSql( delete ) );
+		dynamicSimpleDao.executeUpdate( buildDeleteRefModelSql( delete ) );
 		return null;
 	}
 
@@ -699,7 +699,7 @@ public class TransModelServiceImpl implements TransModelService {
 		sb1.append( " reffd left join TMS_COM_TAB tab on tab.tab_name=reffd.tab_name where " ).append( TMS_COM_REFFD.REF_ID );
 		sb1.append( " = ?" );
 
-		List<Map<String, Object>> ref_fds = tmsSimpleDao.queryForList( sb1.toString(), Long.parseLong( ref_id ) );
+		List<Map<String, Object>> ref_fds = dynamicSimpleDao.queryForList( sb1.toString(), Long.parseLong( ref_id ) );
 
 		if( ref_fds.size() > 0 ) {
 			throw new TmsMgrServiceException( "当前表存在" + MapUtil.getString( ref_fds.get( 0 ), "tab_desc" ) + "引用字段:" + MapUtil.getString( ref_fds.get( 0 ), "REF_NAME" ) );
@@ -794,7 +794,7 @@ public class TransModelServiceImpl implements TransModelService {
 
 		m.put( TMS_COM_REFFD.REF_ID, MapUtil.getLong( m, TMS_COM_REFFD.REF_ID ) );
 		m.put( TMS_COM_REFFD.REF_NAME, ref_name );
-		tmsSimpleDao.batchUpdate( buildUpdateRefFdModelSql(), update );
+		dynamicSimpleDao.batchUpdate( buildUpdateRefFdModelSql(), update );
 		m.remove( "old" );
 		m.remove( "REF_NAME_OLD" );
 		return m;
@@ -850,7 +850,7 @@ public class TransModelServiceImpl implements TransModelService {
 		m.put( TMS_COM_REFFD.REF_ID, MapUtil.getLong( m, TMS_COM_REFFD.REF_ID ) );// 和数据库数据类型保持一致
 		m.put( TMS_COM_REFFD.REF_NAME, ref_name );
 
-		tmsSimpleDao.batchUpdate( buildAddRefFdModelSql(), add );
+		dynamicSimpleDao.batchUpdate( buildAddRefFdModelSql(), add );
 		return m;
 	}
 
@@ -885,7 +885,7 @@ public class TransModelServiceImpl implements TransModelService {
 			checkRefNameBeRefed( tab_name, ref_name, "1" );
 		}
 
-		tmsSimpleDao.executeUpdate( buildDeleteRefFdModelSql( delete ) );
+		dynamicSimpleDao.executeUpdate( buildDeleteRefFdModelSql( delete ) );
 		return null;
 	}
 
@@ -970,7 +970,7 @@ public class TransModelServiceImpl implements TransModelService {
 				m.put( TMS_COM_FD.SRC_DEFAULT, "" );
 			}
 		}
-		tmsSimpleDao.batchUpdate( buildAddModelSql(), add );
+		dynamicSimpleDao.batchUpdate( buildAddModelSql(), add );
 		if( "''".equals( src_defvalue ) || "\"\"".equals( src_defvalue ) ) {
 			if( !Arrays.asList( tmsNumberType ).equals( type.toLowerCase() ) ) {
 				m.put( TMS_COM_FD.SRC_DEFAULT, "\"\"" );
@@ -1039,7 +1039,7 @@ public class TransModelServiceImpl implements TransModelService {
 				m.put( TMS_COM_FD.SRC_DEFAULT, "" );
 			}
 		}
-		tmsSimpleDao.batchUpdate( buildUpdateModelSql(), update );
+		dynamicSimpleDao.batchUpdate( buildUpdateModelSql(), update );
 		if( "''".equals( src_defvalue ) || "\"\"".equals( src_defvalue ) ) {
 			if( !Arrays.asList( tmsNumberType ).equals( type.toLowerCase() ) ) {
 				m.put( TMS_COM_FD.SRC_DEFAULT, "\"\"" );
@@ -1066,7 +1066,7 @@ public class TransModelServiceImpl implements TransModelService {
 			checkRefNameBeRefed( tab_name, ref_name, "1" );
 		}
 
-		tmsSimpleDao.executeUpdate( buildDeleteModelSql( delete ), MapUtil.getString( (Map) delete.get( 0 ), "TAB_NAME" ) );
+		dynamicSimpleDao.executeUpdate( buildDeleteModelSql( delete ), MapUtil.getString( (Map) delete.get( 0 ), "TAB_NAME" ) );
 		return null;
 	}
 
@@ -1109,7 +1109,7 @@ public class TransModelServiceImpl implements TransModelService {
 		// String findAcRefSql = "SELECT * FROM TMS_COM_ACTION WHERE ac_src=?
 		// and ac_txn like '" + tab_name + "%'";
 		// long acRef = tmsSimpleDao.count(findAcRefSql, ref_name);
-		long statRef = tmsSimpleDao.count( findStatRefSql, ref_name );
+		long statRef = dynamicSimpleDao.count( findStatRefSql, ref_name );
 		// TODO 分别报错
 		if( statRef > 0 ) {
 			throw new TmsMgrServiceException( "[" + ref_name + "]被引用，不能" + ("1".equals( type ) ? "删除" : "编辑") );
@@ -1224,7 +1224,7 @@ public class TransModelServiceImpl implements TransModelService {
 	public boolean isDuplicateByTransAttrAndRoster( String attrCode ) {
 		String sql = "select * from " + DBConstant.TMS_MGR_ROSTER + " r where upper(r." + DBConstant.TMS_MGR_ROSTER_ROSTERNAME + ") = ? and " + DBConstant.TMS_MGR_ROSTER_STATUS
 				+ " = '1'";
-		long dupCount = tmsSimpleDao.count( sql, attrCode.toUpperCase() );
+		long dupCount = dynamicSimpleDao.count( sql, attrCode.toUpperCase() );
 		return dupCount > 0;
 	}
 
@@ -1234,7 +1234,7 @@ public class TransModelServiceImpl implements TransModelService {
 	public List<Map<String, Object>> getTransByTabnameList( Map<String, String> conds ) {
 
 		// 1、根据传来的交易节点(tab_name,chann)查出所有父节点（本身及以上）
-		List<Map<String, Object>> list = tmsSimpleDao.queryForList(
+		List<Map<String, Object>> list = dynamicSimpleDao.queryForList(
 				"SELECT t.tab_name,t.tab_desc FROM tms_com_tab t " + " START WITH t.tab_name = ?" + " CONNECT BY PRIOR t.parent_tab=t.tab_name",
 				conds.get( "txntype" ).toString() );
 
@@ -1243,10 +1243,10 @@ public class TransModelServiceImpl implements TransModelService {
 		for( int i = 0; i < list.size(); i++ ) {
 			List<Map<String, Object>> listfor = null;
 			if( i == 0 ) {
-				listdb = tmsSimpleDao.queryForList( " SELECT * FROM tms_com_fd d WHERE d.tab_name=? ", list.get( i ).get( "TAB_NAME" ).toString() );
+				listdb = dynamicSimpleDao.queryForList( " SELECT * FROM tms_com_fd d WHERE d.tab_name=? ", list.get( i ).get( "TAB_NAME" ).toString() );
 			}
 			else {
-				listfor = tmsSimpleDao.queryForList( " SELECT * FROM tms_com_fd d WHERE d.tab_name=? ", list.get( i ).get( "TAB_NAME" ).toString() );
+				listfor = dynamicSimpleDao.queryForList( " SELECT * FROM tms_com_fd d WHERE d.tab_name=? ", list.get( i ).get( "TAB_NAME" ).toString() );
 				if( listfor.size() != 0 ) {
 					listdb.addAll( listfor );
 				}
@@ -1268,7 +1268,7 @@ public class TransModelServiceImpl implements TransModelService {
 		StringBuilder region = new StringBuilder( "TMS_MGR_REGION" );
 		StringBuilder city = new StringBuilder( "TMS_MGR_CITY" );
 
-		Object suffix = tmsSimpleDao
+		Object suffix = dynamicSimpleDao
 				.queryForList( "SELECT CASE c.is_suffix WHEN 0 THEN '' WHEN 1 THEN '_N' else '_N' END tab_name "
 						+ "FROM (SELECT a.is_suffix FROM tms_mgr_iplog a where a.iplog_id=(SELECT max(b.iplog_id) " + "FROM tms_mgr_iplog b where b.operate_result=1)) c" )
 				.get( 0 ).get( "TAB_NAME" );

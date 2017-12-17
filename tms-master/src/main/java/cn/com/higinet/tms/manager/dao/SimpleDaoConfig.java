@@ -53,8 +53,8 @@ public class SimpleDaoConfig {
 		return simpleDao;
 	}
 
-	@Bean("tmsSimpleDao")
-	public SimpleDao tmsSimpleDao() {
+	@Bean("dynamicSimpleDao")
+	public SimpleDao dynamicSimpleDao() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
 		jdbcTemplate.setDataSource( dynamicDataSource );
 
@@ -78,8 +78,8 @@ public class SimpleDaoConfig {
 		return new DataSourceTransactionManager( dynamicDataSource );
 	}
 
-	@Bean("officialTransactionManager")
-	public DataSourceTransactionManager officialTransactionManager() {
+	@Bean("onlineTransactionManager")
+	public DataSourceTransactionManager onlineTransactionManager() {
 		return new DataSourceTransactionManager( onlineDataSource );
 	}
 
@@ -89,13 +89,13 @@ public class SimpleDaoConfig {
 	}
 
 	@Primary
-	@Bean("tmpTransactionManager")
-	public DataSourceTransactionManager tmpTransactionManager() {
+	@Bean("offlineTransactionManager")
+	public DataSourceTransactionManager offlineTransactionManager() {
 		return new DataSourceTransactionManager( offlineDataSource );
 	}
 
 	@Bean("tmsSqlMap")
-	public SqlMap sqlmap() {
+	public SqlMap tmsSqlMap() {
 		SqlMap sqlmap = new SqlMap();
 		sqlmap.setDbtype( "mysql" );
 		sqlmap.setBasenames( new String[] {

@@ -21,8 +21,8 @@ import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
-import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
+import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.query.common.model.Column;
 import cn.com.higinet.tms.manager.modules.query.common.model.Custom;
@@ -35,8 +35,8 @@ import cn.com.higinet.tms.manager.modules.query.service.QueryService;
 public abstract class AbstractSqlProcessImpl extends QueryDataProcessCommon {
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	protected SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	protected SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	protected QueryService queryService;
@@ -94,7 +94,7 @@ public abstract class AbstractSqlProcessImpl extends QueryDataProcessCommon {
 		} else {
 			pagesize = Integer.MAX_VALUE;
 		}
-		SimpleDao simpleDao = tmsSimpleDao;
+		SimpleDao simpleDao = dynamicSimpleDao;
 		String dsName = process.getCustom().getStmt().getDsName();
 		if (!CmcStringUtil.isBlank(dsName)) {
 			dsName = String.format("%sSimpleDao", dsName);

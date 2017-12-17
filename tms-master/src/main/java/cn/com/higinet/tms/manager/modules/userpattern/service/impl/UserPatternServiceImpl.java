@@ -46,8 +46,8 @@ public class UserPatternServiceImpl implements UserPatternService {
 
 	private static final String split_1 = "#";
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	@Autowired
 	@Qualifier("offlineSimpleDao")
 	private SimpleDao offlineSimpleDao;
@@ -114,7 +114,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 			sqlConds.put( "STAT_FN", stat_fn );
 		}
 
-		Page<Map<String, Object>> r = tmsSimpleDao.pageQuery( sql.toString(), sqlConds, new Order().asc( "STAT_NAME" ) );
+		Page<Map<String, Object>> r = dynamicSimpleDao.pageQuery( sql.toString(), sqlConds, new Order().asc( "STAT_NAME" ) );
 		List<Map<String, Object>> list = r.getList();
 		// String txnSql = tmsSqlMap.getSql("tms.userpattern.queryTxnFeature");
 		for( Map<String, Object> map : list ) {
@@ -124,7 +124,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 			String txnSql = "SELECT CODE_KEY,CODE_VALUE,TYPE,CODE fd_code FROM ( SELECT REF_NAME CODE_KEY,NAME CODE_VALUE,TYPE,CODE,TAB_NAME FROM TMS_COM_FD UNION SELECT REF_NAME CODE_KEY,REF_DESC CODE_VALUE,'' TYPE,'' CODE,TAB_NAME FROM TMS_COM_REFFD ) F WHERE F.TAB_NAME IN (" + TransCommon.arr2str( TransCommon.cutToIds( txn ) ) + ") AND CODE_KEY = ? ORDER BY TAB_NAME";
 
 			// 查询交易属性
-			List<Map<String, Object>> l = tmsSimpleDao.queryForList( txnSql, txnFeature );
+			List<Map<String, Object>> l = dynamicSimpleDao.queryForList( txnSql, txnFeature );
 
 			if( l != null && l.size() > 0 ) {
 				txnFeature = MapUtil.getString( l.get( 0 ), "CODE_VALUE" );
@@ -170,12 +170,12 @@ public class UserPatternServiceImpl implements UserPatternService {
 				im.put( "USER_PATTERN_1", new_us[1] );
 				im.put( "USER_PATTERN_C", new_us[2] );
 				if( MapUtil.isEmpty( upMap ) ) {
-					tmsSimpleDao.create( "TMS_COM_USERPATTERN", im );
+					dynamicSimpleDao.create( "TMS_COM_USERPATTERN", im );
 				}
 				else {
 					Map<String, Object> cond = new HashMap<String, Object>();
 					cond.put( "USERID", MapUtil.getString( upMap, "USERID" ) );
-					tmsSimpleDao.update( "TMS_COM_USERPATTERN", im, cond );
+					dynamicSimpleDao.update( "TMS_COM_USERPATTERN", im, cond );
 				}
 
 				rmap = map;
@@ -197,7 +197,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 
 				Map<String, Object> cond = new HashMap<String, Object>();
 				cond.put( "USERID", MapUtil.getString( upMap, "USERID" ) );
-				tmsSimpleDao.update( "TMS_COM_USERPATTERN", im, cond );
+				dynamicSimpleDao.update( "TMS_COM_USERPATTERN", im, cond );
 
 				rmap = map;
 			}
@@ -214,10 +214,10 @@ public class UserPatternServiceImpl implements UserPatternService {
 				im.put( "USER_PATTERN_C", new_us[2] );
 				Map<String, Object> cond = new HashMap<String, Object>();
 				cond.put( "USERID", MapUtil.getString( upMap, "USERID" ) );
-				tmsSimpleDao.update( "TMS_COM_USERPATTERN", im, cond );
+				dynamicSimpleDao.update( "TMS_COM_USERPATTERN", im, cond );
 			}
 			else {
-				tmsSimpleDao.delete( "TMS_COM_USERPATTERN", im );
+				dynamicSimpleDao.delete( "TMS_COM_USERPATTERN", im );
 			}
 
 		}
@@ -343,7 +343,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 	 * @return
 	 */
 	private Map<String, Object> getUserpattern( String userId ) {
-		List<Map<String, Object>> upList = tmsSimpleDao.queryForList( "select * from TMS_COM_USERPATTERN where USERID = ?", userId );
+		List<Map<String, Object>> upList = dynamicSimpleDao.queryForList( "select * from TMS_COM_USERPATTERN where USERID = ?", userId );
 		return upList == null || upList.size() <= 0 ? new HashMap() : upList.get( 0 );
 	}
 
@@ -450,7 +450,7 @@ public class UserPatternServiceImpl implements UserPatternService {
 			}
 
 		}
-		return tmsSimpleDao.pageQuery( sql.toString(), reqs, new Order().asc( "USERID" ) );
+		return dynamicSimpleDao.pageQuery( sql.toString(), reqs, new Order().asc( "USERID" ) );
 	}
 
 	/*
@@ -544,25 +544,25 @@ public class UserPatternServiceImpl implements UserPatternService {
 	private String code2Text( String stat_value, String stat_fd, String code ) {
 		if( code != null && code.length() > 0 ) {
 			String sql = "select * from CMC_CODE where CATEGORY_ID = ? and CODE_KEY = ?";
-			List<Map<String, Object>> codeList = tmsSimpleDao.queryForList( sql, code, stat_fd );
+			List<Map<String, Object>> codeList = dynamicSimpleDao.queryForList( sql, code, stat_fd );
 			if( codeList == null || codeList.size() == 0 ) return stat_value;
 			stat_value = MapUtil.getString( codeList.get( 0 ), "CODE_VALUE" );
 		}
 		else if( "COUNTRYCODE".equalsIgnoreCase( stat_fd ) ) {
 			String sql = "select * from " + ipLocationService.getLocationCurrName( "TMS_MGR_COUNTRY" ) + " where COUNTRYCODE = ?";
-			List<Map<String, Object>> codeList = tmsSimpleDao.queryForList( sql, stat_value );
+			List<Map<String, Object>> codeList = dynamicSimpleDao.queryForList( sql, stat_value );
 			if( codeList == null || codeList.size() == 0 ) return stat_value;
 			stat_value = MapUtil.getString( codeList.get( 0 ), "COUNTRYNAME" );
 		}
 		else if( "REGIONCODE".equalsIgnoreCase( stat_fd ) ) {
 			String sql = "select * from " + ipLocationService.getLocationCurrName( "TMS_MGR_REGION" ) + " where REGIONCODE = ?";
-			List<Map<String, Object>> codeList = tmsSimpleDao.queryForList( sql, stat_value );
+			List<Map<String, Object>> codeList = dynamicSimpleDao.queryForList( sql, stat_value );
 			if( codeList == null || codeList.size() == 0 ) return stat_value;
 			stat_value = MapUtil.getString( codeList.get( 0 ), "REGIONNAME" );
 		}
 		else if( "CITYCODE".equalsIgnoreCase( stat_fd ) ) {
 			String sql = "select * from " + ipLocationService.getLocationCurrName( "TMS_MGR_CITY" ) + " where CITYCODE = ?";
-			List<Map<String, Object>> codeList = tmsSimpleDao.queryForList( sql, stat_value );
+			List<Map<String, Object>> codeList = dynamicSimpleDao.queryForList( sql, stat_value );
 			if( codeList == null || codeList.size() == 0 ) return stat_value;
 			stat_value = MapUtil.getString( codeList.get( 0 ), "CITYNAME" );
 		}

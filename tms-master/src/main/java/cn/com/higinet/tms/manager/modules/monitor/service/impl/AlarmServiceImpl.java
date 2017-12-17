@@ -19,8 +19,9 @@ import cn.com.higinet.tms.manager.modules.monitor.service.AlarmService;
 public class AlarmServiceImpl implements AlarmService { 
 
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
+	
 	@Autowired
 	private IPLocationService ipLocationService;
 
@@ -36,7 +37,7 @@ public class AlarmServiceImpl implements AlarmService {
 		.append(",").append(DBConstant.TMS_MGR_REGION_COUNTRYORDER)
 		.append(" FROM ").append(ipLocationService.getLocationCurrName(DBConstant.TMS_MGR_COUNTRY))
 		.append(" ORDER BY ").append(DBConstant.TMS_MGR_REGION_COUNTRYORDER);
-		return tmsSimpleDao.queryForList(strSql.toString());
+		return dynamicSimpleDao.queryForList(strSql.toString());
 	}
 	
 	/**
@@ -52,7 +53,7 @@ public class AlarmServiceImpl implements AlarmService {
 		.append("='").append(country+"'").append(" ORDER BY ")
 		.append(DBConstant.TMS_MGR_REGION_COUNTRYCODE).append(",")
 		.append(DBConstant.TMS_MGR_REGION_REGIONCODE);
-		return tmsSimpleDao.queryForList(strSql.toString());
+		return dynamicSimpleDao.queryForList(strSql.toString());
 	}
 	
 	/**
@@ -69,7 +70,7 @@ public class AlarmServiceImpl implements AlarmService {
 		.append(DBConstant.TMS_MGR_CITY_COUNTRYCODE).append(",")
 		.append(DBConstant.TMS_MGR_CITY_REGIONCODE).append(",")
 		.append(DBConstant.TMS_MGR_CITY_CITYCODE);
-		return tmsSimpleDao.queryForList(strSql.toString());
+		return dynamicSimpleDao.queryForList(strSql.toString());
 	}
 	
 	public List<Map<String, Object>> listTransactionTrafficAlarm(Map<String, String> conds) {
@@ -97,6 +98,6 @@ public class AlarmServiceImpl implements AlarmService {
 		strSql.append(" WHERE tra.");
 		strSql.append(DBConstant.TMS_RUN_ALERT_TRAFFICID).append("=?");
 		
-		return tmsSimpleDao.queryForList(strSql.toString(), new BigDecimal(trafficid));
+		return dynamicSimpleDao.queryForList(strSql.toString(), new BigDecimal(trafficid));
 	}
 }

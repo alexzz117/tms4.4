@@ -49,8 +49,8 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 public class DfpService {
 	
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	
 	@Autowired
 	@Qualifier("offlineSimpleDao")
@@ -70,11 +70,11 @@ public class DfpService {
 	*/
 	public List<Map<String, Object>> appList( Map<String, Object> reqs ) {
 		String sql = "SELECT A.* FROM TMS_DFP_APPLICATION A  ORDER BY A.APP_ID";
-		return tmsSimpleDao.queryForList( sql );
+		return dynamicSimpleDao.queryForList( sql );
 	}
 
 	private Map<String, Object> appInfo( String app_id ) {
-		return tmsSimpleDao.retrieve( "TMS_DFP_APPLICATION", MapWrap.map( "APP_ID", app_id ).getMap() );
+		return dynamicSimpleDao.retrieve( "TMS_DFP_APPLICATION", MapWrap.map( "APP_ID", app_id ).getMap() );
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class DfpService {
 				// 删除
 				Map<String, Object> cond = new HashMap<String, Object>();
 				cond.put( "APP_ID", MapUtil.getString( map, "APP_ID" ) );
-				tmsSimpleDao.delete( "TMS_DFP_APPLICATION", cond );
+				dynamicSimpleDao.delete( "TMS_DFP_APPLICATION", cond );
 				rmap = map;
 			}
 		}
@@ -126,7 +126,7 @@ public class DfpService {
 				c_m.put( "COOKIENAME", MapUtil.getString( map, "COOKIENAME" ) );
 				c_m.put( "APP_NAME", MapUtil.getString( map, "APP_NAME" ) );
 				c_m.put( "TOKEN_TYPE", MapUtil.getString( map, "TOKEN_TYPE" ) );
-				tmsSimpleDao.create( "TMS_DFP_APPLICATION", c_m );
+				dynamicSimpleDao.create( "TMS_DFP_APPLICATION", c_m );
 				rmap = map;
 			}
 		}
@@ -151,7 +151,7 @@ public class DfpService {
 				c_m.put( "COOKIENAME", MapUtil.getString( map, "COOKIENAME" ) );
 				c_m.put( "APP_NAME", MapUtil.getString( map, "APP_NAME" ) );
 				c_m.put( "TOKEN_TYPE", MapUtil.getString( map, "TOKEN_TYPE" ) );
-				tmsSimpleDao.update( "TMS_DFP_APPLICATION", c_m, cond );
+				dynamicSimpleDao.update( "TMS_DFP_APPLICATION", c_m, cond );
 				rmap = map;
 			}
 		}
@@ -165,7 +165,7 @@ public class DfpService {
 	* @return
 	*/
 	public List<Map<String, Object>> proList( Map<String, Object> reqs ) {
-		return tmsSimpleDao.listAll( "TMS_DFP_PROPERTY", new Order().asc( "PROP_ID" ).asc( "PROP_NAME" ) );
+		return dynamicSimpleDao.listAll( "TMS_DFP_PROPERTY", new Order().asc( "PROP_ID" ).asc( "PROP_NAME" ) );
 	}
 
 	/**
@@ -191,7 +191,7 @@ public class DfpService {
 				// 删除
 				Map<String, Object> cond = new HashMap<String, Object>();
 				cond.put( "PROP_ID", MapUtil.getLong( map, "PROP_ID" ) );
-				tmsSimpleDao.delete( "TMS_DFP_PROPERTY", cond );
+				dynamicSimpleDao.delete( "TMS_DFP_PROPERTY", cond );
 				rmap = map;
 			}
 		}
@@ -205,10 +205,10 @@ public class DfpService {
 				//				}
 				// 增加
 				String checkIdSql = "SELECT 1 FROM TMS_DFP_APPLICATION WHERE APP_ID = ?";
-				if( !tmsSimpleDao.queryForList( checkIdSql, map.get( "PROP_ID" ) ).isEmpty() ) {
+				if( !dynamicSimpleDao.queryForList( checkIdSql, map.get( "PROP_ID" ) ).isEmpty() ) {
 					throw new TmsMgrServiceException( "属性ID不能重复" );
 				}
-				tmsSimpleDao.create( "TMS_DFP_PROPERTY", map );
+				dynamicSimpleDao.create( "TMS_DFP_PROPERTY", map );
 				rmap = map;
 			}
 		}
@@ -223,7 +223,7 @@ public class DfpService {
 				// 更新
 				Map<String, Object> cond = new HashMap<String, Object>();
 				cond.put( "PROP_ID", MapUtil.getLong( map, "PROP_ID" ) );
-				tmsSimpleDao.update( "TMS_DFP_PROPERTY", map, cond );
+				dynamicSimpleDao.update( "TMS_DFP_PROPERTY", map, cond );
 				rmap = map;
 			}
 		}
@@ -238,7 +238,7 @@ public class DfpService {
 	*/
 	public List<Map<String, Object>> appProList( Map<String, Object> reqs ) {
 		String sql = "SELECT AP.*,P.PROP_NAME,P.PROP_TYPE,P.PROP_COMMENT,A.APP_NAME FROM TMS_DFP_APP_PROPERTIES AP,TMS_DFP_PROPERTY P,TMS_DFP_APPLICATION A WHERE AP.PROP_ID=P.PROP_ID AND AP.APP_ID=A.APP_ID ORDER BY AP.APP_ID ASC,P.PROP_ID ASC";
-		return tmsSimpleDao.queryForList( sql );
+		return dynamicSimpleDao.queryForList( sql );
 	}
 
 	/**
@@ -259,7 +259,7 @@ public class DfpService {
 			for( Map<String, Object> map : delList ) {
 				Map<String, Object> cond = new HashMap<String, Object>();
 				cond.put( "ID", MapUtil.getLong( map, "ID" ) );
-				tmsSimpleDao.delete( "TMS_DFP_APP_PROPERTIES", cond );
+				dynamicSimpleDao.delete( "TMS_DFP_APP_PROPERTIES", cond );
 				rmap = map;
 			}
 		}
@@ -277,7 +277,7 @@ public class DfpService {
 				insertData.put( "WEIGHT", MapUtil.getDouble( map, "WEIGHT" ) );
 				insertData.put( "STORECOLUMN", MapUtil.getString( map, "STORECOLUMN" ) );
 				insertData.put( "IS_TOKEN", MapUtil.getString( map, "IS_TOKEN" ) );
-				tmsSimpleDao.create( "TMS_DFP_APP_PROPERTIES", insertData );
+				dynamicSimpleDao.create( "TMS_DFP_APP_PROPERTIES", insertData );
 				rmap = map;
 			}
 		}
@@ -294,7 +294,7 @@ public class DfpService {
 				c_m.put( "WEIGHT", MapUtil.getDouble( map, "WEIGHT" ) );
 				c_m.put( "STORECOLUMN", MapUtil.getString( map, "STORECOLUMN" ) );
 				c_m.put( "IS_TOKEN", MapUtil.getString( map, "IS_TOKEN" ) );
-				tmsSimpleDao.update( "TMS_DFP_APP_PROPERTIES", c_m, cond );
+				dynamicSimpleDao.update( "TMS_DFP_APP_PROPERTIES", c_m, cond );
 				rmap = map;
 			}
 		}
@@ -321,7 +321,7 @@ public class DfpService {
 
 		String sql = "SELECT * FROM TMS_DFP_APPLICATION WHERE APP_ID = ?";
 
-		List<Map<String, Object>> appList = tmsSimpleDao.queryForList( sql, MapUtil.getString( cond, "APP_ID" ) );
+		List<Map<String, Object>> appList = dynamicSimpleDao.queryForList( sql, MapUtil.getString( cond, "APP_ID" ) );
 
 		if( type.equals( "add" ) && appList.size() > 0 ) {
 			return true;
@@ -361,7 +361,7 @@ public class DfpService {
 	 */
 	public boolean checkAppReferenced( String app_id ) {
 		String sql = "SELECT * FROM TMS_DFP_APP_PROPERTIES WHERE APP_ID = ?";
-		List<Map<String, Object>> app_pro_list = tmsSimpleDao.queryForList( sql, app_id );
+		List<Map<String, Object>> app_pro_list = dynamicSimpleDao.queryForList( sql, app_id );
 		if( app_pro_list.size() > 0 ) {
 			return true;
 		}
@@ -393,7 +393,7 @@ public class DfpService {
 	 */
 	private boolean checkProReferenced( Long pro_id ) {
 		String sql = "SELECT * FROM TMS_DFP_APP_PROPERTIES WHERE PROP_ID = ?";
-		List<Map<String, Object>> app_pro_list = tmsSimpleDao.queryForList( sql, pro_id );
+		List<Map<String, Object>> app_pro_list = dynamicSimpleDao.queryForList( sql, pro_id );
 		if( app_pro_list.size() > 0 ) {
 			return true;
 		}
@@ -774,7 +774,7 @@ public class DfpService {
 
 	private String[] queryDeviceProperty( String app_id ) {
 		String sql = "SELECT P.* FROM TMS_DFP_APP_PROPERTIES AP,TMS_DFP_PROPERTY P WHERE AP.PROP_ID=P.PROP_ID AND AP.APP_ID=?";
-		List<Map<String, Object>> p_l = tmsSimpleDao.queryForList( sql, app_id );
+		List<Map<String, Object>> p_l = dynamicSimpleDao.queryForList( sql, app_id );
 
 		if( p_l == null || p_l.size() == 0 ) return null;
 

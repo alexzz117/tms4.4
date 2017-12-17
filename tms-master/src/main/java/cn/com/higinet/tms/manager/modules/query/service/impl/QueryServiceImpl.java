@@ -37,10 +37,10 @@ import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
-import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.PropertiesUtil;
 import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.StaticParameters;
+import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.query.common.model.Column;
@@ -57,8 +57,8 @@ import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 public class QueryServiceImpl extends ApplicationObjectSupport implements QueryService {
 	
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 
 	@Autowired
 	@Qualifier("cmcSimpleDao")
@@ -156,7 +156,7 @@ public class QueryServiceImpl extends ApplicationObjectSupport implements QueryS
 
 	public void deleteQueryGroup(long groupId, HttpServletRequest request) {
 		String sql = "select * from " + DBConstant.TMS_COM_QUERY + " q where q." + DBConstant.TMS_COM_QUERY_GROUP_ID + " = ?";
-		List<Map<String, Object>> queryList = tmsSimpleDao.queryForList(sql, groupId);
+		List<Map<String, Object>> queryList = dynamicSimpleDao.queryForList(sql, groupId);
 		StringBuffer error = null;
 		if (queryList != null && queryList.size() > 0) {
 			for (Map<String, Object> query : queryList) {

@@ -7,8 +7,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,13 +26,14 @@ import cn.com.higinet.tms.manager.modules.monitor.service.FusionChart;
 @Service("column2DFusionChart")
 public class Column2DFusionChart implements FusionChart{
 	
+	private static final Logger log = LoggerFactory.getLogger( Column2DFusionChart.class );
+	
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	SimpleDao dynamicSimpleDao;
+	
 	@Autowired
 	private IPLocationService ipLocationService;
-
-	private static final Log log = LogFactory.getLog(Column2DFusionChart.class);
 	
 	// 为了使用地区编码，引入两个map，存放编码和地名的键值对 maxiao 2011-8-29
 	private static Map cnmap = new HashMap();//cnmap.put("000000","中国");
@@ -44,7 +45,7 @@ public class Column2DFusionChart implements FusionChart{
 					"from " + ipLocationService.getLocationCurrName("TMS_MGR_REGION") + " region, " + 
 					ipLocationService.getLocationCurrName("TMS_MGR_COUNTRY") + " country " +
 					"where country.COUNTRYCODE = region.COUNTRYCODE and country.COUNTRYCODE = 'CN'";
-		List<Map<String,Object>> initData = tmsSimpleDao.queryForList(initStrSql);
+		List<Map<String,Object>> initData = dynamicSimpleDao.queryForList(initStrSql);
 		for(int i=0;i<initData.size();i++){
 			cnmap.put(MapUtil.getString(initData.get(i), "REGIONCODE"), MapUtil.getString(initData.get(i), "REGIONNAME"));
 			csmap.put(initData.get(i).get("REGIONCODE"),initData.get(i).get("REGIONCODE"));

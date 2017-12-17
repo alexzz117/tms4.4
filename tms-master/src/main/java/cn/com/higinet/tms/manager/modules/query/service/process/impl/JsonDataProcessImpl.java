@@ -25,14 +25,14 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.query.common.QueryJsonUtil;
 import cn.com.higinet.tms.manager.modules.query.common.model.Column;
 import cn.com.higinet.tms.manager.modules.query.common.model.Custom;
+import cn.com.higinet.tms.manager.modules.query.common.model.Custom.Direct;
+import cn.com.higinet.tms.manager.modules.query.common.model.Custom.Effect;
 import cn.com.higinet.tms.manager.modules.query.common.model.Field;
 import cn.com.higinet.tms.manager.modules.query.common.model.Group;
 import cn.com.higinet.tms.manager.modules.query.common.model.JsonDataProcess;
 import cn.com.higinet.tms.manager.modules.query.common.model.Member;
 import cn.com.higinet.tms.manager.modules.query.common.model.Stmt;
 import cn.com.higinet.tms.manager.modules.query.common.model.Table;
-import cn.com.higinet.tms.manager.modules.query.common.model.Custom.Direct;
-import cn.com.higinet.tms.manager.modules.query.common.model.Custom.Effect;
 import cn.com.higinet.tms.manager.modules.query.service.QueryService;
 
 
@@ -49,8 +49,8 @@ public class JsonDataProcessImpl extends QueryDataProcessCommon {
 	private QueryService queryService;
 	
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	
 	private static final String FIELD_TAB_ALIAS = "TAB_ALIAS";
 
@@ -149,7 +149,7 @@ public class JsonDataProcessImpl extends QueryDataProcessCommon {
 							throw new TmsMgrWebException("自定义查询JSON中[custom]->[dbData]->[tables]节点下[name="+table.getName()+"]的表中[dynamic]节点中定义的参数名[" + paramName + "]未传入！");
 						}
 					}
-					List<Map<String, Object>> tabList = tmsSimpleDao.queryForList(table.getDynamic(), conds);
+					List<Map<String, Object>> tabList = dynamicSimpleDao.queryForList(table.getDynamic(), conds);
 					if(tabList != null && tabList.size() > 0) {
 						tabMap = tabList.get(0);
 						String tabName = MapUtil.getString(tabMap, TMS_COM_TAB.TAB_NAME);
@@ -211,7 +211,7 @@ public class JsonDataProcessImpl extends QueryDataProcessCommon {
 				if(fields != null && fields.size() > 0){
 					for(Field field : fields) {
 						if (!CmcStringUtil.isBlank(field.getDynamic())) {
-							List<Map<String, Object>> fieldList = tmsSimpleDao.queryForList(field.getDynamic(), conds);
+							List<Map<String, Object>> fieldList = dynamicSimpleDao.queryForList(field.getDynamic(), conds);
 							for (Map<String, Object> fieldMap : fieldList) {
 								Field f = QueryJsonUtil.createField(fieldMap);
 								createTableField(table, f, fieldsMap);
@@ -227,7 +227,7 @@ public class JsonDataProcessImpl extends QueryDataProcessCommon {
 		if(fields != null && fields.size() > 0) {
 			for(Field field : fields) {
 				if (!CmcStringUtil.isBlank(field.getDynamic())) {
-					List<Map<String, Object>> fieldList = tmsSimpleDao.queryForList(field.getDynamic(), conds);
+					List<Map<String, Object>> fieldList = dynamicSimpleDao.queryForList(field.getDynamic(), conds);
 					for (Map<String, Object> fieldMap : fieldList) {
 						Field f = QueryJsonUtil.createField(fieldMap);
 						createExtendField(f, fieldsMap, pepeatSet);

@@ -24,7 +24,7 @@ public class CommonReportData extends AbstractReportData {
 			strSql += " order by "+cond.get("order").toString() +" desc ";
 		}
 		
-		List<Map<String,Object>> dataList =  tmsSimpleDao.queryForList(strSql, cond);
+		List<Map<String,Object>> dataList =  dynamicSimpleDao.queryForList(strSql, cond);
 		dataVO.setData(dataList);
 	
 		return dataVO;

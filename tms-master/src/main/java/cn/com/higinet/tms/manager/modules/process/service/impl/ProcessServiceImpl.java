@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,9 @@ import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.modules.common.CommonCheckService;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
-import cn.com.higinet.tms.manager.modules.common.SequenceService;
-import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_PROCESS;
 import cn.com.higinet.tms.manager.modules.common.DBConstant.TMS_COM_TAB;
+import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.process.service.ProcessService;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
@@ -26,14 +25,13 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 @SuppressWarnings("all")
 @Service("processService")
 public class ProcessServiceImpl implements ProcessService{
-	
-	private static Log log = LogFactory.getLog(ProcessServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger( ProcessServiceImpl.class );
 	
 	@Autowired
 	private CommonCheckService commonCheckService;
 	@Autowired
-	@Qualifier("tmsSimpleDao")
-	private SimpleDao tmsSimpleDao;
+	@Qualifier("dynamicSimpleDao")
+	private SimpleDao dynamicSimpleDao;
 	@Autowired
 	private TransDefService transDefService;
 	@Autowired
@@ -52,7 +50,7 @@ public class ProcessServiceImpl implements ProcessService{
 		sql.append("pcs.").append(TMS_COM_PROCESS.PS_TXN).append("=tab.").append(TMS_COM_TAB.TAB_NAME).append(" AND ");
 		sql.append("pcs.").append(TMS_COM_PROCESS.PS_TXN);
 		sql.append("=? order by ").append(TMS_COM_PROCESS.PS_ORDER);
-		return tmsSimpleDao.queryForList(sql.toString(), txnid);
+		return dynamicSimpleDao.queryForList(sql.toString(), txnid);
 	}
 
 	@Transactional
@@ -102,7 +100,7 @@ public class ProcessServiceImpl implements ProcessService{
 		m.put(TMS_COM_PROCESS.PS_ID, Long.parseLong(sequenceService.getSequenceIdToString(DBConstant.SEQ_TMS_COM_PROCESS_ID)));
 		m.put(TMS_COM_PROCESS.PS_ORDER, MapUtil.getLong(m, TMS_COM_PROCESS.PS_ORDER));
 		m.put(TMS_COM_PROCESS.PS_ENABLE, MapUtil.getLong(m, TMS_COM_PROCESS.PS_ENABLE));
-		tmsSimpleDao.batchUpdate(buildAddSql(), add);
+		dynamicSimpleDao.batchUpdate(buildAddSql(), add);
 		return (Map) add.get(0);
 	}
 	/*
@@ -126,14 +124,14 @@ public class ProcessServiceImpl implements ProcessService{
 			transDefService.checkSingleParentAndAllSubSame(MapUtil.getString(m, "PS_ID"),MapUtil.getString(m, "PS_NAME"), MapUtil.getString(m, "PS_TXN"), false, "ps", false);
 		}
 		
-		tmsSimpleDao.batchUpdate(buildUpdateSql(), update);
+		dynamicSimpleDao.batchUpdate(buildUpdateSql(), update);
 		return (Map) update.get(0);
 	}
 	/*
 	 * 删除数据
 	 */
 	private Map deleteRecord(List delete){
-		tmsSimpleDao.executeUpdate(buildDeleteSql(delete));
+		dynamicSimpleDao.executeUpdate(buildDeleteSql(delete));
 		return null;
 	}
 	
