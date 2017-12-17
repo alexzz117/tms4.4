@@ -486,7 +486,7 @@ public class TransModelServiceImpl implements TransModelService {
 		List<Map<String, Object>> modeldata = getSelfAndSubFd( tab_name );
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		// TODO TransDefServiceImpl.getImmediateFamilyAttrInfos refact it
+		// TODO TransDefService.getImmediateFamilyAttrInfos refact it
 		// and remove,模型字段
 		for( Map<String, Object> ec : modeldata ) {
 			String db_tab_name = MapUtil.getString( ec, "TAB_NAME" );
