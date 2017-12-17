@@ -1,10 +1,14 @@
 package cn.com.higinet.tms.base.entity.offline;
 
-import javax.persistence.*;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 import cn.com.higinet.tms.base.entity.common.EntityBase;
-
-import java.util.Date;
 
 @Entity
 public class cmc_operator extends EntityBase<cmc_operator> {
@@ -118,7 +122,7 @@ public class cmc_operator extends EntityBase<cmc_operator> {
 		this.lastLogin = lastLogin;
 	}
 
-	public Date getLastPwd() {
+	public Date getLastPwd() { 
 		return lastPwd;
 	}
 
