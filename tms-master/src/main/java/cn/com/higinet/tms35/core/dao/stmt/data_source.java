@@ -16,7 +16,7 @@ import cn.com.higinet.tms35.comm.tms_exception;
 
 public class data_source {
 	static Logger log = LoggerFactory.getLogger( data_source.class );
-	static String testConnSql = ((SqlMap) ApplicationContextUtil.getBean( "SqlMap" )).getSql( "tms.common.testconnection" );
+	static String testConnSql = ((SqlMap) ApplicationContextUtil.getBean( "tmsSqlMap" )).getSql( "tms.common.testconnection" );
 
 	DataSource m_ds;
 	Connection m_conn;
