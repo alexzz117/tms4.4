@@ -20,24 +20,24 @@
 	</appender>
 
 	<!-- 按照每天生成日志文件 -->
-	<appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<!-- <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<File>${log.base}/${log.name}.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
+			日志文件输出的文件名
 			<FileNamePattern>${log.base}/${log.name}-%d{yyyy-MM-dd}.log.%i</FileNamePattern>
-			<!--日志文件保留天数 -->
+			日志文件保留天数
 			<MaxHistory>7</MaxHistory>
 			<TimeBasedFileNamingAndTriggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				<!--日志文件最大的大小 -->
+				日志文件最大的大小
 				<MaxFileSize>100MB</MaxFileSize>
 			</TimeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+			格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符
 			<pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%-40.40logger:%-3.3line] [%.20thread] - %msg%n</pattern>
 		</encoder>
-	</appender>
+	</appender> -->
 
 	<!-- 日志级别 -->
 	<root>
