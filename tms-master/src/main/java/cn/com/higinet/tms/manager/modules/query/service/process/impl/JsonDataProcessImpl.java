@@ -58,7 +58,7 @@ public class JsonDataProcessImpl extends QueryDataProcessCommon {
 	public Object dataProcess(Object... args) {
 		Map<String, Object> queryMap = (Map<String, Object>) args[0];//TMS_COM_QUERY表中数据集合
 		Map<String, String[]> paramterMap = (Map<String, String[]>) args[1];
-		Map<String, Object> conds = reBuildRequestParameterMap(paramterMap);//@RequestParam conds
+		Map<String, Object> conds = reBuildRequestParameterMap(paramterMap);
 		Custom custom = QueryJsonUtil.json2Entity(MapUtil.getString(queryMap, DBConstant.TMS_COM_QUERY_QUERY_DATA));
 		if(custom == null){
 			return null;

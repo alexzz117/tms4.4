@@ -185,13 +185,6 @@ public class DfpController {
 		return m;
 	}
 
-	//	@RequestMapping(value="/channleList",method=RequestMethod.POST)
-	//	public Model channleListAction(@RequestParam Map<String,Object> reqs) {
-	//		Model m = new Model();
-	//		m.setRow(dfpService.channleAllList());
-	//		return m;
-	//	}
-
 	@RequestMapping(value = "/exportJs", method = RequestMethod.GET)
 	public void exportJsAction( @RequestBody Map<String, String> reqs, HttpServletResponse response ) {
 

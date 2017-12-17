@@ -12,13 +12,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -91,7 +92,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model listUserpatternAction( @RequestParam Map<String, Object> reqs ) {
+	public Model listUserpatternAction( @RequestBody RequestModel reqs ) {
 
 		Model model = new Model();
 		model.setPage( userPatternService35.pageStatPattern( reqs ) );
@@ -104,7 +105,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/userList", method = RequestMethod.POST)
-	public Model userListAction( @RequestParam Map<String, Object> reqs ) {
+	public Model userListAction( @RequestBody RequestModel reqs ) {
 
 		Model model = new Model();
 		model.setPage( userPatternService35.pageUser( reqs ) );
@@ -117,7 +118,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/userPatternList", method = RequestMethod.POST)
-	public Model userPatternListAction( @RequestParam Map<String, Object> reqs ) {
+	public Model userPatternListAction( @RequestBody RequestModel reqs ) {
 
 		Long stat_id = MapUtil.getLong( reqs, "stat_id" );
 
@@ -137,7 +138,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/statPatternList", method = RequestMethod.POST)
-	public Model statPatternListAction( @RequestParam Map<String, Object> reqs ) {
+	public Model statPatternListAction( @RequestBody RequestModel reqs ) {
 
 		Model model = new Model();
 		model.setList( userPatternService35.queryStatPatternList( reqs ) );
@@ -150,7 +151,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/statInfo", method = RequestMethod.POST)
-	public Model statInfoAction( @RequestParam Map<String, Object> reqs ) {
+	public Model statInfoAction( @RequestBody RequestModel reqs ) {
 
 		Model model = new Model();
 		String statId = MapUtil.getString( reqs, "stat_id" );
@@ -164,7 +165,7 @@ public class UserpatternController {
 	* @return
 	 */
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public Model saveStatAction( @RequestParam Map<String, Object> reqs ) {
+	public Model saveStatAction( @RequestBody RequestModel reqs ) {
 
 		String json = MapUtil.getString( reqs, "postData" );
 
@@ -195,7 +196,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getCountry", method = RequestMethod.POST)
-	public Model getCountryAction( @RequestParam Map<String, Object> reqs ) {
+	public Model getCountryAction( @RequestBody RequestModel reqs ) {
 
 		Model model = new Model();
 		model.setList( userPatternService35.getCountry( reqs ) );
@@ -208,7 +209,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getRegion", method = RequestMethod.POST)
-	public Model getRegionAction( @RequestParam Map<String, Object> reqs ) {
+	public Model getRegionAction( @RequestBody RequestModel reqs ) {
 
 		Model model = new Model();
 		model.setList( userPatternService35.getRegion( reqs ) );
@@ -221,7 +222,7 @@ public class UserpatternController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getCity", method = RequestMethod.POST)
-	public Model getCityAction( @RequestParam Map<String, Object> reqs ) {
+	public Model getCityAction( @RequestBody RequestModel reqs ) {
 
 		Model model = new Model();
 		model.setList( userPatternService35.getCity( reqs ) );

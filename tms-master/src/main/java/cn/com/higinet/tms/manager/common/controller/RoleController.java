@@ -15,11 +15,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.service.FuncService;
 import cn.com.higinet.tms.manager.common.service.RoleService;
@@ -58,7 +60,7 @@ public class RoleController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Model listRoleActoin( @RequestParam Map<String, String> reqs ) {
+	public Model listRoleActoin( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		model.setPage( roleService.listRole( reqs ) );
 		return model;
@@ -70,7 +72,7 @@ public class RoleController {
 	 * @return
 	 */
 	@RequestMapping(value = "/listAll", method = RequestMethod.POST)
-	public Model listRole( @RequestParam Map<String, String> reqs ) {
+	public Model listRole( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		model.setRow( roleService.listAllRole( reqs ) );
 		return model;
@@ -82,7 +84,7 @@ public class RoleController {
 	 * @return
 	 */
 	@RequestMapping(value = "/listNormalRole", method = RequestMethod.POST)
-	public Model listNormalRole( @RequestParam Map<String, String> reqs ) {
+	public Model listNormalRole( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		model.setRow( roleService.listNormalRole( reqs ) );
 		return model;
@@ -103,7 +105,7 @@ public class RoleController {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public Model addRoleActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model addRoleActoin( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Map<String, Object> role = new HashMap<String, Object>();
 		Model model = new Model();
 		role.put( "ROLE_NAME", reqs.get( "role_name" ) );
@@ -151,9 +153,9 @@ public class RoleController {
 	 * @return
 	 */
 	@RequestMapping(value = "/get")
-	public Model getRoleActoin( @RequestParam String roleId ) {
+	public Model getRoleActoin( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
-		model.setRow( roleService.getRole( roleId ) );
+		model.setRow( roleService.getRole( modelMap.getString( "roleId" ) ) );
 		return model;
 	}
 
@@ -163,7 +165,7 @@ public class RoleController {
 	 * @return
 	 */
 	@RequestMapping(value = "/mod", method = RequestMethod.POST)
-	public Model updateOperatorActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model updateOperatorActoin( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Map<String, Object> role = roleService.getRole( reqs.get( "role_id" ) );
 		Model model = new Model();
 		role.put( "ROLE_NAME", reqs.get( "role_name" ) );
@@ -238,7 +240,7 @@ public class RoleController {
 	 * @return
 	 */
 	@RequestMapping(value = "/checkUserName", method = RequestMethod.POST)
-	public Model checkeUserNameAction( @RequestParam Map<String, String> reqs ) {
+	public Model checkeUserNameAction( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		boolean flag = roleService.listRoleName( reqs );
 		if( flag == true ) {
@@ -255,7 +257,7 @@ public class RoleController {
 	 * @return
 	 */
 	/*	@RequestMapping(value="/checkRole", method=RequestMethod.POST)
-		public Model checkRole(@RequestParam Map<String, String> reqs){
+		public Model checkRole(@RequestBody Map<String, String> reqs){
 			Model model = new Model();
 			boolean flag = roleService.delRole(reqs);
 			if(flag == true){

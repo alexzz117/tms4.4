@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,7 +45,7 @@ public class TransDefController {
 	 * @return
 	 */
 	@RequestMapping(value = "/init", method = RequestMethod.GET)
-	public String initTranDefTree( @RequestParam Map<String, String> reqs ) {
+	public String initTranDefTree( @RequestBody Map<String, String> reqs ) {
 		return "tms35/model/model_list";
 	}
 

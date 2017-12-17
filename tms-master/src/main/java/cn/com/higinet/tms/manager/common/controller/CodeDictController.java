@@ -12,7 +12,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -136,7 +135,7 @@ public class CodeDictController {
 	@RequestMapping(value = "/category/get", method = RequestMethod.POST)
 	public Model getCategoreyAction( @RequestBody RequestModel inData ) {
 		Model model = new Model();
-		
+
 		String categoryId = inData.getString( "categoryId" );
 		if( Stringz.isEmpty( categoryId ) ) return model.addError( "categoryId is empty" );
 
@@ -292,9 +291,9 @@ public class CodeDictController {
 	 * 检查代码类别key是否重复
 	 */
 	@RequestMapping(value = "/check/categoryId", method = RequestMethod.POST)
-	public Model checkCateGoryIdAction( @RequestParam String categoryId ) {
+	public Model checkCateGoryIdAction( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
-		boolean flag = codeDictService.hasCateGoryId( categoryId );
+		boolean flag = codeDictService.hasCateGoryId( modelMap.getString( "categoryId" ) );
 		if( flag ) {
 			model.set( "checke_result", "false" );
 		}
@@ -302,6 +301,5 @@ public class CodeDictController {
 			model.set( "checke_result", "true" );
 		}
 		return model;
-
 	}
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
 
@@ -22,16 +23,18 @@ import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
 @Controller("nameListViewController")
 @RequestMapping("/tms/mgrView")
 public class NameListViewController {
+
 	private static final Logger logger = LoggerFactory.getLogger( NameListViewController.class );
-	
+
 	@Autowired
 	private NameListService nameListViewService;
+
 	/**
 	 * 名单列表查询页面
 	 * @return
 	 */
-	@RequestMapping(value="/list", method=RequestMethod.GET)
-	public String listNameListView(){
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public String listNameListView() {
 		return "tms/mgr/name_list_view";
 	}
 
@@ -40,18 +43,19 @@ public class NameListViewController {
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value="/list", method=RequestMethod.POST)
-	public Model listNameListActoin(@RequestBody Map<String, String> reqs){
+	@RequestMapping(value = "/list", method = RequestMethod.POST)
+	public Model listNameListActoin( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
-		model.setPage(nameListViewService.listNameList(reqs));
+		model.setPage( nameListViewService.listNameList( reqs ) );
 		return model;
 	}
+
 	/**
 	 * 名单编辑页面
 	 * @return
 	 */
-	@RequestMapping(value="/edit", method=RequestMethod.GET)
-	public String editNameListView(){
+	@RequestMapping(value = "/edit", method = RequestMethod.GET)
+	public String editNameListView() {
 		return "tms/mgr/name_view";
 	}
 
@@ -60,48 +64,49 @@ public class NameListViewController {
 	 * @param rosterId
 	 * @return
 	 */
-	@RequestMapping(value="/get")
-	public Model getNameListActoin(@RequestBody String rosterId){
+	@RequestMapping(value = "/get")
+	public Model getNameListActoin( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
-		model.setRow(nameListViewService.getOneNameList(rosterId));
+		model.setRow( nameListViewService.getOneNameList( modelMap.getString( "rosterId" ) ) );
 		return model;
 	}
-	
+
 	/**
 	 * 名单值列表查询页面
 	 * @return
 	 */
-	@RequestMapping(value="/valuelist", method=RequestMethod.GET)
-	public String listValueList(){
+	@RequestMapping(value = "/valuelist", method = RequestMethod.GET)
+	public String listValueList() {
 		return "tms/mgr/value_list_view";
 	}
-	
+
 	/**
 	 * 名单值列表查询交易
 	 * @param reqs
 	 * @return
 	 */
-	@RequestMapping(value="/valuelist", method=RequestMethod.POST)
-	public Model listValueListActoin(@RequestBody Map<String, String> reqs){
-		
-		logger.debug("listValueListActoin inputNode ---> "+reqs);
-		
-		String rosterId = reqs.get("rosterId");
-		
+	@RequestMapping(value = "/valuelist", method = RequestMethod.POST)
+	public Model listValueListActoin( @RequestBody Map<String, String> reqs ) {
+
+		logger.debug( "listValueListActoin inputNode ---> " + reqs );
+
+		String rosterId = reqs.get( "rosterId" );
+
 		Model model = new Model();
 		// 查询条件
-		reqs.put(DBConstant.TMS_MGR_ROSTERVALUE_ROSTERID, rosterId);
-		
-		model.setPage(nameListViewService.listValueListByPage(reqs));
-		
+		reqs.put( DBConstant.TMS_MGR_ROSTERVALUE_ROSTERID, rosterId );
+
+		model.setPage( nameListViewService.listValueListByPage( reqs ) );
+
 		return model;
 	}
+
 	/**
 	 * 名单值修改页面
 	 * @return
 	 */
-	@RequestMapping(value="/valueedit", method=RequestMethod.GET)
-	public String editValueListView(){
+	@RequestMapping(value = "/valueedit", method = RequestMethod.GET)
+	public String editValueListView() {
 		return "tms/mgr/value_view";
 	}
 
@@ -110,17 +115,17 @@ public class NameListViewController {
 	 * @param rosterValueId
 	 * @return
 	 */
-	@RequestMapping(value="/valueget")
-	public Model getValueListActoin(@RequestBody Map<String, String> reqs){
-		
-		String rosterValueId = reqs.get("rosterValueId");
-		
+	@RequestMapping(value = "/valueget")
+	public Model getValueListActoin( @RequestBody Map<String, String> reqs ) {
+
+		String rosterValueId = reqs.get( "rosterValueId" );
+
 		Model model = new Model();
-		
+
 		// 通过名单值表的主键查询名单值信息
-		model.setRow(nameListViewService.getOneValueList(rosterValueId));
-		
+		model.setRow( nameListViewService.getOneValueList( rosterValueId ) );
+
 		return model;
 	}
-	
+
 }

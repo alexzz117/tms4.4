@@ -30,13 +30,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
@@ -52,6 +52,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.NameListService;
 @Controller("nameListController")
 @RequestMapping("/tms/mgr")
 public class NameListController {
+	
 	@Autowired
 	private NameListService nameListService;
 
@@ -158,9 +159,9 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/get")
-	public Model getNameListActoin( @RequestParam String rosterId ) {
+	public Model getNameListActoin( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
-		model.setRow( nameListService.getOneNameList( rosterId ) );
+		model.setRow( nameListService.getOneNameList( modelMap.getString( "rosterId" ) ) );
 		return model;
 	}
 
@@ -182,7 +183,6 @@ public class NameListController {
 	 * @param arrs
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/del", method = RequestMethod.POST)
 	public Model delNameListActoin( @RequestBody Map<String, List<Map<String, String>>> modelMap, HttpServletRequest request ) {
 		Model model = new Model();
@@ -224,7 +224,7 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/valuelist", method = RequestMethod.POST)
-	public Model listValueListActoin( @RequestParam Map<String, String> reqs ) {
+	public Model listValueListActoin( @RequestBody Map<String, String> reqs ) {
 		String rosterId = reqs.get( "rosterId" );
 
 		Model model = new Model();
@@ -252,10 +252,10 @@ public class NameListController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/valueadd", method = RequestMethod.POST)
-	public Model addValueListActoin( @RequestBody ModelMap modelMap, HttpServletRequest request ) {
+	public Model addValueListActoin( @RequestBody RequestModel modelMap, HttpServletRequest request ) {
 		Model model = new Model();
 		try {
-			model.setRow( nameListService.createValueList( (Map<String, Object>) modelMap ) );
+			model.setRow( nameListService.createValueList( modelMap ) );
 		}
 		catch( Exception e ) {
 			e.printStackTrace();
@@ -281,7 +281,7 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/valueget")
-	public Model getValueListActoin( @RequestParam Map<String, String> reqs ) {
+	public Model getValueListActoin( @RequestBody Map<String, String> reqs ) {
 		String rosterValueId = reqs.get( "rosterValueId" );
 		Model model = new Model();
 		// 通过名单值表的主键查询名单值信息
@@ -295,7 +295,7 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/valuemod", method = RequestMethod.POST)
-	public Model updateValueListActoin( @RequestParam Map<String, Object> reqs, HttpServletRequest request ) {
+	public Model updateValueListActoin( @RequestBody Map<String, Object> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 		try {
 			nameListService.updateOneValueList( reqs );
@@ -315,7 +315,7 @@ public class NameListController {
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/valuedel")
-	public Model delValueListActoin( @RequestParam Map<String, Object> reqs, HttpServletRequest request ) {
+	public Model delValueListActoin( @RequestBody Map<String, Object> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 		String json = MapUtil.getString( reqs, "postData" );
 		Map<String, List<Map<String, String>>> formList = null;
@@ -343,7 +343,7 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/changevalueget", method = RequestMethod.POST)
-	public Model getChangeValueList( @RequestParam Map<String, String> reqs ) {
+	public Model getChangeValueList( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put( DBConstant.TMS_MGR_ROSTER_ROSTERTYPE, reqs.get( "rostertype" ) );
@@ -359,7 +359,7 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/changevalue", method = RequestMethod.POST)
-	public Model updateRosterIdActoin( @RequestParam Map<String, Object> reqs, HttpServletRequest request ) {
+	public Model updateRosterIdActoin( @RequestBody Map<String, Object> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 		String str = MapUtil.getString( reqs, "rosterId" );
 		String[] strArr = str.split( "\\|\\|\\|\\|" );
@@ -392,7 +392,7 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/import", method = RequestMethod.POST)
-	public String importNameListAction( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public String importNameListAction( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Map<String, Object> inputNode = new HashMap<String, Object>();
 		MultipartHttpServletRequest multipartrequest = (MultipartHttpServletRequest) request;
 		MultipartFile file = multipartrequest.getFile( "importFile" );
@@ -453,7 +453,7 @@ public class NameListController {
 	}
 
 	@RequestMapping(value = "/export", method = RequestMethod.GET)
-	public void exportListAction( @RequestParam Map<String, String> reqs, HttpServletResponse response ) {
+	public void exportListAction( @RequestBody Map<String, String> reqs, HttpServletResponse response ) {
 		String type; //导出类型
 		if( StringUtil.isEmpty( reqs.get( "flag" ) ) ) { //默认导出类型为csv
 			type = "csv";
@@ -509,14 +509,10 @@ public class NameListController {
 				for( int i = 0; i < dateList.size(); i++ ) {
 					Map<String, Object> txn = dateList.get( i );
 					if( "csv".equals( type ) ) {
-						write.append( MapUtil.getString( txn, "ROSTERVALUE" ) + "\t" ).append( "," ).append( MapUtil.getString( txn, "ENABLETIME" ) + "\t" ).append( "," )
-								.append( MapUtil.getString( txn, "DISABLETIME" ) + "\t" ).append( "," )
-								.append( MapUtil.getString( txn, "REMARK" ).trim().length() == 0 ? " " : MapUtil.getString( txn, "REMARK" ) + "\t" ).append( enter );
+						write.append( MapUtil.getString( txn, "ROSTERVALUE" ) + "\t" ).append( "," ).append( MapUtil.getString( txn, "ENABLETIME" ) + "\t" ).append( "," ).append( MapUtil.getString( txn, "DISABLETIME" ) + "\t" ).append( "," ).append( MapUtil.getString( txn, "REMARK" ).trim().length() == 0 ? " " : MapUtil.getString( txn, "REMARK" ) + "\t" ).append( enter );
 					}
 					else if( "txt".equals( type ) ) {
-						write.append( MapUtil.getString( txn, "ROSTERVALUE" ) ).append( "," ).append( MapUtil.getString( txn, "ENABLETIME" ) ).append( "," )
-								.append( MapUtil.getString( txn, "DISABLETIME" ) ).append( "," )
-								.append( MapUtil.getString( txn, "REMARK" ).trim().length() == 0 ? " " : MapUtil.getString( txn, "REMARK" ) ).append( enter );
+						write.append( MapUtil.getString( txn, "ROSTERVALUE" ) ).append( "," ).append( MapUtil.getString( txn, "ENABLETIME" ) ).append( "," ).append( MapUtil.getString( txn, "DISABLETIME" ) ).append( "," ).append( MapUtil.getString( txn, "REMARK" ).trim().length() == 0 ? " " : MapUtil.getString( txn, "REMARK" ) ).append( enter );
 					}
 				}
 				buff.write( write.toString().getBytes( "GB2312" ) );
@@ -630,7 +626,7 @@ public class NameListController {
 	 * @param response
 	 */
 	@RequestMapping(value = "/exportLog", method = RequestMethod.POST)
-	public Model exportLog( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model exportLog( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 		String rosterdesc = reqs.get( "rosterdesc" );
 		List<Map<String, Object>> dateList = nameListService.listValueListById( reqs );

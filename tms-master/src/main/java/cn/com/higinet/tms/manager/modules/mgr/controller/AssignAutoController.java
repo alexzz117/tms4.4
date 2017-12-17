@@ -27,7 +27,7 @@ import cn.com.higinet.tms.manager.modules.mgr.service.AssignAutoService;
 @RequestMapping("/tms/assignAuto")
 public class AssignAutoController {
 	
-	private static final Logger log = LoggerFactory.getLogger( AssignAutoController.class );
+	private static final Logger logger = LoggerFactory.getLogger( AssignAutoController.class );
 	
 	@Autowired
 	private AssignAutoService assignAutoService;
@@ -131,7 +131,7 @@ public class AssignAutoController {
 	@RequestMapping(value="/modpaySuspend", method= RequestMethod.POST)
 	public Model modPaySuspendList(@RequestBody Map<String, String> reqs){
 		Model model = new Model();
-		log.debug("listValueListActoin inputNode ---> "+reqs);
+		logger.debug("listValueListActoin inputNode ---> "+reqs);
 		return model;
 	}
 }

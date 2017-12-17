@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -30,9 +30,11 @@ import cn.com.higinet.tms.manager.modules.mgr.service.IPProtectService;
  * IP地址导入控制类
  * @author zhang.lei
  */
+
 @Controller("tmsIPProtectController")
 @RequestMapping("/tms/ip")
 public class IPProtectController {
+	
 	private static final Logger logger = LoggerFactory.getLogger( IPProtectController.class );
 	
 	@Autowired
@@ -68,7 +70,7 @@ public class IPProtectController {
 	
 	@SuppressWarnings("finally")
 	@RequestMapping(value="/import",method=RequestMethod.POST)
-	public String importThread(@RequestParam Map<String, String> reqs,HttpServletRequest request){
+	public String importThread(@RequestBody Map<String, String> reqs,HttpServletRequest request){
 		//初始化进度参数
 		IPProtectService.initialization();
 		IPCache.initialization();

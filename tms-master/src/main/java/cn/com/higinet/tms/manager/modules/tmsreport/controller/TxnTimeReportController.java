@@ -2,16 +2,25 @@ package cn.com.higinet.tms.manager.modules.tmsreport.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.manager.dao.Page;
+import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
+import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
+import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
+import cn.com.higinet.tms.manager.modules.tmsreport.service.TxnTimeReportService;
 import jxl.Workbook;
-import jxl.format.Border;
-import jxl.format.BorderLineStyle;
 import jxl.write.Label;
 import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
@@ -19,20 +28,6 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import cn.com.higinet.tms.base.entity.common.Model;
-import cn.com.higinet.tms.manager.dao.Page;
-import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
-import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms.manager.modules.tmsreport.common.ReportConstant;
-import cn.com.higinet.tms.manager.modules.tmsreport.service.DisposalService;
-import cn.com.higinet.tms.manager.modules.tmsreport.service.TxnTimeReportService;
 
 @Controller("txnTimeReportController")
 @RequestMapping("/report/txnTime")
@@ -60,7 +55,7 @@ public class TxnTimeReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/list", method=RequestMethod.POST)
-	public Model listReportAction(@RequestParam Map<String, String> reqs,HttpServletRequest request){
+	public Model listReportAction(@RequestBody Map<String, String> reqs,HttpServletRequest request){
 		Model model = new Model();
 		Page<Map<String, Object>>  page = txnTimeReportService.listTxnTimeReport(reqs);
 		model.setPage(page);
@@ -74,7 +69,7 @@ public class TxnTimeReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/showChart", method=RequestMethod.POST)
-	public Model showChartAction(@RequestParam Map<String, String> reqs,HttpServletRequest request){
+	public Model showChartAction(@RequestBody Map<String, String> reqs,HttpServletRequest request){
 		Model model = new Model();
 		model.set("CHARTDATA", txnTimeReportService.getChartData(null,reqs));
 		return model;
@@ -86,7 +81,7 @@ public class TxnTimeReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/export", method=RequestMethod.GET)
-	public void exportListAction(@RequestParam Map<String, String> reqs,HttpServletRequest request,HttpServletResponse response){
+	public void exportListAction(@RequestBody Map<String, String> reqs,HttpServletRequest request,HttpServletResponse response){
 		List<Map<String, Object>>  txnTimeList = txnTimeReportService.exportList(reqs);
 		String titles [] = {"交易名称"};
 		String colum [] = {"TXNNAME","RISK_EVAL_NUMBER","RISK_EVAL_RUNTIME_AVG","RISK_EVAL_RUNTIME_MAX","RISK_EVAL_RUNTIME_MIN",

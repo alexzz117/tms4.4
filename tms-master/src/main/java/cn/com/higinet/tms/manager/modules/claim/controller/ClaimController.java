@@ -6,13 +6,11 @@ package cn.com.higinet.tms.manager.modules.claim.controller;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.modules.ac.service.AcService;
@@ -29,40 +27,38 @@ import cn.com.higinet.tms.manager.modules.ac.service.AcService;
 @Controller("claimController")
 @RequestMapping("/tms/claim")
 public class ClaimController {
-	
-	private static Log log = LogFactory.getLog(ClaimController.class);
-	
+
 	@Autowired
 	AcService actionService35;
-	
+
 	/**
 	* 方法描述:理赔信息列表页面
 	* @return
 	 */
-	@RequestMapping(value="/list",method=RequestMethod.GET)
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public String listClaimView() {
 		return "tms35/claim/claim_list";
 	}
-	
+
 	/**
 	* 方法描述:理赔信息页面
 	* @return
 	 */
-	@RequestMapping(value="/add",method=RequestMethod.GET)
+	@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String addClaimView() {
 		return "tms35/claim/claim_add";
 	}
-	
+
 	/**
 	* 方法描述:动作查询列表
 	* @param reqs
 	* @return
 	 */
-	@RequestMapping(value="/list",method=RequestMethod.POST)
-	public Model listAction(@RequestParam Map<String,Object> reqs) {
+	@RequestMapping(value = "/list", method = RequestMethod.POST)
+	public Model listAction( @RequestBody Map<String, Object> reqs ) {
 		Model model = new Model();
-		model.setRow(actionService35.listAction(reqs));
+		model.setRow( actionService35.listAction( reqs ) );
 		return model;
 	}
-	
+
 }

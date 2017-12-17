@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -122,24 +121,6 @@ public class AuthController extends ApplicationObjectSupport {
 	}
 
 	/**
-	 * 获取授权信息详细信息
-	 * @param reqs
-	 * @return
-	 */
-	//	@RequestMapping(value="/getAuthDetail",method=RequestMethod.POST)
-	//	public Model getAuthAction(@RequestParam String authIds){
-	//		Model model = new Model();
-	//		
-	//		String[] authIdArr = authIds.split(",");
-	//		List<Map<String, Object>> authList = authService.getAuthByAuthIds(authIdArr);
-	//		Page page = new Page();
-	//		page.setList(authList);
-	//		model.setPage(page);
-	//		
-	//		return model;
-	//	}
-
-	/**
 	 * 更新授权信息
 	 * @param regs
 	 * @return
@@ -234,7 +215,7 @@ public class AuthController extends ApplicationObjectSupport {
 	}
 
 	@RequestMapping(value = "/listSubOperate", method = RequestMethod.POST)
-	public Model subOperateAction( @RequestParam Map<String, String> reqs ) {
+	public Model subOperateAction( @RequestBody Map<String, String> reqs ) {
 		Model model = new Model();
 		model.setPage( authService.subDataList( reqs ) );
 		return model;
@@ -275,7 +256,7 @@ public class AuthController extends ApplicationObjectSupport {
 	 * @return
 	 */
 	@RequestMapping(value = "/dataquary", method = RequestMethod.POST)
-	public Model dataQueryActoin( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+	public Model dataQueryActoin( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 
 		try {
