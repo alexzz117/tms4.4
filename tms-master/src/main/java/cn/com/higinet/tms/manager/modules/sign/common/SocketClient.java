@@ -10,7 +10,7 @@ import java.net.SocketException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cn.com.higinet.tms.manager.modules.stat.service.impl.StatServiceImpl;
+import cn.com.higinet.tms.manager.modules.stat.service.StatService;
 
 /**
  * Socket客户端工具类
@@ -18,7 +18,7 @@ import cn.com.higinet.tms.manager.modules.stat.service.impl.StatServiceImpl;
  * @author lining
  */
 public class SocketClient {
-	private static Log logger = LogFactory.getLog(StatServiceImpl.class);
+	private static Log logger = LogFactory.getLog(StatService.class);
 	
 	private String ip;
 	private int port;
