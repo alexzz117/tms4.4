@@ -106,17 +106,13 @@ public class TransModelService {
 		return fd;
 	}
 
-	/*
+	/**
 	 * 把数组的主键对应的交易名称查出来 以便前端显示
 	 */
 	private String[] addTxnName( String[] txnids, List<Map<String, Object>> txndefs ) {
-
 		String[] idPlusName = new String[txnids.length];
-
 		for( int i = 0; i < txnids.length; i++ ) {
-
 			for( Map<String, Object> txndef : txndefs ) {
-
 				// if(txndef.containsValue(txnids[i])) {
 				if( MapUtil.getString( txndef, TMS_COM_TAB.TAB_NAME ).equals( txnids[i] ) ) {
 					if( i > 0 ) {
@@ -131,21 +127,15 @@ public class TransModelService {
 		return idPlusName;
 	}
 
-	/*
+	/**
 	 * 无数据时候,先查询 再补全名字
 	 */
 	private String[] addTxnName( String[] txnids ) {
-
 		List<Map<String, Object>> txndefs = transDefService.getFartherTranDefName( txnids[txnids.length - 1] );
-
 		String[] idPlusName = new String[txnids.length];
-
 		for( int i = 0; i < txnids.length; i++ ) {
-
 			for( Map<String, Object> txndef : txndefs ) {
-
 				if( MapUtil.getString( txndef, TMS_COM_TAB.TAB_NAME ).equals( txnids[i] ) ) {
-
 					idPlusName[i] = txnids[i] + "____" + MapUtil.getString( txndef, TMS_COM_TAB.TAB_DESC );
 				}
 			}
