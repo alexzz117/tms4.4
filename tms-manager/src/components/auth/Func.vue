@@ -25,7 +25,7 @@
       <el-col :span="18">
         <div style="height:38px;width:100%;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
           <el-breadcrumb id="funcPath" separator=">" style="padding: 10px 15px;">
-            <el-breadcrumb-item v-for="(item,index) in breadcrumbData" :keys="index">{{ item.text }}</el-breadcrumb-item>
+            <el-breadcrumb-item v-for="item in breadcrumbData" :key="item.text">{{ item.text }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <el-main style="max-height: 76vh;overflow-y: auto;">
