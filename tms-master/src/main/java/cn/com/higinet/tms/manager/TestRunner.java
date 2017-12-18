@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 
 @Component
@@ -20,7 +21,14 @@ public class TestRunner implements CommandLineRunner {
 
 	@Override
 	public void run( String... arg0 ) throws Exception {
-		logger.info( tmsSqlMap.getSql( "tms.common.systime" ) );
+		//logger.info( tmsSqlMap.getSql( "tms.common.systime" ) );
+
+		long l = System.currentTimeMillis();
+
+		for( int i = 0; i < 50000; i++ ) {
+			logger.info( "sssssssssss" );
+		}
+		logger.info( Stringz.valueOf( System.currentTimeMillis() - l ) );
 	}
 
 }

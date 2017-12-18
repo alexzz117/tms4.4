@@ -10,7 +10,7 @@ public class Stringz extends StringUtils {
 	public static boolean isNotEmpty( Object str ) {
 		return !isEmpty( str );
 	}
-	
+
 	public static boolean isNotEmpty( Object... strings ) {
 		return !isEmpty( strings );
 	}
