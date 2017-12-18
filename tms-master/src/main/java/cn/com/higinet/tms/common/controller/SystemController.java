@@ -30,6 +30,7 @@ public class SystemController {
 
 		cmc_code code = new cmc_code();
 		code.setCategory_id( "111111111111" );
+		model.setRow( code );
 
 		return model;
 	}
