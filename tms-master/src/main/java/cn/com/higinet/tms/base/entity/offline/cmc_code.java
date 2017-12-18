@@ -1,12 +1,9 @@
 package cn.com.higinet.tms.base.entity.offline;
 
-import javax.persistence.Entity;
-
 import cn.com.higinet.tms.base.entity.common.EntityBase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class cmc_code extends EntityBase<cmc_code> {
