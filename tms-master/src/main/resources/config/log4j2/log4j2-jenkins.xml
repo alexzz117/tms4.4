@@ -13,7 +13,6 @@
 
 	<!--定义所有的appender -->
 	<appenders>
-
 		<!--文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，这个也挺有用的，适合临时测试用 -->
 		<!-- <File name="log" fileName="log/test.log" append="false">
 			<PatternLayout pattern="${pattern}" />
@@ -52,7 +51,7 @@
 		<!-- <logger name="org.mybatis" level="info"></logger> -->
 		
 		<AsyncLogger level="info">
-			<appender-ref ref="RollingFileInfo" />
+			<appender-ref ref="RollingFileInfo" level="info" />
 		</AsyncLogger>
 	</loggers>
 </configuration>  
