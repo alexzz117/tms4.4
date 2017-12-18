@@ -39,7 +39,7 @@
       getData () {
         let self = this
         ajax.post({
-          url: '/tms/auth/modelList',
+          url: '/manager/auth/modelList',
           param: {},
           success: function (data) {
             if (data.page) {

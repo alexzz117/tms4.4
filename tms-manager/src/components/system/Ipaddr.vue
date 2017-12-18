@@ -229,6 +229,14 @@
           this.$message('请选择城市代码文件')
           return
         }
+        if (!importCardFileExist) {
+          this.$message('请选择身份证号段文件')
+          return
+        }
+        if (!importMobileFileExist) {
+          this.$message('请选择手机号段文件')
+          return
+        }
         if (!importIPFileName.endsWith('.csv')) {
           this.$message('IP地址文件必须为csv文件')
           return
@@ -237,11 +245,11 @@
           this.$message('城市代码文件必须为csv文件')
           return
         }
-        if (importCardFileExist && !importCardFileName.endsWith('.csv')) {
+        if (!importCardFileName.endsWith('.csv')) {
           this.$message('身份证号段文件必须为csv文件')
           return
         }
-        if (importMobileFileExist && !importMobileFileName.endsWith('.csv')) {
+        if (!importMobileFileName.endsWith('.csv')) {
           this.$message('手机号段文件必须为csv文件')
           return
         }
@@ -270,27 +278,43 @@
           this.mobileProgressShow = true
         }
         ajax.post({
-          url: '/tms/ip/import',
+          url: '/manager/ip/import',
           param: self.uploadForm,
           success: function (data) {
             self.uploadForm = new FormData()
-            getProgressTimer = window.setInterval(self.getImportProgress, 1000)
+            ajax.post({
+              url: '/manager/ip/recordImpInfo',
+              param: {},
+              success: function () {
+                getProgressTimer = window.setInterval(self.getImportProgress, 1000)
+              }
+            })
           },
           error: function (data) {
             self.uploadForm = new FormData()
-            alert(data.error)
+            // alert(data.error)
+            self.$message(data.error)
+            self.progressReset()
+            try {
+              window.clearInterval(getProgressTimer)
+            } catch (e) {}
           },
           fail: function (err) {
             self.uploadForm = new FormData()
-            alert('导入文件发生错误')
+            // alert('导入文件发生错误')
+            self.$message('导入文件发生错误')
             console.log(err)
+            self.progressReset()
+            try {
+              window.clearInterval(getProgressTimer)
+            } catch (e) {}
           }
         })
       },
       getImportProgress () {
         let self = this
         ajax.post({
-          url: '/tms/ip/getProgress',
+          url: '/manager/ip/getProgress',
           param: {},
           success: function (data) {
             let errorInfo = data.errorinfo
@@ -305,11 +329,16 @@
             self.cardProgress = cardProgress
             self.mobileProgress = mobileProgress
             if (!util.isEmpty(errorInfo)) {
-              alert(errorInfo)
+              // alert(errorInfo)
+              self.$message(errorInfo)
               console.log('clear timer')
               window.clearInterval(getProgressTimer)
             }
             self.timeCount++
+            if (self.timeCount === 30 && IPProgress === 0 && cityProgress === 0 && cardProgress === 0 && mobileProgress === 0) {
+              self.$message('导入文件发生错误')
+              window.clearInterval(getProgressTimer)
+            }
 
             if (!(util.isEmpty(errorInfo) && (IPProgress < 100 || cityProgress < 100 ||
                 cardProgress < 100 || mobileProgress < 100))) {
@@ -334,7 +363,6 @@
         this.mobileProgressShow = false
       },
       importIPFile (file) {
-        console.log(123)
         this.uploadForm.append('importIPFile', file)
         this.$refs.importIPFile.abort()
         return false

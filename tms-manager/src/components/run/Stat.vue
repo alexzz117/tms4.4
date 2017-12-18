@@ -91,7 +91,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="stat_datafd" label="统计目标" align="left"></el-table-column>
+      <el-table-column prop="stat_datafd" label="统计目标" align="left">
+        <template slot-scope="scope">
+          <span>{{scope.row.stat_datafd | statDataFdFilter}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="stat_fn" label="统计函数" align="left"></el-table-column>
       <el-table-column prop="storecolumn" label="存储字段" align="left"></el-table-column>
       <el-table-column label="有效性" align="left" width="60">
@@ -186,7 +190,7 @@
     mounted: function () {
       this.$nextTick(function () {
         vm = this
-        this.reloadData()
+        // this.reloadData()
       })
     },
     watch: {
@@ -225,24 +229,37 @@
         if (v === null || v === '') {
           return ''
         }
-        console.log(v)
-        let returnText = ''
+        let returnTextArr = []
         let arr = v.split(',')
 
-        let self = this
         for (let value of arr) {
-          let temp = ''
-          for (let row of self.statParamList) {
-            if (arr !== '' && arr === row['CODE_KEY']) {
-              temp = row['CODE_VALUE']
-              return false
+          for (let i = 0; i < vm.statParamList.length; i++) {
+            let row = vm.statParamList[i]
+            if (value !== '' && value === row.code_key) {
+              returnTextArr.push(row.code_value)
+              break
             }
           }
         }
-        if (temp.length === 0) temp = arr
-        if (returnText.length > 0) returnText += ','
-        returnText += temp
-        return returnText
+        return returnTextArr.join(',')
+      },
+      statDataFdFilter (v) {
+        if (v === null || v === '') {
+          return ''
+        }
+        let returnTextArr = []
+        let arr = v.split(',')
+
+        for (let value of arr) {
+          for (let i = 0; i < vm.statDataFdList.length; i++) {
+            let row = vm.statDataFdList[i]
+            if (value !== '' && value === row.code_key) {
+              returnTextArr.push(row.code_value)
+              break
+            }
+          }
+        }
+        return returnTextArr.join(',')
       }
     },
     methods: {
@@ -250,10 +267,11 @@
         this.selectedRows = rows
       },
       reloadData () {
+        // getData卸载了这一句的回调中，因为需要依赖这个的取值
         this.getStatParamSelectData()
         this.getStatDataFnSelectData()
         this.getStatDataValidSelectData()
-        this.getData()
+        // this.getData()
       },
       getData () {
         let self = this
@@ -261,12 +279,11 @@
           txnId: this.txnIdParent
         }
         ajax.post({
-          url: '/tms/stat/list',
+          url: '/manager/stat/list',
           param: paramsObj,
           success: function (data) {
             if (data.row) {
               self.tableData = data.row
-              // self.bindGridData(data)
             }
           }
         })
@@ -274,7 +291,7 @@
       getStatParamSelectData () {
         let self = this
         ajax.post({
-          url: '/tms/stat/txnFeature',
+          url: '/manager/stat/txnFeature',
           param: {txn_id: this.txnIdParent},
           success: function (data) {
             if (data.row) {
@@ -284,6 +301,8 @@
                 self.statParamList.push(value)
                 self.statDataFdList.push(value)
               }
+
+              self.getData()
             }
           }
         })
@@ -291,7 +310,7 @@
       getStatDataFnSelectData () {
         let self = this
         ajax.post({
-          url: '/tms/stat/code',
+          url: '/manager/stat/code',
           param: {
             category_id: 'tms.pub.func',
             args: 2

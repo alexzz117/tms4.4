@@ -82,42 +82,42 @@ export default new Router({
           component: Txn
         },
         {
-          path: 'authCenter',
+          path: 'authCenter.vue',
           name: 'AuthCenter',
           component: AuthCenter
         },
         {
-          path: 'authDataCompare',
+          path: 'authDataCompare.vue',
           name: 'AuthDataCompare',
           component: AuthDataCompare
         },
         {
-          path: 'authDataList',
+          path: 'authDataList.vue',
           name: 'AuthDataList',
           component: AuthDataList
         },
         {
-          path: 'authLogList',
+          path: 'authLogList.vue',
           name: 'AuthLogList',
           component: AuthLogList
         },
         {
-          path: 'authSubDataList',
+          path: 'authSubDataList.vue',
           name: 'AuthSubDataList',
           component: AuthSubDataList
         },
         {
-          path: 'codedict',
+          path: 'codedict.vue',
           name: 'Codedict',
           component: Codedict
         },
         {
-          path: 'codeDictInfo',
+          path: 'codeDictInfo.vue',
           name: 'CodeDictInfo',
           component: CodedictInfo
         },
         {
-          path: 'ipaddr.vhtml',
+          path: 'ipaddr.vue',
           name: 'Ipaddr',
           component: Ipaddr
         },

@@ -65,6 +65,7 @@
 <script>
   import ajax from '@/common/ajax'
   import check from '@/common/check'
+  import util from '@//common/util'
 
   export default {
     computed: {
@@ -80,15 +81,8 @@
         if (this.dialogType === 'edit' && this.selectedRows[0].category_id === value) {
           callback()
         } else {
-          // ajax.post('/cmc/codedict/check/categoryId', {categoryId: value}, function (data) {
-          //   if (data.checkresult === false) {
-          //     return callback(new Error('该代码类别key已存在'))
-          //   } else {
-          //     callback()
-          //   }
-          // })
           ajax.post({
-            url: '/cmc/codedict/check/categoryId',
+            url: '/manager/codedict/check/categoryId',
             param: {categoryId: value},
             success: function (data) {
               if (data.checkresult === false) {
@@ -181,14 +175,10 @@
           pageindex: this.currentPage,
           pagesize: this.pageSize
         }
-        Object.assign(paramsObj, this.queryForm)
-        // ajax.post('/cmc/codedict/category/list', paramsObj, function (data) {
-        //   if (data.page) {
-        //     self.bindGridData(data)
-        //   }
-        // })
+        let upperParams = util.toggleObjKey(this.queryForm, 'upper')
+        Object.assign(paramsObj, upperParams)
         ajax.post({
-          url: '/cmc/codedict/category/list',
+          url: '/manager/codedict/category/list',
           param: paramsObj,
           success: function (data) {
             if (data.page) {
@@ -202,13 +192,8 @@
           if (valid) {
             let self = this
             let paramsObj = this.dictDialogForm
-            // ajax.post('/cmc/codedict/category/add', paramsObj, function (data) {
-            //   self.getData()
-            //   self.$message('添加成功')
-            //   self.dictDialogVisible = false
-            // })
             ajax.post({
-              url: '/cmc/codedict/category/add',
+              url: '/manager/codedict/category/add',
               param: paramsObj,
               success: function (data) {
                 self.getData()
@@ -229,16 +214,13 @@
           this.$message('请选择一行代码类别信息。')
           return
         }
-        if (confirm('确定删除?')) {
-          // ajax.post('/cmc/codedict/category/del', {
-          //   categoryId: data.category_id
-          // }, function (data) {
-          //   self.$message('删除成功')
-          //   self.getData()
-          // })
-
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
           ajax.post({
-            url: '/cmc/codedict/category/del',
+            url: '/manager/codedict/category/del',
             param: {
               categoryId: data.category_id
             },
@@ -247,20 +229,20 @@
               self.getData()
             }
           })
-        }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       },
       updData (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let self = this
             let paramsObj = this.dictDialogForm
-            // ajax.post('/cmc/codedict/category/update', paramsObj, function (data) {
-            //   self.getData()
-            //   self.$message('编辑成功')
-            //   self.dictDialogVisible = false
-            // })
             ajax.post({
-              url: '/cmc/codedict/category/update',
+              url: '/manager/codedict/category/update',
               param: paramsObj,
               success: function (data) {
                 self.getData()

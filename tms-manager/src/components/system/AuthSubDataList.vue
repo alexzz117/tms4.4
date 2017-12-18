@@ -122,7 +122,7 @@
           pagesize: this.pageSize
         }
         ajax.post({
-          url: '/tms/auth/listSubOperate',
+          url: '/manager/auth/listSubOperate',
           param: paramsObj,
           success: function (data) {
             if (data.page) {

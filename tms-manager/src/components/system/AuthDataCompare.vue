@@ -76,7 +76,7 @@
           table_pkvalue: this.tablePkvalue
         }
         ajax.post({
-          url: '/tms/auth/dataCompare',
+          url: '/manager/auth/dataCompare',
           param: params,
           success: function (data) {
             if (data.page) {

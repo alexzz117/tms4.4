@@ -179,13 +179,8 @@
           if (valid) {
             let self = this
             let paramsObj = this.dictDialogForm
-            // ajax.post('/cmc/codedict/code/add', paramsObj, function (data) {
-            //   self.getData()
-            //   self.$message('添加成功')
-            //   self.dictDialogVisible = false
-            // })
             ajax.post({
-              url: '/cmc/codedict/code/add',
+              url: '/manager/codedict/code/add',
               param: paramsObj,
               success: function (data) {
                 self.getData()
@@ -205,14 +200,8 @@
           pageindex: this.currentPage,
           pagesize: this.pageSize
         }
-        // Object.assign(paramsObj, this.queryForm)
-        // ajax.post('/cmc/codedict/category/codelist', paramsObj, function (data) {
-        //   if (data.page) {
-        //     self.bindGridData(data)
-        //   }
-        // })
         ajax.post({
-          url: '/cmc/codedict/category/codelist',
+          url: '/manager/codedict/category/codelist',
           param: paramsObj,
           success: function (data) {
             if (data.page) {
@@ -229,16 +218,13 @@
           this.$message('请选择一行字典信息。')
           return
         }
-        if (confirm('确定删除?')) {
-          // ajax.post('cmc/codedict/code/del', {
-          //   codeId: data.code_id
-          // }, function (data) {
-          //   self.$message('删除成功')
-          //   self.getData()
-          // })
-
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
           ajax.post({
-            url: 'cmc/codedict/code/del',
+            url: 'manager/codedict/code/del',
             param: {
               codeId: data.code_id
             },
@@ -247,20 +233,20 @@
               self.getData()
             }
           })
-        }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       },
       updData (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let self = this
             let paramsObj = this.dictDialogForm
-            // ajax.post('/cmc/codedict/code/update', paramsObj, function (data) {
-            //   self.getData()
-            //   self.$message('编辑成功')
-            //   self.dictDialogVisible = false
-            // })
             ajax.post({
-              url: '/cmc/codedict/code/update',
+              url: '/manager/codedict/code/update',
               param: paramsObj,
               success: function (data) {
                 self.getData()
