@@ -178,24 +178,33 @@
       },
       selRole () {
         var self = this
-        ajax.post('/cmc/role/listNormalRole', null, function (data) {
-          self.roles = data.row
-        })
+        var option = {
+          url: '/cmc/role/listNormalRole',
+          success: function (data) {
+            self.roles = data.row
+          }
+        }
+        ajax.post(option)
       },
       selUser () {
         var self = this
-        ajax.post('/cmc/operator/list', {
-          login_name: this.userForm.login_name,
-          real_name: this.userForm.real_name,
-          flag: this.userForm.flag,
-          role: this.userForm.role,
-          pageindex: 1,
-          pagesize: 10
-        }, function (data) {
-          if (data.page) {
-            self.bindGridData(data)
+        var option = {
+          url: '/cmc/operator/list',
+          param: {
+            login_name: this.userForm.login_name,
+            real_name: this.userForm.real_name,
+            flag: this.userForm.flag,
+            role: this.userForm.role,
+            pageindex: 1,
+            pagesize: 10
+          },
+          success: function (data) {
+            if (data.page) {
+              self.bindGridData(data)
+            }
           }
-        })
+        }
+        ajax.post(option)
       },
       openDialog (flag) {
         this.flag = flag
@@ -233,19 +242,29 @@
       },
       addUser () {
         var self = this
-        ajax.post('/cmc/operator/add', this.userDialogForm, function (data) {
-          self.$message('创建成功。')
-          self.roleDialogVisible = false
-          self.selUser()
-        })
+        var option = {
+          url: '/cmc/operator/add',
+          param: this.userDialogForm,
+          success: function (data) {
+            self.$message('创建成功。')
+            self.roleDialogVisible = false
+            self.selUser()
+          }
+        }
+        ajax.post(option)
       },
       updateUser () {
         var self = this
-        ajax.post('/cmc/operator/mod', this.userDialogForm, function (data) {
-          self.$message('更新成功。')
-          self.roleDialogVisible = false
-          self.selUser()
-        })
+        var option = {
+          url: '/cmc/operator/mod',
+          param: this.userDialogForm,
+          success: function (data) {
+            self.$message('更新成功。')
+            self.roleDialogVisible = false
+            self.selUser()
+          }
+        }
+        ajax.post(option)
       },
       delUser () {
         var self = this
@@ -255,12 +274,17 @@
           return
         }
         var data = this.multipleSelection[0]
-        ajax.post('/cmc/operator/del', {
-          operatorId: data.operator_id
-        }, function (data) {
-          self.$message('删除成功。')
-          self.selUser()
-        })
+        var option = {
+          url: '/cmc/operator/del',
+          param: {
+            operatorId: data.operator_id
+          },
+          success: function (data) {
+            self.$message('删除成功。')
+            self.selUser()
+          }
+        }
+        ajax.post(option)
       },
       resetPwd () {
         var self = this
@@ -274,13 +298,18 @@
         // var pwd = jcl.util.crypt.md5(password);
 
         var data = this.multipleSelection[0]
-        ajax.post('/cmc/operator/reset', {
-          operatorId: data.operator_id,
-          passWord: pwd
-        }, function (data) {
-          self.$message('密码重置成功。')
-          self.selUser()
-        })
+        var option = {
+          url: '/cmc/operator/reset',
+          param: {
+            operatorId: data.operator_id,
+            passWord: pwd
+          },
+          success: function (data) {
+            self.$message('密码重置成功。')
+            self.selUser()
+          }
+        }
+        ajax.post(option)
       },
       resetFlag () {
         var self = this
@@ -290,12 +319,17 @@
           return
         }
         var data = this.multipleSelection[0]
-        ajax.post('/cmc/operator/resetLoginFailedAttempts', {
-          operatorId: data.operator_id
-        }, function (data) {
-          self.$message('用户解锁成功。')
-          self.selUser()
-        })
+        var option = {
+          url: '/cmc/operator/resetLoginFailedAttempts',
+          param: {
+            operatorId: data.operator_id
+          },
+          success: function (data) {
+            self.$message('用户解锁成功。')
+            self.selUser()
+          }
+        }
+        ajax.post(option)
       }
     },
     data () {
@@ -314,14 +348,18 @@
         if (this.flag === 'edit' && this.multipleSelection[0].login_name === value) {
           callback()
         } else {
-          var params = {'username': value}// 用户名
-          ajax.post('/cmc/operator/check/username', params, function (data) { // 请求校验用户名
-            if (data.checkresult === false) {
-              return callback(new Error('用户名已被占用'))
-            } else {
-              callback()
+          var option = {
+            url: '/cmc/operator/check/username',
+            param: {'username': value}, // 用户名
+            success: function (data) { // 请求校验用户名
+              if (data.checkresult === false) {
+                return callback(new Error('用户名已被占用'))
+              } else {
+                callback()
+              }
             }
-          })
+          }
+          ajax.post(option)
         }
       }
       // 证件号码格式校验 证件号码只能有数字和字母组成
