@@ -54,44 +54,49 @@
   import ajax from '@/common/ajax'
 
   export default {
-    created() {
+    created () {
       this.selLog()
     },
     methods: {
-      handleSizeChange(val) {
+      handleSizeChange (val) {
         console.log(`每页 ${val} 条`)
       },
-      handleCurrentChange(val) {
+      handleCurrentChange (val) {
         console.log(`当前页: ${val}`)
       },
-      handleSelectionChange(val) {
+      handleSelectionChange (val) {
         this.multipleSelection = val
       },
-      bindGridData(data) {
+      bindGridData (data) {
         this.roleData = data.page.list
         this.currentPage = data.page.index
         this.pagesize = data.page.size
         this.total = data.page.total
       },
-      selLog() {
-        var self = this;
+      selLog () {
+        var self = this
         console.info(this.value6[0])
         console.info(this.value6[1])
-        ajax.post('/cmc/log/list', {
-          operator_name: this.logForm.operator_name,
-          operate_func: this.logForm.operate_func,
-          operate_time: this.value6[0],
-          end_time: this.value6[1],
-          pageindex: 1,
-          pagesize: 10
-        }, function (data) {
-          if (data.page) {
-            self.bindGridData(data)
+        var option = {
+          url: '/cmc/log/list',
+          param: {
+            operator_name: this.logForm.operator_name,
+            operate_func: this.logForm.operate_func,
+            operate_time: this.value6[0],
+            end_time: this.value6[1],
+            pageindex: 1,
+            pagesize: 10
+          },
+          success: function (data) {
+            if (data.page) {
+              self.bindGridData(data)
+            }
           }
-        })
+        }
+        ajax.post(option)
       }
     },
-    data() {
+    data () {
       return {
         inline: true,
         value6: '',
