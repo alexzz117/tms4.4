@@ -7,16 +7,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 当前系统日期各种格式处理帮助类
- * 
  * @author lifx
  * 
  */
 public class CalendarUtil {
-	static Logger log = Logger.getLogger( CalendarUtil.class );
+
+	private static final Logger log = LoggerFactory.getLogger( CalendarUtil.class );
 
 	public static SimpleDateFormat FORMAT1 = new SimpleDateFormat( "yyyy" );
 

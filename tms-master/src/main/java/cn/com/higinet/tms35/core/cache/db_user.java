@@ -4,7 +4,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms35.comm.bin_stream;
 import cn.com.higinet.tms35.comm.str_tool;
@@ -12,7 +13,7 @@ import cn.com.higinet.tms35.core.dao.row_in_db_impl;
 
 public class db_user extends row_in_db_impl
 {
-	final static Logger log = Logger.getLogger(db_user.class);
+	private static final Logger log = LoggerFactory.getLogger( db_user.class );
 	static class_field g_field = new class_field();
 	static
 	{

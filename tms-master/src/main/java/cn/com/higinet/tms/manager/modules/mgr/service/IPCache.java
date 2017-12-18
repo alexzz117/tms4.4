@@ -15,7 +15,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms35.comm.bin_stream;
 import cn.com.higinet.tms35.comm.comp_tool;
@@ -26,7 +27,7 @@ import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 public class IPCache
 {
-	static Logger log = Logger.getLogger(IPCache.class);
+	private static final Logger log = LoggerFactory.getLogger( IPCache.class );
 	//进度参数
 	static boolean cahceOver = false;
 	static long indexProgress = 0;

@@ -38,7 +38,7 @@ public class ControllerHandlerExceptionResolver implements HandlerExceptionResol
 	private final Logger logger = LoggerFactory.getLogger( this.getClass() );
 
 	public ModelAndView resolveException( HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex ) {
-		if( logger.isDebugEnabled() ) logger.debug( "contentType: " + request.getContentType() );
+		/*if( logger.isDebugEnabled() ) logger.debug( "contentType: " + request.getContentType() );
 		Model model = new Model();
 		if( ex instanceof SQLException || ex instanceof DataAccessException ) {
 			model.addError( "数据库异常." );
@@ -52,7 +52,8 @@ public class ControllerHandlerExceptionResolver implements HandlerExceptionResol
 		String msg = "uri: " + request.getRequestURI();
 		msg = msg + ", handler: " + handler;
 		logger.error( msg, ex );
-		return model;
+		return model;*/
+		return new ModelAndView();
 	}
 
 }

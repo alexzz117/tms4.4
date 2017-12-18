@@ -63,6 +63,8 @@ public class OperateLogInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle( HttpServletRequest request, HttpServletResponse response, Object handler ) {
 
+		if(true) return true;
+		
 		String self = (String) request.getAttribute( "forward" );
 		if( !CmcStringUtil.isEmpty( self ) && "self".equals( self ) ) {
 			return true;
@@ -126,7 +128,7 @@ public class OperateLogInterceptor extends HandlerInterceptorAdapter {
 		 * StringUtil.isEmpty(self)
 		 * 不是双审uri或者是双审的第二次
 		 */
-		String self = (String) request.getAttribute( "forward" );
+		/*String self = (String) request.getAttribute( "forward" );
 		String operateuri = request.getRequestURI().toString();
 
 		if( CmcStringUtil.isEmpty( self ) && operateuri.indexOf( "dualaudit" ) > -1 ) {
@@ -167,7 +169,7 @@ public class OperateLogInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		//处理授权日志
-		dealAuthLog();
+		dealAuthLog();*/
 	}
 
 	/**

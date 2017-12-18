@@ -86,7 +86,7 @@ public class RiskCaseController {
 		Timestamp curDate = (Timestamp) caseMap.get("CUR_DATE");
 		caseMap.put("CUR_DATE", null != curDate && curDate.toString().length() > 10 ? curDate.toString().substring(0, 10) : curDate);
 		// model.setRow(List);
-		model.addObject("caseMap", caseMap);
+		model.put("caseMap", caseMap);
 
 		Map<String, Object> txnMap = riskCaseService.getTableMap("TMS_MGR_RISK_CASE_TXN", "CASE_UUID", reqs.get("UUID"));
 		caseMap.put("USERID", txnMap.get("USERID"));
@@ -94,7 +94,7 @@ public class RiskCaseController {
 		caseMap.put("ACCOUNTID", txnMap.get("ACCOUNTID"));
 		caseMap.put("AMOUNT", txnMap.get("AMOUNT"));
 
-		model.addObject("caseMap", caseMap);
+		model.put("caseMap", caseMap);
 		return model;
 	}
 
@@ -184,9 +184,8 @@ public class RiskCaseController {
 		String status = (String) caseMap.get("STATUS");
 
 		Map<String, Object> map = riskCaseService.getRiskCaseInvst(caseUuid);
-		model.addObject("caseInvest", map);
-
-		model.addObject("status", status);
+		model.put("caseInvest", map);
+		model.put("status", status);
 		return model;
 	}
 

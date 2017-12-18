@@ -126,7 +126,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			model.addError( "error.cmc.nosession" );
 			model.set( "url", ManagerConstants.URI_LOGIN );
 			ObjectMapper m = new ObjectMapper();
-			m.writeValue( response.getOutputStream(), model.getModel() );
+			m.writeValue( response.getOutputStream(), model );
 		}
 		else {
 			response.setStatus( HttpServletResponse.SC_NOT_FOUND );
@@ -148,7 +148,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			Model model = new Model();
 			model.addError( "error.cmc.forbidden" );
 			ObjectMapper m = new ObjectMapper();
-			m.writeValue( response.getOutputStream(), model.getModel() );
+			m.writeValue( response.getOutputStream(), model );
 		}
 		else {
 			response.setStatus( HttpServletResponse.SC_NOT_FOUND );

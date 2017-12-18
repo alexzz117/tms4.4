@@ -187,7 +187,7 @@ public class AlarmEventController {
 	public Model saveAlarmAuditAction( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
 		Model model = new Model();
 		int result = alarmEventService.alarmAudit( reqs, request );
-		model.addObject( "result", result );
+		model.put( "result", result );
 		return model;
 	}
 

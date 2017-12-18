@@ -235,7 +235,7 @@ public class QueryController {
 
 		customQueryProcecess( model, reqs, request );
 
-		model.setViewName( "tms35/query/jcq_view" );
+		//model.setViewName( "tms35/query/jcq_view" );
 		return model;
 	}
 
