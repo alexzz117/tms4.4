@@ -29,7 +29,7 @@ public class SystemController {
 		log.info( "" );
 
 		cmc_code code = new cmc_code();
-		code.getCategory_id();
+		code.setCategory_id( "111111111111" );
 
 		return model;
 	}
