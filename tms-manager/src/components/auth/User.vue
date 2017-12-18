@@ -329,7 +329,7 @@
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: '已取消密码重置'
           })
         })
       },
@@ -360,7 +360,7 @@
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: '已取消用户解锁'
           })
         })
       }
