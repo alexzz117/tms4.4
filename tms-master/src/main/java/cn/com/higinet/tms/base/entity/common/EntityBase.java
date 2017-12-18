@@ -115,5 +115,4 @@ public class EntityBase<T> implements Cloneable, Serializable {
 			return null;
 		}
 	}
-
 }
