@@ -29,8 +29,12 @@ public class SystemController {
 		log.info( "" );
 
 		cmc_code code = new cmc_code();
-		code.setCategory_id( "111111111111" );
+		code.setCategoryId( "111111111111" );
+		code.setCodeKey( "asdfasdfsaf" );
 		model.setRow( code );
+		
+		cmc_code code2 = code.cloneEntity();
+		model.put( "sss", code2 );
 
 		return model;
 	}

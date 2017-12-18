@@ -14,21 +14,19 @@ import com.alibaba.fastjson.JSON;
 /**
  * @author zhang.lei
  * */
-public class EntityBase<T> implements Cloneable, Serializable {
-
-	private static final long serialVersionUID = 1L;
+public interface EntityBase<T> extends Serializable {
 
 	/**
 	 * 实体转JSON String
 	 * */
-	public String toJSONString() {
+	public default String toJSONString() {
 		return JSON.toJSONString( this );
 	}
 
 	/**
 	 * 实体转Map
 	 * */
-	public Map<String, Object> toMap() {
+	public default Map<String, Object> toMap() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		for( Field field : this.getClass().getDeclaredFields() ) {
 			try {
@@ -55,7 +53,7 @@ public class EntityBase<T> implements Cloneable, Serializable {
 	 * 将实体内的空字符的String替换成null
 	 * */
 	@SuppressWarnings("unchecked")
-	public T removeEmpty() {
+	public default T removeEmpty() {
 		try {
 			for( Field field : this.getClass().getDeclaredFields() ) {
 				if( field.getModifiers() >= 16 ) continue;
@@ -75,7 +73,7 @@ public class EntityBase<T> implements Cloneable, Serializable {
 	 * 合并实体
 	 * */
 	@SuppressWarnings("unchecked")
-	public T combine( T entity ) {
+	public default T combine( T entity ) {
 		T self = (T) this;
 
 		try {
@@ -97,7 +95,7 @@ public class EntityBase<T> implements Cloneable, Serializable {
 	 * 注意，此方法只适合成员都为值类型的实体，如果存在引用类型，需要@Override
 	 * */
 	@SuppressWarnings("unchecked")
-	public T clone() {
+	public default T cloneEntity() {
 		try {
 			T self = (T) this;
 			T copy = (T) this.getClass().newInstance();

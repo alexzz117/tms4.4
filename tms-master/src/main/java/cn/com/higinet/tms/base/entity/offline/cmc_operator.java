@@ -4,18 +4,17 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import cn.com.higinet.tms.base.entity.common.EntityBase;
+import lombok.Data;
 
 @Entity
-public class cmc_operator extends EntityBase<cmc_operator> {
+@Data
+public class cmc_operator implements EntityBase<cmc_operator> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "ID")
 	private Long id;
 
@@ -81,181 +80,4 @@ public class cmc_operator extends EntityBase<cmc_operator> {
 
 	@Column(name = "UPLOAD_FILE_MAX_SIZE")
 	private String uploadFileMaxSize;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId( Long id ) {
-		this.id = id;
-	}
-
-	public String getOperatorId() {
-		return operatorId;
-	}
-
-	public void setOperatorId( String operatorId ) {
-		this.operatorId = operatorId;
-	}
-
-	public String getLoginName() {
-		return loginName;
-	}
-
-	public void setLoginName( String loginName ) {
-		this.loginName = loginName;
-	}
-
-	public String getRealName() {
-		return realName;
-	}
-
-	public void setRealName( String realName ) {
-		this.realName = realName;
-	}
-
-	public Date getLastLogin() {
-		return lastLogin;
-	}
-
-	public void setLastLogin( Date lastLogin ) {
-		this.lastLogin = lastLogin;
-	}
-
-	public Date getLastPwd() { 
-		return lastPwd;
-	}
-
-	public void setLastPwd( Date lastPwd ) {
-		this.lastPwd = lastPwd;
-	}
-
-	public Integer getFailedLoginAttempts() {
-		return failedLoginAttempts;
-	}
-
-	public void setFailedLoginAttempts( Integer failedLoginAttempts ) {
-		this.failedLoginAttempts = failedLoginAttempts;
-	}
-
-	public Date getLastFailedLoginDate() {
-		return lastFailedLoginDate;
-	}
-
-	public void setLastFailedLoginDate( Date lastFailedLoginDate ) {
-		this.lastFailedLoginDate = lastFailedLoginDate;
-	}
-
-	public Date getLockoutDate() {
-		return lockoutDate;
-	}
-
-	public void setLockoutDate( Date lockoutDate ) {
-		this.lockoutDate = lockoutDate;
-	}
-
-	public String getUploadFileType() {
-		return uploadFileType;
-	}
-
-	public void setUploadFileType( String uploadFileType ) {
-		this.uploadFileType = uploadFileType;
-	}
-
-	public String getUploadFileMaxSize() {
-		return uploadFileMaxSize;
-	}
-
-	public void setUploadFileMaxSize( String uploadFileMaxSize ) {
-		this.uploadFileMaxSize = uploadFileMaxSize;
-	}
-
-	public String getPassword() {
-		return this.password;
-	}
-
-	public void setPassword( String password ) {
-		this.password = password;
-	}
-
-	public String getFlag() {
-		return this.flag;
-	}
-
-	public void setFlag( String flag ) {
-		this.flag = flag;
-	}
-
-	public String getPhone() {
-		return this.phone;
-	}
-
-	public void setPhone( String phone ) {
-		this.phone = phone;
-	}
-
-	public String getMobile() {
-		return this.mobile;
-	}
-
-	public void setMobile( String mobile ) {
-		this.mobile = mobile;
-	}
-
-	public String getEmail() {
-		return this.email;
-	}
-
-	public void setEmail( String email ) {
-		this.email = email;
-	}
-
-	public String getAddress() {
-		return this.address;
-	}
-
-	public void setAddress( String address ) {
-		this.address = address;
-	}
-
-	public String getMemo() {
-		return this.memo;
-	}
-
-	public void setMemo( String memo ) {
-		this.memo = memo;
-	}
-
-	public String getConf() {
-		return this.conf;
-	}
-
-	public void setConf( String conf ) {
-		this.conf = conf;
-	}
-
-	public String getCredentialtype() {
-		return this.credentialtype;
-	}
-
-	public void setCredentialtype( String credentialtype ) {
-		this.credentialtype = credentialtype;
-	}
-
-	public String getCredentialnum() {
-		return this.credentialnum;
-	}
-
-	public void setCredentialnum( String credentialnum ) {
-		this.credentialnum = credentialnum;
-	}
-
-	public Integer getLockout() {
-		return this.lockout;
-	}
-
-	public void setLockout( Integer lockout ) {
-		this.lockout = lockout;
-	}
-
 }

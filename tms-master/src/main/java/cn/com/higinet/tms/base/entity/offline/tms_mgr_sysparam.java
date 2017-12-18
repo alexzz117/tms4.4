@@ -1,11 +1,17 @@
 package cn.com.higinet.tms.base.entity.offline;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 import cn.com.higinet.tms.base.entity.common.EntityBase;
+import lombok.Data;
 
+@Data
 @Entity
-public class tms_mgr_sysparam extends EntityBase<tms_mgr_sysparam> {
+public class tms_mgr_sysparam implements EntityBase<tms_mgr_sysparam> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,89 +46,5 @@ public class tms_mgr_sysparam extends EntityBase<tms_mgr_sysparam> {
 
 	@Column(name = "SYSPARAMDESC")
 	String sysParamDesc;
-
-	public Integer getSysparamId() {
-		return sysparamId;
-	}
-
-	public void setSysparamId( Integer sysparamId ) {
-		this.sysparamId = sysparamId;
-	}
-
-	public String getSysParamName() {
-		return sysParamName;
-	}
-
-	public void setSysParamName( String sysParamName ) {
-		this.sysParamName = sysParamName;
-	}
-
-	public String getDataType() {
-		return dataType;
-	}
-
-	public void setDataType( String dataType ) {
-		this.dataType = dataType;
-	}
-
-	public String getValueType() {
-		return valueType;
-	}
-
-	public void setValueType( String valueType ) {
-		this.valueType = valueType;
-	}
-
-	public String getDictId() {
-		return dictId;
-	}
-
-	public void setDictId( String dictId ) {
-		this.dictId = dictId;
-	}
-
-	public Integer getOrderBy() {
-		return orderBy;
-	}
-
-	public void setOrderBy( Integer orderBy ) {
-		this.orderBy = orderBy;
-	}
-
-	public String getStartValue() {
-		return startValue;
-	}
-
-	public void setStartValue( String startValue ) {
-		this.startValue = startValue;
-	}
-
-	public String getEndValue() {
-		return endValue;
-	}
-
-	public void setEndValue( String endValue ) {
-		this.endValue = endValue;
-	}
-
-	public String getSysParamModule() {
-		return sysParamModule;
-	}
-
-	public void setSysParamModule( String sysParamModule ) {
-		this.sysParamModule = sysParamModule;
-	}
-
-	public String getSysParamDesc() {
-		return sysParamDesc;
-	}
-
-	public void setSysParamDesc( String sysParamDesc ) {
-		this.sysParamDesc = sysParamDesc;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
 
 }
