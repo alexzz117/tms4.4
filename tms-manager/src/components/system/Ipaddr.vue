@@ -17,7 +17,7 @@
           <el-main>
             <el-upload
               ref="importIPFile"
-              class="ip-file-upload"
+              class="ip-file-upload ipaddr-fie-upload"
               accept=".csv"
               name="importIPFileInput"
               drag
@@ -43,7 +43,7 @@
           <el-main>
             <el-upload
               ref="importCityFile"
-              class="ip-file-upload"
+              class="ip-file-upload ipaddr-fie-upload"
               accept=".csv"
               name="importCityFileInput"
               drag
@@ -68,7 +68,7 @@
           <el-main>
             <el-upload
               ref="importCardFile"
-              class="ip-file-upload"
+              class="ip-file-upload ipaddr-fie-upload"
               accept=".csv"
               name="importCardFileInput"
               drag
@@ -94,7 +94,7 @@
           <el-main>
             <el-upload
               ref="importMobileFile"
-              class="ip-file-upload"
+              class="ip-file-upload ipaddr-fie-upload"
               accept=".csv"
               name="importMobileFileInput"
               drag
@@ -375,8 +375,8 @@
 </script>
 
 <style>
-  .el-upload-dragger{
-    width: 180px;
+  .ipaddr-fie-upload .el-upload-dragger{
+    width: 180px !important;
   }
   .submit-btn{
     width: 200px;

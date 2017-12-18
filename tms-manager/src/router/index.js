@@ -29,11 +29,13 @@ import Ipaddr from '@/components/system/Ipaddr'
 import Log from '@/components/system/Log'
 
 import NotFoundComponent from '@/components/NotFoundComponent'
+import util from '@/common/util'
 
 Vue.use(Router)
 
 export default new Router({
   mode: 'history',
+  base: util.getWebRootPath(),
   linkActiveClass: 'active',
   routes: [
     {
@@ -115,7 +117,7 @@ export default new Router({
           component: CodedictInfo
         },
         {
-          path: 'ipaddr',
+          path: 'ipaddr.vhtml',
           name: 'Ipaddr',
           component: Ipaddr
         },

@@ -225,7 +225,14 @@ function renderDateTime(v){
   }
 }
 
+function getWebRootPath () {
+  var pathName = window.document.location.pathname
+  var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1)
+  return projectName
+}
+
 var util = {
+  getWebRootPath: getWebRootPath,
   isFunction: isFunction,
   renderDate: renderDate,
   renderDateTime: renderDateTime,

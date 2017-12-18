@@ -2,9 +2,9 @@ import axios from 'axios'
 import util from '@/common/util'
 
 var config = {
-  // prefix: 'tms-web',  // 正式测试环境
+  // prefix: util.getWebRootPath(),  // 正式测试环境
   suffix: '?format=json',
-  prefix: 'api'  // node.js 测试环境
+  prefix: '/api' // node.js 测试环境
 }
 
 // function post (url, param, cb, errorCb) {
