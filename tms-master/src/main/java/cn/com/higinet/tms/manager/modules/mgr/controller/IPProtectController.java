@@ -12,10 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -71,7 +68,8 @@ public class IPProtectController {
 	
 	@SuppressWarnings("finally")
 	@RequestMapping(value="/import",method=RequestMethod.POST)
-	public String importThread(@RequestBody Map<String, String> reqs,HttpServletRequest request){
+	public Model importThread(@RequestParam Map<String, String> reqs, HttpServletRequest request){
+		Model model = new Model();
 		//初始化进度参数
 		IPProtectService.initialization();
 		IPCache.initialization();
@@ -141,8 +139,11 @@ public class IPProtectController {
 		} finally {
 			if (CmcStringUtil.isBlank(error) && !isLoad) {
 				error = "运行时错误，请查看日志！";
+				model.addError("运行时错误，请查看日志！");
+				return model;
 			}
-			return "tms/mgr/ipprotect_getprogress";
+			return model;
+//			return "tms/mgr/ipprotect_getprogress";
 		}
 	}
 	

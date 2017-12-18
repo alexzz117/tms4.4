@@ -101,17 +101,18 @@ public class CodeDictController {
 
 	/**
 	 * 删除代码类别操作
-	 * @param operatorId
 	 * @return
 	 */
 	@RequestMapping(value = "/category/del")
-	public Model delCategoryAction( @RequestParam("categoryId") String[] categoryId ) {
+	public Model delCategoryAction(@RequestBody RequestModel requestModel) {
 		Model model = new Model();
+		String categoryId = requestModel.getString("categoryId");
 		String runmode = codeDict.getCode( "common.model", "runmode" );
 		if( runmode != null && "development".equals( runmode ) ) {
-			if( categoryId != null && categoryId.length > 0 ) {
-				codeDictService.deleteCodeCategory( categoryId[0] );
-			}
+//			if( categoryId != null && categoryId.length > 0 ) {
+//				codeDictService.deleteCodeCategory( categoryId[0] );
+			codeDictService.deleteCodeCategory( categoryId );
+//			}
 		}
 		else {
 			model.addError( "error.cmc.func.runmode.msg" );
@@ -223,18 +224,19 @@ public class CodeDictController {
 
 	/**
 	 * 删除字典信息操作
-	 * @param operatorId
 	 * @return
 	 */
 	@RequestMapping(value = "/code/del")
 	public Model delCodeAction( @RequestBody RequestModel modeMap ) {
-		List<String> codeIds = (List<String>) modeMap.getObject( "codeId" );
-		if( codeIds == null || codeIds.size() == 0 ) return new Model().addError( "codeId is null" );
+//		List<String> codeIds = (List<String>) modeMap.getObject( "codeId" );
+		String codeId = modeMap.getString( "codeId" );
+//		if( codeIds == null || codeIds.size() == 0 ) return new Model().addError( "codeId is null" );
 
 		Model model = new Model();
 		String runmode = codeDict.getCode( "common.model", "runmode" );
 		if( runmode != null && "development".equals( runmode ) ) {
-			codeDictService.deleteCode( codeIds.get( 0 ) );
+//			codeDictService.deleteCode( codeIds.get( 0 ) );
+			codeDictService.deleteCode( codeId );
 		}
 		else {
 			model.addError( "error.cmc.func.runmode.msg" );
