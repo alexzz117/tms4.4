@@ -484,19 +484,30 @@
       delFunc () {
         var self = this
         var selectNode = self.$refs.tree.currentNode.node
-        var option = {
-          url: '/cmc/func/del',
-          param: {
-            funcId: selectNode.id,
-            rf: 'json'
-          },
-          success: function (data) {
-            selectNode.visible = false
-            self.resetPage()
-            self.$message('配置删除成功。')
+        this.$confirm('确定要删除功能节点吗？其下级节点将都会被删除！', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var option = {
+            url: '/cmc/func/del',
+            param: {
+              funcId: selectNode.id,
+              rf: 'json'
+            },
+            success: function (data) {
+              selectNode.visible = false
+              self.resetPage()
+              self.$message('删除功能成功')
+            }
           }
-        }
-        ajax.post(option)
+          ajax.post(option)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       },
       closeFuncForm () {
         var self = this
