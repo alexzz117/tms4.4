@@ -50,8 +50,8 @@
 		<!-- <logger name="org.springframework" level="info"></logger> -->
 		<!-- <logger name="org.mybatis" level="info"></logger> -->
 		
-		<AsyncLogger level="info">
-			<appender-ref ref="RollingFileInfo" level="info" />
-		</AsyncLogger>
+		<asyncLogger level="info">
+			<appender-ref ref="RollingFileInfo" />
+		</asyncLogger>
 	</loggers>
 </configuration>  
