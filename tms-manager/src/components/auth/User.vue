@@ -274,17 +274,28 @@
           return
         }
         var data = this.multipleSelection[0]
-        var option = {
-          url: '/cmc/operator/del',
-          param: {
-            operatorId: data.operator_id
-          },
-          success: function (data) {
-            self.$message('删除成功。')
-            self.selUser()
+        this.$confirm('确定删除', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var option = {
+            url: '/cmc/operator/del',
+            param: {
+              operatorId: data.operator_id
+            },
+            success: function (data) {
+              self.$message('删除成功。')
+              self.selUser()
+            }
           }
-        }
-        ajax.post(option)
+          ajax.post(option)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       },
       resetPwd () {
         var self = this
@@ -298,18 +309,29 @@
         // var pwd = jcl.util.crypt.md5(password);
 
         var data = this.multipleSelection[0]
-        var option = {
-          url: '/cmc/operator/reset',
-          param: {
-            operatorId: data.operator_id,
-            passWord: pwd
-          },
-          success: function (data) {
-            self.$message('密码重置成功。')
-            self.selUser()
+        this.$confirm('确定重置密码吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var option = {
+            url: '/cmc/operator/reset',
+            param: {
+              operatorId: data.operator_id,
+              passWord: pwd
+            },
+            success: function (data) {
+              self.$message('密码重置成功。')
+              self.selUser()
+            }
           }
-        }
-        ajax.post(option)
+          ajax.post(option)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       },
       resetFlag () {
         var self = this
@@ -319,17 +341,28 @@
           return
         }
         var data = this.multipleSelection[0]
-        var option = {
-          url: '/cmc/operator/resetLoginFailedAttempts',
-          param: {
-            operatorId: data.operator_id
-          },
-          success: function (data) {
-            self.$message('用户解锁成功。')
-            self.selUser()
+        this.$confirm('确定要解锁吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var option = {
+            url: '/cmc/operator/resetLoginFailedAttempts',
+            param: {
+              operatorId: data.operator_id
+            },
+            success: function (data) {
+              self.$message('用户解锁成功。')
+              self.selUser()
+            }
           }
-        }
-        ajax.post(option)
+          ajax.post(option)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       }
     },
     data () {
