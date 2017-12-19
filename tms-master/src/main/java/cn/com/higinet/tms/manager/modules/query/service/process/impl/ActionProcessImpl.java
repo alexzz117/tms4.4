@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
 
-import cn.com.higinet.tms.manager.dao.Page;
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.manager.modules.query.common.model.JsonDataProcess;
 import cn.com.higinet.tms.manager.modules.query.service.process.QueryDataProcess;
 

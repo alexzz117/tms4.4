@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.manager.dao.DomainWrap;
 import cn.com.higinet.tms.manager.dao.Order;
-import cn.com.higinet.tms.manager.dao.Page;
 
 /**
  * 数据库的简单访问对象Oracle实现

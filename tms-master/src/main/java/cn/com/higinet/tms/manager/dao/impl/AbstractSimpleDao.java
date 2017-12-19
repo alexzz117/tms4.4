@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.manager.common.BaseConstant;
 import cn.com.higinet.tms.manager.dao.DomainWrap;
 import cn.com.higinet.tms.manager.dao.Order;
-import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 
 /**

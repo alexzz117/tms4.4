@@ -7,12 +7,12 @@ import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.manager.dao.DomainWrap;
 import cn.com.higinet.tms.manager.dao.GeneralJdbcTemplate;
 import cn.com.higinet.tms.manager.dao.GeneralNamedParameterJdbcTemplate;
 import cn.com.higinet.tms.manager.dao.MapRowMapper;
 import cn.com.higinet.tms.manager.dao.Order;
-import cn.com.higinet.tms.manager.dao.Page;
 
 /**
  * 通用数据库分页(jdbc)

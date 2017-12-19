@@ -20,7 +20,7 @@ import org.springframework.jdbc.core.CallableStatementCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import cn.com.higinet.tms.manager.dao.Page;
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrWebException;
 import cn.com.higinet.tms.manager.modules.query.common.model.JsonDataProcess;
 

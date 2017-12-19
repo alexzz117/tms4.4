@@ -7,7 +7,7 @@ package cn.com.higinet.tms.manager.modules.userpattern.service;
 import java.util.List;
 import java.util.Map;
 
-import cn.com.higinet.tms.manager.dao.Page;
+import cn.com.higinet.tms.base.entity.common.Page;
 
 /**
  * 功能/模块:

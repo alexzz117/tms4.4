@@ -3,7 +3,7 @@ package cn.com.higinet.tms.manager.modules.tmsreport.service;
 import java.util.List;
 import java.util.Map;
 
-import cn.com.higinet.tms.manager.dao.Page;
+import cn.com.higinet.tms.base.entity.common.Page;
 
 public interface TxnReportService {
 	/**

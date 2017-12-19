@@ -18,10 +18,10 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.common.util.AuthDataBusUtil;
 import cn.com.higinet.tms.manager.dao.Order;
-import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.modules.aop.cache.CacheRefresh;
 import cn.com.higinet.tms.manager.modules.aop.cache.common.MethodConfig;

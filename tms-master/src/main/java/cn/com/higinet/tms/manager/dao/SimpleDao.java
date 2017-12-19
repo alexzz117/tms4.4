@@ -8,6 +8,8 @@ package cn.com.higinet.tms.manager.dao;
 import java.util.List;
 import java.util.Map;
 
+import cn.com.higinet.tms.base.entity.common.Page;
+
 /**
  * 简单数据库访问对象
  * <pre>

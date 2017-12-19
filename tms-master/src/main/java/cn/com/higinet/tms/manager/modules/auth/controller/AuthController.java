@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
-import cn.com.higinet.tms.manager.dao.Page;
 import cn.com.higinet.tms.manager.modules.auth.exception.TmsMgrAuthDataSyncException;
 import cn.com.higinet.tms.manager.modules.auth.exception.TmsMgrAuthDepException;
 import cn.com.higinet.tms.manager.modules.auth.service.AuthService;
