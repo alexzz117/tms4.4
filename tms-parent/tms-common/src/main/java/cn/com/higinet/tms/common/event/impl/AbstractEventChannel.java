@@ -16,10 +16,11 @@
  */
 package cn.com.higinet.tms.common.event.impl;
 
-import cn.com.higinet.tms.common.event.EventChannelHandler;
 import cn.com.higinet.tms.common.event.EventBus;
 import cn.com.higinet.tms.common.event.EventChannel;
+import cn.com.higinet.tms.common.event.EventChannelHandler;
 import cn.com.higinet.tms.common.event.EventContext;
+import cn.com.higinet.tms.common.lang.Initializable;
 import cn.com.higinet.tms.common.lifecycle.Service;
 import cn.com.higinet.tms.common.util.StringUtils;
 
@@ -135,7 +136,13 @@ public abstract class AbstractEventChannel extends Service implements EventChann
 	@Override
 	public void busStarted(EventBus bus) {
 		// TODO Auto-generated method stub
-
+		if (handler instanceof Initializable) {
+			try {
+				((Initializable) handler).initialize();
+			} catch (Exception e) {
+				logger.error("EventChannel " + getChannelName() + "eventChannelHandler initialize failed.", e);
+			}
+		}
 	}
 
 	/**
@@ -143,7 +150,14 @@ public abstract class AbstractEventChannel extends Service implements EventChann
 	 */
 	@Override
 	public void busStopped(EventBus bus) {
-
+		if (handler instanceof Initializable) {
+			try {
+				((Initializable) handler).destroy();
+				;
+			} catch (Exception e) {
+				logger.error("EventChannel " + getChannelName() + "eventChannelHandler initialize failed.", e);
+			}
+		}
 	}
 
 	/**
