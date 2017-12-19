@@ -34,7 +34,9 @@ import cn.com.higinet.tms.common.event.EventContext;
  */
 public abstract class BatchDisruptorEventChannelHandler implements EventChannelHandler {
 
-	protected List<EventContext> events = new ArrayList<EventContext>(1024);
+	protected int batchSize = 1024;
+
+	protected List<EventContext> events = new ArrayList<EventContext>(batchSize);
 
 	/** 
 	 * @see cn.com.higinet.tms.common.event.EventChannelHandler#handleEvent(cn.com.higinet.tms.common.event.EventContext, cn.com.higinet.tms.common.event.EventChannel)
@@ -42,7 +44,7 @@ public abstract class BatchDisruptorEventChannelHandler implements EventChannelH
 	@Override
 	public void handleEvent(EventContext event, EventChannel channel) throws Exception {
 		events.add(event);
-		if (event.isEndOfBatch() | events.size() == 1024) {
+		if (event.isEndOfBatch() | events.size() == batchSize) {
 			try {
 				handleEvents(events, channel);
 			} catch (Exception e) {
