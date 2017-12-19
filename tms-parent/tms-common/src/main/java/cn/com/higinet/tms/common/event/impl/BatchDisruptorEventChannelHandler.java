@@ -38,6 +38,14 @@ public abstract class BatchDisruptorEventChannelHandler implements EventChannelH
 
 	protected List<EventContext> events = new ArrayList<EventContext>(batchSize);
 
+	public int getBatchSize() {
+		return batchSize;
+	}
+
+	public void setBatchSize(int batchSize) {
+		this.batchSize = batchSize;
+	}
+
 	/** 
 	 * @see cn.com.higinet.tms.common.event.EventChannelHandler#handleEvent(cn.com.higinet.tms.common.event.EventContext, cn.com.higinet.tms.common.event.EventChannel)
 	 */
