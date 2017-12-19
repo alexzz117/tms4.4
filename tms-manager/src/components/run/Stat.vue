@@ -1,109 +1,225 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
-             :inline="true" style="text-align: left">
-      <el-form-item label="统计名称:" prop="stat_name">
-        <el-input v-model="queryShowForm.stat_name" class="query-form-item" auto-complete="off" :maxlength=50></el-input>
-      </el-form-item>
-      <el-form-item label="统计描述:" prop="stat_desc">
-        <el-input v-model="queryShowForm.stat_desc" class="query-form-item" auto-complete="off" :maxlength=50></el-input>
-      </el-form-item>
-      <el-form-item label="统计引用对象:" prop="stat_param">
-        <el-select v-model="queryShowForm.stat_param" class="query-form-item" placeholder="请选择"
-                   multiple collapse-tags
-                   @change="statParamSelectChange">
+    <transition name="fade">
 
-          <el-option key="&ALLPICK&" label="全选" value="&ALLPICK&">
-          </el-option>
+      <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
+               :inline="true" style="text-align: left" v-show="queryFormShow">
+        <el-form-item label="统计名称:" prop="stat_name">
+          <el-input v-model="queryShowForm.stat_name" class="query-form-item" auto-complete="off" :maxlength=50></el-input>
+        </el-form-item>
+        <el-form-item label="统计描述:" prop="stat_desc">
+          <el-input v-model="queryShowForm.stat_desc" class="query-form-item" auto-complete="off" :maxlength=50></el-input>
+        </el-form-item>
+        <el-form-item label="统计引用对象:" prop="stat_param">
 
-          <el-option
-            v-for="item in statParamList"
-            :key="item.code_key"
-            :label="item.code_value"
-            :value="item.code_key">
-          </el-option>
+          <AllPickSelect :dataList="statParamList" @dataChange="statParamDataChange"></AllPickSelect>
 
-        </el-select>
-      </el-form-item>
-      <el-form-item label="统计目标:" prop="stat_datafd">
+        </el-form-item>
+        <el-form-item label="统计目标:" prop="stat_datafd">
 
-        <el-select v-model="queryShowForm.stat_datafd" class="query-form-item" placeholder="请选择"
-                   clearable>
-          <el-option
-            v-for="item in statDataFdList"
-            :key="item.code_key"
-            :label="item.code_value"
-            :value="item.code_key">
-          </el-option>
+          <el-select v-model="queryShowForm.stat_datafd" class="query-form-item" placeholder="请选择"
+                     clearable>
+            <el-option
+              v-for="item in statDataFdList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
 
-        </el-select>
+          </el-select>
 
-      </el-form-item>
-      <el-form-item label="统计函数:" prop="stat_fn">
-        <el-select v-model="queryShowForm.stat_fn" class="query-form-item" placeholder="请选择"
-                   clearable>
-          <el-option
-            v-for="item in statFnList"
-            :key="item.code_key"
-            :label="item.code_value"
-            :value="item.code_key">
-          </el-option>
+        </el-form-item>
+        <el-form-item label="统计函数:" prop="stat_fn">
+          <el-select v-model="queryShowForm.stat_fn" class="query-form-item" placeholder="请选择"
+                     clearable>
+            <el-option
+              v-for="item in statFnList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
 
-        </el-select>
-      </el-form-item>
-      <el-form-item label="有效性:" prop="stat_valid">
-        <el-select v-model="queryShowForm.stat_valid" class="query-form-item" placeholder="请选择"
-                   clearable>
-          <el-option
-            v-for="item in statValidList"
-            :key="item.code_key"
-            :label="item.code_value"
-            :value="item.code_key">
-          </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="有效性:" prop="stat_valid">
+          <el-select v-model="queryShowForm.stat_valid" class="query-form-item" placeholder="请选择"
+                     clearable>
+            <el-option
+              v-for="item in statValidList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
 
-        </el-select>
-      </el-form-item>
-    </el-form>
+          </el-select>
+        </el-form-item>
+      </el-form>
+
+    </transition>
 
     <div style="margin-bottom: 10px;text-align: left ">
-      <!--<el-button class="el-icon-view" type="primary">查询</el-button>-->
-      <el-button plain class="el-icon-view" :disabled="notSelectOne">查看</el-button>
-      <el-button plain class="el-icon-plus">新建</el-button>
-      <el-button plain class="el-icon-edit" :disabled="notSelectOne">编辑</el-button>
-      <el-button plain class="el-icon-delete" :disabled="notSelectOne">删除</el-button>
-      <el-button plain class="el-icon-circle-check" :disabled="notSelectOne">启用</el-button>
-      <el-button plain class="el-icon-remove" :disabled="notSelectOne">停用</el-button>
-      <el-button plain class="el-icon-share" :disabled="notSelectOne">引用点</el-button>
+      <el-button class="el-icon-view" type="primary" @click="queryFormShow = !queryFormShow">查询</el-button>
+      <el-button plain class="el-icon-view" :disabled="notSelectOne" @click="showData">查看</el-button>
+      <el-button plain class="el-icon-plus" :disabled="isExpand" @click="openDialog('add')">新建</el-button>
+      <el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand">编辑</el-button>
+      <el-button plain class="el-icon-delete" :disabled="notSelectOne || isExpand">删除</el-button>
+      <el-button plain class="el-icon-circle-check" :disabled="notSelectOne || isExpand">启用</el-button>
+      <el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>
+      <el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>
     </div>
 
-    <el-table
-      :data="tableDataShow"
-      stripe
-      border
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
-      <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
-      <el-table-column prop="stat_desc" label="统计描述" align="left" width="250"></el-table-column>
-      <el-table-column label="统计引用对象" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.stat_param | statParamFilter}}</span>
-        </template>
-      </el-table-column>
+    <div class="stat-expand-table-box">
+      <el-table
 
-      <el-table-column prop="stat_datafd" label="统计目标" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.stat_datafd | statDataFdFilter}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="stat_fn" label="统计函数" align="left"></el-table-column>
-      <el-table-column prop="storecolumn" label="存储字段" align="left"></el-table-column>
-      <el-table-column label="有效性" align="left" width="60">
-        <template slot-scope="scope">
-          <span>{{scope.row.stat_valid | renderStatValidFilter}}</span>
-        </template>
-      </el-table-column>
-    </el-table>
+        ref="dataTable"
+        :data="tableDataShow"
+        stripe
+        border
+        style="width: 100%"
+        @expand-change="handleExpandChange"
+        @selection-change="handleSelectionChange">
+
+        <el-table-column type="selection" width="55" align="left" :selectable="rowSelectable"></el-table-column>
+        <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
+        <el-table-column prop="stat_desc" label="统计描述" align="left" width="250"></el-table-column>
+        <el-table-column label="统计引用对象" align="left">
+          <template slot-scope="scope">
+            <span>{{scope.row.stat_param | statParamFilter}}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="stat_datafd" label="统计目标" align="left">
+          <template slot-scope="scope">
+            <span>{{scope.row.stat_datafd | statDataFdFilter}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="统计函数" align="left">
+          <template slot-scope="scope">
+            <span>{{scope.row.stat_fn | statFnFilter}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="storecolumn" label="存储字段" align="left"></el-table-column>
+        <el-table-column label="有效性" align="left" width="60">
+          <template slot-scope="scope">
+            <span>{{scope.row.stat_valid | renderStatValidFilter}}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+
+    </div>
+
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
+      <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true">
+        <el-form-item label="统计描述:" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatDescShow">
+          <el-input v-model="dialogForm.stat_desc" auto-complete="off" :maxlength=50 :style="formItemContentStyle"></el-input>
+        </el-form-item>
+
+        <el-form-item label="统计引用对象:" :label-width="formLabelWidth" prop="stat_param" :style="formItemStyle" v-show="formStatParamShow">
+          <AllPickSelect :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle"></AllPickSelect>
+        </el-form-item>
+
+        <el-form-item label="统计函数:" :label-width="formLabelWidth" prop="stat_fn" :style="formItemStyle" v-show="formStatFnShow">
+          <el-select v-model="dialogForm.stat_fn" placeholder="请选择" :style="formItemContentStyle"
+                     clearable>
+            <el-option
+              v-for="item in statFnList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
+
+          </el-select>
+        </el-form-item>
+
+        <!--惊了 这个东西-->
+        <el-form-item label="统计条件:" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatCondInShow">
+          <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly></el-input>
+          <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
+        </el-form-item>
+
+        <el-form-item label="统计目标:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="formStatDatafdShow">
+          <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle"
+                     clearable>
+            <el-option
+              v-for="item in statDataFdList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="单位:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formCoununitShow">
+          <el-input v-model="dialogForm.coununit" auto-complete="off" :style="formItemContentStyle"></el-input>
+        </el-form-item>
+
+        <el-form-item label="周期:" :label-width="formLabelWidth" prop="countround" :style="formItemStyle" v-show="formCountroundShow">
+          <el-input v-model="dialogForm.countround" auto-complete="off" :style="formItemContentStyle"></el-input>
+        </el-form-item>
+
+        <el-form-item label="交易结果:" :label-width="formLabelWidth" prop="result_cond" :style="formItemStyle" v-show="formResultCondShow">
+          <el-select v-model="dialogForm.result_cond" placeholder="请选择" :style="formItemContentStyle"
+                     clearable>
+            <el-option
+              v-for="item in resultCondList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="数据类型:" :label-width="formLabelWidth" prop="datatype" :style="formItemStyle" v-show="formDatatypeShow">
+          <el-select v-model="dialogForm.datatype" placeholder="请选择" :style="formItemContentStyle"
+                     clearable>
+            <el-option
+              v-for="item in datatypeCodeList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="存储字段:" :label-width="formLabelWidth" prop="storecolumn" :style="formItemStyle" v-show="formStoreColumnShow">
+          <el-select v-model="dialogForm.storecolumn" placeholder="请选择" :style="formItemContentStyle"
+                     clearable>
+            <el-option
+              v-for="item in storecolumnCodeList"
+              :key="item.code_key"
+              :label="item.code_value"
+              :value="item.code_key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="连续:" :label-width="formLabelWidth" prop="continues" :style="formItemStyle" v-show="formContinuesShow">
+          <el-switch
+            v-model="dialogForm.continues"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </el-form-item>
+
+        <el-form-item label="事中:" :label-width="formLabelWidth" prop="stat_unresult" :style="formItemStyle" v-show="formStatUnresultShow">
+          <el-switch
+            v-model="dialogForm.stat_unresult"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </el-form-item>
+
+        <el-form-item label="有效性:" :label-width="formLabelWidth" prop="stat_valid" :style="formItemStyle" v-show="formStatValidShow">
+            <el-radio v-model="dialogForm.stat_valid" label="0">停用</el-radio>
+            <el-radio v-model="dialogForm.stat_valid" label="1">启用</el-radio>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('dialogForm')">保 存</el-button>
+      </div>
+    </el-dialog>
+
 
   </div>
 </template>
@@ -113,6 +229,8 @@
   import util from '@/common/util'
   import check from '@/common/check'
 
+  import AllPickSelect from '@/components/common/AllPickSelect'
+
   let vm = null
 
   export default {
@@ -120,24 +238,91 @@
       notSelectOne () {
         return this.selectedRows.length !== 1
       },
-      statParamSelectAllPick () {
-        let allValuesArr = this.statParamList.map(x => x.code_key)
-        let b = new Set(this.queryShowForm.stat_param)
-        let differenceABSet = new Set(allValuesArr.filter(x => !b.has(x)))
-        console.log(differenceABSet)
-        return differenceABSet.size === 0
-        // return this.queryShowForm.stat_param.length > this.statParamList.length
+      // 下面是控制表单项显示，隐藏的
+      formStatDescShow () {
+        return true
       },
+      formStatParamShow () {
+        return true
+      },
+      formStatFnShow () {
+        return true
+      },
+      formStatCondInShow () {
+        return true
+      },
+      formStatDatafdShow () {
+        return true
+      },
+      formCoununitShow () {
+        return true
+      },
+      formCountroundShow () {
+        return true
+      },
+      formResultCondShow () {
+        return true
+      },
+      formDatatypeShow () {
+        return this.dialogForm.stat_fn === 'calculat_expressions'
+      },
+      formStoreColumnShow () {
+        return true
+      },
+      formContinuesShow () {
+        return true
+      },
+      formStatUnresultShow () {
+        return true
+      },
+      formStatValidShow () {
+        return true
+      },
+      // tableDataShow 用于表格数据的前台检索
       tableDataShow () {
         console.log('tableDataShow')
+        let statName = this.queryShowForm.stat_name
+        let statDesc = this.queryShowForm.stat_desc
+        let statParamList = this.queryShowForm.stat_param
+        let statFd = this.queryShowForm.stat_datafd
+        let statFn = this.queryShowForm.stat_fn
+        let statValid = this.queryShowForm.stat_valid
+
         let showData = this.tableData.filter((x) => {
-          let statName = this.queryShowForm.stat_name
-          let statDesc = this.queryShowForm.stat_desc
-          let statParamList = this.queryShowForm.stat_param
+          // 统计名称模糊查询
           if (statName !== '' && !x.stat_name.includes(statName)) {
+            console.log('stat_name')
             return false
           }
+          // 统计描述模糊查询
           if (statDesc !== '' && !x.stat_desc.includes(statDesc)) {
+            console.log('stat_desc')
+            return false
+          }
+          // 统计引用对象
+          if (statParamList != null && statParamList.length > 0) {
+            let containStatParam = false
+            for (let i = 0; i < statParamList.length; i++) {
+              if (x.stat_param === statParamList[i]) {
+                containStatParam = true
+                break
+              }
+            }
+            if (!containStatParam) {
+              console.log('containStatParam')
+              return false
+            }
+          }
+          // 统计目标
+          if (statFd != null && statFd !== '' && x.stat_datafd !== statFd) {
+            return false
+          }
+          // 统计目标
+          if (statFn != null && statFn !== '' && x.stat_fn !== statFn) {
+            return false
+          }
+          // 有效性  下面这个!= 不能改成!==
+          if (statValid != null && statValid !== '' && x.stat_valid != statValid) {
             return false
           }
 
@@ -152,10 +337,20 @@
         txnIdParent: this.txnId,
         isVisibilityParent: this.isVisibility,
         modelName: '',
+        isExpand: false,
         tableData: [],
-        dialogTitle: '授权意见',
-        dictDialogVisible: false,
-        statParamSelectedCached: [],
+        allStoreFd: [],
+        enableStoreFd: [],
+        dialogTitle: '',
+        dialogVisible: false,
+        formLabelWidth: '120px',
+        formItemStyle: {
+          width: '400px'
+        },
+        formItemContentStyle: {
+          width: '250px'
+        },
+        queryFormShow: false,
         queryShowForm: {
           stat_name: '',
           stat_desc: '',
@@ -164,10 +359,15 @@
           stat_fn: '',
           stat_valid: ''
         },
+        dialogForm: this.initDialogForm(),
+        // 下面这几条都是下拉框取值用的
         statParamList: [],
         statDataFdList: [],
         statFnList: [],
         statValidList: [],
+        resultCondList: [],
+        datatypeCodeList: [],
+        storecolumnCodeList: [],
         rules: {
           auth_status: [
             { required: true, message: '请选择是否通过授权', trigger: 'blur' }
@@ -178,7 +378,6 @@
             { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
         },
-        formLabelWidth: '130px',
         dialogType: '',
         currentPage: 1,
         pageSize: 10,
@@ -260,16 +459,56 @@
           }
         }
         return returnTextArr.join(',')
+      },
+      statFnFilter (v) {
+        if (v === null || v === '') {
+          return ''
+        }
+        let returnTextArr = []
+        let arr = v.split(',')
+
+        for (let value of arr) {
+          for (let i = 0; i < vm.statFnList.length; i++) {
+            let row = vm.statFnList[i]
+            if (value !== '' && value === row.code_key) {
+              returnTextArr.push(row.code_value)
+              break
+            }
+          }
+        }
+        return returnTextArr.join(',')
       }
     },
     methods: {
+      initDialogForm () {
+        return {
+          stat_desc: '',
+          stat_param: '',
+          stat_fn: '',
+          stat_cond: '',
+          stat_cond_in: '',
+          stat_datafd: '',
+          coununit: '',
+          countround: '',
+          result_cond: '',
+          datatype: '',
+          storecolumn: '',
+          continues: '',
+          stat_unresult: '',
+          stat_valid: '0'
+        }
+      },
       handleSelectionChange (rows) {
         this.selectedRows = rows
       },
+      handleExpandChange (row, expandRows) {
+        console.log(row)
+        console.log(expandRows)
+      },
       reloadData () {
-        // getData卸载了这一句的回调中，因为需要依赖这个的取值
+        // getData getStatDataFnSelectData 写在了这一句的回调中，因为需要依赖这个的取值
         this.getStatParamSelectData()
-        this.getStatDataFnSelectData()
+        // this.getStatDataFnSelectData()
         this.getStatDataValidSelectData()
         // this.getData()
       },
@@ -284,6 +523,8 @@
           success: function (data) {
             if (data.row) {
               self.tableData = data.row
+              self.allStoreFd = data.allStoreFd
+              self.enableStoreFd = data.enableStoreFd
             }
           }
         })
@@ -301,78 +542,71 @@
                 self.statParamList.push(value)
                 self.statDataFdList.push(value)
               }
-
-              self.getData()
+              ajax.post({
+                url: '/manager/stat/code',
+                param: {
+                  category_id: 'tms.pub.func',
+                  args: 2
+                },
+                success: function (data) {
+                  if (data.row) {
+                    self.statFnList = []
+                    for (let value of data.row) {
+                      self.statFnList.push(value)
+                    }
+                    self.getData()
+                  }
+                }
+              })
             }
           }
         })
+      },
+      rowSelectable () {
+        return !this.isExpand
+      },
+      showData () {
+        let row = this.selectedRows[0]
+        let length = this.selectedRows.length
+        if (length !== 1) {
+          this.$message('请选择一行交易统计信息。')
+          return
+        }
+        this.$refs.dataTable.toggleRowExpansion(row)
+        this.isExpand = !this.isExpand
+      },
+      openDialog (dialogType) {
+        this.dialogType = dialogType
+        if (dialogType === 'edit') {
+          this.dialogTitle = '编辑交易统计'
+          let length = this.selectedRows.length
+          if (length !== 1) {
+            this.$message('请选择一行交易统计信息。')
+            return
+          }
+          // 拷贝而不是赋值
+          Object.assign(this.dialogForm, this.selectedRows[0])
+        } else if (dialogType === 'add') {
+          this.dialogTitle = '新建交易统计'
+          this.dialogForm = this.initDialogForm()
+        }
+        this.dialogVisible = true
+        if (this.$refs['initDialogForm']) {
+          this.$refs['dialogForm'].clearValidate()
+        }
       },
       getStatDataFnSelectData () {
-        let self = this
-        ajax.post({
-          url: '/manager/stat/code',
-          param: {
-            category_id: 'tms.pub.func',
-            args: 2
-          },
-          success: function (data) {
-            if (data.row) {
-              self.statFnList = []
-              for (let value of data.row) {
-                self.statFnList.push(value)
-              }
-            }
-          }
-        })
+        // let self = this
       },
-      getStatDataValidSelectData () {
-        // TODO select码值获取
-        this.statValidList = [{'code_key': '0', 'code_value': '停用'}, {'code_key': '1', 'code_value': '启用'}]
+      statParamDataChange (value) {
+        this.queryShowForm.stat_param = value
       },
-      statParamSelectChange (val) {
-        let a = new Set(this.statParamSelectedCached)
-        let b = new Set(this.queryShowForm.stat_param)
-
-        let differenceABSet = new Set(this.statParamSelectedCached.filter(x => !b.has(x)))
-
-        if (differenceABSet.size > 0) {
-          if (differenceABSet.has('&ALLPICK&')) {
-            // 取消了全选
-            this.queryShowForm.stat_param = []
-          } else {
-            // 取消了其他
-            this.queryShowForm.stat_param = this.queryShowForm.stat_param.filter(x => x !== '&ALLPICK&')
-          }
-        }
-
-        differenceABSet = new Set(this.queryShowForm.stat_param.filter(x => !a.has(x)))
-        if (differenceABSet.size > 0) {
-          if (differenceABSet.has('&ALLPICK&')) {
-            // 添加了全选
-            this.queryShowForm.stat_param = []
-            this.queryShowForm.stat_param = this.statParamList.map((x) => {
-              return x.code_key
-            })
-            this.queryShowForm.stat_param.push('&ALLPICK&')
-          } else {
-            // 添加了其他
-            if (this.statParamSelectAllPick) {
-              this.queryShowForm.stat_param.push('&ALLPICK&')
-            }
-          }
-        }
-        this.statParamSelectedCached = []
-        let tempSet = new Set(this.queryShowForm.stat_param)
-        let finalArr = []
-        if (tempSet.has('&ALLPICK&')) {
-          finalArr.push('&ALLPICK&')
-          tempSet.delete('&ALLPICK&')
-          finalArr = finalArr.concat(Array.from(tempSet))
-          this.queryShowForm.stat_param = finalArr
-        }
-
-        Object.assign(this.statParamSelectedCached, this.queryShowForm.stat_param)
+      addStatParamDataChange (value) {
+        this.dialogForm.stat_param = value
       }
+    },
+    components: {
+      AllPickSelect
     }
   }
 </script>
@@ -380,5 +614,22 @@
 <style>
   .query-form-item{
     width: 200px;
+  }
+  .stat-expand-table-box .el-table__expand-column{
+    /*visibility: hidden;*/
+    width: 0px;
+    border-right: none !important;
+  }
+  .stat-expand-table-box .el-table__expand-icon{
+    visibility: hidden;
+  }
+  .stat-expand-table-box .el-table__body-wrapper{
+    overflow: hidden;
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
+    opacity: 0
   }
 </style>
