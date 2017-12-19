@@ -87,7 +87,7 @@
       selTree () {
         var self = this
         var option = {
-          url: '/tms35/trandef/query',
+          url: '/manager/trandef/query',
           success: function (data) {
             if (data.list) {
               self.treeList = (data.list)
@@ -96,7 +96,7 @@
             }
           }
         }
-        ajax.post(option);
+        ajax.post(option)
       },
       // 把功能节点列表格式化为树形Json结构
       formatTreeData (list, rootNodes) {
@@ -173,7 +173,7 @@
         }
         if (tabName === 'trandef') {
           var data = self.$refs.tree.getCurrentNode()
-          self.toolBtn.addBtn = !(data.txnid === null || data.txnid.trim() === '')
+          self.toolBtn.addBtn = !(data.txnid === undefined || data.txnid === null || data.txnid.trim() === '')
           self.toolBtn.delBtn = data.id === 'T'  // 当前交易为root时,不允许删除
         } else {
           self.toolBtn.addBtn = true
