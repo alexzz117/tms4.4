@@ -52,7 +52,7 @@
               <el-input type="textarea" v-model="funcForm.conf" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
             <el-form-item label="节点类型" prop="ftype_name" v-bind:class="{hidden:funcFormVisible.ftype_name}">
-              <el-input v-model="funcForm.ftype_name" auto-complete="off" :readonly="funcFormReadonly"></el-input>
+              <el-input v-model="funcForm.ftype_name" auto-complete="off" readonly="readonly"></el-input>
             </el-form-item>
             <el-form-item label="访问授权" prop="isgrant" v-bind:class="{hidden:funcFormVisible.isgrant}">
               <el-checkbox label="需要授权" name="type" v-model="funcForm.isgrant"
@@ -163,6 +163,7 @@
           icon: 'ticon-root',
           onum: 0
         }],
+        nodeTypes: ['子系统', '模块', '功能', '子功能'],
         defaultProps: {
           children: 'children',
           label: 'text'
@@ -272,7 +273,9 @@
           rootNodes = []
           for (var i in list) {
             if (list[i].fid === undefined || list[i].fid === null || list[i].fid === '') {
-              rootNodes.push(list[i])
+              if (list[i].id !== undefined && list[i].id !== null && list[i].id !== '') {
+                rootNodes.push(list[i])
+              }
             }
           }
         }
@@ -318,7 +321,6 @@
       },
       // 功能树节点点击事件
       handleNodeClick (data, node) {
-        console.info(node)
         var selectNode = this.funcForm
         // 重复点击同一节点判断
         if (selectNode.func_id === data.id) {
@@ -426,7 +428,6 @@
       },
       //  功能信息表单条目数据展示
       showNodeValue (data) {
-        var nodeTypes = ['子系统', '模块', '功能', '子功能']
         var self = this
         var formData = {
           func_id: data.id,
@@ -434,7 +435,7 @@
           func_type: data.func_type,
           func_name: data.text,
           conf: data.conf,
-          ftype_name: nodeTypes[data.func_type],
+          ftype_name: self.nodeTypes[data.func_type],
           isgrant: (data.isgrant === '1'),
           menu: (data.menu ? data.menu : '1'),
           flag: (data.flag ? data.flag : '1'),
@@ -471,7 +472,10 @@
         this.$refs['funcForm'].resetFields()
         var self = this
         var selectNode = self.$refs.tree.getCurrentNode()
-        // 功能表单为编辑状态
+        self.funcForm.parent_id = selectNode.id
+        self.funcForm.func_type = Number(selectNode.func_type) + 1
+        self.funcForm.ftype_name = self.nodeTypes[Number(selectNode.func_type) + 1]
+          // 功能表单为编辑状态
         self.funcFormReadonly = false
         self.showNodeAttr(Number(selectNode.func_type) + 1 + '')
       },
@@ -492,7 +496,7 @@
           var option = {
             url: '/cmc/func/del',
             param: {
-              funcId: selectNode.id,
+              funcId: selectNode.data.id,
               rf: 'json'
             },
             success: function (data) {
