@@ -5,8 +5,16 @@
       <el-form-item label="操作员" prop="operator_name">
         <el-input v-model="logForm.operator_name"></el-input>
       </el-form-item>
-      <el-form-item label="姓名" prop="real_name">
-        <el-input v-model="logForm.operate_func"></el-input>
+      <el-form-item label="所属功能" prop="operate_func">
+        <el-select v-model="logForm.operate_func" placeholder="所属功能">
+          <el-option label="全部" value=""></el-option>
+          <el-option
+            v-for="item in funcList"
+            :key="item.func_id"
+            :label="item.func_name"
+            :value="item.func_id">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="操作时间" prop="real_name">
         <el-date-picker
@@ -31,7 +39,7 @@
       <el-table-column type="selection" width="35" align="left"></el-table-column>
       <el-table-column prop="real_name" label="操作员" align="left" width="160"></el-table-column>
       <el-table-column prop="login_name" label="用户名" align="left" width="160"></el-table-column>
-      <el-table-column prop="operate_time" label="操作时间" align="left" width="100"></el-table-column>
+      <el-table-column prop="operate_time" label="操作时间" align="left" width="100" :formatter="formatterDate"></el-table-column>
       <el-table-column prop="func_name" label="所属功能" align="left" width="120"></el-table-column>
       <el-table-column prop="operate_result" label="操作结果" align="left" width="150"></el-table-column>
       <el-table-column prop="operate_data" label="操作数据" align="left"></el-table-column>
@@ -56,6 +64,7 @@
   export default {
     created () {
       this.selLog()
+      this.selFunc()
     },
     methods: {
       handleSizeChange (val) {
@@ -73,17 +82,31 @@
         this.pagesize = data.page.size
         this.total = data.page.total
       },
+      selFunc () {
+        var self = this
+        var option = {
+          url: '/cmc/func/getAll',
+          success: function (data) {
+            self.funcList = data.row
+          }
+        }
+        ajax.post(option)
+      },
       selLog () {
         var self = this
-        console.info(this.value6[0])
-        console.info(this.value6[1])
+        var operateTime = ''
+        var endTime = ''
+        if (self.value6 !== null && self.value6.length > 0) {
+          operateTime = self.value6[0]
+          endTime = self.value6[1]
+        }
         var option = {
           url: '/cmc/log/list',
           param: {
-            operator_name: this.logForm.operator_name,
-            operate_func: this.logForm.operate_func,
-            operate_time: this.value6[0],
-            end_time: this.value6[1],
+            operator_name: self.logForm.operator_name,
+            operate_func: self.logForm.operate_func,
+            operate_time: operateTime,
+            end_time: endTime,
             pageindex: 1,
             pagesize: 10
           },
@@ -94,17 +117,21 @@
           }
         }
         ajax.post(option)
+      },
+      formatterDate (row, column) {
+        return util.renderDateTime(row.operate_time)
       }
     },
     data () {
       return {
         inline: true,
-        value6: '',
+        value6: [],
+        funcList: [],
         logForm: {
           operator_name: '',
           operate_func: '',
-          operate_time: '0',
-          end_time: '0'
+          operate_time: '',
+          end_time: ''
         },
         roleData: [{
           operate_time: 1513130185000,
