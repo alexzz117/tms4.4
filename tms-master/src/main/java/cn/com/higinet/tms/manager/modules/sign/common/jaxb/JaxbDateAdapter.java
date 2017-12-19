@@ -6,7 +6,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import cn.com.higinet.tms35.core.cond.date_tool;
+import cn.com.higinet.tms.engine.core.cond.date_tool;
 
 /**
  * 日期时间类型参数值转换

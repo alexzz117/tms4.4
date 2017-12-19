@@ -1,6 +1,6 @@
 package cn.com.higinet.tms.manager.modules.common.parser;
 
-import cn.com.higinet.tms35.core.cond.yl.yyflexer;
+import cn.com.higinet.tms.engine.core.cond.yl.yyflexer;
 
 // line 1 ".\\cond_lex.l"
 

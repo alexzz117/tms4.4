@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import cn.com.higinet.tms.engine.core.dao.dao_seq;
+import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 import cn.com.higinet.tms.manager.dao.SqlMap;
-import cn.com.higinet.tms35.core.dao.dao_seq;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 @Component("sequenceService")
 public class SequenceService {

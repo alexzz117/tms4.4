@@ -18,12 +18,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.tms35.comm.bin_stream;
-import cn.com.higinet.tms35.comm.comp_tool;
-import cn.com.higinet.tms35.comm.tms_exception;
-import cn.com.higinet.tms35.core.cache.linear;
-import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
+import cn.com.higinet.tms.engine.comm.bin_stream;
+import cn.com.higinet.tms.engine.comm.comp_tool;
+import cn.com.higinet.tms.engine.comm.tms_exception;
+import cn.com.higinet.tms.engine.core.cache.linear;
+import cn.com.higinet.tms.engine.core.dao.stmt.batch_stmt_jdbc;
+import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 
 public class IPCache
 {

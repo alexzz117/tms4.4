@@ -5,8 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import cn.com.higinet.tms.engine.comm.comp_tool;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms35.comm.comp_tool;
 
 public class ReportCompare {
 

@@ -14,18 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import cn.com.higinet.tms.engine.comm.web_tool;
+import cn.com.higinet.tms.engine.core.cache.cache_init;
+import cn.com.higinet.tms.engine.core.cache.db_fd;
+import cn.com.higinet.tms.engine.core.cache.db_process;
+import cn.com.higinet.tms.engine.core.cache.db_rule;
+import cn.com.higinet.tms.engine.core.cache.db_rule_action;
+import cn.com.higinet.tms.engine.core.cache.db_stat;
+import cn.com.higinet.tms.engine.core.cache.db_strategy;
+import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
-import cn.com.higinet.tms35.comm.web_tool;
-import cn.com.higinet.tms35.core.cache.cache_init;
-import cn.com.higinet.tms35.core.cache.db_fd;
-import cn.com.higinet.tms35.core.cache.db_process;
-import cn.com.higinet.tms35.core.cache.db_rule;
-import cn.com.higinet.tms35.core.cache.db_rule_action;
-import cn.com.higinet.tms35.core.cache.db_stat;
-import cn.com.higinet.tms35.core.cache.db_strategy;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 @Component("commonCheckService")
 public class CommonCheckService {

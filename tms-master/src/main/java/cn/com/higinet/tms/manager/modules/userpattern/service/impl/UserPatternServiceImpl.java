@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.engine.comm.utf8_split;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
@@ -32,7 +33,6 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 import cn.com.higinet.tms.manager.modules.userpattern.service.UserPatternService;
-import cn.com.higinet.tms35.comm.utf8_split;
 
 /**
  * 功能/模块:
