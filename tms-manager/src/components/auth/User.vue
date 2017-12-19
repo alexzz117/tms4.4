@@ -10,14 +10,14 @@
       </el-form-item>
       <el-form-item label="状态">
         <el-select v-model="userForm.flag" placeholder="状态">
-          <el-option label="全部" value="0"></el-option>
+          <el-option label="全部" value=""></el-option>
           <el-option label="停用" value="1"></el-option>
           <el-option label="正常" value="2"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="角色">
         <el-select v-model="userForm.role" placeholder="角色">
-          <el-option label="全部" value="0"></el-option>
+          <el-option label="全部" value=""></el-option>
           <el-option
             v-for="item in roles"
             :key="item.role_id"
@@ -318,6 +318,7 @@
             url: '/cmc/operator/reset',
             param: {
               operatorId: data.operator_id,
+              loginName: data.login_name,
               passWord: pwd
             },
             success: function (data) {
@@ -369,7 +370,6 @@
       // 用户名格式校验 只能是长度为6的字母和数字组成
       var UserNameCheck = (rule, value, callback) => {
         var type = /^[0-9a-zA-Z]*$/
-        console.info(type.test(value))
         if (type.test(value) && value.length === 6) {
           callback()
         } else {
@@ -385,7 +385,8 @@
             url: '/cmc/operator/check/username',
             param: {'username': value}, // 用户名
             success: function (data) { // 请求校验用户名
-              if (data.checkresult === false) {
+              debugger
+              if (data.checke_result === 'false') {
                 return callback(new Error('用户名已被占用'))
               } else {
                 callback()
@@ -458,8 +459,8 @@
         userForm: {
           login_name: '',
           real_name: '',
-          flag: '0',
-          role: '0'
+          flag: '',
+          role: ''
         },
         roleData: [{
           operator_id: '123123123123123123',
