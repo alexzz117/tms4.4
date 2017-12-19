@@ -52,7 +52,7 @@ public class StringTest {
 					i++;
 					fo.write(bytes);
 					if (i != len - 1) {
-						fo.write("/n".getBytes());
+						fo.write(System.lineSeparator().getBytes());
 					}
 				}
 				fo.flush();
