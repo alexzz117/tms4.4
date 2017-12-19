@@ -35,7 +35,7 @@ import cn.com.higinet.tms.common.exception.UnsupportedTypeException;
  * @since:  v4.3
  */
 public final class TypesUtils {
-	
+
 	/** type value mapping. */
 	private static Map<Integer, String> typeValueMapping = new HashMap<Integer, String>();
 
@@ -205,6 +205,9 @@ public final class TypesUtils {
 			case Types.VARBINARY:
 			case Types.LONGVARBINARY:
 				return byte[].class;
+			case Types.DECIMAL:
+			case Types.NUMERIC:
+				return java.math.BigDecimal.class;
 		}
 		throw new UnsupportedTypeException("Unsupported JDBC type %d", sqlType);
 	}

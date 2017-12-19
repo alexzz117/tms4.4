@@ -16,6 +16,8 @@
  */
 package cn.com.higinet.tms.common.repository.converters;
 
+import java.math.BigDecimal;
+
 import cn.com.higinet.tms.common.exception.BaseRuntimeException;
 import cn.com.higinet.tms.common.util.StringUtils;
 
@@ -65,6 +67,8 @@ public class PersistenceConverter implements InnerConverter {
 				obj = Double.valueOf(value).doubleValue();
 			} else if (type == byte[].class) {
 				obj = value.getBytes();
+			} else if (type == java.math.BigDecimal.class) {
+				obj = new BigDecimal(value);
 			}
 		} catch (Exception e) {
 			throw new ConvertValueException("Exception occurred when convert value type,target type is \"%s\",current value is \"%s\".", type.toString(), value);
