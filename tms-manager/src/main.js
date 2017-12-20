@@ -13,6 +13,9 @@ Vue.prototype.$axios=axios;
 
 Vue.config.productionTip = false
 
+import dictCode from '@/common/dictCode'
+
+dictCode.getCodeData()
 
 /* eslint-disable no-new */
 new Vue({

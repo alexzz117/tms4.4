@@ -2,9 +2,9 @@ import axios from 'axios'
 import util from '@/common/util'
 
 var config = {
-  // prefix: util.getWebRootPath(),  // 正式测试环境
+  // prefix: util.getWebRootPath() + '/manager',  // 正式测试环境
   suffix: '?format=json',
-  prefix: '/api' // node.js 测试环境
+  prefix: '/context/manager' // 分离测试环境
 }
 
 // function post (url, param, cb, errorCb) {
@@ -59,6 +59,28 @@ function post (opt) {
     })
 }
 
+function get (opt) {
+  let option = {}
+  Object.assign(option, defaultOption, opt)
+  var sendUrl = config.prefix + option.url + config.suffix
+
+  axios.get(sendUrl)
+    .then(function (response) {
+      if (response.status === 200) {
+        if (response.data && response.data.success === true) {
+          var data = util.toggleObjKey(response.data)
+          option.success(data)
+        } else {
+          option.error(response.data)
+        }
+      }
+    })
+    .catch(function (error) {
+      option.fail(error)
+    })
+}
+
 export default {
-  post: post
+  post: post,
+  get: get
 }
