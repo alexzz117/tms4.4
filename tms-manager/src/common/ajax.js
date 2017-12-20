@@ -4,7 +4,8 @@ import util from '@/common/util'
 var config = {
   // prefix: util.getWebRootPath() + '/manager',  // 正式测试环境
   suffix: '?format=json',
-  prefix: '/context/manager' // 分离测试环境
+  prefix: '/context' // 分离测试环境
+  // prefix: '/api' // local mock
 }
 
 // function post (url, param, cb, errorCb) {
@@ -31,9 +32,16 @@ var config = {
 //     })
 // }
 
+let modelDef = {
+  manager: '/manager',
+  timer: '/timer',
+  plus: '/plus'
+}
+
 let defaultOption = {
   url: '',
   param: {},
+  model: modelDef.manager,
   success: function (data) {},
   error: function (data) { alert(data.error) },
   fail: function (error) { alert(error) }
@@ -42,7 +50,7 @@ let defaultOption = {
 function post (opt) {
   let option = {}
   Object.assign(option, defaultOption, opt)
-  var sendUrl = config.prefix + option.url + config.suffix
+  var sendUrl = config.prefix + option.model + option.url + config.suffix
   axios.post(sendUrl, option.param)
     .then(function (response) {
       if (response.status === 200) {
@@ -62,7 +70,7 @@ function post (opt) {
 function get (opt) {
   let option = {}
   Object.assign(option, defaultOption, opt)
-  var sendUrl = config.prefix + option.url + config.suffix
+  var sendUrl = config.prefix + option.model + option.url + config.suffix
 
   axios.get(sendUrl)
     .then(function (response) {
@@ -82,5 +90,6 @@ function get (opt) {
 
 export default {
   post: post,
-  get: get
+  get: get,
+  model: modelDef
 }

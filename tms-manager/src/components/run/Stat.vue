@@ -61,7 +61,7 @@
       <el-button class="el-icon-view" type="primary" @click="queryFormShow = !queryFormShow">查询</el-button>
       <el-button plain class="el-icon-view" :disabled="notSelectOne" @click="showData">查看</el-button>
       <el-button plain class="el-icon-plus" :disabled="isExpand" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand">编辑</el-button>
+      <el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand" @click="openDialog('edit')">编辑</el-button>
       <el-button plain class="el-icon-delete" :disabled="notSelectOne || isExpand">删除</el-button>
       <el-button plain class="el-icon-circle-check" :disabled="notSelectOne || isExpand">启用</el-button>
       <el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>
@@ -76,7 +76,6 @@
         stripe
         border
         style="width: 100%"
-        @expand-change="handleExpandChange"
         @selection-change="handleSelectionChange">
 
         <el-table-column type="selection" width="55" align="left" :selectable="rowSelectable"></el-table-column>
@@ -115,11 +114,11 @@
         </el-form-item>
 
         <el-form-item label="统计引用对象:" :label-width="formLabelWidth" prop="stat_param" :style="formItemStyle" v-show="formStatParamShow">
-          <AllPickSelect :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle"></AllPickSelect>
+          <AllPickSelect :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle" :disabled="modDisabled"></AllPickSelect>
         </el-form-item>
 
         <el-form-item label="统计函数:" :label-width="formLabelWidth" prop="stat_fn" :style="formItemStyle" v-show="formStatFnShow">
-          <el-select v-model="dialogForm.stat_fn" placeholder="请选择" :style="formItemContentStyle"
+          <el-select v-model="dialogForm.stat_fn" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled"
                      clearable>
             <el-option
               v-for="item in statFnList"
@@ -132,13 +131,13 @@
         </el-form-item>
 
         <!--惊了 这个东西-->
-        <el-form-item label="统计条件:" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatCondInShow">
+        <el-form-item :label="formStatCondInName" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatCondInShow">
           <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly></el-input>
           <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
         </el-form-item>
 
         <el-form-item label="统计目标:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="formStatDatafdShow">
-          <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle"
+          <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled"
                      clearable>
             <el-option
               v-for="item in statDataFdList"
@@ -149,8 +148,13 @@
           </el-select>
         </el-form-item>
 
+
+        <el-form-item label="函数参数:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formFnParamShow">
+          <el-input v-model="dialogForm.fn_param" auto-complete="off" :style="formItemContentStyle" readonly ></el-input>
+        </el-form-item>
+
         <el-form-item label="单位:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formCoununitShow">
-          <el-input v-model="dialogForm.coununit" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="dialogForm.coununit" auto-complete="off" :style="formItemContentStyle" :disabled="modDisabled"></el-input>
         </el-form-item>
 
         <el-form-item label="周期:" :label-width="formLabelWidth" prop="countround" :style="formItemStyle" v-show="formCountroundShow">
@@ -232,55 +236,86 @@
   import AllPickSelect from '@/components/common/AllPickSelect'
 
   let vm = null
+  let _dataTypeClassify = [
+    {recap: 'long', type: ['long', 'time', 'datetime']},
+    {recap: 'double', type: ['double', 'money']},
+    {recap: 'string', type: ['string', 'devid', 'ip', 'userid', 'acc', 'code', 'object']}
+  ]
 
   export default {
     computed: {
       notSelectOne () {
         return this.selectedRows.length !== 1
       },
-      // 下面是控制表单项显示，隐藏的
-      formStatDescShow () {
-        return true
+      // // 下面是控制表单项显示，隐藏的
+      formStatCondInName () {
+        if (this.dialogForm.stat_fn === 'calculat_expressions') {
+          if (this.dialogType === 'view') {
+            return ''
+          } else {
+            return '表达式:'
+          }
+        } else {
+          return '统计条件:'
+        }
       },
-      formStatParamShow () {
-        return true
-      },
-      formStatFnShow () {
-        return true
-      },
-      formStatCondInShow () {
-        return true
-      },
-      formStatDatafdShow () {
-        return true
-      },
-      formCoununitShow () {
-        return true
-      },
-      formCountroundShow () {
-        return true
-      },
-      formResultCondShow () {
-        return true
-      },
-      formDatatypeShow () {
-        return this.dialogForm.stat_fn === 'calculat_expressions'
-      },
-      formStoreColumnShow () {
-        return true
-      },
-      formContinuesShow () {
-        return true
-      },
-      formStatUnresultShow () {
-        return true
-      },
-      formStatValidShow () {
-        return true
-      },
+      // formStatDescShow () {
+      //   return true
+      // },
+      // formStatParamShow () {
+      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
+      // },
+      // formStatFnShow () {
+      //   return true
+      // },
+      // formStatCondInShow () {
+      //   return true
+      // },
+      // formFnParamShow () {
+      //   if (this.dialogForm.stat_fn === 'rang_bin_dist') {
+      //     let statDatafd = this.dialogForm.stat_datafd
+      //     let dataType = ''
+      //     if (statDatafd != undefined && statDatafd !== '') {
+      //       let txnFeature = this.queryTxnFeature(statDatafd)
+      //       if (txnFeature) {
+      //         dataType = txnFeature.type
+      //       }
+      //       if (dataType === 'datetime' || dataType === 'time' || dataType === 'double' || dataType === 'money' || dataType === 'long') {
+      //         return true
+      //       }
+      //     }
+      //   }
+      //   return false
+      // },
+      // formStatDatafdShow () {
+      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
+      // },
+      // formCoununitShow () {
+      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
+      // },
+      // formCountroundShow () {
+      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
+      // },
+      // formResultCondShow () {
+      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
+      // },
+      // formDatatypeShow () {
+      //   return this.dialogForm.stat_fn === 'calculat_expressions'
+      // },
+      // formStoreColumnShow () {
+      //   return true
+      // },
+      // formContinuesShow () {
+      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
+      // },
+      // formStatUnresultShow () {
+      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
+      // },
+      // formStatValidShow () {
+      //   return true
+      // },
       // tableDataShow 用于表格数据的前台检索
       tableDataShow () {
-        console.log('tableDataShow')
         let statName = this.queryShowForm.stat_name
         let statDesc = this.queryShowForm.stat_desc
         let statParamList = this.queryShowForm.stat_param
@@ -342,6 +377,7 @@
         allStoreFd: [],
         enableStoreFd: [],
         dialogTitle: '',
+        dialogType: '',
         dialogVisible: false,
         formLabelWidth: '120px',
         formItemStyle: {
@@ -368,6 +404,22 @@
         resultCondList: [],
         datatypeCodeList: [],
         storecolumnCodeList: [],
+        // 控制表单是否显示
+        formStatDescShow: true,
+        formStatParamShow: true,
+        formStatFnShow: true,
+        formStatCondInShow: true,
+        formStatDatafdShow: true,
+        formFnParamShow: true,
+        formCoununitShow: true,
+        formCountroundShow: true,
+        formResultCondShow: true,
+        formDatatypeShow: true,
+        formStoreColumnShow: true,
+        formContinuesShow: true,
+        formStatUnresultShow: true,
+        formStatValidShow: true,
+        modDisabled: false,
         rules: {
           auth_status: [
             { required: true, message: '请选择是否通过授权', trigger: 'blur' }
@@ -378,7 +430,6 @@
             { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
         },
-        dialogType: '',
         currentPage: 1,
         pageSize: 10,
         total: 0,
@@ -407,6 +458,19 @@
           if (this.isVisibilityParent === true) {
             vm.reloadData()
           }
+        }
+      },
+      'dialogForm.stat_fn': {
+        handler: (val, oldVal) => {
+          vm.fnChangeEvent()
+          // 周期修改触发
+          vm.countroundChangeEvent()
+        }
+      },
+      'dialogForm.coununit': {
+        handler: (val, oldVal) => {
+          // 周期修改触发
+          vm.countroundChangeEvent()
         }
       }
     },
@@ -487,6 +551,7 @@
           stat_fn: '',
           stat_cond: '',
           stat_cond_in: '',
+          fn_param: '',
           stat_datafd: '',
           coununit: '',
           countround: '',
@@ -501,10 +566,6 @@
       handleSelectionChange (rows) {
         this.selectedRows = rows
       },
-      handleExpandChange (row, expandRows) {
-        console.log(row)
-        console.log(expandRows)
-      },
       reloadData () {
         // getData getStatDataFnSelectData 写在了这一句的回调中，因为需要依赖这个的取值
         this.getStatParamSelectData()
@@ -518,13 +579,13 @@
           txnId: this.txnIdParent
         }
         ajax.post({
-          url: '/manager/stat/list',
+          url: '/stat/list',
           param: paramsObj,
           success: function (data) {
             if (data.row) {
               self.tableData = data.row
-              self.allStoreFd = data.allStoreFd
-              self.enableStoreFd = data.enableStoreFd
+              self.allStoreFd = data.allstorefd
+              self.enableStoreFd = data.enablestorefd
             }
           }
         })
@@ -532,7 +593,7 @@
       getStatParamSelectData () {
         let self = this
         ajax.post({
-          url: '/manager/stat/txnFeature',
+          url: '/stat/txnFeature',
           param: {txn_id: this.txnIdParent},
           success: function (data) {
             if (data.row) {
@@ -543,7 +604,8 @@
                 self.statDataFdList.push(value)
               }
               ajax.post({
-                url: '/manager/stat/code',
+                url: '/stat/code',
+                model: ajax.model.manager,
                 param: {
                   category_id: 'tms.pub.func',
                   args: 2
@@ -575,6 +637,17 @@
         this.$refs.dataTable.toggleRowExpansion(row)
         this.isExpand = !this.isExpand
       },
+      dialogOpenHandle () {
+        this.formDatatypeShow = false
+
+        this.fnChangeEventCommon()
+
+        this.countroundChangeEvent()
+
+        if (this.dialogType !== 'add') {
+
+        }
+      },
       openDialog (dialogType) {
         this.dialogType = dialogType
         if (dialogType === 'edit') {
@@ -584,25 +657,247 @@
             this.$message('请选择一行交易统计信息。')
             return
           }
+          this.modDisabled = true
           // 拷贝而不是赋值
           Object.assign(this.dialogForm, this.selectedRows[0])
         } else if (dialogType === 'add') {
           this.dialogTitle = '新建交易统计'
+          this.modDisabled = false
           this.dialogForm = this.initDialogForm()
+        } else if (dialogType === 'view') {
+          this.dialogTitle = '查看交易统计'
+          let length = this.selectedRows.length
+          if (length !== 1) {
+            this.$message('请选择一行交易统计信息。')
+            return
+          }
+          this.modDisabled = false
+          Object.assign(this.dialogForm, this.selectedRows[0])
+          // TODO 不可编辑
         }
         this.dialogVisible = true
-        if (this.$refs['initDialogForm']) {
+        if (this.$refs['dialogForm']) {
           this.$refs['dialogForm'].clearValidate()
         }
+        this.dialogOpenHandle()
       },
       getStatDataFnSelectData () {
         // let self = this
       },
+      getStatDataValidSelectData () {
+        // TODO select码值获取
+        this.statValidList = [{'code_key': '0', 'code_value': '停用'}, {'code_key': '1', 'code_value': '启用'}]
+      },
+      // 全选select的回调
       statParamDataChange (value) {
         this.queryShowForm.stat_param = value
       },
       addStatParamDataChange (value) {
         this.dialogForm.stat_param = value
+      },
+      // 下面是这一页的工具函数
+      queryTxnFeature (fd) {
+        for (let loopObj of this.statDataFdList) {
+          if (loopObj.code_key === fd) {
+            return loopObj
+          }
+        }
+        return null
+      },
+      changeFeatureTypeToDataType (type) {
+        var _type = type
+        for (let loop of _dataTypeClassify) {
+          if (loop.type.includes(type)) {
+            _type = loop.recap
+            break
+          }
+        }
+        return _type
+      },
+      getStorageFdByfdName (storeFds, storeFdName) {
+        var _storeFd = null
+        if (storeFds && storeFdName) {
+          for (let loop of storeFds) {
+            if (loop.fd_name === storeFdName) {
+              _storeFd = loop
+              break
+            }
+          }
+        }
+        return _storeFd
+      },
+      getCanUseStorageFdByDataType (datatype, effect) {
+        var sfdItems = []
+        var enableStoreFds = this.enableStoreFd
+        if (!effect) {
+          var srows = this.selectedRows
+          if (srows && srows.length > 0) {
+            var srow = srows[0];
+            if (srow && srow.storecolumn) {
+              var allStoreFds = this.allStoreFd
+              var storeFd = this.getStorageFdByfdName(allStoreFds, srow.storecolumn)
+              if (storeFd) {
+                enableStoreFds.splice(0, 0, storeFd)
+              }
+            }
+          }
+        }
+        sfdItems = sfdItems.concat(this.getEnableStorageFdByDataType(datatype, enableStoreFds))
+        return sfdItems
+      },
+      // 根据数据类型获取可用存储字段
+      getEnableStorageFdByDataType (datatype, enableStoreFds) {
+        // debugger
+        var sfdItems = []
+        if (datatype && enableStoreFds) {
+          for (let fd of enableStoreFds) {
+            for (let dt of _dataTypeClassify) {
+              if (dt.type.includes(datatype)) {
+                if (dt.recap === 'long' || dt.recap === 'double') {
+                  if (datatype !== 'double') {
+                    if (fd.type === datatype) {
+                      sfdItems.push({code_value: fd.fd_name, code_key: fd.fd_name})
+                    }
+                  }
+                  if (fd.type === 'double') {
+                    sfdItems.push({code_value: fd.fd_name, code_key: fd.fd_name})
+                  }
+                } else if (dt.recap === 'string') {
+                  if (datatype !== 'string') {
+                    if (fd.type === datatype) {
+                      sfdItems.push({code_value: fd.fd_name, code_key: fd.fd_name})
+                    }
+                  }
+                }
+                if (fd.type === 'string') {
+                  sfdItems.push({code_value: fd.fd_name, code_key: fd.fd_name})
+                }
+              }
+            }
+          }
+        }
+        return sfdItems
+      },
+      // 统计函数变化触发
+      changeDialogForm (type) {
+        switch (type) {
+          case 'calculat_expressions':// 计算表达式
+            this.dialogForm.stat_param = ''
+            this.dialogForm.stat_datafd = ''
+            this.dialogForm.coununit = ''
+            this.dialogForm.countround = ''
+            this.dialogForm.fn_param = ''
+            this.dialogForm.result_cond = ''
+            this.dialogForm.continues = ''
+            this.dialogForm.stat_unresult = ''
+            this.formStatParamShow = false
+            this.formStatDatafdShow = false
+            this.formCoununitShow = false
+            this.formCountroundShow = false
+            this.formFnParamShow = false
+            this.formResultCondShow = false
+            this.formContinuesShow = false
+            this.formStatUnresultShow = false
+            break
+          default:
+            this.formStatParamShow = true
+            this.formStatDatafdShow = true
+            this.formCoununitShow = true
+            this.formCountroundShow = true
+            this.formFnParamShow = true
+            this.formResultCondShow = true
+            this.formContinuesShow = true
+            this.formStatUnresultShow = true
+            break
+        }
+      },
+      // 统计函数修改与弹出窗口共用的调整表单样式的方法
+      fnChangeEventCommon () {
+        let val = this.dialogForm
+        if (val.stat_fn === 'calculat_expressions') { // 计数表达式函数
+          this.changeDialogForm('calculat_expressions')
+          this.formDatatypeShow = true
+        } else {
+          this.changeDialogForm()
+          if (val.stat_fn === 'rang_bin_dist') { // 区间函数
+            let statDatafd = val.stat_datafd
+            let dataType = ''
+            if (statDatafd != undefined && statDatafd !== '') {
+              let txnFeature = vm.queryTxnFeature(statDatafd)
+              if (txnFeature) {
+                dataType = txnFeature.type
+              }
+
+              if (dataType === 'datetime' || dataType === 'time' || dataType === 'double' || dataType === 'money' || dataType === 'long') {
+                this.formFnParamShow = true
+              } else {
+                this.dialogForm.fn_param = ''
+                this.formFnParamShow = false
+              }
+            }
+          } else {
+            if (val.stat_fn === 'count' || val.stat_fn === 'status') {
+              // 隐藏表单的统计目标
+              this.dialogForm.stat_datafd = ''
+              this.formStatDatafdShow = false
+            } else {
+              // 显示表单的函数参数
+              this.formStatDatafdShow = true
+            }
+            // 隐藏表单的函数参数
+            this.dialogForm.fn_param = ''
+            this.formFnParamShow = false
+          }
+        }
+      },
+      fnChangeEvent () {
+        let val = this.dialogForm
+        val.storecolumn = ''// 存储字段清空
+
+        this.fnChangeEventCommon()
+
+        let type = '' // 数据类型
+        if (val.stat_fn === 'snapshot') {
+          // 快照数据类型取统计字段数据类型
+          var fd = val.stat_datafd
+          var oneFeature = this.queryTxnFeature(fd)
+          if (oneFeature) {
+            type = this.changeFeatureTypeToDataType(oneFeature.type)
+          }
+        } else {
+          for (let loop of this.statFnList) {
+            if (loop.code_key === val.stat_fn) {
+              type = loop.func_type
+            }
+          }
+        }
+        if (type === 'object' && val.stat_fn === 'calculat_expressions') {
+          // 显示数据类型字段
+          val.datatype = ''
+          val.storecolumn = ''
+          val.datatype = ''
+          val.storecolumn = ''
+          this.formDatatypeShow = true
+          type = ''
+        } else {
+          val.datatype = type
+          this.formDatatypeShow = false
+          // 给数据类型字段赋值
+
+          this.storecolumnCodeList = this.getCanUseStorageFdByDataType(type, true)
+        }
+      },
+      // 周期修改触发
+      countroundChangeEvent () {
+        let val = this.dialogForm
+        if (val.coununit === '7' || val.coununit === '9' || val.stat_fn === 'calculat_expressions') { // 会话，永久不需要周期
+          // 隐藏表单的函数参数
+          this.dialogForm.countround = ''
+          this.formCountroundShow = false
+        } else {
+          // 显示表单的函数参数
+          this.formCountroundShow = true
+        }
       }
     },
     components: {
