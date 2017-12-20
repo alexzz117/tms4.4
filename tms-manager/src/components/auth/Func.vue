@@ -52,7 +52,7 @@
               <el-input type="textarea" v-model="funcForm.conf" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
             <el-form-item label="节点类型" prop="ftype_name" v-bind:class="{hidden:funcFormVisible.ftype_name}">
-              <el-input v-model="funcForm.ftype_name" auto-complete="off" readonly="readonly"></el-input>
+              <el-input v-model="funcForm.ftype_name" auto-complete="off" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
             <el-form-item label="访问授权" prop="isgrant" v-bind:class="{hidden:funcFormVisible.isgrant}">
               <el-checkbox label="需要授权" name="type" v-model="funcForm.isgrant"
@@ -472,8 +472,7 @@
         this.$refs['funcForm'].resetFields()
         var self = this
         var selectNode = self.$refs.tree.getCurrentNode()
-        self.funcForm.parent_id = selectNode.id
-        self.funcForm.func_type = Number(selectNode.func_type) + 1
+        console.info(selectNode)
         self.funcForm.ftype_name = self.nodeTypes[Number(selectNode.func_type) + 1]
           // 功能表单为编辑状态
         self.funcFormReadonly = false
@@ -496,7 +495,7 @@
           var option = {
             url: '/cmc/func/del',
             param: {
-              funcId: selectNode.data.id,
+              funcId: selectNode.id,
               rf: 'json'
             },
             success: function (data) {
