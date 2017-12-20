@@ -5,4 +5,4 @@
  * @author zhang.lei
  *
  */
-package cn.com.higinet;
+package cn.com.higinet.tms;
