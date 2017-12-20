@@ -1,0 +1,19 @@
+
+spring:
+  cloud:
+    zookeeper:
+      connectString: 5.higinet.net:2181
+      discovery:
+        register: true
+        instancePort: ${server.port}
+      config: 
+        enabled: true
+        root: config
+
+#zuul:
+#  ignored-patterns : /manager,/system
+#  routes: 
+#    plus : 
+#      path: /plus/**
+#      strip-prefix : false
+#      serviceId : tms-plus

@@ -2,8 +2,6 @@ package cn.com.higinet.tms.common.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
@@ -15,60 +13,56 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
-import cn.com.higinet.tms.base.entity.offline.cmc_code;
-import lombok.SneakyThrows;
 
 @RestController
 @RequestMapping("/system")
 @RefreshScope
 public class SystemController {
 
-	private static final Logger log = LoggerFactory.getLogger( SystemController.class );
+	//private static final Logger log = LoggerFactory.getLogger( SystemController.class );
 
 	@Value("${spring.application.instance}")
 	String instance;
 
 	@Value("${spring.application.name}")
 	String appName;
-	
-	@Value("${test}")
-	String testConfig;
+
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public Model instance() {
+		Model model = new Model();
+		model.addAttribute( "instance", instance );
+		return model;
+	}
 
 	@Autowired
 	LoadBalancerClient loadBalance;
 
-	@Autowired
-	DiscoveryClient client;
-
-	@SneakyThrows
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public Model instance() {
+	@RequestMapping(value = "/serviceInstance", method = RequestMethod.GET)
+	public Model serviceInstance() {
 		Model model = new Model();
-		
-		model.put( "testConfig", testConfig );
-		
-		model.addAttribute( "instance", instance );
-
-		cmc_code code = new cmc_code();
-		code.setCategoryId( "111111111111" );
-		code.setCodeKey( "asdfasdfsaf" );
-		model.setRow( code );
-		cmc_code code2 = code.cloneEntity();
-		model.put( "cmc_code", code2 );
-
 		ServiceInstance serviceInstance = loadBalance.choose( appName );
 		model.put( "serviceInstance", serviceInstance );
-		
-		List<ServiceInstance> instanceList = client.getInstances( appName );
-		model.put( "instanceList", instanceList );
-
 		return model;
 	}
 
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	public Model delCodeAction() {
+	@Autowired
+	DiscoveryClient discoveryClient;
+
+	@RequestMapping(value = "/discoveryClient", method = RequestMethod.GET)
+	public Model discoveryClient() {
 		Model model = new Model();
-		model.addAttribute( "sss", "sss" );
+		List<ServiceInstance> instanceList = discoveryClient.getInstances( appName );
+		model.put( "instanceList", instanceList );
+		return model;
+	}
+	
+	@Value("${test}")
+	String zookeeperTest;
+
+	@RequestMapping(value = "/zookeeperTest", method = RequestMethod.GET)
+	public Model zookeeperTest() {
+		Model model = new Model();
+		model.put( "zookeeperTest", zookeeperTest );
 		return model;
 	}
 }
