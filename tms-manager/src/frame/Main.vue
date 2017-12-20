@@ -51,6 +51,15 @@
               <el-menu-item index="4-4">操作日志管理</el-menu-item>
             </router-link>
           </el-submenu>
+          <el-submenu index="5">
+            <template slot="title"><i class="el-icon-setting"></i>综合查询</template>
+            <router-link :to="{ name:'TxnEventQuery'}" tag="li" replace>
+              <el-menu-item index="5-1">交易事件查询</el-menu-item>
+            </router-link>
+            <router-link tag="li" replace>
+              <el-menu-item index="5-2">报警事件查询</el-menu-item>
+            </router-link>
+          </el-submenu>
 
         </el-menu>
       </el-aside>

@@ -28,6 +28,8 @@ import CodedictInfo from '@/components/system/CodedictInfo'
 import Ipaddr from '@/components/system/Ipaddr'
 import Log from '@/components/system/Log'
 
+import TxnEventQuery from '@/components/synquery/TxnEventQuery'
+
 import NotFoundComponent from '@/components/NotFoundComponent'
 import util from '@/common/util'
 
@@ -125,6 +127,11 @@ export default new Router({
           path: 'log',
           name: 'Log',
           component: Log
+        },
+        {
+          path: 'TxnEventQuery',
+          name: 'TxnEventQuery',
+          component: TxnEventQuery
         }
       ]
     },
