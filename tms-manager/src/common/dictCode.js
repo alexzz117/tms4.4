@@ -30,10 +30,6 @@ function rendCode(codeName, codeVal) {
 
 function getCodeItems(codeName) {
   var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
-  items.unshift(   {
-    value: '',
-    label: '请选择'
-  })
   return items
 }
 
