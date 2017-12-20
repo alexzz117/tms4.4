@@ -6,10 +6,24 @@
 
 <script>
   export default {
+    create () {
 
+    },
+    data () {
+      return {}
+    },
+    method () {
+
+    }
   }
 </script>
 
 <style>
+  .hidden {
+    display: none;
+  }
 
+  .disabledFlag {
+    color: #dcdfe6;
+  }
 </style>
