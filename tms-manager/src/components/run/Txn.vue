@@ -158,7 +158,13 @@
         }
         self.showToolBtn()
         self.txnId = data.id
-        self.activeName = 'trandef'
+        self.activeName = 'trandef' // tab跳转到首位,交易定义
+        self.tabVisibility = { // 同时更新显隐状态
+          trandefVisibility: true,
+          tranmdlVisibility: false,
+          statVisibility: false,
+          ruleVisibility: false
+        }
 //        if (!data.children || data.children.length === 0){
 //          this.$router.push(data.name);
 //        }
