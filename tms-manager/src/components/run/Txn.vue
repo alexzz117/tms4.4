@@ -8,7 +8,7 @@
     <el-container style="height: 100%; border-top: 1px solid #eee" class="wrapper">
       <el-aside width="200px" style="min-height: 400px;border:0;border-right: 1px solid #eee">
         <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
-          <el-button plain class="el-icon-plus" @click="" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
+          <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
           </el-button>
           <el-button plain class="el-icon-delete" @click="" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
           </el-button>
@@ -27,8 +27,8 @@
         <!--&lt;!&ndash;用router-view渲染视图&ndash;&gt;-->
         <!--<router-view/>-->
         <el-tabs v-model="activeName" @tab-click="handleClick" ref="tab">
-          <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;"><trandef></trandef></el-tab-pane>
-          <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl></tranmdl></el-tab-pane>
+          <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;"><trandef :txnId='txnId' :isVisibility="tabVisibility.trandefVisibility" ref="trandef"></trandef></el-tab-pane>
+          <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl :txnId='txnId' :isVisibility="tabVisibility.tranmdlVisibility"></tranmdl></el-tab-pane>
           <el-tab-pane label="交易统计" name="stat"><stat :txnId='txnId' :isVisibility="tabVisibility.statVisibility"></stat></el-tab-pane>
           <el-tab-pane label="交易规则" name="rule"><rule></rule></el-tab-pane>
         </el-tabs>
@@ -52,7 +52,6 @@
       return {
         toolBtn: { // 功能树操作按钮
           addBtn: true, // 添加按钮
-          editBtn: true, // 编辑按钮
           delBtn: true // 删除按钮
         },
         txnId: 'T0101',
@@ -87,7 +86,7 @@
       selTree () {
         var self = this
         var option = {
-          url: '/manager/trandef/query',
+          url: '/trandef/query',
           success: function (data) {
             if (data.list) {
               self.treeList = (data.list)
@@ -158,13 +157,14 @@
           self.selectKey = data.id
         }
         self.showToolBtn()
-        console.log(data)
-        this.txnId = data.label
+        self.txnId = data.id
+        self.activeName = 'trandef'
 //        if (!data.children || data.children.length === 0){
 //          this.$router.push(data.name);
 //        }
         // 同步面包屑导航地址
         self.syncBreadcrumb(node)
+        // console.info(data)
       },
       showToolBtn (tabName) {
         var self = this
@@ -218,6 +218,9 @@
         }
         // console.log(tab, event);
         this.showToolBtn(tab.name)
+      },
+      addFunc () {
+        this.$refs.trandef.addFormVisible = true
       }
     },
     components: {
