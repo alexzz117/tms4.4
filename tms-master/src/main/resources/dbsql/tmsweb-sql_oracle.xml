@@ -127,7 +127,7 @@
 	<entry key="tms.auth.query"><![CDATA[ select auth.*,record.real_oper from tms_mgr_authinfo auth,tms_mgr_authrecord record  where record.auth_id = auth.auth_id and query_pkvalue =? and module_id='tranConf' and auth_status='0' and record.real_oper = 'd' and record.is_main = '1']]></entry>
 	
 	<!-- 名单列表查询 -->
-	<entry key="tms.roster.namelist"><![CDATA[ AND ROSTER.ROSTERDESC like '%'||:ROSTERDESC||'%']]></entry>
+	<entry key="tms.roster.namelist"><![CDATA[ AND ROSTER.ROSTERDESC like '%'||:rosterdesc||'%']]></entry>
 	
 	<!-- 反洗钱SQL语句begin -->
 	<!-- 反洗钱导出交易查询 -->

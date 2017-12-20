@@ -97,5 +97,5 @@
 	<entry key="tms.ip.insertMgrLog">insert into %s(ID,NAME,DATA) values(1,'IPData',empty_blob())</entry>
 	
 	<!-- 名单列表查询 -->
-	<entry key="tms.roster.namelist"><![CDATA[ AND ROSTER.ROSTERDESC like '%'||:ROSTERDESC||'%']]></entry>
+	<entry key="tms.roster.namelist"><![CDATA[ AND ROSTER.ROSTERDESC like '%'||:rosterdesc||'%']]></entry>
 </properties>

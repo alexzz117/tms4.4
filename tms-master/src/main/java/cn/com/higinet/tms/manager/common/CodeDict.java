@@ -93,8 +93,8 @@ public class CodeDict {
 			String codeValue = (String) code.get( "CODE_VALUE" );
 
 			Map<String, Object> item = Maps.newHashMap();
-			item.put( "key", codeKey );
-			item.put( "value", codeValue );
+			item.put( "value", codeKey );
+			item.put( "label", codeValue );
 
 			if( codes0.containsKey( categoryId ) ) {
 				codes0.get( categoryId ).getItems().add( item );

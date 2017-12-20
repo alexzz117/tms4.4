@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.DictCategory;
+import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.manager.common.CodeDict;
 import cn.com.higinet.tms.manager.common.ManagerConstants;
 
@@ -40,8 +41,9 @@ public class EnvController {
 	private Map<String, DictCategory> codes;
 
 	@RequestMapping(value = "/dict", method = RequestMethod.GET)
-	public Map<String, DictCategory> message() {
-
+	public Model message() {
+	
+		
 		if( isOverdue() || codes == null ) {
 			synchronized (EnvController.class) {
 				codes = codeDict.getAllCodes();
@@ -50,7 +52,10 @@ public class EnvController {
 			}
 
 		}
-		return codes;
+		
+		Model model = new Model();
+		model.put("codes", codes);
+		return model;
 	}
 
 	/**

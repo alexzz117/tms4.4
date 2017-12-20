@@ -89,16 +89,16 @@ public class NameListService {
 	public Page<Map<String, Object>> listNameList( Map<String, String> conds ) {
 		StringBuilder sql = new StringBuilder();
 		sql.append( "SELECT ROSTER.ROSTERID,ROSTER.ROSTERTYPE, ROSTER.DATATYPE, ROSTER.ROSTERNAME, ROSTER.ROSTERDESC, ROSTER.ISCACHE, ROSTER.CREATETIME, ROSTER.REMARK, " + "(SELECT COUNT(1) FROM TMS_MGR_ROSTERVALUE ROSTERVALUE WHERE ROSTERVALUE.ROSTERID=ROSTER.ROSTERID) VALUECOUNT " + "FROM TMS_MGR_ROSTER ROSTER " + "WHERE STATUS!='2'" );
-		if( !StringUtil.isEmpty( conds.get( "DATATYPE" ) ) ) {
-			sql.append( " AND ROSTER.DATATYPE=:DATATYPE" );
+		if( !StringUtil.isEmpty( conds.get( "datatype" ) ) ) {
+			sql.append( " AND ROSTER.DATATYPE=:datatype" );
 		}
-		if( !StringUtil.isEmpty( conds.get( "ROSTERDESC" ) ) ) {
+		if( !StringUtil.isEmpty( conds.get( "rosterdesc" ) ) ) {
 			sql.append( " " ).append( tmsSqlMap.getSql( "tms.roster.namelist" ) );
 		}
-		if( !StringUtil.isEmpty( conds.get( "ROSTERTYPE" ) ) ) {
-			sql.append( " AND ROSTER.ROSTERTYPE=:ROSTERTYPE" );
+		if( !StringUtil.isEmpty( conds.get( "rostertype" ) ) ) {
+			sql.append( " AND ROSTER.ROSTERTYPE=:rostertype" );
 		}
-		Order order = new Order().asc( "DATATYPE,CREATETIME" );
+		Order order = new Order().asc( "datatype, createtime" );
 		Page<Map<String, Object>> rosterPage = getSimpleDao().pageQuery( sql.toString(), conds, order );
 
 		/*for(Map<String,Object> rosterMap: rosterPage.getList()){
@@ -228,7 +228,7 @@ public class NameListService {
 		nameList.put( "MODIFYTIME", time );
 
 		Map<String, Object> conds = new HashMap<String, Object>();
-		conds.put( "ROSTERID", reqs.get( "rosterId" ) );
+		conds.put( "ROSTERID", reqs.get( "rosterid" ) );
 
 		getSimpleDao().update( DBConstant.TMS_MGR_ROSTER, nameList, conds );
 	}
@@ -242,7 +242,7 @@ public class NameListService {
 
 		String rosterIds = "";
 		for( Map<String, String> delMap : delList ) {
-			int rosterId = MapUtil.getInteger( delMap, "ROSTERID" );
+			int rosterId = MapUtil.getInteger( delMap, "rosterid" );
 			rosterIds += ",'" + rosterId + "'";
 		}
 		rosterIds = rosterIds.substring( 1 );
@@ -290,8 +290,8 @@ public class NameListService {
 			List<db_rule> ref_rule = new ArrayList<db_rule>();
 			List<db_strategy> ref_sw = new ArrayList<db_strategy>();
 			List<db_rule_action> ref_act = new ArrayList<db_rule_action>();
-			String roster_name = MapUtil.getString( delMap, "ROSTERNAME" );
-			String roster_desc = MapUtil.getString( delMap, "ROSTERDESC" );
+			String roster_name = MapUtil.getString( delMap, "rostername" );
+			String roster_desc = MapUtil.getString( delMap, "rosterdesc" );
 			boolean isRefed = web_tool.find_ref_roster( roster_name, ref_stat, ref_rule, ref_sw, ref_act );
 			if( isRefed ) {
 				throw new TmsMgrServiceException( "[" + roster_desc + "]被引用，不能删除" );
