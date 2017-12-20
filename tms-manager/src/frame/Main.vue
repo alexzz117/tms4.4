@@ -11,7 +11,6 @@
         </el-dropdown-menu>
       </el-dropdown>
     </el-header>
-
     <el-container>
       <el-aside width="220px">
         <el-menu :default-openeds="['1', '3', '4']">
@@ -56,11 +55,10 @@
             <router-link :to="{ name:'TxnEventQuery'}" tag="li" replace>
               <el-menu-item index="5-1">交易事件查询</el-menu-item>
             </router-link>
-            <router-link tag="li" replace>
+            <router-link :to="{ name:'TxnEventQuery'}" tag="li" replace>
               <el-menu-item index="5-2">报警事件查询</el-menu-item>
             </router-link>
           </el-submenu>
-
         </el-menu>
       </el-aside>
       <el-main>

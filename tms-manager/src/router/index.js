@@ -129,7 +129,7 @@ export default new Router({
           component: Log
         },
         {
-          path: 'TxnEventQuery',
+          path: 'txnEventQuery',
           name: 'TxnEventQuery',
           component: TxnEventQuery
         }
