@@ -191,7 +191,7 @@
             }
 
             ajax.post({
-              url: '/manager/auth/modAuth',
+              url: '/auth/modAuth',
               param: paramsObj,
               success: function (data) {
                 self.getData()
@@ -212,7 +212,7 @@
           pagesize: this.pageSize
         }
         ajax.post({
-          url: '/manager/auth/authList',
+          url: '/auth/authList',
           param: paramsObj,
           success: function (data) {
             if (data.page) {

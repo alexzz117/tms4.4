@@ -82,7 +82,7 @@
           callback()
         } else {
           ajax.post({
-            url: '/manager/codedict/check/categoryId',
+            url: '/codedict/check/categoryId',
             param: {categoryId: value},
             success: function (data) {
               if (data.checkresult === false) {
@@ -178,7 +178,7 @@
         let upperParams = util.toggleObjKey(this.queryForm, 'upper')
         Object.assign(paramsObj, upperParams)
         ajax.post({
-          url: '/manager/codedict/category/list',
+          url: '/codedict/category/list',
           param: paramsObj,
           success: function (data) {
             if (data.page) {
@@ -193,7 +193,7 @@
             let self = this
             let paramsObj = this.dictDialogForm
             ajax.post({
-              url: '/manager/codedict/category/add',
+              url: '/codedict/category/add',
               param: paramsObj,
               success: function (data) {
                 self.getData()
@@ -220,7 +220,7 @@
           type: 'warning'
         }).then(() => {
           ajax.post({
-            url: '/manager/codedict/category/del',
+            url: '/codedict/category/del',
             param: {
               categoryId: data.category_id
             },
@@ -242,7 +242,7 @@
             let self = this
             let paramsObj = this.dictDialogForm
             ajax.post({
-              url: '/manager/codedict/category/update',
+              url: '/codedict/category/update',
               param: paramsObj,
               success: function (data) {
                 self.getData()

@@ -278,12 +278,12 @@
           this.mobileProgressShow = true
         }
         ajax.post({
-          url: '/manager/ip/import',
+          url: '/ip/import',
           param: self.uploadForm,
           success: function (data) {
             self.uploadForm = new FormData()
             ajax.post({
-              url: '/manager/ip/recordImpInfo',
+              url: '/ip/recordImpInfo',
               param: {},
               success: function () {
                 getProgressTimer = window.setInterval(self.getImportProgress, 1000)
@@ -314,7 +314,7 @@
       getImportProgress () {
         let self = this
         ajax.post({
-          url: '/manager/ip/getProgress',
+          url: '/ip/getProgress',
           param: {},
           success: function (data) {
             let errorInfo = data.errorinfo

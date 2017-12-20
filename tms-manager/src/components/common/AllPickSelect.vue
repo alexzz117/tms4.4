@@ -1,6 +1,6 @@
 <template>
   <el-select v-model="selectedRows" class="query-form-item" placeholder="请选择"
-             multiple collapse-tags
+             multiple collapse-tags :disabled="selectDisabled"
              @change="selectChange">
 
     <el-option key="&ALLPICK&" label="全选" value="&ALLPICK&">
@@ -28,15 +28,26 @@
     },
     data () {
       return {
+        selectDisabled: false,
         allDataList: [],
         selectedCached: [],
         selectedRows: []
       }
     },
-    props: ['dataList'],
+    props: {
+      dataList: {
+        type: Array,
+        default: []
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      }
+    },
     mounted: function () {
       this.$nextTick(function () {
         this.allDataList = this.dataList
+        this.selectDisabled = this.disabled
         // this.selectedRows = this.value
       })
     },

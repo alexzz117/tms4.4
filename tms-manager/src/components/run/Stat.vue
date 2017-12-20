@@ -46,9 +46,9 @@
                      clearable>
             <el-option
               v-for="item in statValidList"
-              :key="item.code_key"
-              :label="item.code_value"
-              :value="item.code_key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
 
           </el-select>
@@ -131,10 +131,14 @@
         </el-form-item>
 
         <!--惊了 这个东西-->
+
         <el-form-item :label="formStatCondInName" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatCondInShow">
-          <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly></el-input>
-          <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
+          <div @dblclick="statCondInPopup">
+            <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly></el-input>
+            <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
+          </div>
         </el-form-item>
+
 
         <el-form-item label="统计目标:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="formStatDatafdShow">
           <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled"
@@ -150,7 +154,9 @@
 
 
         <el-form-item label="函数参数:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formFnParamShow">
-          <el-input v-model="dialogForm.fn_param" auto-complete="off" :style="formItemContentStyle" readonly ></el-input>
+          <div @dblclick="fnParamPopup">
+            <el-input v-model="dialogForm.fn_param" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
+          </div>
         </el-form-item>
 
         <el-form-item label="单位:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formCoununitShow">
@@ -166,9 +172,9 @@
                      clearable>
             <el-option
               v-for="item in resultCondList"
-              :key="item.code_key"
-              :label="item.code_value"
-              :value="item.code_key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -178,9 +184,9 @@
                      clearable>
             <el-option
               v-for="item in datatypeCodeList"
-              :key="item.code_key"
-              :label="item.code_value"
-              :value="item.code_key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -234,6 +240,7 @@
   import check from '@/common/check'
 
   import AllPickSelect from '@/components/common/AllPickSelect'
+  import dictCode from "../../common/dictCode";
 
   let vm = null
   let _dataTypeClassify = [
@@ -244,6 +251,8 @@
 
   export default {
     computed: {
+      txnIdParent () { return this.txnId },
+      isVisibilityParent () { return this.isVisibility },
       notSelectOne () {
         return this.selectedRows.length !== 1
       },
@@ -259,61 +268,6 @@
           return '统计条件:'
         }
       },
-      // formStatDescShow () {
-      //   return true
-      // },
-      // formStatParamShow () {
-      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
-      // },
-      // formStatFnShow () {
-      //   return true
-      // },
-      // formStatCondInShow () {
-      //   return true
-      // },
-      // formFnParamShow () {
-      //   if (this.dialogForm.stat_fn === 'rang_bin_dist') {
-      //     let statDatafd = this.dialogForm.stat_datafd
-      //     let dataType = ''
-      //     if (statDatafd != undefined && statDatafd !== '') {
-      //       let txnFeature = this.queryTxnFeature(statDatafd)
-      //       if (txnFeature) {
-      //         dataType = txnFeature.type
-      //       }
-      //       if (dataType === 'datetime' || dataType === 'time' || dataType === 'double' || dataType === 'money' || dataType === 'long') {
-      //         return true
-      //       }
-      //     }
-      //   }
-      //   return false
-      // },
-      // formStatDatafdShow () {
-      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
-      // },
-      // formCoununitShow () {
-      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
-      // },
-      // formCountroundShow () {
-      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
-      // },
-      // formResultCondShow () {
-      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
-      // },
-      // formDatatypeShow () {
-      //   return this.dialogForm.stat_fn === 'calculat_expressions'
-      // },
-      // formStoreColumnShow () {
-      //   return true
-      // },
-      // formContinuesShow () {
-      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
-      // },
-      // formStatUnresultShow () {
-      //   return this.dialogForm.stat_fn !== 'calculat_expressions'
-      // },
-      // formStatValidShow () {
-      //   return true
-      // },
       // tableDataShow 用于表格数据的前台检索
       tableDataShow () {
         let statName = this.queryShowForm.stat_name
@@ -368,9 +322,6 @@
     },
     data () {
       return {
-        // txnId: '123',
-        txnIdParent: this.txnId,
-        isVisibilityParent: this.isVisibility,
         modelName: '',
         isExpand: false,
         tableData: [],
@@ -446,16 +397,14 @@
     watch: {
       txnId: {
         handler: (val, oldVal) => {
-          this.txnIdParent = val
-          if (this.isVisibilityParent === true) {
+          if (vm.isVisibilityParent === true) {
             vm.reloadData()
           }
         }
       },
       isVisibility: {
         handler: (val, oldVal) => {
-          this.isVisibilityParent = val
-          if (this.isVisibilityParent === true) {
+          if (vm.isVisibilityParent === true) {
             vm.reloadData()
           }
         }
@@ -472,6 +421,12 @@
           // 周期修改触发
           vm.countroundChangeEvent()
         }
+      },
+      'dialogForm.stat_datafd': {
+        handler: (val, oldVal) => {
+          // 周期修改触发
+          vm.datafdChangeEvent()
+        }
       }
     },
     filters: {
@@ -479,14 +434,7 @@
         return util.renderDateTime(value)
       },
       renderStatValidFilter (value) {
-        // TODO 远程获取渲染
-        if (value === 0) {
-          return '停用'
-        } else if (value === 1) {
-          return '启用'
-        } else {
-          return ''
-        }
+        return dictCode.rendCode('tms.mgr.rulestatus', value)
       },
       statParamFilter (v) {
         if (v === null || v === '') {
@@ -569,8 +517,11 @@
       reloadData () {
         // getData getStatDataFnSelectData 写在了这一句的回调中，因为需要依赖这个的取值
         this.getStatParamSelectData()
+        this.statValidList = dictCode.getCodeItems('tms.mgr.rulestatus')
+        this.resultCondList = dictCode.getCodeItems('tms.stat.txnstatus')
+        this.datatypeCodeList = dictCode.getCodeItems('tms.stat.datatype')
         // this.getStatDataFnSelectData()
-        this.getStatDataValidSelectData()
+        // this.getStatDataValidSelectData()
         // this.getData()
       },
       getData () {
@@ -684,9 +635,12 @@
       getStatDataFnSelectData () {
         // let self = this
       },
-      getStatDataValidSelectData () {
-        // TODO select码值获取
-        this.statValidList = [{'code_key': '0', 'code_value': '停用'}, {'code_key': '1', 'code_value': '启用'}]
+      // 函数参数弹窗
+      fnParamPopup () {
+        console.log('fnParamPopup')
+      },
+      statCondInPopup () {
+        console.log('statCondInPopup')
       },
       // 全选select的回调
       statParamDataChange (value) {
@@ -834,6 +788,10 @@
                 this.dialogForm.fn_param = ''
                 this.formFnParamShow = false
               }
+            } else {
+              // 隐藏表单的函数参数
+              this.dialogForm.fn_param = ''
+              this.formFnParamShow = false
             }
           } else {
             if (val.stat_fn === 'count' || val.stat_fn === 'status') {
@@ -897,6 +855,45 @@
         } else {
           // 显示表单的函数参数
           this.formCountroundShow = true
+        }
+      },
+      // 统计目标变化响应
+      datafdChangeEvent () {
+        let val = this.dialogForm
+        val.storecolumn = ''// 存储字段清空
+
+        var fn = val.stat_fn
+        var fd = val.stat_datafd
+        var dataType = ''
+        var oneFeature = this.queryTxnFeature(fd)
+        if (oneFeature) {
+          dataType = oneFeature.type
+        }
+        // 快照，通过统计目标给数据类型赋值
+        if (fn === 'snapshot') {
+          var type = this.changeFeatureTypeToDataType(dataType)
+          val.datatype = type
+          // 根据函数类型过滤存储字段
+          this.storecolumnCodeList = this.getCanUseStorageFdByDataType(type, true)
+        }
+        if (fn === 'rang_bin_dist') { // 区间函数
+          if ((dataType === 'datetime' || dataType === 'time' || dataType === 'double' || dataType === 'money' || dataType === 'long')) {
+            // 显示表单的函数参数
+            val.fn_param = ''
+            this.formFnParamShow = true
+          } else {
+            if (fd !== '') {
+              this.$message('非时间类型、日期时间类型和非数值类型的统计目标，不能使用区间分布函数')
+              val.stat_datafd = ''
+            }
+            val.stat_datafd = ''
+            val.fn_param = ''
+            this.formFnParamShow = false
+          }
+        } else {
+          // 隐藏表单的函数参数
+          val.fn_param = ''
+          this.formFnParamShow = false
         }
       }
     },

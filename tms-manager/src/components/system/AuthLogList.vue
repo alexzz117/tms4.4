@@ -109,7 +109,7 @@
           pagesize: this.pageSize
         }
         ajax.post({
-          url: '/manager/auth/toLog',
+          url: '/auth/toLog',
           param: paramsObj,
           success: function (data) {
             if (data.page) {

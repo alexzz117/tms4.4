@@ -180,7 +180,7 @@
             let self = this
             let paramsObj = this.dictDialogForm
             ajax.post({
-              url: '/manager/codedict/code/add',
+              url: '/codedict/code/add',
               param: paramsObj,
               success: function (data) {
                 self.getData()
@@ -201,7 +201,7 @@
           pagesize: this.pageSize
         }
         ajax.post({
-          url: '/manager/codedict/category/codelist',
+          url: '/codedict/category/codelist',
           param: paramsObj,
           success: function (data) {
             if (data.page) {
@@ -246,7 +246,7 @@
             let self = this
             let paramsObj = this.dictDialogForm
             ajax.post({
-              url: '/manager/codedict/code/update',
+              url: '/codedict/code/update',
               param: paramsObj,
               success: function (data) {
                 self.getData()
