@@ -68,9 +68,9 @@
         let realSelectRow = this.selectedRows.filter(x => x !== '&ALLPICK&')
         this.$emit('dataChange', realSelectRow)
       },
-      // allDataList () {
-      //   this.dataList = this.allDataList
-      // },
+      selectedList () {
+        this.selectedRows = this.selectedList
+      },
       dataList () {
         this.allDataList = this.dataList
       }

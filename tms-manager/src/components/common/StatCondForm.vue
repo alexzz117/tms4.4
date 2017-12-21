@@ -21,7 +21,7 @@
 
       <el-form-item label="日期函数:" :label-width="formLabelWidth" prop="date_func" :style="formItemStyle" >
         <el-select v-model="statCondInDictDialogForm.date_func" placeholder="请选择" :style="formItemContentStyle"
-                   clearable @change="selectChange">
+                   clearable @change="selectChangeAddBracket">
           <el-option
             v-for="item in dateFuncList"
             :key="item.code_key"
@@ -33,7 +33,7 @@
 
       <el-form-item label="字符函数:" :label-width="formLabelWidth" prop="str_func" :style="formItemStyle" >
         <el-select v-model="statCondInDictDialogForm.str_func" placeholder="请选择" :style="formItemContentStyle"
-                   clearable @change="selectChange">
+                   clearable @change="selectChangeAddBracket">
           <el-option
             v-for="item in strFuncList"
             :key="item.code_key"
@@ -69,7 +69,7 @@
 
       <el-form-item label="自定义函数:" :label-width="formLabelWidth" prop="diy_func" :style="formItemStyle" >
         <el-select v-model="statCondInDictDialogForm.diy_func" placeholder="请选择" :style="formItemContentStyle"
-                   clearable @change="selectChange">
+                   clearable @change="selectChangeAddBracket">
           <el-option
             v-for="item in diyFuncList"
             :key="item.code_key"
@@ -93,7 +93,7 @@
 
       <el-form-item label="动作函数:" :label-width="formLabelWidth" prop="ac_func" :style="formItemStyle" >
         <el-select v-model="statCondInDictDialogForm.ac_func" placeholder="请选择" :style="formItemContentStyle"
-                   clearable @change="selectChange">
+                   clearable @change="selectChangeAddBracket">
           <el-option
             v-for="item in acFuncList"
             :key="item.code_key"
@@ -164,7 +164,7 @@
         },
         formLabelWidth: '120px',
         statFnDialogVisible: false,
-        selectArea: [],
+        selectArea: [0, 0],
         statCondInDictDialogForm: this.initStatCondInDictDialogForm(),
         treeData: [],
         defaultProps: {
@@ -261,16 +261,27 @@
         // return selectArea
       },
       selectChange (value) {
-        // console.log('selectChange')
-        // console.log()
+        this.selectChangeCommon(value)
+      },
+      selectChangeAddBracket (value) {
+        this.selectChangeCommon(value + '()')
+      },
+      selectChangeCommon (value) {
+        let self = this
         let to = this.statCondInDictDialogForm.stat_cond_value
         let area = this.selectArea
+        console.log(area)
         var pre = to.substr(0, area[0])
         var post = to.substr(area[1])
         var _val = [pre, value, post]
 
         this.statCondInDictDialogForm = this.initStatCondInDictDialogForm()
         this.statCondInDictDialogForm.stat_cond_value = _val.join('')
+        setTimeout(function () {
+          let statCondValueTextarea = self.$refs.statCondValue.$refs.textarea
+          statCondValueTextarea.focus()
+          self.getSelectedPostion(statCondValueTextarea)
+        }, 300)
       },
       initStatCondInDictDialogForm () {
         return {
@@ -427,11 +438,12 @@
           }
           return childs
         }
-
         return tree  // 返回树结构Json
       },
       handleNodeClick (data, node) {
-        console.log('tree click')
+        if (node.isLeaf) {
+          this.selectChangeCommon(data.code_key)
+        }
       },
       closeDialog () {
         this.$emit('closeDialog')

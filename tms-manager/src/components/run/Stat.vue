@@ -220,8 +220,8 @@
         </el-form-item>
 
         <el-form-item label="有效性:" :label-width="formLabelWidth" prop="stat_valid" :style="formItemStyle" v-show="formStatValidShow">
-            <el-radio v-model="dialogForm.stat_valid" label="0">停用</el-radio>
-            <el-radio v-model="dialogForm.stat_valid" label="1">启用</el-radio>
+            <el-radio v-model="dialogForm.stat_valid" :label=0>停用</el-radio>
+            <el-radio v-model="dialogForm.stat_valid" :label=1>启用</el-radio>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -230,6 +230,9 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="条件" :visible.sync="statCondInDialogVisible">
+      <StatCondForm @closeDialog="closeStatCondInDialog" :txnId="txnId"></StatCondForm>
+    </el-dialog>
 
   </div>
 </template>
@@ -240,7 +243,8 @@
   import check from '@/common/check'
 
   import AllPickSelect from '@/components/common/AllPickSelect'
-  import dictCode from "../../common/dictCode";
+  import StatCondForm from '@/components/common/StatCondForm'
+  import dictCode from '@/common/dictCode'
 
   let vm = null
   let _dataTypeClassify = [
@@ -251,7 +255,10 @@
 
   export default {
     computed: {
-      txnIdParent () { return this.txnId },
+      txnIdParent () {
+        console.log('stat txnId change')
+        return this.txnId
+      },
       isVisibilityParent () { return this.isVisibility },
       notSelectOne () {
         return this.selectedRows.length !== 1
@@ -330,6 +337,7 @@
         dialogTitle: '',
         dialogType: '',
         dialogVisible: false,
+        statCondInDialogVisible: false,
         formLabelWidth: '120px',
         formItemStyle: {
           width: '400px'
@@ -347,6 +355,7 @@
           stat_valid: ''
         },
         dialogForm: this.initDialogForm(),
+        statCondInDictDialogForm: {},
         // 下面这几条都是下拉框取值用的
         statParamList: [],
         statDataFdList: [],
@@ -508,7 +517,7 @@
           storecolumn: '',
           continues: '',
           stat_unresult: '',
-          stat_valid: '0'
+          stat_valid: 0
         }
       },
       handleSelectionChange (rows) {
@@ -611,10 +620,12 @@
           this.modDisabled = true
           // 拷贝而不是赋值
           Object.assign(this.dialogForm, this.selectedRows[0])
+          console.log(this.selectedRows[0])
         } else if (dialogType === 'add') {
           this.dialogTitle = '新建交易统计'
           this.modDisabled = false
           this.dialogForm = this.initDialogForm()
+
         } else if (dialogType === 'view') {
           this.dialogTitle = '查看交易统计'
           let length = this.selectedRows.length
@@ -624,7 +635,7 @@
           }
           this.modDisabled = false
           Object.assign(this.dialogForm, this.selectedRows[0])
-          // TODO 不可编辑
+
         }
         this.dialogVisible = true
         if (this.$refs['dialogForm']) {
@@ -640,7 +651,11 @@
         console.log('fnParamPopup')
       },
       statCondInPopup () {
+        this.statCondInDialogVisible = true
         console.log('statCondInPopup')
+      },
+      closeStatCondInDialog () {
+        this.statCondInDialogVisible = false
       },
       // 全选select的回调
       statParamDataChange (value) {
@@ -898,7 +913,8 @@
       }
     },
     components: {
-      AllPickSelect
+      AllPickSelect,
+      StatCondForm
     }
   }
 </script>

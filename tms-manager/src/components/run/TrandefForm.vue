@@ -91,7 +91,7 @@
       modelusedVisible: function () { // 模型状态是否可见（添加:不可见，默认值为0；编辑：可见）
         return this.tranDefForm.op === 'add'
       },
-      formReadonly: function () { // 表单只读控制
+      formReadonly () { // 表单只读控制
         return this.tranDefForm.tab_name === 'T' || (this.tranDefForm.tab_name === '' && this.tranDefForm.op === '')
       }
     },
