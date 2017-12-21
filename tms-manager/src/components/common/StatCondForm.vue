@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <!--<div>-->
+  <el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible">
     <el-form :model="statCondInDictDialogForm"  ref="statCondInDictDialogForm" style="text-align: left"  :inline="true">
       <el-form-item label="交易属性:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" >
         <el-select v-model="statCondInDictDialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle"
@@ -118,7 +119,8 @@
     </el-form>
     <div class="stat-cond-form-footer">
       <el-button @click="closeDialog">取 消</el-button>
-      <el-button type="primary">确 定</el-button>
+      <el-button type="primary" @click="reset">重 置</el-button>
+      <el-button type="primary" @click="callback">确 定</el-button>
     </div>
 
     <el-dialog title="交易统计" :visible.sync="statFnDialogVisible" width="400px" append-to-body>
@@ -136,12 +138,13 @@
         <el-button @click="statFnDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
-  </div>
-
+  </el-dialog>
+  <!--</div>-->
 </template>
 
 <script>
   import ajax from '@/common/ajax'
+  import util from "../../common/util";
   // import dictCode from "../../common/dictCode";
 
   let vm = null
@@ -153,6 +156,8 @@
     },
     data () {
       return {
+        firstOpen: true,
+        statCondInDialogVisible: false,
         formItemStyle: {
           width: '330px'
         },
@@ -179,11 +184,16 @@
         rosterFuncList: [],
         diyFuncList: [],
         ruleFuncList: [],
-        acFuncList: []
+        acFuncList: [],
+        allSelectData: new Set() // 表达式解释翻译用的保存所有key value
       }
     },
     props: {
-      value: {
+      statCond: {
+        type: String,
+        default: ''
+      },
+      statCondIn: {
         type: String,
         default: ''
       },
@@ -197,20 +207,24 @@
         handler: (val, oldVal) => {
           vm.reloadData()
         }
+      },
+      'statCondInDictDialogForm.stat_cond_value': {
+        handler: (val, oldVal) => {
+          vm.searchCondName(val, 1)
+        }
+      },
+      'statCondInDictDialogForm.stat_cond_in': {
+        handler: (val, oldVal) => {
+          vm.searchCondName(val, 2)
+        }
       }
     },
     mounted: function () {
       this.$nextTick(function () {
         vm = this
-        this.statCondInDictDialogForm.stat_cond_value = this.value
+        this.statCondInDictDialogForm.stat_cond_value = this.statCond
+        this.statCondInDictDialogForm.stat_cond_in = this.statCondIn
         this.initData()
-        let self = this
-        let statCondValueTextarea = this.$refs.statCondValue.$refs.textarea
-        statCondValueTextarea.addEventListener('keydown', function () { self.getSelectedPostion(statCondValueTextarea) })
-        statCondValueTextarea.addEventListener('keyup', function () { self.getSelectedPostion(statCondValueTextarea) })
-        statCondValueTextarea.addEventListener('mousedown', function () { self.getSelectedPostion(statCondValueTextarea) })
-        statCondValueTextarea.addEventListener('mouseup', function () { self.getSelectedPostion(statCondValueTextarea) })
-        statCondValueTextarea.addEventListener('focus', function () { self.getSelectedPostion(statCondValueTextarea) })
       })
     },
     methods: {
@@ -306,7 +320,7 @@
         // 统计目标
         this.getRuleFuncList()
         // 关系函数
-        this.getCodeData('operFuncList', 'tms.pub.func', '3')
+        this.getCodeData('operFuncList', 'tms.pub.func', '3', true)
         // 自定义函数
         this.getCodeData('diyFuncList', 'tms.pub.func', '1')
         // 动作函数
@@ -317,6 +331,10 @@
         this.getCodeData('strFuncList', 'tms.pub.func', '5')
         // 名单函数
         this.getCodeData('rosterFuncList', 'tms.pub.roster')
+        let self = this
+        setTimeout(function () {
+          self.searchCondName(self.statCondInDictDialogForm.stat_cond_value, 1)
+        }, 500)
       },
       reloadData () {
         // 规则列表
@@ -333,6 +351,7 @@
             if (data.row) {
               self.statDatafdList = []
               for (let value of data.row) {
+                self.allSelectData.add({code_key: value.code_key, code_value: value.code_value})
                 value.code_value = `${value.code_value}(${value.code_key})`
                 self.statDatafdList.push(value)
               }
@@ -349,6 +368,7 @@
             if (data.row) {
               self.ruleFuncList = []
               for (let value of data.row) {
+                self.allSelectData.add({code_key: value.code_key, code_value: value.code_value})
                 value.code_value = `${value.code_value}(${value.code_key})`
                 self.ruleFuncList.push(value)
               }
@@ -356,7 +376,7 @@
           }
         })
       },
-      getCodeData (listName, categoryId, arg) {
+      getCodeData (listName, categoryId, arg, ignoreDict) { // 最后一个参数是是否将结果放入翻译用的set中
         let self = this
         let param = {}
         param.category_id = categoryId
@@ -370,6 +390,9 @@
             if (data.row) {
               self[listName] = []
               for (let value of data.row) {
+                if (!ignoreDict) {
+                  self.allSelectData.add({code_key: value.code_key, code_value: value.code_value})
+                }
                 value.code_value = `${value.code_value}(${value.code_key})`
                 self[listName].push(value)
               }
@@ -394,6 +417,11 @@
             if (data.row) {
               self.treeList = (data.row)
               self.treeData = self.formatTreeData(data.row)
+              for (let treeNode of data.row) {
+                if (treeNode.ftype == 2) {
+                  self.allSelectData.add({code_key: treeNode.code_key, code_value: treeNode.code_value})
+                }
+              }
               // self.expendNodesByLevel(1)
             }
           }
@@ -440,13 +468,72 @@
         }
         return tree  // 返回树结构Json
       },
+      // kind 1:英译汉 2:汉译英。默认是英译汉
+      searchCondName (condValue, kind) {
+        if (condValue === '' || condValue == null) {
+          this.statCondInDictDialogForm.stat_cond_value = ''
+          this.statCondInDictDialogForm.stat_cond_in = ''
+          return
+        }
+        let key = 'code_key'
+        let val = 'code_value'
+        if (kind === 2) {
+          val = 'code_key'
+          key = 'code_value'
+        }
+        var condname = condValue
+
+        for (let loop of this.allSelectData) {
+          if (loop[key]) {
+            condname = condname.replace(new RegExp(util.escapeExprSpecialWord(loop[key]), 'g'), loop[val])
+          }
+        }
+
+        if (kind === 2) {
+          this.statCondInDictDialogForm.stat_cond_value = condname
+        } else {
+          this.statCondInDictDialogForm.stat_cond_in = condname
+        }
+      },
       handleNodeClick (data, node) {
         if (node.isLeaf) {
           this.selectChangeCommon(data.code_key)
         }
       },
       closeDialog () {
-        this.$emit('closeDialog')
+        this.statCondInDialogVisible = false
+        // this.$emit('closeDialog')
+      },
+      callback () {
+        let callbackObj = {
+          stat_cond_value: this.statCondInDictDialogForm.stat_cond_value,
+          stat_cond_in: this.statCondInDictDialogForm.stat_cond_in
+        }
+        this.$emit('valueCallback', callbackObj)
+        this.statCondInDialogVisible = false
+      },
+      reset () {
+        this.statCondInDictDialogForm.stat_cond_value = ''
+        this.statCondInDictDialogForm.stat_cond_in = ''
+      },
+      setValue (valueObj) {
+        this.statCondInDictDialogForm.stat_cond_value = valueObj.stat_cond_value
+        this.statCondInDictDialogForm.stat_cond_in = valueObj.stat_cond_in
+      },
+      open () {
+        if (this.firstOpen) {
+          let self = this
+          setTimeout(function () {
+            let statCondValueTextarea = self.$refs.statCondValue.$refs.textarea
+            statCondValueTextarea.addEventListener('keydown', function () { self.getSelectedPostion(statCondValueTextarea) })
+            statCondValueTextarea.addEventListener('keyup', function () { self.getSelectedPostion(statCondValueTextarea) })
+            statCondValueTextarea.addEventListener('mousedown', function () { self.getSelectedPostion(statCondValueTextarea) })
+            statCondValueTextarea.addEventListener('mouseup', function () { self.getSelectedPostion(statCondValueTextarea) })
+            statCondValueTextarea.addEventListener('focus', function () { self.getSelectedPostion(statCondValueTextarea) })
+          }, 300)
+        }
+        this.firstOpen = false
+        this.statCondInDialogVisible = true
       }
     }
   }

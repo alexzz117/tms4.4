@@ -59,7 +59,7 @@
 
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-view" type="primary" @click="queryFormShow = !queryFormShow">查询</el-button>
-      <el-button plain class="el-icon-view" :disabled="notSelectOne" @click="showData">查看</el-button>
+      <el-button plain class="el-icon-view" :disabled="notSelectOne" @click="openDialog('view')">查看</el-button>
       <el-button plain class="el-icon-plus" :disabled="isExpand" @click="openDialog('add')">新建</el-button>
       <el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand" @click="openDialog('edit')">编辑</el-button>
       <el-button plain class="el-icon-delete" :disabled="notSelectOne || isExpand">删除</el-button>
@@ -110,15 +110,15 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
       <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true">
         <el-form-item label="统计描述:" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatDescShow">
-          <el-input v-model="dialogForm.stat_desc" auto-complete="off" :maxlength=50 :style="formItemContentStyle"></el-input>
+          <el-input v-model="dialogForm.stat_desc" auto-complete="off" :maxlength=50 :style="formItemContentStyle" :disabled="viewDisabled"></el-input>
         </el-form-item>
 
         <el-form-item label="统计引用对象:" :label-width="formLabelWidth" prop="stat_param" :style="formItemStyle" v-show="formStatParamShow">
-          <AllPickSelect :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle" :disabled="modDisabled"></AllPickSelect>
+          <AllPickSelect :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"></AllPickSelect>
         </el-form-item>
 
         <el-form-item label="统计函数:" :label-width="formLabelWidth" prop="stat_fn" :style="formItemStyle" v-show="formStatFnShow">
-          <el-select v-model="dialogForm.stat_fn" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled"
+          <el-select v-model="dialogForm.stat_fn" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"
                      clearable>
             <el-option
               v-for="item in statFnList"
@@ -133,15 +133,15 @@
         <!--惊了 这个东西-->
 
         <el-form-item :label="formStatCondInName" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatCondInShow">
-          <div @dblclick="statCondInPopup">
-            <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly></el-input>
-            <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
+          <div @dblclick="statCondInPopup" :disabled="viewDisabled">
+            <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly :disabled="viewDisabled"></el-input>
+            <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="viewDisabled"></el-input>
           </div>
         </el-form-item>
 
 
         <el-form-item label="统计目标:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="formStatDatafdShow">
-          <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled"
+          <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"
                      clearable>
             <el-option
               v-for="item in statDataFdList"
@@ -155,20 +155,20 @@
 
         <el-form-item label="函数参数:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formFnParamShow">
           <div @dblclick="fnParamPopup">
-            <el-input v-model="dialogForm.fn_param" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
+            <el-input v-model="dialogForm.fn_param" auto-complete="off" :style="formItemContentStyle" readonly :disabled="viewDisabled"></el-input>
           </div>
         </el-form-item>
 
         <el-form-item label="单位:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formCoununitShow">
-          <el-input v-model="dialogForm.coununit" auto-complete="off" :style="formItemContentStyle" :disabled="modDisabled"></el-input>
+          <el-input v-model="dialogForm.coununit" auto-complete="off" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"></el-input>
         </el-form-item>
 
         <el-form-item label="周期:" :label-width="formLabelWidth" prop="countround" :style="formItemStyle" v-show="formCountroundShow">
-          <el-input v-model="dialogForm.countround" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="dialogForm.countround" auto-complete="off" :style="formItemContentStyle" :disabled="viewDisabled"></el-input>
         </el-form-item>
 
         <el-form-item label="交易结果:" :label-width="formLabelWidth" prop="result_cond" :style="formItemStyle" v-show="formResultCondShow">
-          <el-select v-model="dialogForm.result_cond" placeholder="请选择" :style="formItemContentStyle"
+          <el-select v-model="dialogForm.result_cond" placeholder="请选择" :style="formItemContentStyle" :disabled="viewDisabled"
                      clearable>
             <el-option
               v-for="item in resultCondList"
@@ -180,7 +180,7 @@
         </el-form-item>
 
         <el-form-item label="数据类型:" :label-width="formLabelWidth" prop="datatype" :style="formItemStyle" v-show="formDatatypeShow">
-          <el-select v-model="dialogForm.datatype" placeholder="请选择" :style="formItemContentStyle"
+          <el-select v-model="dialogForm.datatype" placeholder="请选择" :style="formItemContentStyle" :disabled="viewDisabled"
                      clearable>
             <el-option
               v-for="item in datatypeCodeList"
@@ -192,7 +192,7 @@
         </el-form-item>
 
         <el-form-item label="存储字段:" :label-width="formLabelWidth" prop="storecolumn" :style="formItemStyle" v-show="formStoreColumnShow">
-          <el-select v-model="dialogForm.storecolumn" placeholder="请选择" :style="formItemContentStyle"
+          <el-select v-model="dialogForm.storecolumn" placeholder="请选择" :style="formItemContentStyle" :disabled="viewDisabled"
                      clearable>
             <el-option
               v-for="item in storecolumnCodeList"
@@ -206,6 +206,7 @@
         <el-form-item label="连续:" :label-width="formLabelWidth" prop="continues" :style="formItemStyle" v-show="formContinuesShow">
           <el-switch
             v-model="dialogForm.continues"
+            :disabled="viewDisabled"
             active-color="#13ce66"
             inactive-color="#ff4949">
           </el-switch>
@@ -214,25 +215,26 @@
         <el-form-item label="事中:" :label-width="formLabelWidth" prop="stat_unresult" :style="formItemStyle" v-show="formStatUnresultShow">
           <el-switch
             v-model="dialogForm.stat_unresult"
+            :disabled="viewDisabled"
             active-color="#13ce66"
             inactive-color="#ff4949">
           </el-switch>
         </el-form-item>
 
         <el-form-item label="有效性:" :label-width="formLabelWidth" prop="stat_valid" :style="formItemStyle" v-show="formStatValidShow">
-            <el-radio v-model="dialogForm.stat_valid" :label=0>停用</el-radio>
-            <el-radio v-model="dialogForm.stat_valid" :label=1>启用</el-radio>
+            <el-radio v-model="dialogForm.stat_valid" :label=0 :disabled="viewDisabled">停用</el-radio>
+            <el-radio v-model="dialogForm.stat_valid" :label=1 :disabled="viewDisabled">启用</el-radio>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('dialogForm')">保 存</el-button>
+        <el-button @click="dialogVisible = false" v-show="!viewDisabled">取 消</el-button>
+        <el-button type="primary" @click="submitForm('dialogForm')" v-show="!viewDisabled">保 存</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog title="条件" :visible.sync="statCondInDialogVisible">
-      <StatCondForm @closeDialog="closeStatCondInDialog" :txnId="txnId"></StatCondForm>
-    </el-dialog>
+    <!--<el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible">-->
+      <StatCondForm ref="StatCondDialog" @closeDialog="closeStatCondInDialog" @valueCallback="statCondInValueCallBack" :statCond="dialogForm.stat_cond" :statCondIn="dialogForm.stat_cond_in" :txnId="txnId"></StatCondForm>
+    <!--</el-dialog>-->
 
   </div>
 </template>
@@ -266,11 +268,12 @@
       // // 下面是控制表单项显示，隐藏的
       formStatCondInName () {
         if (this.dialogForm.stat_fn === 'calculat_expressions') {
-          if (this.dialogType === 'view') {
-            return ''
-          } else {
-            return '表达式:'
-          }
+          // if (this.dialogType === 'view') {
+          //   return ''
+          // } else {
+          //   return '表达式:'
+          // }
+          return '表达式:'
         } else {
           return '统计条件:'
         }
@@ -380,6 +383,7 @@
         formStatUnresultShow: true,
         formStatValidShow: true,
         modDisabled: false,
+        viewDisabled: false,
         rules: {
           auth_status: [
             { required: true, message: '请选择是否通过授权', trigger: 'blur' }
@@ -587,16 +591,6 @@
       rowSelectable () {
         return !this.isExpand
       },
-      showData () {
-        let row = this.selectedRows[0]
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行交易统计信息。')
-          return
-        }
-        this.$refs.dataTable.toggleRowExpansion(row)
-        this.isExpand = !this.isExpand
-      },
       dialogOpenHandle () {
         this.formDatatypeShow = false
 
@@ -618,14 +612,15 @@
             return
           }
           this.modDisabled = true
+          this.viewDisabled = false
           // 拷贝而不是赋值
           Object.assign(this.dialogForm, this.selectedRows[0])
           console.log(this.selectedRows[0])
         } else if (dialogType === 'add') {
           this.dialogTitle = '新建交易统计'
           this.modDisabled = false
+          this.viewDisabled = false
           this.dialogForm = this.initDialogForm()
-
         } else if (dialogType === 'view') {
           this.dialogTitle = '查看交易统计'
           let length = this.selectedRows.length
@@ -633,9 +628,9 @@
             this.$message('请选择一行交易统计信息。')
             return
           }
+          this.viewDisabled = true
           this.modDisabled = false
           Object.assign(this.dialogForm, this.selectedRows[0])
-
         }
         this.dialogVisible = true
         if (this.$refs['dialogForm']) {
@@ -651,18 +646,31 @@
         console.log('fnParamPopup')
       },
       statCondInPopup () {
-        this.statCondInDialogVisible = true
-        console.log('statCondInPopup')
+        if (!this.viewDisabled) {
+          this.$refs.StatCondDialog.open()
+          // this.statCondInDialogVisible = true
+          // console.log('xxxx')
+          // console.log(this.$refs.StatCondDialog)
+          this.$refs.StatCondDialog.setValue({
+            stat_cond_value: this.dialogForm.stat_cond,
+            stat_cond_in: this.dialogForm.stat_cond_in
+          })
+          this.statCondInDialogVisible = true
+        }
       },
       closeStatCondInDialog () {
         this.statCondInDialogVisible = false
       },
-      // 全选select的回调
+      // 子组件的回调
       statParamDataChange (value) {
         this.queryShowForm.stat_param = value
       },
       addStatParamDataChange (value) {
         this.dialogForm.stat_param = value
+      },
+      statCondInValueCallBack (value) {
+        this.dialogForm.stat_cond = value.stat_cond_value
+        this.dialogForm.stat_cond_in = value.stat_cond_in
       },
       // 下面是这一页的工具函数
       queryTxnFeature (fd) {

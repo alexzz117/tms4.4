@@ -231,7 +231,20 @@ function getWebRootPath () {
   return projectName
 }
 
+let fbsArr = ['\\', '$', '(', ')', '*', '+', '.', '[', ']', '?', '^', '{', '}', '|']
+function escapeExprSpecialWord (val) {
+  if (!val || val === '') {
+    return ''
+  }
+  for (let key of fbsArr) {
+    if (val.includes(key)) {
+      val = val.replace(key, '\\' + key)
+    }
+  }
+  return val
+}
 var util = {
+  escapeExprSpecialWord: escapeExprSpecialWord,
   getWebRootPath: getWebRootPath,
   isFunction: isFunction,
   renderDate: renderDate,
