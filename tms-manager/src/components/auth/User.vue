@@ -207,6 +207,7 @@
         ajax.post(option)
       },
       openDialog (flag) {
+        let self = this
         this.flag = flag
         if (flag === 'edit') {
           this.dialogTitle = '编辑用户'
@@ -215,7 +216,30 @@
             this.$message('请选择一行用户信息。')
             return
           }
-          this.userDialogForm = this.multipleSelection[0]
+          var option = {
+            url: '/operator/get',
+            param: {operatorId: this.multipleSelection[0].operator_id},
+            success: function (data) {
+              var info = data.row
+              self.userDialogForm = {
+                operator_id: info.operator_id,
+                login_name: info.login_name,
+                flag: info.flag,
+                real_name: info.real_name,
+                role: info.role,
+                credentialtype: info.credentialtype,
+                credentialnum: info.credentialnum,
+                phone: info.phone,
+                mobile: info.mobile,
+                email: info.email,
+                address: info.address,
+                memo: info.memo,
+                repwd: info.password,
+                password: info.password
+              }
+            }
+          }
+          ajax.post(option)
         } else if (flag === 'add') {
           this.dialogTitle = '新建用户'
           this.userDialogForm = {
