@@ -150,6 +150,7 @@
         this.expendKey = expendNodeIds
       },
       handleNodeClick (data, node) {
+        console.info(data)
         var self = this
         if (self.selectKey === data.id) {
           return
