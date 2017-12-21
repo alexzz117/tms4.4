@@ -28,7 +28,6 @@
       selectDisabled () {
         return this.disabled
       }
-
     },
     data () {
       return {
@@ -51,7 +50,7 @@
     mounted: function () {
       this.$nextTick(function () {
         this.allDataList = this.dataList
-        this.selectDisabled = this.disabled
+        // this.selectDisabled = this.disabled
         // this.selectedRows = this.value
       })
     },
