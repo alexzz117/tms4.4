@@ -10,7 +10,7 @@
         <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
           <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
           </el-button>
-          <el-button plain class="el-icon-delete" @click="" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
+          <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
           </el-button>
         </div>
         <el-tree :data="treeData" node-key="id" ref="tree"
@@ -54,7 +54,7 @@
           addBtn: true, // 添加按钮
           delBtn: true // 删除按钮
         },
-        txnId: 'T0101',
+        txnId: '',
         tabVisibility: {
           trandefVisibility: true,
           tranmdlVisibility: false,
@@ -64,7 +64,6 @@
         treeList: [],
         treeData: [],
         expendKey: ['T'], // 默认展开的功能节点id
-        selectKey: '',
         defaultProps: {
           children: 'children',
           label: 'text'
@@ -151,10 +150,8 @@
       },
       handleNodeClick (data, node) {
         var self = this
-        if (self.selectKey === data.id) {
+        if (self.txnId === data.id) {
           return
-        } else {
-          self.selectKey = data.id
         }
         self.showToolBtn()
         self.txnId = data.id
@@ -226,6 +223,15 @@
       },
       addFunc () {
         this.$refs.trandef.addFormVisible = true
+      },
+      delFunc () {
+        let data = this.$refs.tree.getCurrentNode()
+        let param = {
+          tab_name: data.id,
+          op: 'del',
+          tab_desc: data.tab_desc
+        }
+        this.$refs['trandef'].delInfo(param)
       }
     },
     components: {

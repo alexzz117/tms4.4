@@ -77,9 +77,12 @@
     },
     computed: {
       selectedList: function () { // 交易识别标识是否可见（组：不可见；交易：可见）
-        var list = this.tranDefForm.tab_disposal.split(',')
-        console.info(list)
-        return list
+        let tabDisposal = this.tranDefForm.tab_disposal
+        if (!tabDisposal || tabDisposal.trim() === '') {
+          return []
+        } else {
+          return tabDisposal.split(',')
+        }
       },
       txnIdVisible: function () { // 交易识别标识是否可见（组：不可见；交易：可见）
         return this.tranDefForm.txn_type !== '1'
@@ -159,6 +162,17 @@
             {type: 'number', max: 9999, min: 0, message: '顺序必须为小于5位数的正整数', trigger: 'blur'}
           ]
         }
+      }
+    },
+    watch: {
+      tranDefForm: {
+        handler (curVal) {
+          // 当交易类型选择为【交易组】的时候，清空交易识别标识的值
+          if (curVal.txn_type === '0') {
+            curVal.txnid = ''
+          }
+        },
+        deep: true
       }
     },
     methods: {

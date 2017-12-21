@@ -72,7 +72,6 @@
           },
           success: function (data) {
             var info = data.infos
-            console.info(info)
             if (info.tab_name && info.tab_name !== '' && info.tab_name !== 'T') {
               self.editVisible = false
             } else {
@@ -160,7 +159,6 @@
         ajax.post(option)
       },
       submitForm (op) { // 提交表单；op：操作方式；
-        console.info(op)
         var self = this
         var params = {}
         if (op === 'add') {
@@ -168,7 +166,6 @@
         } else {
           params = self.$refs['infoForm'].tranDefForm
         }
-        console.info('参数', params)
         var option = {
           url: '/trandef/save',
           param: params,
@@ -180,10 +177,39 @@
               } else {
                 self.$message('修改成功')
               }
+              self.reloadPage()
             }
           }
         }
         ajax.post(option)
+      },
+      delInfo (param) {
+        var self = this
+        this.$confirm('确定要删除交易吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var option = {
+            url: '/trandef/save',
+            param: param,
+            success: function (data) {
+              if (data.success) {
+                self.$message('删除交易成功')
+                self.reloadPage()
+              }
+            }
+          }
+          ajax.post(option)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
+      reloadPage () {
+        window.location.reload()
       }
     },
     components: {
