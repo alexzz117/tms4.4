@@ -24,11 +24,15 @@
         let b = new Set(this.selectedRows)
         let differenceABSet = new Set(allValuesArr.filter(x => !b.has(x)))
         return differenceABSet.size === 0
+      },
+      selectDisabled () {
+        return this.disabled
       }
+
     },
     data () {
       return {
-        selectDisabled: false,
+        // selectDisabled: false,
         allDataList: [],
         selectedCached: [],
         selectedRows: []
