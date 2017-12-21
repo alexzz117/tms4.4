@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,14 +136,18 @@ public class StatController {
 
 	/**
 	* 方法描述:查询统计目标下拉列表
-	* @param category_id 代码
-	* @param args sql参数
 	* @return
 	 */
 	@RequestMapping(value = "/code", method = RequestMethod.POST)
-	public Model queryCode( @RequestBody String category_id, String[] args ) {
+	public Model queryCode(@RequestBody RequestModel requestModel) {
 		Model model = new Model();
-		model.setRow( statService.codeList( category_id, args ) );
+		String categoryId = requestModel.getString("category_id");
+		String args =  requestModel.getString("args");
+		String [] argsArr = null;
+		if(StringUtil.isNotEmpty(args)){
+			argsArr = new String[]{args};
+		}
+		model.setRow( statService.codeList( categoryId, argsArr));
 		return model;
 	}
 
