@@ -72,6 +72,7 @@
           },
           success: function (data) {
             var info = data.infos
+            console.info(info)
             if (info.tab_name && info.tab_name !== '' && info.tab_name !== 'T') {
               self.editVisible = false
             } else {

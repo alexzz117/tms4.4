@@ -150,7 +150,6 @@
         this.expendKey = expendNodeIds
       },
       handleNodeClick (data, node) {
-        console.info(data)
         var self = this
         if (self.selectKey === data.id) {
           return
@@ -171,7 +170,6 @@
 //        }
         // 同步面包屑导航地址
         self.syncBreadcrumb(node)
-        // console.info(data)
       },
       showToolBtn (tabName) {
         var self = this

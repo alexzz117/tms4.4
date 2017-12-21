@@ -35,7 +35,7 @@
         <el-input v-model="tranDefForm.txnid" auto-complete="off" :readonly="formReadonly"></el-input>
       </el-form-item>
       <el-form-item label="处置策略:" :label-width="formLabelWidth" prop="tab_disposal">
-        <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :disabled="formReadonly"></AllPickSelect>
+        <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly"></AllPickSelect>
       </el-form-item>
       <el-form-item label="渠道名称" prop="chann">
         <el-select v-model="tranDefForm.chann" placeholder="请选择" :disabled="formReadonly||channVisible">
@@ -76,6 +76,11 @@
     create () {
     },
     computed: {
+      selectedList: function () { // 交易识别标识是否可见（组：不可见；交易：可见）
+        var list = this.tranDefForm.tab_disposal.split(',')
+        console.info(list)
+        return list
+      },
       txnIdVisible: function () { // 交易识别标识是否可见（组：不可见；交易：可见）
         return this.tranDefForm.txn_type !== '1'
       },
@@ -158,7 +163,7 @@
     },
     methods: {
       addStatParamDataChange (value) {
-        this.dialogForm.stat_param = value
+        this.tranDefForm.tab_disposal = value.join(',')
       }
     },
     components: {
