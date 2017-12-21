@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ import cn.com.higinet.tms.manager.common.service.FuncService;
  * @version 2.0.0, 2011-6-30
  */
 @RestController("cmcFuncController")
-@RequestMapping("/cmc/func")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/func")
 public class FuncController {
 
 	@Autowired

@@ -39,7 +39,7 @@ import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
  * @version 2.0.0, 2011-6-30
  */
 @RestController("cmcOperatorController")
-@RequestMapping("/cmc/operator")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/operator")
 public class OperatorController {
 
 	@Autowired
