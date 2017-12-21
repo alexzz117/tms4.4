@@ -137,6 +137,7 @@
 <script>
   import check from '@/common/check'
   import ajax from '@/common/ajax'
+  import crypt from '@/common/crypt'
 
   export default {
     created () {
@@ -255,8 +256,8 @@
             email: '',
             address: '',
             memo: '',
-            repwd: '123456',
-            password: '123456'
+            repwd: crypt.md5('123456'),
+            password: crypt.md5('123456')
           }
         }
         this.roleDialogVisible = true
@@ -328,9 +329,7 @@
           this.$message('请选择一行用户信息。')
           return
         }
-        var password = '123456'
-        var pwd = password // 需要MD5加密
-        // var pwd = jcl.util.crypt.md5(password);
+        var pwd = crypt.md5('123456') // MD5加密
 
         var data = this.multipleSelection[0]
         this.$confirm('确定重置密码吗？', '提示', {
