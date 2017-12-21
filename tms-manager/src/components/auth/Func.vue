@@ -242,7 +242,7 @@
       selTree () {
         var self = this
         var option = {
-          url: '/cmc/func/tree',
+          url: '/func/tree',
           success: function (data) {
             if (data.list) {
               var rootNodes = { // 根节点
@@ -493,7 +493,7 @@
           type: 'warning'
         }).then(() => {
           var option = {
-            url: '/cmc/func/del',
+            url: '/func/del',
             param: {
               funcId: selectNode.id,
               rf: 'json'
@@ -525,9 +525,9 @@
         // var selectNode = self.$refs.tree.currentNode.node
         var url = ''
         if (self.funcForm.func_id === '') {
-          url = '/cmc/func/add'
+          url = '/func/add'
         } else {
-          url = '/cmc/func/mod'
+          url = '/func/mod'
         }
         var option = {
           url: url,

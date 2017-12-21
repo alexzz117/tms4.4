@@ -85,7 +85,7 @@
       selFunc () {
         var self = this
         var option = {
-          url: '/cmc/func/getAll',
+          url: '/func/getAll',
           success: function (data) {
             self.funcList = data.row
           }
@@ -101,7 +101,7 @@
           endTime = self.value6[1]
         }
         var option = {
-          url: '/cmc/log/list',
+          url: '/log/list',
           param: {
             operator_name: self.logForm.operator_name,
             operate_func: self.logForm.operate_func,

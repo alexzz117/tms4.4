@@ -179,7 +179,7 @@
       selRole () {
         var self = this
         var option = {
-          url: '/cmc/role/listNormalRole',
+          url: '/role/listNormalRole',
           success: function (data) {
             self.roles = data.row
           }
@@ -189,7 +189,7 @@
       selUser () {
         var self = this
         var option = {
-          url: '/cmc/operator/list',
+          url: '/operator/list',
           param: {
             login_name: this.userForm.login_name,
             real_name: this.userForm.real_name,
@@ -243,7 +243,7 @@
       addUser () {
         var self = this
         var option = {
-          url: '/cmc/operator/add',
+          url: '/operator/add',
           param: this.userDialogForm,
           success: function (data) {
             self.$message('创建成功。')
@@ -256,7 +256,7 @@
       updateUser () {
         var self = this
         var option = {
-          url: '/cmc/operator/mod',
+          url: '/operator/mod',
           param: this.userDialogForm,
           success: function (data) {
             self.$message('更新成功。')
@@ -280,7 +280,7 @@
           type: 'warning'
         }).then(() => {
           var option = {
-            url: '/cmc/operator/del',
+            url: '/operator/del',
             param: {
               operatorId: data.operator_id
             },
@@ -315,7 +315,7 @@
           type: 'warning'
         }).then(() => {
           var option = {
-            url: '/cmc/operator/reset',
+            url: '/operator/reset',
             param: {
               operatorId: data.operator_id,
               loginName: data.login_name,
@@ -348,7 +348,7 @@
           type: 'warning'
         }).then(() => {
           var option = {
-            url: '/cmc/operator/resetLoginFailedAttempts',
+            url: '/operator/resetLoginFailedAttempts',
             param: {
               operatorId: data.operator_id
             },
@@ -382,7 +382,7 @@
           callback()
         } else {
           var option = {
-            url: '/cmc/operator/check/username',
+            url: '/operator/check/username',
             param: {'username': value}, // 用户名
             success: function (data) { // 请求校验用户名
               debugger
