@@ -40,11 +40,15 @@
     props: {
       dataList: {
         type: Array,
-        default: []
+        default: function () {
+          return []
+        }
       },
       selectedList: {
         type: Array,
-        default: []
+        default: function () {
+          return []
+        }
       },
       disabled: {
         type: Boolean,
