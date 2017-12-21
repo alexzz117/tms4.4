@@ -42,6 +42,10 @@
         type: Array,
         default: []
       },
+      selectedList: {
+        type: Array,
+        default: []
+      },
       disabled: {
         type: Boolean,
         default: false
@@ -51,7 +55,7 @@
       this.$nextTick(function () {
         this.allDataList = this.dataList
         // this.selectDisabled = this.disabled
-        // this.selectedRows = this.value
+        this.selectedRows = this.selectedList
       })
     },
     watch: {
