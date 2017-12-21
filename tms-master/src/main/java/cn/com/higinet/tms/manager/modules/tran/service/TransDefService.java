@@ -144,10 +144,10 @@ public class TransDefService {
 		clms.put(TMS_COM_TAB.SHOW_ORDER, MapUtil.getLong(reqs, "show_order"));
 		clms.put(TMS_COM_TAB.IS_ENABLE, MapUtil.getLong(reqs, "is_enable"));
 		clms.put(TMS_COM_TAB.TXNID, MapUtil.getString(reqs, "txnid"));
-		clms.put(TMS_COM_TAB.MODELUSED, MapUtil.getString(reqs, "MODELUSED"));
+		clms.put(TMS_COM_TAB.MODELUSED, MapUtil.getString(reqs, "modelused"));
 		clms.put(TMS_COM_TAB.BASE_TAB, "TMS_RUN_TRAFFICDATA");
 		clms.put(TMS_COM_TAB.CAN_REF, 0);
-		clms.put(TMS_COM_TAB.TAB_DISPOSAL, MapUtil.getString(reqs, "TAB_DISPOSAL"));
+		clms.put(TMS_COM_TAB.TAB_DISPOSAL, MapUtil.getString(reqs, "tab_disposal"));
 
 		// 将交易主键id放到service方法createTran的参数中，双审需要。add by wangsch 2013-08-09
 		reqs.put("tab_name", tab_name);
@@ -187,7 +187,7 @@ public class TransDefService {
 		String txnid = MapUtil.getString(reqs, "txnid");
 		String show_order = MapUtil.getString(reqs, "show_order");
 		String tab_desc = MapUtil.getString(reqs, "tab_desc");
-		String tab_disposal = MapUtil.getString(reqs, "TAB_DISPOSAL");
+		String tab_disposal = MapUtil.getString(reqs, "tab_disposal");
 
 		// check
 		// S1:名字/顺序/渠道,不与同级其他相同,可以与自己相同
@@ -236,9 +236,9 @@ public class TransDefService {
 		row.put(TMS_COM_TAB.CHANN, chann);
 		row.put(TMS_COM_TAB.TAB_DESC, MapUtil.getString(reqs, "tab_desc"));
 
-		String traindate = MapUtil.getString(reqs, "TRAINDATE");
-		String modelused = MapUtil.getString(reqs, "MODELUSED");
-		String modelused_o = MapUtil.getString(reqs, "MODELUSED_O");
+		String traindate = MapUtil.getString(reqs, "traindate");
+		String modelused = MapUtil.getString(reqs, "modelused");
+		String modelused_o = MapUtil.getString(reqs, "modelused_o");
 
 		row.put(TMS_COM_TAB.MODELUSED, modelused);
 
