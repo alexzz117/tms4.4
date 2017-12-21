@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +36,7 @@ import cn.com.higinet.tms.manager.common.service.RoleService;
  * @author zhang.lei
  */
 @RestController("cmcRoleController")
-@RequestMapping("/cmc/role")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/role")
 public class RoleController {
 
 	@Autowired
