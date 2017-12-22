@@ -37,7 +37,8 @@ var check = {
   },
   checkFormZhSpecialCharacter: function (rule, value, callback) {
     if (!check.checkSpecialCharacter(value, 2)){
-      return callback(new Error('请不要输入特殊字符！如($,%)'));
+      // return callback(new Error('请不要输入特殊字符！如($,%)'));
+      return callback(new Error('只能包含汉字,字母,数字和下划线'));
     }
     callback()
   },

@@ -119,7 +119,7 @@
     </el-form>
     <div class="stat-cond-form-footer">
       <el-button @click="closeDialog">取 消</el-button>
-      <el-button type="primary" @click="reset">重 置</el-button>
+      <el-button @click="reset">重 置</el-button>
       <el-button type="primary" @click="callback">确 定</el-button>
     </div>
 
@@ -222,7 +222,7 @@
     watch: {
       txnIdParent: {
         handler: (val, oldVal) => {
-          vm.reloadData()
+          // vm.reloadData()
         }
       },
       'statCondInDictDialogForm.stat_cond_value': {
@@ -545,6 +545,7 @@
       open () {
         if (this.firstOpen) {
           let self = this
+          this.initData()
           setTimeout(function () {
             let statCondValueTextarea = self.$refs.statCondValue.$refs.textarea
             statCondValueTextarea.addEventListener('keydown', function () { self.getSelectedPostion(statCondValueTextarea) })
@@ -554,7 +555,7 @@
             statCondValueTextarea.addEventListener('focus', function () { self.getSelectedPostion(statCondValueTextarea) })
           }, 300)
         }
-        this.initData()
+
         this.firstOpen = false
         this.statCondInDialogVisible = true
       }

@@ -30,6 +30,36 @@ function isNumeric( obj ) {
   return !isNaN( parseFloat(obj) ) && isFinite( obj );
 }
 
+/*
+
+IsNumber(string,string,string):
+
+功能：判断是否为浮点数、整数
+
+add by caiqian 2012-2-16修改校验浮点数，只需判断是否是数字，小数点后保留几位
+sign:null表示没有正负号，"+"：正；"-"：负
+deci:小数点的精度，如果此参数没有，默认是无限浮点数，如果为0，表示整数，如果不为0，表示具体的精度
+*/
+
+function isNumber(objStr,sign,deci)
+{
+  var regStr="^";
+  if(!sign){
+    regStr+="-?";
+  }else if(sign=="-"){
+    regStr+="-";
+  }
+  if(!deci){
+    regStr += "\\d+(\\.\\d+)?$";
+  }else if(deci=="0"){
+    regStr += "(0|([1-9]+\\d*))$";
+  }else{
+    regStr += "\\d+(\\.\\d{1,"+deci+"})?$";
+  }
+  var regu = new RegExp(regStr,"g");
+  return regu.test(objStr);
+}
+
 function type( obj ) {
   return obj == null ?
     String( obj ) :
@@ -252,6 +282,7 @@ var util = {
   isArray: Array.isArray || isArray,
   isWindow: isWindow,
   isNumeric: isNumeric,
+  isNumber: isNumber,
   type: type,
   isPlainObject: isPlainObject,
   isEmptyObject: isEmptyObject,

@@ -3,7 +3,7 @@
     <transition name="fade">
 
       <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
-               :inline="true" style="text-align: left" v-show="queryFormShow">
+               :inline="true" style="text-align: left" v-show="queryFormShow" >
         <el-form-item label="统计名称:" prop="stat_name">
           <el-input v-model="queryShowForm.stat_name" class="query-form-item" auto-complete="off" :maxlength=50></el-input>
         </el-form-item>
@@ -108,9 +108,9 @@
     </div>
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
-      <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true">
+      <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true" :rules="dialogFormRules">
         <el-form-item label="统计描述:" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatDescShow">
-          <el-input v-model="dialogForm.stat_desc" auto-complete="off" :maxlength=50 :style="formItemContentStyle" :disabled="viewDisabled"></el-input>
+          <el-input v-model="dialogForm.stat_desc" auto-complete="off" :maxlength=200 :style="formItemContentStyle" :disabled="viewDisabled"></el-input>
         </el-form-item>
 
         <el-form-item label="统计引用对象:" :label-width="formLabelWidth" prop="stat_param" :style="formItemStyle" v-show="formStatParamShow">
@@ -130,15 +130,12 @@
           </el-select>
         </el-form-item>
 
-        <!--惊了 这个东西-->
-
-        <el-form-item :label="formStatCondInName" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatCondInShow">
+        <el-form-item :label="formStatCondInName" :class="{'is-required':dialogForm.stat_fn === 'calculat_expressions'}" :label-width="formLabelWidth" prop="stat_cond" :style="formItemStyle" v-show="formStatCondInShow">
           <div @dblclick="statCondInPopup" :disabled="viewDisabled">
             <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly :disabled="viewDisabled"></el-input>
             <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="viewDisabled"></el-input>
           </div>
         </el-form-item>
-
 
         <el-form-item label="统计目标:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="formStatDatafdShow">
           <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"
@@ -153,7 +150,7 @@
         </el-form-item>
 
 
-        <el-form-item label="函数参数:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formFnParamShow">
+        <el-form-item label="函数参数:" :label-width="formLabelWidth" prop="fn_param" :style="formItemStyle" v-show="formFnParamShow">
           <div @dblclick="fnParamPopup">
             <el-input v-model="dialogForm.fn_param" auto-complete="off" :style="formItemContentStyle" readonly :disabled="viewDisabled"></el-input>
           </div>
@@ -233,12 +230,13 @@
     </el-dialog>
 
     <!--<el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible">-->
-      <StatCondForm ref="StatCondDialog" @closeDialog="closeStatCondInDialog" @valueCallback="statCondInValueCallBack"
+      <StatCondPicker ref="StatCondDialog" @closeDialog="closeStatCondInDialog" @valueCallback="statCondInValueCallBack"
                     :statCond="dialogForm.stat_cond" :statCondIn="dialogForm.stat_cond_in" :txnId="txnId"
-                    :hideItems="['rule_func', 'ac_func']"
-      ></StatCondForm>
-    <!--</el-dialog>-->
+                    :hideItems="['rule_func', 'ac_func']" >
 
+      </StatCondPicker>
+    <!--</el-dialog>-->
+      <FuncParamPicker ref="FuncParamPickerDialog" @valueCallback="funcParamValueCallBack"></FuncParamPicker>
 
 
   </div>
@@ -250,7 +248,8 @@
   import check from '@/common/check'
 
   import AllPickSelect from '@/components/common/AllPickSelect'
-  import StatCondForm from '@/components/common/StatCondForm'
+  import StatCondPicker from '@/components/common/StatCondPicker'
+  import FuncParamPicker from '@/components/common/FuncParamPicker'
   import dictCode from '@/common/dictCode'
 
   let vm = null
@@ -389,14 +388,18 @@
         formStatValidShow: true,
         modDisabled: false,
         viewDisabled: false,
-        rules: {
-          auth_status: [
-            { required: true, message: '请选择是否通过授权', trigger: 'blur' }
+        dialogFormRules: {
+          stat_desc: [
+            { required: true, message: '统计描述不能为空' },
+            { max: 200, message: '长度在200个字符以内' },
+            { validator: check.checkFormZhSpecialCharacter }
           ],
-          auth_msg: [
-            { required: true, message: '请输入授权说明', trigger: 'blur' },
-            { max: 2048, message: '长度在2048个字符以内', trigger: 'blur' },
-            { validator: check.checkFormSpecialCode, trigger: 'blur' }
+          stat_cond: [
+            { validator: this.checkStatCond }
+          ],
+          stat_fn: [
+            { required: true, message: '统计函数不能为空' },
+            { validator: this.checkStatFn }
           ]
         },
         currentPage: 1,
@@ -609,6 +612,7 @@
       },
       openDialog (dialogType) {
         this.dialogType = dialogType
+        let self = this
         if (dialogType === 'edit') {
           this.dialogTitle = '编辑交易统计'
           let length = this.selectedRows.length
@@ -620,7 +624,9 @@
           this.viewDisabled = false
           // 拷贝而不是赋值
           Object.assign(this.dialogForm, this.selectedRows[0])
-          console.log(this.selectedRows[0])
+          setTimeout(function () {
+            self.dialogForm.fn_param = self.selectedRows[0].fn_param
+          }, 300)
         } else if (dialogType === 'add') {
           this.dialogTitle = '新建交易统计'
           this.modDisabled = false
@@ -649,13 +655,23 @@
       // 函数参数弹窗
       fnParamPopup () {
         console.log('fnParamPopup')
+        var objectValue = this.dialogForm.stat_fn
+        var statDatafd = this.dialogForm.stat_datafd
+        // 区间统计类函数需要修改区间参数
+        if (objectValue === 'rang_bin_dist') {
+          var fnParam = this.dialogForm.fn_param
+          var paramType = ''
+          var oneFeature = this.queryTxnFeature(statDatafd)
+          if (oneFeature) {
+            paramType = oneFeature.type
+          }
+          this.$refs.FuncParamPickerDialog.open(fnParam, paramType)
+          // params.initParamList(fnParam, paramType)
+        }
       },
       statCondInPopup () {
         if (!this.viewDisabled) {
           this.$refs.StatCondDialog.open()
-          // this.statCondInDialogVisible = true
-          // console.log('xxxx')
-          // console.log(this.$refs.StatCondDialog)
           this.$refs.StatCondDialog.setValue({
             stat_cond_value: this.dialogForm.stat_cond,
             stat_cond_in: this.dialogForm.stat_cond_in
@@ -676,6 +692,9 @@
       statCondInValueCallBack (value) {
         this.dialogForm.stat_cond = value.stat_cond_value
         this.dialogForm.stat_cond_in = value.stat_cond_in
+      },
+      funcParamValueCallBack (value) {
+        this.dialogForm.fn_param = value
       },
       // 下面是这一页的工具函数
       queryTxnFeature (fd) {
@@ -923,11 +942,40 @@
           val.fn_param = ''
           this.formFnParamShow = false
         }
+      },
+      // 下面是校验函数
+      checkStatCond (rule, value, callback) {
+        let statCond = this.dialogForm.stat_cond
+        let name = this.formStatCondInName.replace(':', '')
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (isCaExFunc) {
+          if (statCond === '') {
+            return callback(new Error(`${name}不能为空`))
+          }
+        }
+        if (statCond !== '') {
+          if (statCond.length > 512) {
+            return callback(new Error(`${name}不能超过512个字符`))
+          }
+          // 之前的代码这个校验放在后台了
+          // if(!check.checkeCondSpecialCode(statCond)){
+          //   alert(cond_caption+'不能包含特殊字符');
+          //   return false;
+          // }
+        }
+      },
+      checkStatFn (rule, value, callback) {
+        let statFn = this.dialogForm.stat_fn
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if ((!isCaExFunc && statFn !== 'count' && statFn !== 'status') && this.dialogForm.stat_datafd === '') {
+          return callback(new Error(`统计函数为：非"状态"、非"计数"时，统计目标不能为空`))
+        }
       }
     },
     components: {
       AllPickSelect,
-      StatCondForm
+      StatCondPicker,
+      FuncParamPicker
     }
   }
 </script>
