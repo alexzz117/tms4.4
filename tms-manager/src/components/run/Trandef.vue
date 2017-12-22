@@ -65,6 +65,9 @@
       initForm () {
         var self = this
         self.$refs['infoForm'].$refs['tranDefForm'].clearValidate()
+        if (self.txnId === '') {
+          return
+        }
         var option = {
           url: '/trandef/edit_prepare',
           param: {

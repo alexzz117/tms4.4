@@ -175,8 +175,10 @@
         }
         if (tabName === 'trandef') {
           var data = self.$refs.tree.getCurrentNode()
-          self.toolBtn.addBtn = !(data.txnid === undefined || data.txnid === null || data.txnid.trim() === '')
-          self.toolBtn.delBtn = data.id === 'T'  // 当前交易为root时,不允许删除
+          if (data) {
+            self.toolBtn.addBtn = !(data.txnid === undefined || data.txnid === null || data.txnid.trim() === '')
+            self.toolBtn.delBtn = data.id === 'T'  // 当前交易为root时,不允许删除
+          }
         } else {
           self.toolBtn.addBtn = true
           self.toolBtn.delBtn = true
