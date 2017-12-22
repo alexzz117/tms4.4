@@ -6,7 +6,7 @@
         <el-input v-model="listForm.rosterdesc"></el-input>
       </el-form-item>
       <el-form-item label="名单数据类型">
-        <el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择">
+        <el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择" :clearable="clearable">
           <el-option
             v-for="item in datatypeOptions"
             :key="item.value"
@@ -16,7 +16,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="名单类型">
-        <el-select v-model="listForm.rostertype" @focus="selectFocus('rostertype')" placeholder="请选择">
+        <el-select v-model="listForm.rostertype" @focus="selectFocus('rostertype')" placeholder="请选择" :clearable="clearable">
           <el-option
             v-for="item in rostertypeOptions"
             :key="item.value"
@@ -32,9 +32,9 @@
       <el-button plain class="el-icon-plus" @click="openDialog('add')" id="addBtn">新建</el-button>
       <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>
       <el-button plain class="el-icon-delete" @click="del" :disabled="delBtnStatus">删除</el-button>
-      <el-button plain class="el-icon-setting" @click="showValueList" :disabled="btnStatus">名单值</el-button>
-      <el-button plain class="el-icon-setting" @click="importList" :disabled="btnStatus">导入</el-button>
-      <el-button plain class="el-icon-setting" @click="exportList" :disabled="btnStatus">导出</el-button>
+      <el-button plain class="el-icon-edit" @click="showValueList" :disabled="btnStatus">名单值</el-button>
+      <el-button plain class="el-icon-upload" @click="importList" :disabled="btnStatus">导入</el-button>
+      <el-button plain class="el-icon-download" @click="exportList" :disabled="btnStatus">导出</el-button>
     </div>
     <el-table
       :data="gridData"
@@ -71,17 +71,23 @@
           <el-input v-model="listDialogform.rosterdesc" auto-complete="off" :disabled="status"></el-input>
         </el-form-item>
         <el-form-item label="名单数据类型" prop="datatype" data="datatype">
-          <el-select v-model="listDialogform.datatype" :disabled="status">
-            <el-option label="字符类型" value="0"></el-option>
-            <el-option label="设备标识" value="1"></el-option>
-            <el-option label="ip地址" value="2"></el-option>
+          <el-select v-model="listDialogform.datatype" :disabled="status" :clearable="clearable">
+            <el-option
+              v-for="item in datatypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="名单类型" prop="rostertype" data="rostertype">
-          <el-select v-model="listDialogform.rostertype" :disabled="status">
-            <el-option label="白名单" value="0"></el-option>
-            <el-option label="灰名单" value="1"></el-option>
-            <el-option label="黑名单" value="2"></el-option>
+          <el-select v-model="listDialogform.rostertype" :disabled="status" :clearable="clearable">
+            <el-option
+              v-for="item in rostertypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否缓存" prop="iscache" data="iscache">
@@ -92,6 +98,32 @@
           <el-input type="textarea" v-model="listDialogform.remark"></el-input>
         </el-form-item>
       </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="listDialogVisible = false" data="cancelBtn">取 消</el-button>
+        <el-button type="primary" @click="submitForm('listDialogform')" data="saveBtn">保 存</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="名单管理导入" :visible.sync="importDialogVisible">
+      <el-upload
+        class="upload-demo"
+        ref="upload"
+        action="/context/manager/mgr/import"
+        :on-preview="handlePreview"
+        :on-remove="handleRemove"
+        :file-list="fileList"
+        :auto-upload="false">
+        <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+        <div slot="tip" class="el-upload__tip">请上传XLS、XLSX、TXT或CSV格式的文件</div>
+      </el-upload>
+    </el-dialog>
+
+    <el-dialog title="选择导出名单格式" :visible.sync="exportDialogVisible">
+      <el-button type="text"  @click="exportAction('txt')">TXT</el-button>
+      <el-button type="text" @click="exportAction('csv')">CSV</el-button>
+      <el-button type="text" @click="exportAction('xls')">Excel2003及以下版本</el-button>
+      <el-button type="text" @click="exportAction('xlsx')">Excel2007及以上版本</el-button>
       <div slot="footer" class="dialog-footer">
         <el-button @click="listDialogVisible = false" data="cancelBtn">取 消</el-button>
         <el-button type="primary" @click="submitForm('listDialogform')" data="saveBtn">保 存</el-button>
@@ -109,7 +141,6 @@
   export default {
     created () {
       this.sel()
-
     },
     methods: {
       handleSizeChange(val) {
@@ -134,8 +165,6 @@
             this.$message('请选择一行名单信息。')
             return
           }
-          console.log(this.listDialogform)
-          console.log(this.multipleSelection[0])
           this.listDialogform = util.extend({}, this.multipleSelection[0])
         } else if (flag === 'add') {
           this.dialogTitle = '新建名单'
@@ -170,8 +199,6 @@
       },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
-          console.log(valid)
-          console.log(this)
           if (valid) {
             if (this.flag === 'add') {
               this.add()
@@ -179,7 +206,6 @@
               this.update()
             }
           } else {
-            console.log('error submit!!');
             return false;
           }
         })
@@ -216,6 +242,7 @@
         })
       },
       sel(pageinfo) {
+        debugger
         var self = this;
         var param;
         if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
@@ -253,17 +280,20 @@
         })
       },
       showValueList() {
-//        valuelist/:rosterid/:datatype
         var rosterid = this.multipleSelection[0].rosterid
         var datatype = this.multipleSelection[0].datatype
-        var url = `valuelist/${rosterid}/${datatype}`
-        this.$router.push(url);
+        this.$router.push({ name: 'valuelist', params: { rosterid: rosterid, datatype: datatype}})
       },
       importList() {
-
+        this.importDialogVisible = true
       },
       exportList() {
-
+        var row = this.multipleSelection[0]
+        if(row.valuecount === 0){
+          this.$message('名单中没有名单值。');
+          return;
+        }
+        this.exportDialogVisible = true
       },
       selectFocus (name) {
         if (name === 'datatype' &&　this.datatypeOptions.length === 0) {
@@ -275,10 +305,6 @@
         }
       },
       formatter(row, column, cellValue) {
-//        debugger
-//        console.log(row)
-//        console.log(column)
-
         switch(column.property )
         {
           case 'datatype':
@@ -297,11 +323,35 @@
             return cellValue
             break;
         }
+      },
+      submitUpload() {
+        this.$refs.upload.submit();
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      exportAction(flag) {
+        let row = this.multipleSelection[0]
+        let rosterId = `&rosterid=${row.rosterid}&rosterdesc=${row.rosterdesc}`
+        let params = util.serializeObj(this.listForm) + rosterId + "&flag="+flag;
+        let url = '/context/manager/mgr/export?' + params;
+        window.open(url);
+//        var rowData = g.table.selectedOneRow();
+//
+//        export_form.set({rosterId:rowData.ROSTERID,rosterdesc:rowData.ROSTERDESC});
+//        var export_params = export_form.serialize();
+//        jcl.postJSON('/tms/mgr/exportLog', export_params, function(data){
+//        });
+        this.exportDialogVisible = false
       }
     },
     data() {
       return {
         inline: true,
+        clearable: true,
         listForm: {
           rosterdesc: "",
           datatype: "",
@@ -354,7 +404,9 @@
           ]
         },
         multipleSelection: [],
-        flag: ''
+        flag: '',
+        importDialogVisible: false,
+        exportDialogVisible: false
       }
     }
   }

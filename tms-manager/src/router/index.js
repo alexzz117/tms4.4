@@ -29,6 +29,7 @@ import Ipaddr from '@/components/system/Ipaddr'
 import Log from '@/components/system/Log'
 
 import TxnEventQuery from '@/components/synquery/TxnEventQuery'
+import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
 
 import NotFoundComponent from '@/components/NotFoundComponent'
 import util from '@/common/util'
@@ -42,12 +43,12 @@ export default new Router({
   routes: [
     {
       path: '/login',
-      name: 'Login',
+      name: 'login',
       component: Login
     },
     {
       path: '/',
-      name: 'Main',
+      name: 'main',
       component: Main,
       meta: {
         requireAuth: true  // 添加该字段，表示进入这个路由是需要登录的
@@ -55,89 +56,94 @@ export default new Router({
       children: [
         {
           path: 'user',
-          name: 'User',
+          name: 'user',
           component: User
         },
         {
           path: 'role',
-          name: 'Role',
+          name: 'role',
           component: Role
         },
         {
           path: 'func',
-          name: 'Func',
+          name: 'func',
           component: Func
         },
         {
           path: 'valuelist/:rosterid/:datatype',
-          name: 'ValueList',
+          name: 'valuelist',
           component: ValueList
         },
         {
           path: 'list',
-          name: 'List',
+          name: 'list',
           component: List
         },
         {
           path: 'txn',
-          name: 'Txn',
+          name: 'txn',
           component: Txn
         },
         {
           path: 'authCenter.vue',
-          name: 'AuthCenter',
+          name: 'authCenter',
           component: AuthCenter
         },
         {
           path: 'authDataCompare.vue',
-          name: 'AuthDataCompare',
+          name: 'authDataCompare',
           component: AuthDataCompare
         },
         {
           path: 'authDataList.vue',
-          name: 'AuthDataList',
+          name: 'authDataList',
           component: AuthDataList
         },
         {
           path: 'authLogList.vue',
-          name: 'AuthLogList',
+          name: 'authLogList',
           component: AuthLogList
         },
         {
           path: 'authSubDataList.vue',
-          name: 'AuthSubDataList',
+          name: 'authSubDataList',
           component: AuthSubDataList
         },
         {
           path: 'codedict.vue',
-          name: 'Codedict',
+          name: 'codedict',
           component: Codedict
         },
         {
           path: 'codeDictInfo.vue',
-          name: 'CodeDictInfo',
+          name: 'codeDictInfo',
           component: CodedictInfo
         },
         {
           path: 'ipaddr.vue',
-          name: 'Ipaddr',
+          name: 'ipaddr',
           component: Ipaddr
         },
         {
           path: 'log',
-          name: 'Log',
+          name: 'log',
           component: Log
         },
         {
           path: 'txnEventQuery',
-          name: 'TxnEventQuery',
+          name: 'txnEventQuery',
           component: TxnEventQuery
+        },
+        {
+          path: 'alarmEventQuery',
+          name: 'alarmEventQuery',
+          component: AlarmEventQuery
         }
       ]
     },
     {
       path: '*',
-      name: 'NotFound',
+      name: 'notFound',
       component: NotFoundComponent
     }
   ]

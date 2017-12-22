@@ -1,19 +1,19 @@
 <template>
   <div>
-    <h1>名单值管理->{{listdata.rosterdesc}}</h1>
-    <el-form label-position="right" label-width="100px" :model="valueListForm" :rules="rules"
+    <h1>名单值管理 -> {{ title }}</h1>
+    <el-form label-position="right" label-width="100px" :model="valueListForm"
              :inline="inline" style="text-align: left">
-      <el-form-item label="名单值" prop="rostervalue">
+      <el-form-item label="名单值">
         <el-input v-model="valueListForm.rostervalue"></el-input>
       </el-form-item>
     </el-form>
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="del">删除</el-button>
-      <el-button plain class="el-icon-setting" @click="convertValue">值转换</el-button>
-      <el-button plain class="el-icon-setting" @click="backList">返回</el-button>
+      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>
+      <el-button plain class="el-icon-delete" @click="del" :disabled="delBtnStatus">删除</el-button>
+      <el-button plain class="el-icon-edit" @click="changeValue" :disabled="btnStatus">值转换</el-button>
+      <el-button plain class="el-icon-back" @click="backList">返回</el-button>
     </div>
     <el-table
       :data="gridData"
@@ -22,11 +22,11 @@
       style="width: 100%"
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="left"></el-table-column>
-      <el-table-column prop="rostervalue" label="名单值" align="left" width="120"></el-table-column>
-      <el-table-column prop="enabletime" label="开始时间" align="left" width="120"></el-table-column>
-      <el-table-column prop="disabletime" label="结束时间" align="left" width="120"></el-table-column>
-      <el-table-column prop="createtime" label="创建时间" align="left" width="120"></el-table-column>
-      <el-table-column prop="remark" label="备注" align="left" width="120"></el-table-column>
+      <el-table-column prop="rostervalue" label="名单值" align="left" width="200"></el-table-column>
+      <el-table-column prop="enabletime" label="开始时间" align="left" width="200"></el-table-column>
+      <el-table-column prop="disabletime" label="结束时间" align="left" width="200"></el-table-column>
+      <el-table-column prop="createtime" label="创建时间" align="left" width="200"></el-table-column>
+      <el-table-column prop="remark" label="备注" align="left" width="300"></el-table-column>
     </el-table>
     <el-pagination style="margin-top: 10px; text-align: right;"
                    @size-change="handleSizeChange"
@@ -44,10 +44,12 @@
           <el-input v-model="valueListDialogform.rostervalue" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="开始时间" prop="enabletime">
-          <el-date-picker v-model="valueListDialogform.enabletime" type="datetime"></el-date-picker>
+          <el-date-picker v-model="valueListDialogform.enabletime" type="datetime"
+                          value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
         </el-form-item>
         <el-form-item label="结束时间" prop="disabletime">
-          <el-date-picker v-model="valueListDialogform.disabletime" type="datetime"></el-date-picker>
+          <el-date-picker v-model="valueListDialogform.disabletime" type="datetime"
+                          value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input type="textarea" v-model="valueListDialogform.remark"></el-input>
@@ -58,19 +60,35 @@
         <el-button type="primary" @click="submitForm('valueListDialogform')">保 存</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="值转换" :visible.sync="changeValueDialogVisible">
+      <el-table
+        :data="changeValueTableData"
+        highlight-current-row
+        @current-change="handleCurrentChangeValueTable"
+        style="width: 100%">
+        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
+        <el-table-column prop="rosterdesc" label="名单名称" align="left" width="200"></el-table-column>
+        <el-table-column prop="datatype" label="名单数据类型" align="left" width="200"></el-table-column>
+        <el-table-column prop="rostertype" label="名单类型" align="left" width="200"></el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="changeValueDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="constrast">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import axios from 'axios'
   import util from '@/common/util'
   import check from '@/common/check'
   import ajax from '@/common/ajax'
+  import dictCode from '@/common/dictCode'
 
   export default {
     created () {
-      this.getList()
-      this.sel()
+      this.getList(this.sel)
     },
     methods: {
       handleSizeChange(val) {
@@ -87,7 +105,7 @@
       },
       openDialog(flag) {
         this.flag = flag
-        this.dialogTitle = `名单值管理->${this.listdata.rosterdesc}`
+        this.dialogTitle = `名单值管理->${this.title}`
         if (flag === 'edit') {
           var length = this.multipleSelection.length
           if (length !== 1) {
@@ -101,7 +119,7 @@
           } else {
             this.valueListDialogform = {
               rostervalue: "",
-              enabletime: "",
+              enabletime: new Date().format('yyyy-MM-dd hh:mm:ss'),
               disabletime: "",
               remark: ""
             }
@@ -111,6 +129,16 @@
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
+        if (val.length === 1){
+          this.btnStatus = false
+          this.delBtnStatus = false
+        } else if (val.length > 1){
+          this.btnStatus = true
+          this.delBtnStatus = false
+        } else {
+          this.btnStatus = true
+          this.delBtnStatus = true
+        }
       },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
@@ -132,74 +160,142 @@
         this.pagesize = data.page.size
         this.total = data.page.total
       },
-      getList() {
-        var parm = {
-          rosterid: this.$router.params.rosterid
+      bindValueGridData(data) {
+        this.changeValueTableData = data.row
+      },
+      getList(cb) {
+        self = this
+        var param = {
+          rosterid: this.$router.history.current.params.rosterid
         }
-        ajax.post('/tms/mgr/get', parm, function (data) {
-          this.listData = data.row
+        ajax.post({
+          url: '/mgr/get',
+          param: param,
+          success: function (data) {
+            self.listData = data.row
+            self.title = data.row.rosterdesc
+            if (cb) {
+              cb()
+            }
+          }
         })
       },
       add() {
         var self = this
-        var parm = util.extend({
+        var param = util.extend({
           rosterid: this.listData.rosterid,
           datatype: this.listData.datatype,
           rosterdesc: this.listData.rosterdesc,
         }, this.valueListDialogform)
-        ajax.post('/tms/mgr/valueadd', parm, function (data) {
-          self.$message('创建成功。')
-          self.valueListDialogVisible = false
-          self.sel()
+
+        ajax.post({
+          url: '/mgr/valueadd',
+          param: param,
+          success: function (data) {
+            self.$message('创建成功。')
+            self.valueListDialogVisible = false
+            self.sel()
+          }
         })
       },
       del() {
         var self = this
-        ajax.post('/tms/mgr/valuedel', {
-          del: this.multipleSelection
-        }, function (data) {
-          self.$message('删除成功。')
-          self.sel()
+
+        ajax.post({
+          url: '/mgr/valuedel',
+          param: {
+            postData: {
+              del: this.multipleSelection
+            }
+          },
+          success: function (data) {
+            self.$message('删除成功。')
+            self.sel()
+          }
         })
       },
       sel(pageinfo) {
         var self = this;
         var param;
-        if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
-          param = util.extend({
-            pageindex:this.pageindex,
-            pagesize:this.pagesize
-          }, this.valueListForm, pageinfo)
-        } else {
-          param = util.extend({
-            pageindex:this.pageindex,
-            pagesize:this.pagesize
-          }, this.valueListForm)
+        var comParam = {
+          pageindex:this.pageindex,
+          pagesize:this.pagesize,
+          rosterid: this.listData.rosterid,
+          datatype: this.listData.datatype
         }
-        ajax.post('/tms/mgr/valuelist', param, function (data) {
-          if (data.page) {
-            self.bindGridData(data)
+        if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
+          param = util.extend(comParam, this.valueListForm, pageinfo)
+        } else {
+          param = util.extend(comParam, this.valueListForm)
+        }
+        ajax.post({
+          url: '/mgr/valuelist',
+          param: param,
+          success: function (data) {
+            if (data.page) {
+              self.bindGridData(data)
+            }
           }
         })
       },
       update() {
         var self = this;
-        var parm = util.extend({
+        var param = util.extend({
           rosterid: this.listData.rosterid,
           datatype: this.listData.datatype,
           rosterdesc: this.listData.rosterdesc,
         }, this.valueListDialogform)
-        ajax.post('/tms/mgr/valuemod', parm, function (data) {
-          self.$message('更新成功。')
-          self.valueListDialogVisible = false
-          self.sel()
+
+        ajax.post({
+          url: '/mgr/valuemod',
+          param: param,
+          success: function (data) {
+            self.$message('更新成功。')
+            self.valueListDialogVisible = false
+            self.sel()
+          }
         })
       },
-      convertValue() {
-        console.log('值转换')
+      changeValue() {
+        var self = this
+        ajax.post({
+          url: '/mgr/changevalueget',
+          param: {
+            rosterid: this.listData.rosterid,
+            datatype: this.listData.datatype,
+            rostertype: this.listData.rostertype
+          },
+          success: function (data) {
+            self.bindValueGridData(data)
+            self.changeValueDialogVisible= true
+          }
+        })
+      },
+      // 单击值转换确定按钮时
+      constrast() {
+        var rosterValue = this.multipleSelection[0]
+        ajax.post({
+          url: '/mgr/changevalue',
+          param: {
+            rostervalueid: rosterValue.rostervalueid,
+            rostervalue: rosterValue.rostervalue,
+            rosterid: this.valuecurrentRow.rosterid + '||||' + this.valuecurrentRow.rosterdesc,
+            rosteridold: this.listData.rosterid,
+            rosterdescout: this.listData.rosterdesc
+          },
+          success: function (data) {
+            self.$message('值转换成功。')
+            self.changeValueDialogVisible= false
+            self.sel()
+          }
+        })
+      },
+      handleCurrentChangeValueTable(val) {
+        this.valuecurrentRow = val;
       },
       backList() {
-        this.$router.push('list');
+        this.$router.push({ name: 'list' })
+//        this.$router.push('list');
       }
     },
     data() {
@@ -208,7 +304,9 @@
         valueListForm: {
           rostervalue: ""
         },
-        listData: {},
+        listData: {
+          rosterdesc: ""
+        },
         gridData: [],
         pageindex: 1,
         pagesize: 10,
@@ -216,11 +314,12 @@
         valueListDialogVisible: false,
         valueListDialogform: {
           rostervalue: "",
-          enabletime: "",
+          enabletime: new Date().format('yyyy-MM-dd hh:mm:ss'),
           disabletime: "",
           remark: ""
         },
-        dialogTitle: '',
+        dialogTitle: "",
+        title: "testdddd",
         formLabelWidth: '150px',
         rules: {
           rostervalue: [
@@ -243,7 +342,12 @@
           ]
         },
         multipleSelection: [],
-        flag: ''
+        flag: '',
+        changeValueDialogVisible: false,
+        changeValueTableData: [],
+        valuecurrentRow: {},
+        btnStatus: true,
+        delBtnStatus: true
       }
     }
   }

@@ -367,6 +367,15 @@ var util = {
 
     // Return the modified object
     return target;
+  },
+  serializeObj: function(obj) {
+    var str = ''
+    if (util.isPlainObject(obj)) {
+      for(var key in obj) {
+        str += `&${key}=${obj[key]}`
+      }
+    }
+    return str
   }
 }
 
