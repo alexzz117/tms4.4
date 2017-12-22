@@ -54,7 +54,7 @@
           addBtn: true, // 添加按钮
           delBtn: true // 删除按钮
         },
-        txnId: '',
+        txnId: 'T',
         tabVisibility: {
           trandefVisibility: true,
           tranmdlVisibility: false,

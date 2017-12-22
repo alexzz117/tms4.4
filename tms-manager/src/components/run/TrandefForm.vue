@@ -116,8 +116,6 @@
         }
       }
       return {
-        txnIdParent: this.txnId,
-        isVisibilityParent: this.isVisibility,
         tabDisposalList: [],
         tabDisposalSelectedCached: [],
         modelUsedList: [{label: '不使用模型', value: '0'}, {label: '模型学习期', value: '1'}],
@@ -189,4 +187,3 @@
 <style>
 
 </style>
-·
