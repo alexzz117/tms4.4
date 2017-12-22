@@ -113,8 +113,8 @@
           <el-input v-model="dialogForm.stat_desc" auto-complete="off" :maxlength=200 :style="formItemContentStyle" :disabled="viewDisabled"></el-input>
         </el-form-item>
 
-        <el-form-item label="统计引用对象:" :label-width="formLabelWidth" prop="stat_param" :style="formItemStyle" v-show="formStatParamShow">
-          <AllPickSelect :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"></AllPickSelect>
+        <el-form-item label="统计引用对象:" class="is-required" :label-width="formLabelWidth" prop="stat_param" :style="formItemStyle" v-show="formStatParamShow">
+          <AllPickSelect :selectedList="statParamInitList" :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"></AllPickSelect>
         </el-form-item>
 
         <el-form-item label="统计函数:" :label-width="formLabelWidth" prop="stat_fn" :style="formItemStyle" v-show="formStatFnShow">
@@ -130,14 +130,14 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="formStatCondInName" :class="{'is-required':dialogForm.stat_fn === 'calculat_expressions'}" :label-width="formLabelWidth" prop="stat_cond" :style="formItemStyle" v-show="formStatCondInShow">
+        <el-form-item :label="formStatCondInName" :class="{'is-required':StatCondInRequired}" :label-width="formLabelWidth" prop="stat_cond" :style="formItemStyle" v-show="formStatCondInShow">
           <div @dblclick="statCondInPopup" :disabled="viewDisabled">
             <el-input v-model="dialogForm.stat_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly :disabled="viewDisabled"></el-input>
             <el-input v-model="dialogForm.stat_cond_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="viewDisabled"></el-input>
           </div>
         </el-form-item>
 
-        <el-form-item label="统计目标:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="formStatDatafdShow">
+        <el-form-item label="统计目标:" class="is-required" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="formStatDatafdShow">
           <el-select v-model="dialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"
                      clearable>
             <el-option
@@ -149,22 +149,30 @@
           </el-select>
         </el-form-item>
 
-
-        <el-form-item label="函数参数:" :label-width="formLabelWidth" prop="fn_param" :style="formItemStyle" v-show="formFnParamShow">
+        <el-form-item label="函数参数:" class="is-required" :label-width="formLabelWidth" prop="fn_param" :style="formItemStyle" v-show="formFnParamShow">
           <div @dblclick="fnParamPopup">
             <el-input v-model="dialogForm.fn_param" auto-complete="off" :style="formItemContentStyle" readonly :disabled="viewDisabled"></el-input>
           </div>
         </el-form-item>
 
-        <el-form-item label="单位:" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formCoununitShow">
-          <el-input v-model="dialogForm.coununit" auto-complete="off" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"></el-input>
+        <el-form-item label="单位:" class="is-required" :label-width="formLabelWidth" prop="coununit" :style="formItemStyle" v-show="formCoununitShow">
+          <el-select v-model="dialogForm.coununit" placeholder="请选择" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"
+                     clearable>
+            <el-option
+              v-for="item in coununitList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+
         </el-form-item>
 
-        <el-form-item label="周期:" :label-width="formLabelWidth" prop="countround" :style="formItemStyle" v-show="formCountroundShow">
+        <el-form-item label="周期:" class="is-required" :label-width="formLabelWidth" prop="countround" :style="formItemStyle" v-show="formCountroundShow">
           <el-input v-model="dialogForm.countround" auto-complete="off" :style="formItemContentStyle" :disabled="viewDisabled"></el-input>
         </el-form-item>
 
-        <el-form-item label="交易结果:" :label-width="formLabelWidth" prop="result_cond" :style="formItemStyle" v-show="formResultCondShow">
+        <el-form-item label="交易结果:" class="is-required" :label-width="formLabelWidth" prop="result_cond" :style="formItemStyle" v-show="formResultCondShow">
           <el-select v-model="dialogForm.result_cond" placeholder="请选择" :style="formItemContentStyle" :disabled="viewDisabled"
                      clearable>
             <el-option
@@ -176,7 +184,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="数据类型:" :label-width="formLabelWidth" prop="datatype" :style="formItemStyle" v-show="formDatatypeShow">
+        <el-form-item label="数据类型:" class="is-required" :label-width="formLabelWidth" prop="datatype" :style="formItemStyle" v-show="formDatatypeShow">
           <el-select v-model="dialogForm.datatype" placeholder="请选择" :style="formItemContentStyle" :disabled="viewDisabled"
                      clearable>
             <el-option
@@ -282,6 +290,9 @@
           return '统计条件:'
         }
       },
+      StatCondInRequired () {
+        return this.dialogForm.stat_fn === 'calculat_expressions'
+      },
       // tableDataShow 用于表格数据的前台检索
       tableDataShow () {
         let statName = this.queryShowForm.stat_name
@@ -361,12 +372,14 @@
           stat_fn: '',
           stat_valid: ''
         },
+        statParamInitList: [],
         dialogForm: this.initDialogForm(),
         statCondInDictDialogForm: {},
         // 下面这几条都是下拉框取值用的
         statParamList: [],
         statDataFdList: [],
         statFnList: [],
+        coununitList: [],
         statValidList: [],
         resultCondList: [],
         datatypeCodeList: [],
@@ -390,16 +403,40 @@
         viewDisabled: false,
         dialogFormRules: {
           stat_desc: [
-            { required: true, message: '统计描述不能为空' },
-            { max: 200, message: '长度在200个字符以内' },
-            { validator: check.checkFormZhSpecialCharacter }
+            { required: true, message: '统计描述不能为空', trigger: 'none' },
+            { max: 200, message: '长度在200个字符以内', trigger: 'none' },
+            { validator: check.checkFormZhSpecialCharacter, trigger: 'none' }
           ],
           stat_cond: [
-            { validator: this.checkStatCond }
+            { validator: this.checkStatCond, trigger: 'none' }
           ],
           stat_fn: [
-            { required: true, message: '统计函数不能为空' },
-            { validator: this.checkStatFn }
+            { required: true, message: '统计函数不能为空', trigger: 'none' }
+          ],
+          stat_param: [
+            // { required: true, message: '统计引用对象不能为空', trigger: 'none' }
+            { validator: this.checkStatParam, trigger: 'none' }
+          ],
+          stat_datafd: [
+            { validator: this.checkStatDataFd, trigger: 'none' }
+          ],
+          fn_param: [
+            { validator: this.checkFnParam, trigger: 'none' }
+          ],
+          coununit: [
+            { validator: this.checkCoununit, trigger: 'none' }
+          ],
+          countround: [
+            { validator: this.checkCountround, trigger: 'none' }
+          ],
+          result_cond: [
+            { validator: this.checkResultCond, trigger: 'none' }
+          ],
+          datatype: [
+            { validator: this.checkDatatype, trigger: 'none' }
+          ],
+          stat_valid: [
+            { validator: this.checkStatValid, trigger: 'none' }
           ]
         },
         currentPage: 1,
@@ -517,6 +554,7 @@
         return {
           stat_desc: '',
           stat_param: '',
+          stat_param_list: '',
           stat_fn: '',
           stat_cond: '',
           stat_cond_in: '',
@@ -541,6 +579,8 @@
         this.statValidList = dictCode.getCodeItems('tms.mgr.rulestatus')
         this.resultCondList = dictCode.getCodeItems('tms.stat.txnstatus')
         this.datatypeCodeList = dictCode.getCodeItems('tms.stat.datatype')
+        this.coununitList = dictCode.getCodeItems('tms.stat.condunit')
+
         // this.getStatDataFnSelectData()
         // this.getStatDataValidSelectData()
         // this.getData()
@@ -625,6 +665,9 @@
           // 拷贝而不是赋值
           Object.assign(this.dialogForm, this.selectedRows[0])
           setTimeout(function () {
+            if (self.dialogForm.stat_param !== '') {
+              self.statParamInitList = self.selectedRows[0].stat_param.split(',')
+            }
             self.dialogForm.fn_param = self.selectedRows[0].fn_param
           }, 300)
         } else if (dialogType === 'add') {
@@ -632,6 +675,7 @@
           this.modDisabled = false
           this.viewDisabled = false
           this.dialogForm = this.initDialogForm()
+          this.statParamInitList = []
         } else if (dialogType === 'view') {
           this.dialogTitle = '查看交易统计'
           let length = this.selectedRows.length
@@ -641,6 +685,12 @@
           }
           this.viewDisabled = true
           this.modDisabled = false
+          setTimeout(function () {
+            if (self.dialogForm.stat_param !== '') {
+              self.statParamInitList = self.selectedRows[0].stat_param.split(',')
+            }
+            self.dialogForm.fn_param = self.selectedRows[0].fn_param
+          }, 300)
           Object.assign(this.dialogForm, this.selectedRows[0])
         }
         this.dialogVisible = true
@@ -648,6 +698,15 @@
           this.$refs['dialogForm'].clearValidate()
         }
         this.dialogOpenHandle()
+      },
+      submitForm (formName) {
+        console.log(formName)
+        this.$refs[formName].validate((valid) => {
+          console.log(valid)
+          if (valid) {
+            alert('提交')
+          }
+        })
       },
       getStatDataFnSelectData () {
         // let self = this
@@ -963,13 +1022,115 @@
           //   return false;
           // }
         }
+        callback()
       },
-      checkStatFn (rule, value, callback) {
+      checkStatDataFd (rule, value, callback) {
         let statFn = this.dialogForm.stat_fn
+        // let fnParam = this.dialogForm.fn_param
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if ((!isCaExFunc && statFn !== 'count' && statFn !== 'status') && this.dialogForm.stat_datafd === '') {
-          return callback(new Error(`统计函数为：非"状态"、非"计数"时，统计目标不能为空`))
+          return callback(new Error(`统计目标不能为空`))
         }
+        callback()
+      },
+      checkStatParam (rule, value, callback) {
+        let statParam = this.dialogForm.stat_param
+        let counUnit = this.dialogForm.coununit
+        // let fnParam = this.dialogForm.fn_param
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (!isCaExFunc && (statParam.length === 0 || statParam === '')) {
+          return callback(new Error(`统计引用对象不能为空`))
+        } else {
+          if (statParam.length > 6) {
+            return callback(new Error(`统计引用对象最多选择6个`))
+          }
+
+          if (counUnit === '9') {
+            let isFind = false
+            for (let loop of statParam) {
+              if (loop.toUpperCase() === 'SESSIONID') {
+                isFind = true
+                break
+              }
+            }
+            if (!isFind) {
+              return callback(new Error(`单位为会话，必须包含"会话标识"`))
+            }
+          }
+        }
+
+        callback()
+      },
+      checkFnParam (rule, value, callback) {
+        let statFn = this.dialogForm.stat_fn
+        let fnParam = this.dialogForm.fn_param
+        if (statFn === 'rang_bin_dist') {
+          if (fnParam === undefined || fnParam === '') {
+            return callback(new Error(`函数参数不能为空`))
+          } else {
+            if (fnParam.length > 512) {
+              return callback(new Error(`函数参数不能超过512个字符`))
+            }
+          }
+        }
+        callback()
+      },
+      checkCoununit (rule, value, callback) {
+        let coununit = this.dialogForm.coununit
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (!isCaExFunc) {
+          if (coununit === '') {
+            return callback(new Error(`单位不能为空`))
+          }
+        }
+        callback()
+      },
+      checkCountround (rule, value, callback) {
+        let coununit = this.dialogForm.coununit
+        let countround = this.dialogForm.countround
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (!isCaExFunc) {
+          if (coununit !== '7' || coununit !== '9') { // 永久，会话不需要周期
+            if (util.trim(countround) === '') {
+              return callback(new Error(`周期不能为空`))
+            } else {
+              if (!util.isNumber(countround, '+', '0') || parseInt(countround) < 1 || parseInt(countround) > 100) {
+                return callback(new Error(`周期只能输入1-100的正整数`))
+              }
+            }
+          }
+        }
+        callback()
+      },
+      checkResultCond (rule, value, callback) {
+        let resultCond = this.dialogForm.result_cond
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (!isCaExFunc) {
+          if (util.trim(resultCond) === '') {
+            return callback(new Error(`交易结果不能为空`))
+          }
+        }
+        callback()
+      },
+      checkDatatype (rule, value, callback) {
+        let datatype = this.dialogForm.datatype
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (isCaExFunc) {
+          if (util.trim(datatype) === '') {
+            return callback(new Error(`数据类型不能为空`))
+          }
+        }
+        callback()
+      },
+      checkStatValid (rule, value, callback) {
+        let statValid = this.dialogForm.stat_valid
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (!isCaExFunc) {
+          if (util.trim(statValid) === '') {
+            return callback(new Error(`有效性不能为空`))
+          }
+        }
+        callback()
       }
     },
     components: {
