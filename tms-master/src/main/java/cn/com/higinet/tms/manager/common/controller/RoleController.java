@@ -124,21 +124,22 @@ public class RoleController {
 	 * @param roleIds
 	 * @return
 	 */
-	@RequestMapping(value = "/del")
-	public Model delRoleActoin( @RequestParam("roleId") String[] roleIds, HttpServletRequest request ) {
+	@RequestMapping(value = "/del", method = RequestMethod.POST)
+	public Model delRoleActoin(@RequestBody Map<String, String> reqs, HttpServletRequest request ) {
+//    public Model delRoleActoin( @RequestParam("roleId") String[] roleIds,, HttpServletRequest request ) {
+		String roleId = reqs.get("roleid");
 		Model model = new Model();
-		if( roleIds != null && roleIds.length > 0 ) {
-			Map<String, Object> map = roleService.getRole( roleIds[0] );
+		if(roleId != null && !"".equals(roleId)) {
+			Map<String, Object> map = roleService.getRole(roleId);
 			request.setAttribute( "role_name", map.get( DBConstant.CMC_ROLE_ROLE_NAME ) );
-			boolean flag = roleService.delRole( roleIds[0] );
+			boolean flag = roleService.delRole(roleId);
 			if( flag ) {
 				model.addError( "角色已被分配，不能删除！" );
 				return model;
 			}
+			roleService.deleteRole(roleId);
 		}
-		if( roleIds != null && roleIds.length > 0 ) {
-			roleService.deleteRole( roleIds[0] );
-		}
+
 		return model;
 	}
 

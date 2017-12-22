@@ -42,12 +42,12 @@ public class RoleService {
 	 */
 	public Page<Map<String, Object>> listRole( Map<String, String> conds ) {
 		String sql = "select * from " + DBConstant.CMC_ROLE;
-		conds.put( "ROLE_NAME", ConditionUtil.like( conds.get( "ROLE_NAME" ) ) );
+		conds.put( "ROLE_NAME", ConditionUtil.like( conds.get( "role_name" )));
 		String where = ConditionUtil.and( conds, new String[][] {
 				{
-						"like", "ROLE_NAME", "ROLE_NAME"
+						"like", "ROLE_NAME", "role_name"
 				}, {
-						"=", "FLAG", "FLAG"
+						"=", "FLAG", "flag"
 				},
 		} );
 		sql += ConditionUtil.where( where );

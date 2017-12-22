@@ -29,6 +29,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -163,7 +164,7 @@ public class NameListController {
 	@RequestMapping(value = "/get")
 	public Model getNameListActoin( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
-		model.setRow( nameListService.getOneNameList( modelMap.getString( "rosterId" ) ) );
+		model.setRow( nameListService.getOneNameList( modelMap.getString( "rosterid" ) ) );
 		return model;
 	}
 
@@ -227,7 +228,7 @@ public class NameListController {
 	 */
 	@RequestMapping(value = "/valuelist", method = RequestMethod.POST)
 	public Model listValueListActoin( @RequestBody Map<String, String> reqs ) {
-		String rosterId = reqs.get( "rosterId" );
+		String rosterId = reqs.get( "rosterid" );
 
 		Model model = new Model();
 		// 查询条件
@@ -350,7 +351,7 @@ public class NameListController {
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put( DBConstant.TMS_MGR_ROSTER_ROSTERTYPE, reqs.get( "rostertype" ) );
 		conds.put( DBConstant.TMS_MGR_ROSTER_DATATYPE, reqs.get( "datatype" ) );
-		conds.put( DBConstant.TMS_MGR_ROSTER_ROSTERID, reqs.get( "rosterId" ) );
+		conds.put( DBConstant.TMS_MGR_ROSTER_ROSTERID, reqs.get( "rosterid" ) );
 		model.setRow( nameListService.getRosterTypeList( conds ) );
 		return model;
 	}
@@ -363,7 +364,7 @@ public class NameListController {
 	@RequestMapping(value = "/changevalue", method = RequestMethod.POST)
 	public Model updateRosterIdActoin( @RequestBody Map<String, Object> reqs, HttpServletRequest request ) {
 		Model model = new Model();
-		String str = MapUtil.getString( reqs, "rosterId" );
+		String str = MapUtil.getString( reqs, "rosterid" );
 		String[] strArr = str.split( "\\|\\|\\|\\|" );
 		String rosterId = "";
 		String rosterdescEnter = "";
@@ -371,7 +372,7 @@ public class NameListController {
 			rosterId = strArr[0];
 			rosterdescEnter = strArr[1];
 		}
-		reqs.put( "rosterId", rosterId );
+		reqs.put( "rosterid", rosterId );
 		nameListService.updateOneValueListForConvert( reqs );
 		request.setAttribute( "rosterdescOut", reqs.get( "rosterdescOut" ) );
 		request.setAttribute( "rosterdescEnter", rosterdescEnter );
@@ -455,7 +456,7 @@ public class NameListController {
 	}
 
 	@RequestMapping(value = "/export", method = RequestMethod.GET)
-	public void exportListAction( @RequestBody Map<String, String> reqs, HttpServletResponse response ) {
+	public void exportListAction(@RequestParam Map<String, String> reqs, HttpServletResponse response ) {
 		String type; //导出类型
 		if( StringUtil.isEmpty( reqs.get( "flag" ) ) ) { //默认导出类型为csv
 			type = "csv";

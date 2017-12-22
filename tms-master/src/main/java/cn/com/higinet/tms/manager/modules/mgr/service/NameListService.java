@@ -314,13 +314,15 @@ public class NameListService {
 	 */
 	public Page<Map<String, Object>> listValueListByPage( Map<String, String> conds ) {
 		String sql = "SELECT * FROM TMS_MGR_ROSTERVALUE";
-
+		String rostervalue = conds.get( "rostervalue" );
+		conds.put("rostervalue", '%' + rostervalue + '%');
+		
 		sql += SqlWhereHelper.getPatternWhere( conds, SqlWhereHelper.valueListConds );
 
 		StringBuffer sb = new StringBuffer( sql );
-		if( !StringUtil.isEmpty( conds.get( "ROSTERVALUE" ) ) ) {
-			sb.append( " AND (ROSTERVALUE LIKE '%'||:ROSTERVALUE||'%' OR ROSTERVALUE=:MD5ROSTERVALUE)" );
-			conds.put( "MD5ROSTERVALUE", MD5Util.getMD5Hex16( conds.get( "ROSTERVALUE" ) ) );
+		if( !StringUtil.isEmpty( conds.get( "rostervalue" ) ) ) {
+			sb.append( " AND (ROSTERVALUE LIKE :rostervalue OR ROSTERVALUE=:MD5ROSTERVALUE)" );
+			conds.put( "MD5ROSTERVALUE", MD5Util.getMD5Hex16( conds.get( "rostervalue" ) ) );
 		}
 
 		Order order = new Order().desc( "CREATETIME" );
@@ -354,7 +356,7 @@ public class NameListService {
 	 */
 	public Map<String, Object> createValueList( Map<String, Object> req ) {
 		Map<String, Object> insertMap = new HashMap<String, Object>();
-		String rosterId = (String) req.get( "ROSTERID" );
+		String rosterId = String.valueOf(req.get( "rosterid" ));
 
 		String rosterValueId = "2" + sequenceService.getSequenceIdToString( "SEQ_TMS_ROSTERVALUE_ID" );// sequence前加1，用来防止与规则引擎加入名单的主键重复，规则引擎加入名单的主键是“1”+seq
 		insertMap.put( "ROSTERVALUEID", rosterValueId );
@@ -468,7 +470,7 @@ public class NameListService {
 	 */
 	public void updateOneValueList( Map<String, Object> req ) {
 		Map<String, Object> conds = new HashMap<String, Object>();
-		String rosterValueId = (String) req.get( "rosterValueId" );
+		String rosterValueId = req.get( "rostervalueid" ).toString();
 		conds.put( "ROSTERVALUEID", rosterValueId );
 
 		Map<String, Object> updateMap = new HashMap<String, Object>();
@@ -494,17 +496,17 @@ public class NameListService {
 	 */
 	public void updateOneValueListForConvert( Map<String, Object> req ) {
 		Map<String, Object> conds = new HashMap<String, Object>();
-		String rosterValueId = (String) req.get( "rosterValueId" );
+		String rosterValueId = String.valueOf(req.get( "rostervalueid" ));
 		conds.put( "ROSTERVALUEID", rosterValueId );
 
 		Map<String, Object> updateMap = new HashMap<String, Object>();
-		String rosterId = (String) req.get( "rosterId" );
+		String rosterId = (String) req.get( "rosterid" );
 		updateMap.put( "ROSTERID", rosterId );
 		long time = System.currentTimeMillis();
 		updateMap.put( "MODIFYTIME", time );
 
 		//授权需要
-		String rosterOldId = MapUtil.getString( req, "rosterIdOld" );
+		String rosterOldId = MapUtil.getString( req, "rosteridold" );
 		req.put( "ROSTERVALUEID", rosterValueId );
 		req.put( "ROSTERSYNCID", rosterOldId + "," + rosterId );
 		req.put( "ROSTERDEPID", rosterOldId + "," + rosterId );
@@ -520,7 +522,7 @@ public class NameListService {
 		List<Map<String, String>> delList = batchMap.get( "del" );
 		String rosterValueIdStr = "";
 		for( Map<String, String> delMap : delList ) {
-			int rosterValueId = MapUtil.getInteger( delMap, "ROSTERVALUEID" );
+			int rosterValueId = MapUtil.getInteger( delMap, "rostervalueid" );
 			rosterValueIdStr += ",'" + rosterValueId + "'";
 		}
 		rosterValueIdStr = rosterValueIdStr.substring( 1 );
