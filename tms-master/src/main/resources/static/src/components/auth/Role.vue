@@ -18,11 +18,11 @@
     </el-form>
 
     <div style="margin-bottom: 10px;text-align: left ">
-      <el-button class="el-icon-search" type="primary" @click="selRole">查询</el-button>
+      <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="delRole">删除</el-button>
-      <el-button plain class="el-icon-setting" @click="grant">功能授权</el-button>
+      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>
+      <el-button plain class="el-icon-delete" @click="del" :disabled="btnStatus">删除</el-button>
+      <el-button plain class="el-icon-setting" @click="grant" :disabled="btnStatus">功能授权</el-button>
     </div>
 
     <el-table
@@ -33,13 +33,13 @@
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="left"></el-table-column>
       <el-table-column prop="role_name" label="角色名称" align="left" width="180"></el-table-column>
-      <el-table-column prop="flag" label="状态" align="left" width="180"></el-table-column>
+      <el-table-column prop="flag" label="状态" align="left" width="180" :formatter="formatter"></el-table-column>
       <el-table-column prop="info" label="描述信息" align="left"></el-table-column>
     </el-table>
     <el-pagination style="margin-top: 10px; text-align: right;"
                    @size-change="handleSizeChange"
                    @current-change="handleCurrentChange"
-                   :current-page="currentPage"
+                   :current-page="pageindex"
                    :page-sizes="[10, 25, 50, 100]"
                    :page-size="pagesize"
                    layout="total, sizes, prev, pager, next, jumper"
@@ -53,7 +53,7 @@
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;">
           <el-radio v-model="roleDialogform.flag" label="1">正常</el-radio>
-          <el-radio v-model="roleDialogform.flag" label="2">停用</el-radio>
+          <el-radio v-model="roleDialogform.flag" label="0">停用</el-radio>
         </el-form-item>
         <el-form-item label="描述信息" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="roleDialogform.info"></el-input>
@@ -64,17 +64,34 @@
         <el-button type="primary" @click="submitForm('roleDialogform')">保 存</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="功能授权" :visible.sync="grantDialogVisible">
+      <el-tree
+        :data="grantData"
+        show-checkbox
+        default-expand-all
+        node-key="id"
+        ref="tree"
+        highlight-current
+        :props="defaultProps">
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="roleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('roleDialogform')">保 存</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import axios from 'axios'
   import util from '@/common/util'
   import ajax from '@/common/ajax'
+  import check from '@/common/check'
+  import dictCode from '@/common/dictCode'
 
   export default {
     created () {
-      this.selRole()
+      this.sel()
     },
     methods: {
       handleSizeChange(val) {
@@ -106,48 +123,35 @@
           } else {
             this.roleDialogform = {
               role_name: '',
-              rosterdesc: "",
-              datatype: "",
-              rostertype: "",
-              iscache: "1",
-              remark: "",
+              flag: '1',
+              info: ''
             }
-          }
-        }
-
-        } else if (flag === 'add') {
-          this.dialogTitle = '新建角色'
-          this.roleDialogform = {
-            ROLE_NAME: '',
-            FLAG: '1',
-            INFO: ''
           }
         }
         this.roleDialogVisible = true
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
+        if (val.length === 1){
+          this.btnStatus = false
+        } else if (val.length > 1){
+          this.btnStatus = true
+        } else {
+          this.btnStatus = true
+        }
       },
       submitForm(formName) {
-        if (this.flag === 'add') {
-          this.addRole()
-        } else if (this.flag === 'edit') {
-          this.updateRole()
-        }
-//        this.$refs[formName].validate((valid) => {
-//          console.log(valid)
-//          this.addRole()
-//          if (valid) {
-//            if (this.flag === 'add') {
-//              this.addRole()
-//            } else if (this.flag === 'edit') {
-//              this.updateRole()
-//            }
-//          } else {
-//            console.log('error submit!!');
-//            return false;
-//          }
-//        })
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            if (this.flag === 'add') {
+              this.add()
+            } else if (this.flag === 'edit') {
+              this.update()
+            }
+          } else {
+            return false;
+          }
+        })
       },
       bindGridData(data) {
         this.roleData = data.page.list
@@ -155,114 +159,164 @@
         this.pagesize = data.page.size
         this.total = data.page.total
       },
-      addRole() {
+      add() {
         var self = this
-        ajax.post('/cmc/role/add', this.roleDialogform, function (data) {
-          self.$message('创建成功。')
-          self.roleDialogVisible = false
-          self.selRole()
-        })
-      },
-      delRole() {
-        var self = this
-        var data = this.multipleSelection[0]
-        ajax.post('/cmc/role/del', {
-          roleId: data.ROLE_ID
-        }, function (data) {
-          self.$message('删除成功。')
-          self.selRole()
-        })
-      },
-      selRole() {
-        var self = this;
-        ajax.post('/cmc/role/list', {
-          pageindex:1,
-          pagesize:10
-        }, function (data) {
-          if (data.page) {
-            self.bindGridData(data)
+        ajax.post({
+          url: '/role/add',
+          param: this.roleDialogform,
+          success: function (data) {
+            self.$message('创建成功。')
+            self.roleDialogVisible = false
+            self.sel()
           }
         })
       },
-      updateRole() {
+      del() {
+        var self = this
+        var data = this.multipleSelection[0]
+        ajax.post({
+          url: '/role/del',
+          param: {
+            roleid: data.role_id
+          },
+          success: function (data) {
+            self.$message('删除成功。')
+            self.sel()
+          }
+        })
+      },
+      sel(pageinfo) {
         var self = this;
-        ajax.post('/cmc/role/mod', this.roleDialogform, function (data) {
-          self.$message('更新成功。')
-          self.roleDialogVisible = false
-          self.selRole()
+        var param;
+        if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
+          param = util.extend({
+            pageindex:this.pageindex,
+            pagesize:this.pagesize
+          }, this.roleForm, pageinfo)
+        } else {
+          param = util.extend({
+            pageindex:this.pageindex,
+            pagesize:this.pagesize
+          }, this.roleForm)
+        }
+
+        ajax.post({
+          url: '/role/list',
+          param: param,
+          success: function (data) {
+            if (data.page) {
+              self.bindGridData(data)
+            }
+          }
+        })
+      },
+      update() {
+        var self = this;
+        ajax.post({
+          url: '/role/mod',
+          param: this.roleDialogform,
+          success: function (data) {
+            self.$message('更新成功。')
+            self.roleDialogVisible = false
+            self.sel()
+          }
         })
       },
       grant() {
-
+        this.grantData = [{
+          id: 1,
+          label: '一级 1',
+          children: [{
+            id: 4,
+            label: '二级 1-1',
+            children: [{
+              id: 9,
+              label: '三级 1-1-1'
+            }, {
+              id: 10,
+              label: '三级 1-1-2'
+            }]
+          }]
+        }, {
+          id: 2,
+          label: '一级 2',
+          children: [{
+            id: 5,
+            label: '二级 2-1'
+          }, {
+            id: 6,
+            label: '二级 2-2'
+          }]
+        }, {
+          id: 3,
+          label: '一级 3',
+          children: [{
+            id: 7,
+            label: '二级 3-1'
+          }, {
+            id: 8,
+            label: '二级 3-2'
+          }]
+        }]
+        this.grantDialogVisible = true
       },
       selectFocus () {
         this.flagOptions = dictCode.getCodeItems('cmc.cmc_role.flag')
+      },
+      formatter(row, column, cellValue) {
+        switch(column.property )
+        {
+          case 'flag':
+            return dictCode.rendCode('cmc.cmc_role.flag', cellValue)
+            break;
+          default:
+            return cellValue
+            break;
+        }
       }
     },
     data() {
-      var checkSpecialCode = (rule, value, callback) => {
-        if (!this.checkSpecialCode(value)){
-          return callback(new Error('请不要输入特殊字符！如($,%)'));
-        }
-      };
-
-      var roleNameExist = () => {
-        axios.post('/cmc/role/checkUserName', this.roleDialogform)
-          .then(function (data) {
-            if('false'==data.checke_result){
-              return callback(new Error('请不要输入特殊字符！如($,%)'));
-            }else{
-              this.$message({
-                message: '角色名称可以使用',
-                type: 'success'
-              });
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      }
       return {
         inline: true,
         roleForm: {
           ROLE_NAME:''
         },
-        roleData: [
-          {
-            "SPLIT_ROWS_NUM": 1,
-            "ROLE_ID": "26D20B7B9533435098FAC7B4B0DE8DF4",
-            "ROLE_NAME": "tms系统管理员",
-            "FLAG": "1",
-            "INFO": null
-          }
-        ],
-        currentPage: 4,
+        roleData: [],
+        pageindex: 1,
         pagesize: 10,
         total: 100,
         roleDialogVisible: false,
+        grantDialogVisible: false,
         roleDialogform: {
-          ROLE_NAME: '',
-          FLAG: '1',
-          INFO: ''
+          role_name: '',
+          flag: '1',
+          info: ''
         },
         dialogTitle: '',
         formLabelWidth: '100px',
+        btnStatus: true,
         rules: {
           ROLE_NAME: [
             { required: true, message: '请输入角色名称', trigger: 'blur' },
             { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
-            { validator: util.checkSpecialCode, trigger: 'blur' }
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
 //            ,
 //            { validator: roleNameExist, trigger: 'blur' }
           ],
           INFO: [
             { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
-            { validator: util.checkSpecialCode, trigger: 'blur' }
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
         },
         multipleSelection: [],
         flag: '',
-        flagOptions: []
+        flagOptions: [],
+        clearable: true,
+        grantData: [],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        }
       }
     }
   }

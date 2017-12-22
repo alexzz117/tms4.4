@@ -242,7 +242,6 @@
         })
       },
       sel(pageinfo) {
-        debugger
         var self = this;
         var param;
         if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
