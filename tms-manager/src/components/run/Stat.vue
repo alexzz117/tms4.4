@@ -233,8 +233,13 @@
     </el-dialog>
 
     <!--<el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible">-->
-      <StatCondForm ref="StatCondDialog" @closeDialog="closeStatCondInDialog" @valueCallback="statCondInValueCallBack" :statCond="dialogForm.stat_cond" :statCondIn="dialogForm.stat_cond_in" :txnId="txnId"></StatCondForm>
+      <StatCondForm ref="StatCondDialog" @closeDialog="closeStatCondInDialog" @valueCallback="statCondInValueCallBack"
+                    :statCond="dialogForm.stat_cond" :statCondIn="dialogForm.stat_cond_in" :txnId="txnId"
+                    :hideItems="['rule_func', 'ac_func']"
+      ></StatCondForm>
     <!--</el-dialog>-->
+
+
 
   </div>
 </template>

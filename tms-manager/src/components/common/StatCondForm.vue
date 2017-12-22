@@ -2,7 +2,7 @@
   <!--<div>-->
   <el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible">
     <el-form :model="statCondInDictDialogForm"  ref="statCondInDictDialogForm" style="text-align: left"  :inline="true">
-      <el-form-item label="交易属性:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" >
+      <el-form-item label="交易属性:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="itemShow.stat_datafd">
         <el-select v-model="statCondInDictDialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChange">
           <el-option
@@ -14,13 +14,13 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="交易统计:" :label-width="formLabelWidth" prop="stat_fn" :style="formItemStyle" >
+      <el-form-item label="交易统计:" :label-width="formLabelWidth" prop="stat_fn" :style="formItemStyle" v-show="itemShow.stat_fn">
         <div @dblclick="statFnDialogVisible = true">
           <el-input v-model="statCondInDictDialogForm.stat_fn" auto-complete="off" :style="formItemContentStyle" readonly ></el-input>
         </div>
       </el-form-item>
 
-      <el-form-item label="日期函数:" :label-width="formLabelWidth" prop="date_func" :style="formItemStyle" >
+      <el-form-item label="日期函数:" :label-width="formLabelWidth" prop="date_func" :style="formItemStyle" v-show="itemShow.date_func" >
         <el-select v-model="statCondInDictDialogForm.date_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChangeAddBracket">
           <el-option
@@ -32,7 +32,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="字符函数:" :label-width="formLabelWidth" prop="str_func" :style="formItemStyle" >
+      <el-form-item label="字符函数:" :label-width="formLabelWidth" prop="str_func" :style="formItemStyle" v-show="itemShow.str_func" >
         <el-select v-model="statCondInDictDialogForm.str_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChangeAddBracket">
           <el-option
@@ -44,7 +44,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="字符函数:" :label-width="formLabelWidth" prop="oper_func" :style="formItemStyle" >
+      <el-form-item label="字符函数:" :label-width="formLabelWidth" prop="oper_func" :style="formItemStyle"  v-show="itemShow.oper_func" >
         <el-select v-model="statCondInDictDialogForm.oper_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChange">
           <el-option
@@ -56,7 +56,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="名单:" :label-width="formLabelWidth" prop="roster_func" :style="formItemStyle" >
+      <el-form-item label="名单:" :label-width="formLabelWidth" prop="roster_func" :style="formItemStyle" v-show="itemShow.roster_func">
         <el-select v-model="statCondInDictDialogForm.roster_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChange">
           <el-option
@@ -68,7 +68,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="自定义函数:" :label-width="formLabelWidth" prop="diy_func" :style="formItemStyle" >
+      <el-form-item label="自定义函数:" :label-width="formLabelWidth" prop="diy_func" :style="formItemStyle"  v-show="itemShow.diy_func">
         <el-select v-model="statCondInDictDialogForm.diy_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChangeAddBracket">
           <el-option
@@ -80,7 +80,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="交易规则:" :label-width="formLabelWidth" prop="rule_func" :style="formItemStyle" >
+      <el-form-item label="交易规则:" :label-width="formLabelWidth" prop="rule_func" :style="formItemStyle"  v-show="itemShow.rule_func">
         <el-select v-model="statCondInDictDialogForm.rule_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChange">
           <el-option
@@ -92,7 +92,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="动作函数:" :label-width="formLabelWidth" prop="ac_func" :style="formItemStyle" >
+      <el-form-item label="动作函数:" :label-width="formLabelWidth" prop="ac_func" :style="formItemStyle" v-show="itemShow.ac_func">
         <el-select v-model="statCondInDictDialogForm.ac_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChangeAddBracket">
           <el-option
@@ -105,7 +105,7 @@
       </el-form-item>
 
       <div>
-        <el-form-item label="条件表达式:" :label-width="formLabelWidth" prop="stat_cond_value" >
+        <el-form-item label="条件表达式:" :label-width="formLabelWidth" prop="stat_cond_value">
           <el-input type="textarea" v-model="statCondInDictDialogForm.stat_cond_value" ref="statCondValue" :style="textareaContentStyle"></el-input>
         </el-form-item>
       </div>
@@ -176,6 +176,17 @@
           children: 'children',
           label: 'text'
         },
+        itemShow: {
+          stat_datafd: true,
+          stat_fn: true,
+          date_func: true,
+          str_func: true,
+          oper_func: true,
+          roster_func: true,
+          diy_func: true,
+          rule_func: true,
+          ac_func: true
+        },
         expendKey: ['T'], // 默认展开的功能节点id
         statDatafdList: [],
         dateFuncList: [],
@@ -200,6 +211,12 @@
       txnId: {
         type: String,
         default: ''
+      },
+      hideItems: {
+        type: Array,
+        default () {
+          return []
+        }
       }
     },
     watch: {
@@ -224,7 +241,12 @@
         vm = this
         this.statCondInDictDialogForm.stat_cond_value = this.statCond
         this.statCondInDictDialogForm.stat_cond_in = this.statCondIn
-        this.initData()
+        let hideArr = this.hideItems
+
+        for (let hideName of hideArr) {
+          this.itemShow[hideName] = false
+        }
+
       })
     },
     methods: {
@@ -532,6 +554,7 @@
             statCondValueTextarea.addEventListener('focus', function () { self.getSelectedPostion(statCondValueTextarea) })
           }, 300)
         }
+        this.initData()
         this.firstOpen = false
         this.statCondInDialogVisible = true
       }
