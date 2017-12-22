@@ -1,6 +1,5 @@
 package cn.com.higinet.tms.common;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class FastjsonConfig extends WebMvcConfigurerAdapter {
 		super.configureMessageConverters( converters );
 		FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
 		FastJsonConfig fastJsonConfig = new FastJsonConfig();
-		
+
 		//格式化输出
 		fastJsonConfig.setSerializerFeatures( SerializerFeature.PrettyFormat );
 

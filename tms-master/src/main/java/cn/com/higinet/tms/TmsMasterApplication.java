@@ -12,7 +12,6 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 public class TmsMasterApplication {
 
 	public static void main(String[] args) {
-		//System.getProperties().put( "server.myaddress", IPAddressUtil.getHostAddress() );
 		SpringApplication.run(TmsMasterApplication.class, args);
 	}
 }

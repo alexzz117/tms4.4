@@ -126,7 +126,7 @@ public class Model extends ModelMap {
 	 * @return
 	 */
 	public Object get( String attributeName ) {
-		return this.get( attributeName );
+		return super.get( attributeName );
 	}
 
 	/**
