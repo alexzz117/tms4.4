@@ -116,7 +116,7 @@ public class AcController {
 	* @param actionId
 	* @return
 	 */
-	@RequestMapping(value = "/get")
+	@RequestMapping(value = "/get", method = RequestMethod.POST)
 	public Model getActoin( @RequestBody RequestModel modelMap ) {
 		Model model = new Model();
 		model.setRow( actionService35.getOneAction( modelMap.getString( "actionId" ) ) );

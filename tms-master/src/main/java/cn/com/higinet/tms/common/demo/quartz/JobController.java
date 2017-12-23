@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.demo.quartz.aaa;
+package cn.com.higinet.tms.common.demo.quartz;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;

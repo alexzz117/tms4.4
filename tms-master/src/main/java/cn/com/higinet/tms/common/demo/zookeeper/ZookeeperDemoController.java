@@ -35,7 +35,7 @@ public class ZookeeperDemoController {
 		Model model = new Model();
 		String test = new String( curator.getData().forPath( "/config/tms-master/test" ) );
 
-		model.put( "aaa", zookeeperProperties );
+		model.put( "aaaaaaa", zookeeperProperties );
 		model.put( "bbb", curator );
 		model.put( "ccc", test );
 

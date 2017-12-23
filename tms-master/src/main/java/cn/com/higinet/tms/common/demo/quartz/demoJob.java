@@ -4,17 +4,14 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import cn.com.higinet.tms.base.util.Stringz;
+public class demoJob implements BaseJob {
 
-public class demoJob extends QuartzJobBean {
-
-	private static final Logger logger = LoggerFactory.getLogger( demoJob.class );
+	private static Logger logger = LoggerFactory.getLogger( demoJob.class );
 
 	@Override
-	protected void executeInternal( JobExecutionContext arg0 ) throws JobExecutionException {
-		logger.info( Stringz.valueOf( System.currentTimeMillis() )  );
+	public void execute( JobExecutionContext context ) throws JobExecutionException {
+		logger.info( context.getFireTime().toString() );
 	}
 
 }

@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.demo.quartz.aaa;
+package cn.com.higinet.tms.common.demo.quartz;
 
 import java.io.IOException;
 import java.util.Properties;
