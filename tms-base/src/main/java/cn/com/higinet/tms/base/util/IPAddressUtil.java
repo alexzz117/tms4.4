@@ -1,6 +1,7 @@
 package cn.com.higinet.tms.base.util;
 
 import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -21,5 +22,27 @@ public class IPAddressUtil {
 			return 8080;
 		}
 
+	}
+
+	public static String getHostName() {
+		String host = null;
+		try {
+			host = InetAddress.getLocalHost().getHostName();
+		}
+		catch( Exception e ) {
+			e.printStackTrace();
+		}
+		return host;
+	}
+	
+	public static String getHostAddress() {
+		String ip = null;
+		try {
+			ip = InetAddress.getLocalHost().getHostAddress();
+		}
+		catch( Exception e ) {
+			e.printStackTrace();
+		}
+		return ip;
 	}
 }

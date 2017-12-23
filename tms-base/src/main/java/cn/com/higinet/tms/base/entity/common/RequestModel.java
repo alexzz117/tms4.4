@@ -123,4 +123,22 @@ public class RequestModel extends ModelMap {
 		if( this.get( key ) == null ) return false;
 		return (Boolean) this.get( key );
 	}
+
+	/**
+	 * 验证指定属性
+	 * */
+	/*public Model isValid( String... keys ) {
+		Model model = new Model();
+		for( String key : keys ) {
+			if( this.get( key ) == null ) {
+				model.addError( key + " is null" );
+			}
+			else if( this.get( key ) instanceof String ) {
+				if( Stringz.isEmpty( this.get( key ) ) ) {
+					model.addError( key + " is empty" );
+				}
+			}
+		}
+		return model;
+	}*/
 }
