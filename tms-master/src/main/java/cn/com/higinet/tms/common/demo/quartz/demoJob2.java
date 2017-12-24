@@ -5,9 +5,9 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class demoJob implements TmsJob {
+public class demoJob2 implements TmsJob {
 
-	private static Logger logger = LoggerFactory.getLogger( demoJob.class );
+	private static Logger logger = LoggerFactory.getLogger( demoJob2.class );
 
 	@Override
 	public void execute( JobExecutionContext context ) throws JobExecutionException {
@@ -16,7 +16,7 @@ public class demoJob implements TmsJob {
 
 	@Override
 	public String getJobName() {
-		return "demoJob";
+		return null;
 	}
 
 }

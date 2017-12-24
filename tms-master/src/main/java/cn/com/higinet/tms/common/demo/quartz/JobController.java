@@ -1,13 +1,19 @@
 package cn.com.higinet.tms.common.demo.quartz;
 
+import java.util.List;
+import java.util.Map;
+
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
+import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,12 +22,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.util.Classz;
 import cn.com.higinet.tms.base.util.Stringz;
 
 @RestController
 @RequestMapping(value = "/demo/quartz")
 public class JobController {
+
+	private static final Logger logger = LoggerFactory.getLogger( JobController.class );
 
 	@Autowired
 	@Qualifier("Scheduler")
@@ -63,7 +75,7 @@ public class JobController {
 		String jobName = detail.getJobName();
 		String jobGroupName = detail.getJobGroupName();
 		if( Stringz.isEmpty( jobName, jobGroupName ) ) new Model().addError( "param is empty" );
-		
+
 		scheduler.pauseJob( JobKey.jobKey( jobName, jobGroupName ) );
 		return new Model();
 	}
@@ -117,6 +129,23 @@ public class JobController {
 		return new Model();
 	}
 
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/job_class_list", method = RequestMethod.GET)
+	public Model jobclasslist() throws Exception {
+		List<Map<String, String>> resultList = Lists.newArrayList();
+		List<Class<?>> list = Classz.getAllClassByInterface( TmsJob.class, "cn.com.higinet.tms", "cn.com.higinet.tms.engine", "cn.com.higinet.tms.base" );
+		if( list != null ) {
+			for( Class<?> _class : list ) {
+				Map<String, String> map = Maps.newHashMap();
+				TmsJob tmsjob = ((Class<TmsJob>) _class).newInstance();
+				map.put( "label", tmsjob.getJobName() );
+				map.put( "value", tmsjob.getClass().getName() );
+				resultList.add( map );
+			}
+		}
+		return new Model().setList( resultList );
+	}
+
 	/** 
 	 * 验证是否存在 
 	 * @param jobName 
@@ -127,8 +156,8 @@ public class JobController {
 		return scheduler.checkExists( triggerKey );
 	}
 
-	private BaseJob getClass( String classname ) throws Exception {
+	private Job getClass( String classname ) throws Exception {
 		Class<?> class1 = Class.forName( classname );
-		return (BaseJob) class1.newInstance();
+		return (Job) class1.newInstance();
 	}
 }
