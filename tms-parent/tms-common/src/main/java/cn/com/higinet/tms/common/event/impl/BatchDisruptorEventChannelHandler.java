@@ -52,7 +52,7 @@ public abstract class BatchDisruptorEventChannelHandler implements EventChannelH
 	@Override
 	public void handleEvent(EventContext event, EventChannel channel) throws Exception {
 		events.add(event);
-		if (event.isEndOfBatch() || events.size() == batchSize) {
+		if (event.isEndOfBatch() || events.size() >= batchSize) {
 			try {
 				handleEvents(events, channel);
 			} catch (Exception e) {
