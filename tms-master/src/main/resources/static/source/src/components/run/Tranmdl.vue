@@ -276,7 +276,7 @@
         self.tmFormReadOnly = false
       },
       tmDelFunc () {
-        let self = this
+        // let self = this
         console.info('删除交易模型')
       },
       tmInfoFunc () {
