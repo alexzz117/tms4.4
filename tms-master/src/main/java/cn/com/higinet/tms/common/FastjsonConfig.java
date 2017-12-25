@@ -1,9 +1,11 @@
 package cn.com.higinet.tms.common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -37,9 +39,9 @@ public class FastjsonConfig extends WebMvcConfigurerAdapter {
 		fastJsonConfig.setSerializerFeatures( SerializerFeature.PrettyFormat );
 
 		//设置编码
-		//List<MediaType> fastMediaTypes = new ArrayList<MediaType>();
-		//fastMediaTypes.add( MediaType.APPLICATION_JSON_UTF8 );
-		//fastConverter.setSupportedMediaTypes( fastMediaTypes );
+		List<MediaType> fastMediaTypes = new ArrayList<MediaType>();
+		fastMediaTypes.add( MediaType.APPLICATION_JSON_UTF8 );
+		fastConverter.setSupportedMediaTypes( fastMediaTypes );
 
 		fastConverter.setFastJsonConfig( fastJsonConfig );
 		converters.add( fastConverter );
