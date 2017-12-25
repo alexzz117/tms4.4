@@ -1,6 +1,6 @@
 package cn.com.higinet.tms.timer.core;
 
-public class TmsJobDetail {
+public class JobEntity {
 	String jobName;
 	String jobClassName;
 	String jobGroupName;

@@ -43,7 +43,7 @@ public class JobController {
 	 * 新增任务
 	 * */
 	@PostMapping("/add")
-	public Model add( @RequestBody TmsJobDetail detail ) throws Exception {
+	public Model add( @RequestBody JobEntity detail ) throws Exception {
 		String jobName = detail.getJobName();
 		String jobClassName = detail.getJobClassName();
 		String jobGroupName = detail.getJobGroupName();
@@ -71,7 +71,7 @@ public class JobController {
 	 * 暂停任务
 	 * */
 	@RequestMapping(value = "/pause", method = RequestMethod.POST)
-	public Model pause( @RequestBody TmsJobDetail detail ) throws Exception {
+	public Model pause( @RequestBody JobEntity detail ) throws Exception {
 		String jobName = detail.getJobName();
 		String jobGroupName = detail.getJobGroupName();
 		if( Stringz.isEmpty( jobName, jobGroupName ) ) new Model().addError( "param is empty" );
@@ -81,7 +81,7 @@ public class JobController {
 	}
 
 	@RequestMapping(value = "/resume", method = RequestMethod.POST)
-	public Model resume( @RequestBody TmsJobDetail detail ) throws Exception {
+	public Model resume( @RequestBody JobEntity detail ) throws Exception {
 		String jobName = detail.getJobName();
 		String jobGroupName = detail.getJobGroupName();
 		if( Stringz.isEmpty( jobName, jobGroupName ) ) new Model().addError( "param is empty" );
@@ -94,7 +94,7 @@ public class JobController {
 	 * 修改任务
 	 * */
 	@RequestMapping(value = "/reschedule", method = RequestMethod.POST)
-	public Model reschedule( @RequestBody TmsJobDetail detail ) throws Exception {
+	public Model reschedule( @RequestBody JobEntity detail ) throws Exception {
 		String jobName = detail.getJobName();
 		String jobGroupName = detail.getJobGroupName();
 		String cronExpression = detail.getCronExpression();
@@ -115,7 +115,7 @@ public class JobController {
 	 * 删除任务
 	 * */
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
-	public Model delete( @RequestBody TmsJobDetail detail ) throws Exception {
+	public Model delete( @RequestBody JobEntity detail ) throws Exception {
 		String jobName = detail.getJobName();
 		String jobGroupName = detail.getJobGroupName();
 		if( Stringz.isEmpty( jobName, jobGroupName ) ) new Model().addError( "param is empty" );
