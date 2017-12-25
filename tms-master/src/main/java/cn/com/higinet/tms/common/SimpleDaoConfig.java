@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.manager.dao;
+package cn.com.higinet.tms.common;
 
 import javax.sql.DataSource;
 
@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
+import cn.com.higinet.tms.manager.dao.SimpleDao;
+import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.impl.MysqlSimpleDaoImpl;
 
 /**

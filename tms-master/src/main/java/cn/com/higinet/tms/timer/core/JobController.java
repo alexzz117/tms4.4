@@ -10,8 +10,10 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
+import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,41 @@ public class JobController {
 	@Autowired
 	@Qualifier("Scheduler")
 	private Scheduler scheduler;
+
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public Model list() throws Exception {
+		List<TaskEntity> taskList = Lists.newArrayList();
+
+		for( String groupJob : scheduler.getJobGroupNames() ) {
+			for( JobKey jobKey : scheduler.getJobKeys( GroupMatcher.<JobKey> groupEquals( groupJob ) ) ) {
+				List<? extends Trigger> triggers = scheduler.getTriggersOfJob( jobKey );
+				for( Trigger trigger : triggers ) {
+					Trigger.TriggerState triggerState = scheduler.getTriggerState( trigger.getKey() );
+					JobDetail jobDetail = scheduler.getJobDetail( jobKey );
+
+					String cronExpression = "";
+					String createTime = "";
+
+					if( trigger instanceof CronTrigger ) {
+						CronTrigger cronTrigger = (CronTrigger) trigger;
+						cronExpression = cronTrigger.getCronExpression();
+						createTime = cronTrigger.getDescription();
+					}
+
+					TaskEntity task = new TaskEntity();
+					task.setName( jobKey.getName() );
+					task.setGroup( jobKey.getGroup() );
+					task.setDescription( jobDetail.getDescription() );
+					task.setCronExpression( cronExpression );
+					task.setStatus( triggerState.name() );
+					task.setCreateTime( createTime );
+					taskList.add( task );
+				}
+			}
+		}
+		
+		return new Model().setList( taskList );
+	}
 
 	/**
 	 * 新增任务
