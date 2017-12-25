@@ -11,11 +11,8 @@
     </el-form>
 
     <div style="margin-bottom: 10px;text-align: left ">
-      <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="notSelectOne">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="delData()" :disabled="notSelectOne">删除</el-button>
-      <el-button plain class="el-icon-view" @click="showData()" :disabled="notSelectOne">查看</el-button>
       <el-button class="el-icon-search" type="primary" @click="searchData('queryShowForm')">查询</el-button>
+      <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
     </div>
 
     <el-table
@@ -24,7 +21,18 @@
       border
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
+
+      <el-table-column
+        fixed="left"
+        label="操作"
+        width="150">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
+          <el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>
+          <el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>
+        </template>
+      </el-table-column>
+
       <el-table-column prop="category_id" label="代码类别key" align="left" width="180"></el-table-column>
       <el-table-column prop="category_name" label="代码类别value" align="left" width="180"></el-table-column>
       <el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>
@@ -78,7 +86,7 @@
     },
     data () {
       let categoryIdExist = (rule, value, callback) => {
-        if (this.dialogType === 'edit' && this.selectedRows[0].category_id === value) {
+        if (this.dialogType === 'edit' && this.selectRow.category_id === value) {
           callback()
         } else {
           ajax.post({
@@ -113,6 +121,7 @@
         },
         dictData: [],
         selectedRows: [],
+        selectRow: {},
         dictDialogForm: this.initDialogForm(),
         queryRules: {
           category_id: [
@@ -206,14 +215,8 @@
           }
         })
       },
-      delData () {
+      delData (data) {
         let self = this
-        let data = this.selectedRows[0]
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行代码类别信息。')
-          return
-        }
         this.$confirm('确定删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -255,13 +258,8 @@
           }
         })
       },
-      showData () {
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行代码类别信息。')
-          return
-        }
-        this.$router.push({name: 'codeDictInfo', query: { category_id: this.selectedRows[0].category_id }})
+      showData (row) {
+        this.$router.push({name: 'codeDictInfo', query: { category_id: row.category_id }})
       },
       submitForm (formName) {
         if (this.dialogType === 'add') {
@@ -289,17 +287,13 @@
       handleSelectionChange (rows) {
         this.selectedRows = rows
       },
-      openDialog (dialogType) {
+      openDialog (dialogType, row) {
         this.dialogType = dialogType
         if (dialogType === 'edit') {
+          this.selectRow = row
           this.dialogTitle = '编辑代码类别'
-          let length = this.selectedRows.length
-          if (length !== 1) {
-            this.$message('请选择一行代码类别信息。')
-            return
-          }
           // 拷贝而不是赋值
-          Object.assign(this.dictDialogForm, this.selectedRows[0])
+          Object.assign(this.dictDialogForm, row)
         } else if (dialogType === 'add') {
           this.dialogTitle = '新建代码类别'
           this.dictDialogForm = this.initDialogForm()

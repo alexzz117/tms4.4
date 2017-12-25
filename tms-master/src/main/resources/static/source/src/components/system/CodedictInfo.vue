@@ -3,8 +3,6 @@
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="notSelectOne">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="delData()" :disabled="notSelectOne">删除</el-button>
     </div>
 
     <el-table
@@ -13,7 +11,16 @@
       border
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
+      <el-table-column
+        fixed="left"
+        label="操作"
+        width="150">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
+          <el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+
       <el-table-column prop="category_id" label="类别代码" align="left"></el-table-column>
       <el-table-column prop="category_name" label="类别名称" align="left"></el-table-column>
       <el-table-column prop="code_key" label="代码key" align="left"></el-table-column>
@@ -146,17 +153,12 @@
           info: ''
         }
       },
-      openDialog (dialogType) {
+      openDialog (dialogType, row) {
         this.dialogType = dialogType
         if (dialogType === 'edit') {
           this.dialogTitle = '编辑字典信息'
-          let length = this.selectedRows.length
-          if (length !== 1) {
-            this.$message('请选择一行字典信息。')
-            return
-          }
           // 拷贝而不是赋值
-          Object.assign(this.dictDialogForm, this.selectedRows[0])
+          Object.assign(this.dictDialogForm, row)
         } else if (dialogType === 'add') {
           this.dialogTitle = '新建字典信息'
           this.dictDialogForm = this.initDialogForm()
@@ -210,14 +212,8 @@
           }
         })
       },
-      delData () {
+      delData (data) {
         let self = this
-        let data = this.selectedRows[0]
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行字典信息。')
-          return
-        }
         this.$confirm('确定删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

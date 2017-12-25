@@ -59,13 +59,13 @@
 
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-view" type="primary" @click="queryFormShow = !queryFormShow">查询</el-button>
-      <el-button plain class="el-icon-view" :disabled="notSelectOne" @click="openDialog('view')">查看</el-button>
+      <!--<el-button plain class="el-icon-view" :disabled="notSelectOne" @click="openDialog('view')">查看</el-button>-->
       <el-button plain class="el-icon-plus" :disabled="isExpand" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand" @click="openDialog('edit')">编辑</el-button>
-      <el-button plain class="el-icon-delete" :disabled="notSelectOne || isExpand">删除</el-button>
-      <el-button plain class="el-icon-circle-check" :disabled="notSelectOne || isExpand">启用</el-button>
-      <el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>
-      <el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>
+      <!--<el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand" @click="openDialog('edit')">编辑</el-button>-->
+      <!--<el-button plain class="el-icon-delete" :disabled="notSelectOne || isExpand" @click="delData">删除</el-button>-->
+      <!--<el-button plain class="el-icon-circle-check" :disabled="notSelectOne || isExpand">启用</el-button>-->
+      <!--<el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>-->
+      <!--<el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>-->
     </div>
 
     <div class="stat-expand-table-box">
@@ -77,8 +77,20 @@
         border
         style="width: 100%"
         @selection-change="handleSelectionChange">
+        <el-table-column
+          fixed="left"
+          label="操作"
+          width="150">
+          <template slot-scope="scope">
 
-        <el-table-column type="selection" width="55" align="left" :selectable="rowSelectable"></el-table-column>
+            <el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
+            <el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>
+            <el-button type="text" size="small">引用点</el-button>
+
+          </template>
+        </el-table-column>
+        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
+        <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
         <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
         <el-table-column prop="stat_desc" label="统计描述" align="left" width="250"></el-table-column>
         <el-table-column label="统计引用对象" align="left">
@@ -100,7 +112,14 @@
         <el-table-column prop="storecolumn" label="存储字段" align="left"></el-table-column>
         <el-table-column label="有效性" align="left" width="60">
           <template slot-scope="scope">
-            <span>{{scope.row.stat_valid | renderStatValidFilter}}</span>
+            <el-switch
+              v-model="scope.row.stat_valid"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              :active-value=1
+              :inactive-value=0
+              @change="statValidChange(scope.row)">
+            </el-switch>
           </template>
         </el-table-column>
       </el-table>
@@ -238,7 +257,8 @@
             active-color="#13ce66"
             inactive-color="#ff4949"
             active-value="1"
-            inactive-value="0">
+            inactive-value="0"
+            >
           </el-switch>
 
         </el-form-item>
@@ -249,13 +269,11 @@
       </div>
     </el-dialog>
 
-    <!--<el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible">-->
-      <StatCondPicker ref="StatCondDialog" @closeDialog="closeStatCondInDialog" @valueCallback="statCondInValueCallBack"
+      <StatCondPicker ref="StatCondDialog" @valueCallback="statCondInValueCallBack"
                     :statCond="dialogForm.stat_cond" :statCondIn="dialogForm.stat_cond_in" :txnId="txnId"
                     :hideItems="['rule_func', 'ac_func']" >
 
       </StatCondPicker>
-    <!--</el-dialog>-->
       <FuncParamPicker ref="FuncParamPickerDialog" @valueCallback="funcParamValueCallBack"></FuncParamPicker>
 
 
@@ -367,7 +385,6 @@
         dialogTitle: '',
         dialogType: '',
         dialogVisible: false,
-        statCondInDialogVisible: false,
         formLabelWidth: '120px',
         formItemStyle: {
           width: '400px'
@@ -563,6 +580,7 @@
       }
     },
     methods: {
+      // 重建一个新的表单对象
       initDialogForm () {
         return {
           stat_desc: '',
@@ -583,21 +601,19 @@
           stat_valid: 0
         }
       },
+      // 选中列 现在没用了
       handleSelectionChange (rows) {
         this.selectedRows = rows
       },
+      // 重新加载数据
       reloadData () {
-        // getData getStatDataFnSelectData 写在了这一句的回调中，因为需要依赖这个的取值
         this.getStatParamSelectData()
         this.statValidList = dictCode.getCodeItems('tms.mgr.rulestatus')
         this.resultCondList = dictCode.getCodeItems('tms.stat.txnstatus')
         this.datatypeCodeList = dictCode.getCodeItems('tms.stat.datatype')
         this.coununitList = dictCode.getCodeItems('tms.stat.condunit')
-
-        // this.getStatDataFnSelectData()
-        // this.getStatDataValidSelectData()
-        // this.getData()
       },
+      // 加载列表数据
       getData () {
         let self = this
         let paramsObj = {
@@ -615,6 +631,7 @@
           }
         })
       },
+      // 获取统计引用对象，统计目标 统计函数 的下拉值
       getStatParamSelectData () {
         let self = this
         ajax.post({
@@ -649,40 +666,87 @@
           }
         })
       },
-      rowSelectable () {
-        return !this.isExpand
-      },
+      // 表单弹窗弹出时的处理
       dialogOpenHandle () {
         this.formDatatypeShow = false
 
         this.fnChangeEventCommon()
 
         this.countroundChangeEvent()
-
-        if (this.dialogType !== 'add') {
-
-        }
       },
-      openDialog (dialogType) {
+      // 删除数据
+      delData (row) {
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let jsonData = {}
+          jsonData.del = [row]
+          let finalJsonData = {}
+          finalJsonData.postData = jsonData
+          finalJsonData.txnId = this.txnIdParent
+          let self = this
+
+          ajax.post({
+            url: '/stat/save',
+            param: finalJsonData,
+            success: function (data) {
+              self.getData()
+              self.$message('删除成功')
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
+      // 表格中的可用性按钮点击
+      statValidChange (row) {
+        let jsonData = {}
+        jsonData['valid-y'] = [row]
+        let finalJsonData = {}
+        finalJsonData.postData = jsonData
+        finalJsonData.txnId = this.txnIdParent
+        let self = this
+        let message = '编辑成功'
+        if (row.stat_valid === 1) {
+          message = '已启用'
+        } else {
+          message = '已停用'
+        }
+
+        ajax.post({
+          url: '/stat/save',
+          param: finalJsonData,
+          success: function (data) {
+            // self.getData()
+            self.$message(message)
+          }
+        })
+      },
+      // 打开表单弹窗 其中view暂时去掉了
+      openDialog (dialogType, row) {
         this.dialogType = dialogType
         let self = this
         if (dialogType === 'edit') {
           this.allPickCollapse = true // 编辑时多选为隐藏多的标签
           this.dialogTitle = '编辑交易统计'
-          let length = this.selectedRows.length
-          if (length !== 1) {
-            this.$message('请选择一行交易统计信息。')
-            return
-          }
           this.modDisabled = true
           this.viewDisabled = false
           // 拷贝而不是赋值
-          Object.assign(this.dialogForm, this.selectRowNum2Str(this.selectedRows[0]))
+          // Object.assign(this.dialogForm, this.selectRowNum2Str(this.selectedRows[0]))
+          Object.assign(this.dialogForm, this.selectRowNum2Str(row))
+
           setTimeout(function () {
             if (self.dialogForm.stat_param !== '') {
-              self.statParamInitList = self.selectedRows[0].stat_param.split(',')
+              self.statParamInitList = row.stat_param.split(',')
+              // self.statParamInitList = self.selectedRows[0].stat_param.split(',')
             }
-            self.dialogForm.fn_param = self.selectedRows[0].fn_param
+            self.dialogForm.fn_param = row.fn_param
+            // self.dialogForm.fn_param = self.selectedRows[0].fn_param
           }, 300)
         } else if (dialogType === 'add') {
           this.allPickCollapse = true // 新增时多选为隐藏多的标签
@@ -692,6 +756,7 @@
           this.dialogForm = this.initDialogForm()
           this.statParamInitList = []
         } else if (dialogType === 'view') {
+          // 这里暂时走不到了
           this.allPickCollapse = false // 查看时多选为显示多的标签
           this.dialogTitle = '查看交易统计'
           let length = this.selectedRows.length
@@ -707,8 +772,6 @@
             }
             self.dialogForm.fn_param = self.selectedRows[0].fn_param
           }, 300)
-          console.log('selectedRows')
-          console.log(this.selectedRows[0])
           Object.assign(this.dialogForm, this.selectRowNum2Str(this.selectedRows[0]))
         }
         this.dialogVisible = true
@@ -719,6 +782,7 @@
           }
         }, 100)
       },
+      // 下拉获取的码值时字符串，真实数据是数字，要转一下才好用
       selectRowNum2Str (row) {
         let tempObj = {}
         Object.assign(tempObj, row)
@@ -729,8 +793,8 @@
         }
         return tempObj
       },
+      // 提交表单，新增，编辑都在这
       submitForm (formName) {
-        console.log(formName)
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let self = this
@@ -743,13 +807,14 @@
             if (submitParam.stat_param !== null && submitParam.stat_param.length > 0) {
               submitParam.stat_param = submitParam.stat_param.join(',')
             }
-            // var jsonData =  ? JSON.stringify({'add': [submitParam]}) : JSON.stringify({'mod': [submitParam]})
-            // var jsonDataEncode = encodeURIComponent(jsonData)
             let jsonData = {}
+            let message = '提交成功'
             if (this.dialogType === 'add') {
               jsonData.add = [submitParam]
+              message = '新建成功'
             } else {
               jsonData.mod = [submitParam]
+              message = '编辑成功'
             }
             let finalJsonData = {}
             finalJsonData.postData = jsonData
@@ -760,15 +825,12 @@
               param: finalJsonData,
               success: function (data) {
                 self.getData()
-                self.$message('提交成功')
+                self.$message(message)
                 self.dialogVisible = false
               }
             })
           }
         })
-      },
-      getStatDataFnSelectData () {
-        // let self = this
       },
       // 函数参数弹窗
       fnParamPopup () {
@@ -787,8 +849,8 @@
             // params.initParamList(fnParam, paramType)
           }
         }
-
       },
+      // 统计条件弹窗
       statCondInPopup () {
         if (!this.viewDisabled) {
           this.$refs.StatCondDialog.open()
@@ -796,13 +858,9 @@
             stat_cond_value: this.dialogForm.stat_cond,
             stat_cond_in: this.dialogForm.stat_cond_in
           })
-          this.statCondInDialogVisible = true
         }
       },
-      closeStatCondInDialog () {
-        this.statCondInDialogVisible = false
-      },
-      // 子组件的回调
+      //  下面是子组件的回调
       statParamDataChange (value) {
         this.queryShowForm.stat_param = value
       },
@@ -818,7 +876,7 @@
       funcParamValueCallBack (value) {
         this.dialogForm.fn_param = value
       },
-      // 下面是这一页的工具函数
+      // 下面是工具函数（基本控制表单各项的显示隐藏 逻辑按照之前的代码写的）
       queryTxnFeature (fd) {
         for (let loopObj of this.statDataFdList) {
           if (loopObj.code_key === fd) {

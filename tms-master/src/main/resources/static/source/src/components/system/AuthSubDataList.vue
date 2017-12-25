@@ -111,7 +111,7 @@
           modelName: this.modelName,
           flag: 1
         }
-        this.$router.push({name: 'AuthDataCompare', query: params})
+        this.$router.push({name: 'authDataCompare', query: params})
         console.log(row)
       },
       getData () {

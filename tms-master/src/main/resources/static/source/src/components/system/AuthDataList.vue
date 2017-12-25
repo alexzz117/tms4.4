@@ -152,7 +152,7 @@
           modelName: this.modelName,
           flag: 1
         }
-        this.$router.push({name: 'AuthDataCompare', query: params})
+        this.$router.push({name: 'authDataCompare', query: params})
         console.log(row)
       },
       addData (formName) {
@@ -231,7 +231,7 @@
           authId: this.selectedRows[0].auth_id,
           modelName: this.modelName
         }
-        this.$router.push({name: 'AuthSubDataList', query: params})
+        this.$router.push({name: 'authSubDataList', query: params})
       },
       showLog () {
         let length = this.selectedRows.length
@@ -243,7 +243,7 @@
           authId: this.selectedRows[0].auth_id,
           modelName: this.modelName
         }
-        this.$router.push({name: 'AuthLogList', query: params})
+        this.$router.push({name: 'authLogList', query: params})
       },
       auth () {
         this.dialogForm = this.initDialogForm()
