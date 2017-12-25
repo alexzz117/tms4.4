@@ -42,7 +42,7 @@ export default new Router({
   linkActiveClass: 'active',
   routes: [
     {
-      path: '/login.vue',
+      path: '/login_vue',
       name: 'login',
       component: Login
     },
@@ -55,87 +55,87 @@ export default new Router({
       },
       children: [
         {
-          path: 'user.vue',
+          path: 'user_vue',
           name: 'user',
           component: User
         },
         {
-          path: 'role.vue',
+          path: 'role_vue',
           name: 'role',
           component: Role
         },
         {
-          path: 'func.vue',
+          path: 'func_vue',
           name: 'func',
           component: Func
         },
         {
-          path: 'valuelist.vue',
+          path: 'valuelist_vue',
           name: 'valuelist',
           component: ValueList
         },
         {
-          path: 'list.vue',
+          path: 'list_vue',
           name: 'list',
           component: List
         },
         {
-          path: 'txn.vue',
+          path: 'txn_vue',
           name: 'txn',
           component: Txn
         },
         {
-          path: 'authCenter.vue',
+          path: 'authCenter_vue',
           name: 'authCenter',
           component: AuthCenter
         },
         {
-          path: 'authDataCompare.vue',
+          path: 'authDataCompare_vue',
           name: 'authDataCompare',
           component: AuthDataCompare
         },
         {
-          path: 'authDataList.vue',
+          path: 'authDataList_vue',
           name: 'authDataList',
           component: AuthDataList
         },
         {
-          path: 'authLogList.vue',
+          path: 'authLogList_vue',
           name: 'authLogList',
           component: AuthLogList
         },
         {
-          path: 'authSubDataList.vue',
+          path: 'authSubDataList_vue',
           name: 'authSubDataList',
           component: AuthSubDataList
         },
         {
-          path: 'codedict.vue',
+          path: 'codedict_vue',
           name: 'codedict',
           component: Codedict
         },
         {
-          path: 'codeDictInfo.vue',
+          path: 'codeDictInfo_vue',
           name: 'codeDictInfo',
           component: CodedictInfo
         },
         {
-          path: 'ipaddr.vue',
+          path: 'ipaddr_vue',
           name: 'ipaddr',
           component: Ipaddr
         },
         {
-          path: 'log.vue',
+          path: 'log_vue',
           name: 'log',
           component: Log
         },
         {
-          path: 'txnEventQuery.vue',
+          path: 'txnEventQuery_vue',
           name: 'txnEventQuery',
           component: TxnEventQuery
         },
         {
-          path: 'alarmEventQuery.vue',
+          path: 'alarmEventQuery_vue',
           name: 'alarmEventQuery',
           component: AlarmEventQuery
         }

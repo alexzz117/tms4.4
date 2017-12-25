@@ -231,8 +231,16 @@
         </el-form-item>
 
         <el-form-item label="有效性:" :label-width="formLabelWidth" prop="stat_valid" :style="formItemStyle" v-show="formStatValidShow">
-            <el-radio v-model="dialogForm.stat_valid" :label=0 :disabled="viewDisabled">停用</el-radio>
-            <el-radio v-model="dialogForm.stat_valid" :label=1 :disabled="viewDisabled">启用</el-radio>
+
+          <el-switch
+            v-model="dialogForm.stat_valid"
+            :disabled="viewDisabled"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-value="1"
+            inactive-value="0">
+          </el-switch>
+
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -715,7 +723,7 @@
         let tempObj = {}
         Object.assign(tempObj, row)
         for (let field in tempObj) {
-          if (typeof (tempObj[field]) === 'number' && field !== 'stat_valid') {
+          if (typeof (tempObj[field]) === 'number') {
             tempObj[field] = tempObj[field].toString()
           }
         }
@@ -752,11 +760,10 @@
               param: finalJsonData,
               success: function (data) {
                 self.getData()
-                self.$message('添加成功')
-                self.dictDialogVisible = false
+                self.$message('提交成功')
+                self.dialogVisible = false
               }
             })
-            alert('提交')
           }
         })
       },
