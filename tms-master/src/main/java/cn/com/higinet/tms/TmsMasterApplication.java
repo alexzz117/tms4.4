@@ -1,4 +1,4 @@
-package cn.com.higinet;
+package cn.com.higinet.tms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
