@@ -30,7 +30,7 @@ import cn.com.higinet.tms.base.util.Classz;
 import cn.com.higinet.tms.base.util.Stringz;
 
 @RestController
-@RequestMapping(value = "/demo/quartz")
+@RequestMapping(value = "/timer/quartz")
 public class JobController {
 
 	private static final Logger logger = LoggerFactory.getLogger( JobController.class );
