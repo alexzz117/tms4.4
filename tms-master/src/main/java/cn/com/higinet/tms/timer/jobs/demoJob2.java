@@ -1,13 +1,15 @@
-package cn.com.higinet.tms.common.demo.quartz;
+package cn.com.higinet.tms.timer.jobs;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class demoJob implements TmsJob {
+import cn.com.higinet.tms.timer.core.TmsJob;
 
-	private static Logger logger = LoggerFactory.getLogger( demoJob.class );
+public class demoJob2 implements TmsJob {
+
+	private static Logger logger = LoggerFactory.getLogger( demoJob2.class );
 
 	@Override
 	public void execute( JobExecutionContext context ) throws JobExecutionException {
@@ -16,7 +18,7 @@ public class demoJob implements TmsJob {
 
 	@Override
 	public String getJobName() {
-		return "demoJob";
+		return null;
 	}
 
 }

@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.demo.quartz;
+package cn.com.higinet.tms.timer.core;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,15 +9,15 @@ import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.com.higinet.tms.base.util.Stringz;
+
 @Configuration
-@PropertySource("classpath:application.properties")
 public class SchedulerConfig {
 
 	@Autowired
@@ -41,11 +41,11 @@ public class SchedulerConfig {
 		List<JSONObject> itmes = (List<JSONObject>) json.get( "propertySources" );
 		for( JSONObject item : itmes ) {
 			//获取一个节点下的propertyNames
-			List<String> keys = (List<String>) item.get( "propertyNames" );
+			List<String> keys = item.get( "propertyNames" ) != null ? (List<String>) item.get( "propertyNames" ) : null;
 			if( keys == null ) continue;
 			//循环propertyNames拿到系统加载的参数名称，再通过Environment获取参数值
 			for( String key : keys ) {
-				if( key.startsWith( "org.quartz" ) ) {
+				if( Stringz.isNotEmpty( key ) && key.startsWith( "org.quartz" ) ) {
 					//将参数名和参数值写入入Properties
 					properties.setProperty( key, env.getProperty( key ) );
 				}

@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.demo.quartz;
+package cn.com.higinet.tms.timer.core;
 
 public class TmsJobDetail {
 	String jobName;
