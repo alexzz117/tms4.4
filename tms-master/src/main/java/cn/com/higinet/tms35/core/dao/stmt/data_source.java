@@ -17,7 +17,7 @@ import cn.com.higinet.tms35.core.bean;
 public class data_source
 {
 	static Logger log = LoggerFactory.getLogger(data_source.class);
-	static String testConnSql = ((SqlMap) bean.get("tmsSqlMap")).getSql("tms.common.testconnection");
+	static String testConnSql = bean.get(SqlMap.class).getSql("tms.common.testconnection");
 
 	DataSource m_ds;
 	Connection m_conn;
