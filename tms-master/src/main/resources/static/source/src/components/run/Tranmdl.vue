@@ -1,10 +1,61 @@
 <template>
   <div>
-    <el-container>
-      <el-header height="30px" style="text-align: left;line-height: 2em">
+    <el-container style="border: 1px solid #eee;">
+      <el-header height="30px" class="table-header">
           <div>交易模型</div>
       </el-header>
-      <el-main>
+      <el-main style="padding: 0px;">
+        <div style="padding-left: 10px;text-align: left;border-bottom: 1px solid #eee;">
+          <el-button type="text" class="el-icon-plus" @click="tmAddFunc">新建</el-button>
+          <el-button type="text" class="el-icon-edit" @click="tmEditFunc">编辑</el-button>
+          <el-button type="text" class="el-icon-delete" @click="tmDelFunc">删除</el-button>
+          <el-button type="text" class="el-icon-search" @click="tmInfoFunc">查看</el-button>
+        </div>
+        <el-table :data="tableData" ref="formList"
+                  :span-method="groupHandle"
+                  :row-class-name="groupClassName"
+                  @row-dblclick="toggleListHandle"
+                  max-height="430"
+                  style="width: 100%">
+          <el-table-column type="selection" width="35" align="left"></el-table-column>
+          <el-table-column label="属性名称" prop="name">
+            <template slot-scope="scope">
+              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row)></i>
+              <span style="margin-left: 10px">{{scope.row.name}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="属性代码" prop="ref_name"></el-table-column>
+          <el-table-column label="数据来源" prop="src_id"></el-table-column>
+          <el-table-column label="类型" prop="type"></el-table-column>
+          <el-table-column label="存储字段" prop="fd_name"></el-table-column>
+          <el-table-column label="关联代码集" prop="code"></el-table-column>
+          <el-table-column label="默认值" prop="src_default"></el-table-column>
+          <el-table-column label="处理函数" prop="genesisrul"></el-table-column>
+        </el-table>
+      </el-main>
+    </el-container>
+    <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible">
+      <el-form :model="tmForm">
+        <el-form-item label="活动名称" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.name" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-container style="border: 1px solid #eee;">
+      <el-header height="30px" class="table-header">
+        <div>交易模型引用</div>
+      </el-header>
+      <el-main style="padding: 0px;">
+        <div style="padding-left: 10px;text-align: left;border-bottom: 1px solid #eee;">
+          <el-button type="text" class="el-icon-plus" @click="">新建</el-button>
+          <el-button type="text" class="el-icon-edit" @click="">编辑</el-button>
+          <el-button type="text" class="el-icon-delete" @click="">删除</el-button>
+          <el-button type="text" class="el-icon-search" @click="">查看</el-button>
+        </div>
         <el-table :data="tableData" ref="formList"
                   :span-method="groupHandle"
                   :row-class-name="groupClassName"
@@ -75,7 +126,11 @@
       return {
         toggleIcon: ['el-icon-arrow-up', 'el-icon-arrow-down'],
         dataList: [],
-        expendNodeKey: []
+        expendNodeKey: [],
+        tmTitle: '',
+        tmDialogVisible: false,
+        tmForm: [],
+        formLabelWidth: '120px'
       }
     },
     mounted: function () {
@@ -175,6 +230,28 @@
           expendNodeKey.push(key)
         }
         self.expendNodeKey = expendNodeKey
+      },
+      tmAddFunc () {
+        let self = this
+        self.tmTitle = '新建交易模型'
+        self.tmDialogVisible = true
+        self.tmFormReadOnly = false
+      },
+      tmEditFunc () {
+        let self = this
+        self.tmTitle = '编辑交易模型'
+        self.tmDialogVisible = true
+        self.tmFormReadOnly = false
+      },
+      tmDelFunc () {
+        let self = this
+        console.info('删除交易模型')
+      },
+      tmInfoFunc () {
+        let self = this
+        self.tmTitle = '交易模型信息'
+        self.tmDialogVisible = true
+        self.tmFormReadOnly = true
       }
     }
   }
@@ -190,5 +267,11 @@
   }
   tbody .groupStyle .cell {
     padding-left: 15px;
+  }
+
+  .table-header {
+    text-align: left;
+    line-height: 2em;
+    background-color: aquamarine;
   }
 </style>
