@@ -1,14 +1,15 @@
 <template>
   <div>
-    <el-table :data="tableData"
+    <el-table :data="tableData" ref="formList"
               :span-method="groupHandle"
               :row-class-name="groupClassName"
+              @row-dblclick="toggleListHandle"
               max-height="430"
       style="width: 100%">
       <el-table-column type="selection" width="35" align="left"></el-table-column>
       <el-table-column label="属性名称" prop="name">
         <template slot-scope="scope">
-          <i class="el-icon-time"></i>
+          <i v-if="scope.row.group_type==='group'" class="el-icon-arrow-up"></i>
           <span style="margin-left: 10px">{{scope.row.name}}</span>
         </template>
       </el-table-column>
@@ -32,12 +33,44 @@
     },
     computed: {
       txnIdParent () { return this.txnId },
-      isVisibilityParent () { return this.isVisibility }
+      isVisibilityParent () { return this.isVisibility },
+      tableData () {
+        console.info(this.dataList)
+        console.info(this.expendNodeKey)
+        var expendNodeKey = this.expendNodeKey
+        var dataList = this.dataList
+        var tableData = []
+        for (var i in dataList) { // 取数据列表
+          for (var key in dataList[i]) { // 取对象的Key-Value
+            if (dataList[i][key].length > 0) { // 取Value的值List
+              let keys = key.split('____') // 按格式获取名称
+              if (keys && keys.length === 2) { // 格式正确
+                tableData.push({
+                  tab_name: keys[0],
+                  name: keys[1],
+                  group_type: 'group'
+                })
+                if (expendNodeKey.indexOf(key) === -1) {
+                  break
+                }
+                for (var j in dataList[i][key]) {
+                  var item = dataList[i][key][j]
+                  item.group_type = 'item'
+                  tableData.push(item)
+                }
+              }
+            }
+          }
+        }
+        return tableData
+      }
     },
     props: ['txnId', 'isVisibility'],
     data () {
       return {
-        tableData: []
+        toggleIcon: ['el-icon-arrow-up', 'el-icon-arrow-dowm'],
+        dataList: [],
+        expendNodeKey: []
       }
     },
     mounted: function () {
@@ -70,33 +103,20 @@
             tab_name: self.txnId
           },
           success: function (data) {
-            if (data.txnfds) {
-              self.setFormList(data.txnfds)
+            var dataList = data.txnfds
+            if (dataList) {
+              self.dataList = dataList
+              let expendNodeKey = []
+              for (let i in dataList) {
+                for (let key in dataList[i]) {
+                  expendNodeKey.push(key)
+                }
+              }
+              self.expendNodeKey = expendNodeKey
             }
           }
         }
         ajax.post(option)
-      },
-      setFormList (dataList) {
-        var tableData = []
-        for (var i in dataList) { // 取数据列表
-          for (var key in dataList[i]) { // 取对象的Key-Value
-            if (dataList[i][key].length > 0) { // 取Value的值List
-              let keys = key.split('____')
-              tableData.push({
-                tab_name: keys[0],
-                name: keys[1],
-                group_type: 'group'
-              })
-              for (var j in dataList[i][key]) {
-                var item = dataList[i][key][j]
-                item.group_type = 'item'
-                tableData.push(item)
-              }
-            }
-          }
-        }
-        this.tableData = tableData
       },
       groupHandle ({ row, column, rowIndex, columnIndex }) {
         if (row.group_type === 'group') {
@@ -110,10 +130,24 @@
       },
       groupClassName ({row, rowIndex}) {
         if (row.group_type === 'group') {
-          console.info(row)
           return 'groupStyle'
         } else {
           return ''
+        }
+      },
+      toggleListHandle (row, e) {
+        let path = e.path
+        let cellItem = null
+        for (let i in path) {
+          if (path[i].className === 'cell') {
+            cellItem = path[i]
+          }
+        }
+        let iconItem = cellItem.getElementsByTagName('i')
+        if (iconItem[0].getAttribute('class') === 'el-icon-arrow-up') {
+          iconItem[0].setAttribute('class', 'el-icon-arrow-down')
+        } else if (iconItem[0].getAttribute('class') === 'el-icon-arrow-down') {
+          iconItem[0].setAttribute('class', 'el-icon-arrow-up')
         }
       }
     }
@@ -126,5 +160,9 @@
   }
   tbody .groupStyle {
     background-color: #f5f7fa !important;
+    text-align: left;
+  }
+  tbody .groupStyle .cell {
+    padding-left: 15px;
   }
 </style>
