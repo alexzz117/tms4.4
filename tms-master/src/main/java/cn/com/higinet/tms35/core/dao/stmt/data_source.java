@@ -17,7 +17,6 @@ import cn.com.higinet.tms35.core.bean;
 public class data_source
 {
 	static Logger log = LoggerFactory.getLogger(data_source.class);
-	static String testConnSql = bean.get(SqlMap.class).getSql("tms.common.testconnection");
 
 	DataSource m_ds;
 	Connection m_conn;
@@ -58,6 +57,7 @@ public class data_source
 
 	public void reset() throws sql_reconnect_exception
 	{
+		String testConnSql = bean.get(SqlMap.class).getSql("tms.common.testconnection");
 		batch_stmt_jdbc stmt = new batch_stmt_jdbc(this, testConnSql, null);
 		try
 		{
