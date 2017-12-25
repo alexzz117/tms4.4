@@ -78,7 +78,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 
 	private int logOrder = 1;
 
-	@Bean("refreshCacheExecutor")
+	@Bean()
 	public TaskExecutor refreshCacheExecutor() {
 		SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
 		simpleAsyncTaskExecutor.setDaemon( true );
@@ -121,7 +121,9 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	public Page<Map<String, Object>> dataList( Map<String, String> conds ) {
 		String sql = "SELECT AUTH.*, " +
 		// "(SELECT AUTHRECORD.OPERATEDATA_VALUE FROM TMS_MGR_AUTHRECORD AUTHRECORD WHERE AUTHRECORD.AUTH_ID = AUTH.AUTH_ID AND AUTHRECORD.IS_MAIN=1) DATAVALUE, " +
-				" AUTH.operatedata_value DATAVALUE, " + "(SELECT AUTHRECORD.OPERATE_NAME FROM TMS_MGR_AUTHRECORD AUTHRECORD WHERE AUTHRECORD.AUTH_ID = AUTH.AUTH_ID AND AUTHRECORD.IS_MAIN=1) OPERATENAME, " + "(SELECT COUNT(*) FROM TMS_MGR_AUTHRECORD AUTHRECORD WHERE AUTHRECORD.AUTH_ID = AUTH.AUTH_ID) SUB_OPERATE_NUM, "
+				" AUTH.operatedata_value DATAVALUE, "
+				+ "(SELECT AUTHRECORD.OPERATE_NAME FROM TMS_MGR_AUTHRECORD AUTHRECORD WHERE AUTHRECORD.AUTH_ID = AUTH.AUTH_ID AND AUTHRECORD.IS_MAIN=1) OPERATENAME, "
+				+ "(SELECT COUNT(*) FROM TMS_MGR_AUTHRECORD AUTHRECORD WHERE AUTHRECORD.AUTH_ID = AUTH.AUTH_ID) SUB_OPERATE_NUM, "
 				+ "OPERATOR.REAL_NAME FROM TMS_MGR_AUTHINFO AUTH LEFT JOIN CMC_OPERATOR OPERATOR ON AUTH.PROPOSER_ID = OPERATOR.OPERATOR_ID WHERE AUTH.AUTH_STATUS='0' AND AUTH.MODULE_NAME = :modelName";
 
 		Page<Map<String, Object>> page = offlineSimpleDao.pageQuery( sql, conds, new Order().asc( "PROPOSER_TIME" ) );
@@ -148,7 +150,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	private String getFullTxnPath( String authTxn, String txnField ) {
 		StringBuffer sb = new StringBuffer();
 
-		sb.append( "select " + TMS_COM_TAB.TAB_NAME + ", " + TMS_COM_TAB.TAB_DESC + " from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_NAME + " in(" + TransCommon.arr2str( TransCommon.cutToIds( authTxn ) ) + ") order by TAB_NAME DESC" );
+		sb.append( "select " + TMS_COM_TAB.TAB_NAME + ", " + TMS_COM_TAB.TAB_DESC + " from " + TMS_COM_TAB.TABLE_NAME + " where " + TMS_COM_TAB.TAB_NAME + " in("
+				+ TransCommon.arr2str( TransCommon.cutToIds( authTxn ) ) + ") order by TAB_NAME DESC" );
 
 		List<Map<String, Object>> fartherTranDef = offlineSimpleDao.queryForList( sb.toString() );
 
@@ -225,10 +228,9 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 * @return
 	 */
 	public Page<Map<String, Object>> authLogList( Map<String, String> reqs ) {
-		String sql = "SELECT LOG.*," + " OPER.REAL_NAME,OPER.LOGIN_NAME,FUNC.FUNC_NAME" 
-				+ " FROM CMC_OPERATE_LOG LOG LEFT JOIN CMC_OPERATOR OPER ON LOG.OPERATOR_ID = OPER.OPERATOR_ID" 
-				+ " LEFT JOIN TMS_MGR_AUTHLOG AUTHLOG ON AUTHLOG.LOG_ID = LOG.PRIMARY_KEY_ID" 
-				+ " LEFT JOIN CMC_FUNC FUNC ON FUNC.FUNC_ID = LOG.FUNC_ID"
+		String sql = "SELECT LOG.*," + " OPER.REAL_NAME,OPER.LOGIN_NAME,FUNC.FUNC_NAME"
+				+ " FROM CMC_OPERATE_LOG LOG LEFT JOIN CMC_OPERATOR OPER ON LOG.OPERATOR_ID = OPER.OPERATOR_ID"
+				+ " LEFT JOIN TMS_MGR_AUTHLOG AUTHLOG ON AUTHLOG.LOG_ID = LOG.PRIMARY_KEY_ID" + " LEFT JOIN CMC_FUNC FUNC ON FUNC.FUNC_ID = LOG.FUNC_ID"
 				+ " WHERE LOG.PRIMARY_KEY_ID IN (SELECT AUTHLOG.LOG_ID FROM TMS_MGR_AUTHLOG AUTHLOG WHERE AUTHLOG.AUTH_ID = :AUTH_ID)";
 		Map<String, Object> conds = new HashMap<String, Object>();
 		conds.put( "AUTH_ID", StringUtil.parseToString( reqs.get( "authId" ) ) );
@@ -245,7 +247,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 */
 	public Page<Map<String, Object>> historyDataList( Map<String, String> conds ) {
 		String modelName = MapUtil.getString( conds, "modelName" );
-		String sql = "SELECT AI.ORIG_OPERATENAME, AI.OPERATEDATA_VALUE, AI.AUTH_MSG, AI.AUTH_ID, AI.TXN_ID, AI.AUTH_STATUS, AI.PROPOSER_TIME, AI.REFRESH_STATUS, AI.REFRESH_INFO FROM TMS_MGR_AUTHINFO AI WHERE AI.MODULE_NAME = '" + modelName + "'";
+		String sql = "SELECT AI.ORIG_OPERATENAME, AI.OPERATEDATA_VALUE, AI.AUTH_MSG, AI.AUTH_ID, AI.TXN_ID, AI.AUTH_STATUS, AI.PROPOSER_TIME, AI.REFRESH_STATUS, AI.REFRESH_INFO FROM TMS_MGR_AUTHINFO AI WHERE AI.MODULE_NAME = '"
+				+ modelName + "'";
 		if( !MapUtil.isEmpty( conds ) ) {
 			String txnId = MapUtil.getString( conds, "TXN_ID" );
 			if( !StringUtil.isEmpty( txnId ) ) {
@@ -729,7 +732,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		// String sql = "SELECT * FROM TMS_MGR_AUTHINFO AUTHINFO" + " WHERE AUTHINFO.MODULE_ID = '" + mc.getModelId() + "'" + " AND AUTHINFO.AUTH_STATUS = '0' AND AUTHINFO.QUERY_PKVALUE='" + queryPkvalue + "'" + " AND AUTHINFO.QUERY_TABLE_NAME ='" + mc.getQueryTableName() + "'"
 		// + " AND AUTHINFO.QUERY_TABLE_PK = '" + mc.getQueryTablePk() + "'";
 
-		String sql = "SELECT * FROM TMS_MGR_AUTHINFO AUTHINFO" + " WHERE AUTHINFO.MODULE_ID =:MODULE_ID AND AUTHINFO.AUTH_STATUS = '0' AND AUTHINFO.QUERY_PKVALUE=:QUERY_PKVALUE " + "AND AUTHINFO.QUERY_TABLE_NAME =:QUERY_TABLE_NAME" + " AND AUTHINFO.QUERY_TABLE_PK =:QUERY_TABLE_PK";
+		String sql = "SELECT * FROM TMS_MGR_AUTHINFO AUTHINFO" + " WHERE AUTHINFO.MODULE_ID =:MODULE_ID AND AUTHINFO.AUTH_STATUS = '0' AND AUTHINFO.QUERY_PKVALUE=:QUERY_PKVALUE "
+				+ "AND AUTHINFO.QUERY_TABLE_NAME =:QUERY_TABLE_NAME" + " AND AUTHINFO.QUERY_TABLE_PK =:QUERY_TABLE_PK";
 		Map<String, String> conds = new HashMap<String, String>();
 		conds.put( "MODULE_ID", mc.getModelId() );
 		conds.put( "QUERY_PKVALUE", queryPkvalue );
@@ -747,7 +751,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 		if( queryMain ) {
 			conds.put( "IS_MAIN", "1" );
 		}
-		String sql = "select * from TMS_MGR_AUTHRECORD c where exists (select 1 from TMS_MGR_AUTHINFO i where i.AUTH_ID=c.AUTH_ID and i.AUTH_STATUS='0')" + " AND C.TABLE_NAME=:TABLE_NAME AND TABLE_PK=:TABLE_PK AND TABLE_PKVALUE=:TABLE_PKVALUE";
+		String sql = "select * from TMS_MGR_AUTHRECORD c where exists (select 1 from TMS_MGR_AUTHINFO i where i.AUTH_ID=c.AUTH_ID and i.AUTH_STATUS='0')"
+				+ " AND C.TABLE_NAME=:TABLE_NAME AND TABLE_PK=:TABLE_PK AND TABLE_PKVALUE=:TABLE_PKVALUE";
 		if( queryMain ) {
 			sql += " AND IS_MAIN='1'";
 		}
@@ -781,7 +786,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			if( txnFullPath.lastIndexOf( "-" ) != -1 ) { // 如果不是顶级交易
 				txnFullPath = txnFullPath.substring( 0, txnFullPath.lastIndexOf( "-" ) );
 				String fatherTxnStr = SqlWhereHelper.getInWhere( txnFullPath.split( "-" ) );// 上级交易组成的字符串，用在过滤条件的in子句中
-				String sql = "SELECT MODULE_NAME, AUTH_ID " + "FROM TMS_MGR_AUTHINFO " + "WHERE MODULE_ID = 'tranConf' AND AUTH_STATUS = '0' and QUERY_PKVALUE in (" + fatherTxnStr + ")";
+				String sql = "SELECT MODULE_NAME, AUTH_ID " + "FROM TMS_MGR_AUTHINFO " + "WHERE MODULE_ID = 'tranConf' AND AUTH_STATUS = '0' and QUERY_PKVALUE in (" + fatherTxnStr
+						+ ")";
 
 				depInfoList = offlineSimpleDao.queryForList( sql );
 			}
@@ -799,7 +805,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			String[] depModuleArr = depModules.split( "," );
 			String depModulesInWhere = SqlWhereHelper.getInWhere( depModuleArr );
 
-			String sql = "SELECT MODULE_NAME, AUTH_ID FROM TMS_MGR_AUTHINFO" + " WHERE AUTH_STATUS = '0' AND QUERY_PKVALUE IN (" + depValuesInWhere + ")" + " AND MODULE_ID IN (" + depModulesInWhere + ")";
+			String sql = "SELECT MODULE_NAME, AUTH_ID FROM TMS_MGR_AUTHINFO" + " WHERE AUTH_STATUS = '0' AND QUERY_PKVALUE IN (" + depValuesInWhere + ")" + " AND MODULE_ID IN ("
+					+ depModulesInWhere + ")";
 			depInfoList = offlineSimpleDao.queryForList( sql );
 		}
 
@@ -1109,7 +1116,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 			}
 		}
 		else { // 不需要授权
-					// 只生成授权信息，不添加授权记录信息
+				// 只生成授权信息，不添加授权记录信息
 			for( int i = 0; i < dataList.size(); i++ ) {
 				Object pkValue = dataList.get( i );
 				Map<String, Object> authInfo = getAuthInfo( mc, pkValue, AuthStaticParameters.AUTH_STATUS_3 );
@@ -1650,7 +1657,8 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 * 
 	 * @return
 	 */
-	private Map<String, String> generateDataMap( String operateDataField, String tablePk, String queryPk, String syncPk, String depPks, String txnIdField, Map mapArg, String realOper ) {
+	private Map<String, String> generateDataMap( String operateDataField, String tablePk, String queryPk, String syncPk, String depPks, String txnIdField, Map mapArg,
+			String realOper ) {
 		Map<String, String> dataMap = new CaseInsensitiveMap();
 		dataMap.put( "real_oper", realOper );
 

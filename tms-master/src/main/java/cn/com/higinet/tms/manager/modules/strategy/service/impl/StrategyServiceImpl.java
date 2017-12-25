@@ -17,9 +17,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.com.higinet.tms.engine.comm.web_tool;
-import cn.com.higinet.tms.engine.core.cache.cache_init;
-import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -30,6 +27,9 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.strategy.service.StrategyService;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
+import cn.com.higinet.tms35.comm.web_tool;
+import cn.com.higinet.tms35.core.cache.cache_init;
+import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 /**
  * 功能/模块:策略服务类
@@ -47,18 +47,18 @@ public class StrategyServiceImpl implements StrategyService {
 	@Autowired
 	@Qualifier("dynamicDataSource")
 	private DataSource dynamicDataSource;
-	
+
 	@Autowired
 	@Qualifier("dynamicSimpleDao")
 	private SimpleDao dynamicSimpleDao;
-	
+
 	@Autowired
 	@Qualifier("offlineSimpleDao")
 	private SimpleDao offlineSimpleDao;
-	
+
 	@Autowired
 	private TransDefService transDefService;
-	
+
 	@Autowired
 	private SequenceService sequenceService;
 
@@ -69,7 +69,9 @@ public class StrategyServiceImpl implements StrategyService {
 	 */
 	public List<Map<String, Object>> listStrategy( Map<String, Object> input ) {
 		String txnId = MapUtil.getString( input, DBConstant.TMS_COM_STRATEGY_ST_TXN );
-		List<Map<String, Object>> st_list = dynamicSimpleDao.queryForList( "SELECT S.*,(SELECT COUNT(1) FROM TMS_COM_STRATEGY_RULE_REL SRR WHERE SRR.ST_ID=S.ST_ID) RULE_COUNT FROM TMS_COM_STRATEGY S WHERE ST_TXN=? ORDER BY MODIFYTIME DESC ", txnId );
+		List<Map<String, Object>> st_list = dynamicSimpleDao.queryForList(
+				"SELECT S.*,(SELECT COUNT(1) FROM TMS_COM_STRATEGY_RULE_REL SRR WHERE SRR.ST_ID=S.ST_ID) RULE_COUNT FROM TMS_COM_STRATEGY S WHERE ST_TXN=? ORDER BY MODIFYTIME DESC ",
+				txnId );
 
 		// 评估策略
 		for( Map<String, Object> map : st_list ) {
@@ -84,7 +86,9 @@ public class StrategyServiceImpl implements StrategyService {
 	 */
 	public List<Map<String, Object>> listStrategyByRuleid( Map<String, Object> input ) {
 		String ruleId = MapUtil.getString( input, DBConstant.TMS_COM_STRATEGY_RULE_REL_RULE_ID );
-		List<Map<String, Object>> st_list = dynamicSimpleDao.queryForList( "SELECT S.*,(SELECT COUNT(1) FROM TMS_COM_STRATEGY_RULE_REL SRR WHERE SRR.ST_ID=S.ST_ID) RULE_COUNT FROM TMS_COM_STRATEGY S WHERE EXISTS(SELECT 1 FROM TMS_COM_STRATEGY_RULE_REL R WHERE S.ST_ID=R.ST_ID AND R.RULE_ID=?) ORDER BY MODIFYTIME DESC ", ruleId );
+		List<Map<String, Object>> st_list = dynamicSimpleDao.queryForList(
+				"SELECT S.*,(SELECT COUNT(1) FROM TMS_COM_STRATEGY_RULE_REL SRR WHERE SRR.ST_ID=S.ST_ID) RULE_COUNT FROM TMS_COM_STRATEGY S WHERE EXISTS(SELECT 1 FROM TMS_COM_STRATEGY_RULE_REL R WHERE S.ST_ID=R.ST_ID AND R.RULE_ID=?) ORDER BY MODIFYTIME DESC ",
+				ruleId );
 
 		for( Map<String, Object> map : st_list ) {
 			map.put( "TAB_DESC", transDefService.getSelfAndParentTranDefAsStr( MapUtil.getString( map, DBConstant.TMS_COM_STRATEGY_ST_TXN ) ) );
@@ -354,7 +358,8 @@ public class StrategyServiceImpl implements StrategyService {
 
 		String txnids = TransCommon.arr2str( TransCommon.cutToIds( st_txn ) );
 
-		String sql = "SELECT a.* FROM TMS_COM_STRATEGY a WHERE ST_NAME=? " + "and (ST_TXN in (" + txnids + ") OR  exists(select 1 from TMS_COM_TAB where TAB_NAME like '" + st_txn + "%' and a.ST_TXN=TAB_NAME))";
+		String sql = "SELECT a.* FROM TMS_COM_STRATEGY a WHERE ST_NAME=? " + "and (ST_TXN in (" + txnids + ") OR  exists(select 1 from TMS_COM_TAB where TAB_NAME like '" + st_txn
+				+ "%' and a.ST_TXN=TAB_NAME))";
 
 		if( st_id != null && st_id.length() > 0 ) {
 			sql += " and ST_ID != " + st_id;
@@ -397,8 +402,10 @@ public class StrategyServiceImpl implements StrategyService {
 	*/
 	private void deleteStrategy( Map<String, Object> map ) {
 		dynamicSimpleDao.delete( "TMS_COM_STRATEGY", MapWrap.map( DBConstant.TMS_COM_STRATEGY_ST_ID, MapUtil.getLong( map, DBConstant.TMS_COM_STRATEGY_ST_ID ) ).getMap() );
-		dynamicSimpleDao.delete( "TMS_COM_STRATEGY_RULE_EVAL", MapWrap.map( DBConstant.TMS_COM_STRATEGY_RULE_EVAL_ST_ID, MapUtil.getLong( map, DBConstant.TMS_COM_STRATEGY_ST_ID ) ).getMap() );
-		dynamicSimpleDao.delete( "TMS_COM_STRATEGY_RULE_REL", MapWrap.map( DBConstant.TMS_COM_STRATEGY_RULE_EVAL_ST_ID, MapUtil.getLong( map, DBConstant.TMS_COM_STRATEGY_ST_ID ) ).getMap() );
+		dynamicSimpleDao.delete( "TMS_COM_STRATEGY_RULE_EVAL",
+				MapWrap.map( DBConstant.TMS_COM_STRATEGY_RULE_EVAL_ST_ID, MapUtil.getLong( map, DBConstant.TMS_COM_STRATEGY_ST_ID ) ).getMap() );
+		dynamicSimpleDao.delete( "TMS_COM_STRATEGY_RULE_REL",
+				MapWrap.map( DBConstant.TMS_COM_STRATEGY_RULE_EVAL_ST_ID, MapUtil.getLong( map, DBConstant.TMS_COM_STRATEGY_ST_ID ) ).getMap() );
 	}
 
 	/**
@@ -434,7 +441,9 @@ public class StrategyServiceImpl implements StrategyService {
 	public List<Map<String, Object>> listStrategyRule( Map<String, Object> input ) {
 		String stId = MapUtil.getString( input, DBConstant.TMS_COM_STRATEGY_ST_ID );
 		// TODO 显示当前策略及父级策略的规则
-		List<Map<String, Object>> st_list = dynamicSimpleDao.queryForList( "select s.* from tms_com_strategy_rule_rel srr left join tms_com_rule s on srr.rule_id=s.rule_id where st_id=? ORDER BY eval_type ,disposal DESC,rule_order,rule_timestamp DESC ", stId );
+		List<Map<String, Object>> st_list = dynamicSimpleDao.queryForList(
+				"select s.* from tms_com_strategy_rule_rel srr left join tms_com_rule s on srr.rule_id=s.rule_id where st_id=? ORDER BY eval_type ,disposal DESC,rule_order,rule_timestamp DESC ",
+				stId );
 
 		return st_list;
 	}

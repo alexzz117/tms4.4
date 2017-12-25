@@ -17,9 +17,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.com.higinet.tms.engine.comm.web_tool;
-import cn.com.higinet.tms.engine.core.cache.cache_init;
-import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -27,6 +24,9 @@ import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
+import cn.com.higinet.tms35.comm.web_tool;
+import cn.com.higinet.tms35.core.cache.cache_init;
+import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 /**
  * 功能/模块:

@@ -19,9 +19,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.com.higinet.tms.engine.comm.web_tool;
-import cn.com.higinet.tms.engine.core.cache.db_cache;
-import cn.com.higinet.tms.engine.core.cache.db_stat;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
@@ -33,6 +30,9 @@ import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
+import cn.com.higinet.tms35.comm.web_tool;
+import cn.com.higinet.tms35.core.cache.db_cache;
+import cn.com.higinet.tms35.core.cache.db_stat;
 
 /**
  * 功能/模块:
@@ -54,6 +54,14 @@ public class StatService {
 	@Autowired
 	@Qualifier("offlineTransactionManager")
 	private DataSourceTransactionManager offlineTransactionManager;
+
+	@Autowired
+	@Qualifier("onlineDataSource")
+	DataSource onlineDataSource;
+
+	@Autowired
+	@Qualifier("offlineDataSource")
+	DataSource offlineDataSource;
 
 	@Autowired
 	private CommonCheckService commonCheckService;
@@ -86,7 +94,9 @@ public class StatService {
 	* @return 统计配置列表
 	 */
 	public List<Map<String, Object>> statList( Map<String, Object> conds ) {
-		return dynamicSimpleDao.queryForList( "SELECT STAT_ID,STAT_NAME,STAT_DESC,STAT_TXN,STAT_PARAM,STAT_COND, STAT_COND_IN, RESULT_COND,STAT_DATAFD,STAT_FN,COUNUNIT,COUNTROUND,STAT_UNRESULT,DATATYPE,CONTINUES,STAT_VALID,FN_PARAM,'' MARK ,STORECOLUMN FROM TMS_COM_STAT WHERE STAT_TXN=:txnId ORDER BY STAT_NAME", conds );
+		return dynamicSimpleDao.queryForList(
+				"SELECT STAT_ID,STAT_NAME,STAT_DESC,STAT_TXN,STAT_PARAM,STAT_COND, STAT_COND_IN, RESULT_COND,STAT_DATAFD,STAT_FN,COUNUNIT,COUNTROUND,STAT_UNRESULT,DATATYPE,CONTINUES,STAT_VALID,FN_PARAM,'' MARK ,STORECOLUMN FROM TMS_COM_STAT WHERE STAT_TXN=:txnId ORDER BY STAT_NAME",
+				conds );
 	}
 
 	/**
@@ -224,28 +234,29 @@ public class StatService {
 
 		Map<String, Object> rmap = new HashMap<String, Object>();
 
-		DataSource officialTmsDataSource = onlineTransactionManager.getDataSource();
-
-		DataSource tmpTmsDataSource = offlineTransactionManager.getDataSource();
+		//DataSource officialTmsDataSource = onlineTransactionManager.getDataSource();
+		//DataSource tmpTmsDataSource = offlineTransactionManager.getDataSource();
 
 		// 删除
 		if( delList != null && delList.size() > 0 ) {
-			cachInit( tmpTmsDataSource );
+			cachInit( offlineDataSource );
 			for( Map<String, ?> map : delList ) {
 				String stat_name = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_NAME );
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
 
 				// 校验能否删除
-				if( commonCheckService.find_ref_stat( txnId, stat_name ) ) throw new TmsMgrServiceException( "[" + MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_DESC ) + "]被引用，不能删除" );
+				if( commonCheckService.find_ref_stat( txnId, stat_name ) )
+					throw new TmsMgrServiceException( "[" + MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_DESC ) + "]被引用，不能删除" );
 			}
 
-			cachInit( officialTmsDataSource );
+			cachInit( onlineDataSource );
 			for( Map<String, ?> map : delList ) {
 				String stat_name = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_NAME );
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
 
 				// 校验能否删除
-				if( commonCheckService.find_ref_stat( txnId, stat_name ) ) throw new TmsMgrServiceException( "[" + MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_DESC ) + "]被引用未授权，不能删除" );
+				if( commonCheckService.find_ref_stat( txnId, stat_name ) )
+					throw new TmsMgrServiceException( "[" + MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_DESC ) + "]被引用未授权，不能删除" );
 			}
 			for( Map<String, ?> map : delList ) {
 				deleteStat( map );
@@ -254,7 +265,7 @@ public class StatService {
 
 		// 新增
 		if( addList != null && addList.size() > 0 ) {
-			cachInit( tmpTmsDataSource );
+			cachInit( offlineDataSource );
 			for( Map<String, Object> map : addList ) {
 				// 校验能否修改
 				checkCond( map );
@@ -268,7 +279,7 @@ public class StatService {
 
 		// 修改
 		if( modList != null && modList.size() > 0 ) {
-			cachInit( tmpTmsDataSource );
+			cachInit( offlineDataSource );
 			db_stat.cache d = db_cache.get().stat();
 
 			for( Map<String, Object> map : modList ) {
@@ -283,7 +294,7 @@ public class StatService {
 				checkDuplicateStatDesc( map );
 			}
 
-			cachInit( officialTmsDataSource );
+			cachInit( onlineDataSource );
 			for( Map<String, Object> map : modList ) {
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
 				String stat_name = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_NAME );
@@ -308,7 +319,7 @@ public class StatService {
 
 		// 有效性-停用
 		if( validNList != null && validNList.size() > 0 ) {
-			cachInit( tmpTmsDataSource );
+			cachInit( offlineDataSource );
 			for( Map<String, Object> map : validNList ) {
 				// 校验能否被引用
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
@@ -319,7 +330,7 @@ public class StatService {
 				if( commonCheckService.find_ref_valid_stat( txnId, stat_name ) ) throw new TmsMgrServiceException( "[" + stat_desc + "]被引用，不能停用" );
 			}
 
-			cachInit( officialTmsDataSource );
+			cachInit( onlineDataSource );
 			for( Map<String, Object> map : validNList ) {
 				// 校验能否被引用
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
@@ -360,7 +371,8 @@ public class StatService {
 
 		if( db_is_valid != in_is_valid && in_is_valid == 0 ) {
 			// 缓存中查找引用
-			if( commonCheckService.find_ref_valid_stat( db_stat.stat_txn, db_stat.stat_name ) ) throw new TmsMgrServiceException( "[" + MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_DESC ) + "]被引用，不能编辑" );
+			if( commonCheckService.find_ref_valid_stat( db_stat.stat_txn, db_stat.stat_name ) )
+				throw new TmsMgrServiceException( "[" + MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_DESC ) + "]被引用，不能编辑" );
 		}
 
 	}
@@ -501,7 +513,8 @@ public class StatService {
 
 		String txnids = TransCommon.arr2str( TransCommon.cutToIds( txn_id ) );
 
-		String sql = "select * from tms_com_stat a where stat_desc = ? " + "and (stat_txn in (" + txnids + ") OR  exists(select 1 from TMS_COM_TAB where TAB_NAME like '" + txn_id + "%' and a.stat_txn=TAB_NAME))";
+		String sql = "select * from tms_com_stat a where stat_desc = ? " + "and (stat_txn in (" + txnids + ") OR  exists(select 1 from TMS_COM_TAB where TAB_NAME like '" + txn_id
+				+ "%' and a.stat_txn=TAB_NAME))";
 
 		if( stat_id != null && stat_id.length() > 0 ) {
 			sql += " and stat_id != " + stat_id;
