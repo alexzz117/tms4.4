@@ -32,7 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.StringBufferInputStream;
 
-import cn.com.higinet.tms35.core.cond.yl.yyfparser;
+import cn.com.higinet.tms.engine.core.cond.yl.yyfparser;
 
 
 // line 39 "cond_par.java"

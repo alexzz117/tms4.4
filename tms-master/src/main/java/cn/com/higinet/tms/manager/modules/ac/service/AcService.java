@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.com.higinet.tms.engine.comm.web_tool;
+import cn.com.higinet.tms.engine.core.cache.cache_init;
+import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
 import cn.com.higinet.tms.manager.modules.common.DBConstant;
@@ -24,9 +27,6 @@ import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
-import cn.com.higinet.tms35.comm.web_tool;
-import cn.com.higinet.tms35.core.cache.cache_init;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 /**
  * 功能/模块:
@@ -145,9 +145,8 @@ public class AcService {
 		return rmap;
 	}
 
-	/* 动作修改
-	 * (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.action.controller.service.ActionService#modAction(java.util.Map)
+	/* 
+	 * 动作修改
 	 */
 	private Map<String, Object> modAction( Map<String, ?> reqs ) {
 		// 动作修改条件
@@ -170,9 +169,8 @@ public class AcService {
 		return acData;
 	}
 
-	/* 动作插入数据库
-	 * (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.action.controller.service.ActionService#createAction(java.util.Map)
+	/* 
+	 * 动作插入数据库
 	 */
 	public Map<String, Object> createAction( Map<String, Object> reqs ) {
 		Long sequenceId = Long.valueOf( sequenceService.getSequenceIdToString( DBConstant.SEQ_TMS_COM_RULE_ACTION_ID ) );
@@ -212,9 +210,8 @@ public class AcService {
 
 	}
 
-	/* 动作删除
-	 * (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.action.controller.service.ActionService#delAc(java.lang.String[])
+	/*
+	 * 动作删除
 	 */
 	private void deleteAc( Map<String, ?> input ) {
 		dynamicSimpleDao.delete( "TMS_COM_RULE_ACTION", MapWrap.map( DBConstant.TMS_COM_RULE_ACTION_AC_ID, MapUtil.getLong( input, DBConstant.TMS_COM_RULE_ACTION_AC_ID ) ).getMap() );

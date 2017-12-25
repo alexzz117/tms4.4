@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.engine.comm.utf8_split;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
@@ -32,7 +33,6 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 import cn.com.higinet.tms.manager.modules.userpattern.service.UserPatternService;
-import cn.com.higinet.tms35.comm.utf8_split;
 
 /**
  * 功能/模块:
@@ -61,11 +61,6 @@ public class UserPatternServiceImpl implements UserPatternService {
 	@Autowired
 	private IPLocationService ipLocationService;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.com.higinet.tms35.manage.userpattern.service.UserPatternService#listStatPattern(java.util.Map)
-	 */
 	public Page<Map<String, Object>> pageStatPattern( Map<String, Object> reqs ) {
 		Map<String, Object> sqlConds = new HashMap<String, Object>();
 
@@ -832,11 +827,6 @@ public class UserPatternServiceImpl implements UserPatternService {
 		return onlineSimpleDao.queryForList( sql.toString(), c );
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.com.higinet.tms35.manage.userpattern.service.UserPatternService#getRegion(java.util.Map)
-	 */
 	public List<Map<String, Object>> getRegion( Map<String, Object> reqs ) {
 		StringBuilder sql = new StringBuilder( "SELECT REGIONNAME CODE_VALUE,REGIONCODE CODE_KEY FROM TMS_MGR_REGION_N where 1=1 " );
 		Map<String, Object> c = new HashMap<String, Object>();

@@ -23,6 +23,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
+import cn.com.higinet.tms.engine.core.dao.stmt.batch_stmt_jdbc;
+import cn.com.higinet.tms.engine.core.dao.stmt.batch_stmt_jdbc.row_fetch;
+import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
@@ -33,9 +36,6 @@ import cn.com.higinet.tms.manager.modules.common.StaticParameters;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
-import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc;
-import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc.row_fetch;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 /**
  * 功能/模块:
@@ -65,9 +65,6 @@ public class SendRateMessage {
 
 	public int count = 0;
 
-	/* (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.mgr.service.SendMessageService#listServer(java.util.Map)
-	 */
 	/**
 	 * 商户评分接口
 	 * @param transaction	交易数据对象

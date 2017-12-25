@@ -311,9 +311,6 @@ public class RateService {
 	//Map<String,DispatcherExecutor> dispatcherExecutorMap = new HashMap<String, DispatcherExecutor>();
 	Map<String, Long> totalMap = new HashMap<String, Long>();
 	Map<String, Long> completeMap = new HashMap<String, Long>();
-	/* (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.mgr.service.RateService#allRate(java.util.Map)
-	 */
 
 	public void allRate( Map<String, Object> reqs, Map<Integer, Map<String, Object>> ser_map ) {
 		String table_name = MapUtil.getString( reqs, "TABLE_NAME" );//TBL_USER

@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.com.higinet.tms.engine.comm.web_tool;
+import cn.com.higinet.tms.engine.core.cache.cache_init;
+import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
@@ -32,9 +35,6 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 import cn.com.higinet.tms.manager.modules.rule.service.RuleService;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
-import cn.com.higinet.tms35.comm.web_tool;
-import cn.com.higinet.tms35.core.cache.cache_init;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 /**
  * 功能/模块:
@@ -79,11 +79,6 @@ public class RuleServiceImpl implements RuleService {
 	@Autowired
 	private AcService scService;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.com.higinet.tms35.manage.rule.service.RuleService#listRule(java.util.Map)
-	 */
 	public List<Map<String, Object>> listRule( Map<String, Object> input ) {
 		String txnId = MapUtil.getString( input, DBConstant.TMS_COM_RULE_RULE_TXN );
 		String type = MapUtil.getString( input, "type" );
@@ -138,11 +133,6 @@ public class RuleServiceImpl implements RuleService {
 		return rule_list;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.com.higinet.tms35.manage.rule.service.RuleService#saveRule(java.util.Map)
-	 */
 	@Transactional
 	public Map<String, Object> saveRule( Map<String, List<Map<String, ?>>> formList ) {
 		List<Map<String, Object>> delList = MapUtil.getList( formList, "del" );
@@ -423,11 +413,6 @@ public class RuleServiceImpl implements RuleService {
 		return ruleData;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.com.higinet.tms35.manage.rule.service.RuleService#getRule(java.util.Map)
-	 */
 	public Map<String, Object> getRule( Map<String, Object> reqs ) {
 		Long ruleId = MapUtil.getLong( reqs, "ruleId" );
 		return dynamicSimpleDao.retrieve( "TMS_COM_RULE", MapWrap.map( DBConstant.TMS_COM_RULE_RULE_ID, ruleId ).getMap() );

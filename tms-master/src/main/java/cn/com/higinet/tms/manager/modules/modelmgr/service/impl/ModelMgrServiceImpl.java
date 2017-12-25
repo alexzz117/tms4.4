@@ -48,9 +48,6 @@ public class ModelMgrServiceImpl implements ModelMgrService {
 		return modelPage;
 	}
 
-	/* (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.modelmgr.service.ModelMgrService#modelHisList(java.util.Map)
-	 */
 	public Page<Map<String, Object>> modelHisList(Map<String, String> reqs) {
 		String sql = "select TRAINID,TXNID,TRAINDATE,MODELUSED,STARTTIME,ENDTIME,EXECSTATE,MODELDESC,F1SCORE,STARTDATE,TRAINTYPE from TMS_COM_MTRAINHIS where TXNID=:txn_id";
 		Page<Map<String, Object>> modelPage =  offlineSimpleDao.pageQuery(sql, reqs, new Order().desc("STARTTIME"));
@@ -79,9 +76,6 @@ public class ModelMgrServiceImpl implements ModelMgrService {
 		return txnName;
 	}
 
-	/* (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.modelmgr.service.ModelMgrService#modelCorrelationList(java.util.Map)
-	 */
 	public List<Map<String, Object>> modelCorrelationList(
 			Map<String, String> reqs) {
 		String trainid = MapUtil.getString(reqs, "trainid");

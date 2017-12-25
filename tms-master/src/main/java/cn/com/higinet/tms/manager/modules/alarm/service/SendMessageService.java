@@ -9,10 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import cn.com.higinet.tms.engine.comm.hash;
 import cn.com.higinet.tms.manager.modules.common.SocketClient;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
-import cn.com.higinet.tms35.comm.hash;
 
 @Service("sendMessageService")
 public class SendMessageService {
