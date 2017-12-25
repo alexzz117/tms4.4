@@ -6,18 +6,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import ocx.RSAUtil;
-
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.json.JSONObject;
 
-import cn.com.higinet.rapid.base.util.IdUtil;
+import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms35.core.cache.db_cache;
 import cn.com.higinet.tms35.core.cache.db_dfp_app_properties;
 import cn.com.higinet.tms35.core.cache.db_dfp_application;
 import cn.com.higinet.tms35.core.cache.db_dfp_property;
 import cn.com.higinet.tms35.core.cache.linear;
+import ocx.RSAUtil;
 
 public class DeviceUtil {
 	private static Logger log = LoggerFactory.getLogger(DeviceUtil.class);
@@ -99,7 +98,7 @@ public class DeviceUtil {
 	 */
 	public static String getDeviceToken(String deviceInfo, Object tokenType,String device_type){
 		if(TokenType.RANDOM.equals(tokenType)){
-			return IdUtil.uuid();
+			return Stringz.randomUUID().toUpperCase();
 		}
 		if(deviceInfo == null || deviceInfo.length() < 3){
 			return null;

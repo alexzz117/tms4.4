@@ -8,13 +8,15 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
+
 @Service("bean_fac")
 public class bean implements ApplicationContextAware {
 	private static ApplicationContext context;
 
 	final public static <E> E get(Class<E> c) {
 		try {
-			return (E) context.getBean(c);
+			return (E) ApplicationContextUtil.getBean(c);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -22,11 +24,11 @@ public class bean implements ApplicationContextAware {
 	}
 
 	final public static Object get(String name) {
-		return context.getBean(name);
+		return ApplicationContextUtil.getBean(name);
 	}
 
 	final public static boolean containsBean(String name) {
-		return context.containsBean(name);
+		return ApplicationContextUtil.containsBean(name);
 	}
 
 	public void setApplicationContext(ApplicationContext context) throws BeansException {

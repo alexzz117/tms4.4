@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import cn.com.higinet.rapid.base.exception.BaseRuntimeException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -38,10 +37,11 @@ public class cmd_filter implements cmd {
 	 * 参数顺序严格要求，目前并没有做严格判断。
 	 *
 	 * @param args the arguments
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		if (args.length != 5) {
-			throw new BaseRuntimeException("Wrong parameters.\"./filter.sh ip port option[add,delete,clear] type[key,thread] value \"");
+			throw new Exception("Wrong parameters.\"./filter.sh ip port option[add,delete,clear] type[key,thread] value \"");
 		}
 		Socket socket = new Socket();
 		String ip = args[0];

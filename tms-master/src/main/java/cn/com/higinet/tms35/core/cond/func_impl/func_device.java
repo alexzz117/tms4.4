@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import cn.com.higinet.rapid.base.util.IdUtil;
+import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms35.dataSyncLog;
 import cn.com.higinet.tms35.comm.DeviceUtil;
 import cn.com.higinet.tms35.comm.str_tool;
@@ -359,7 +359,7 @@ public class func_device implements func {
 			}
 			if (!device.is_indb() || (RANDOM_CHANGE && app != null && finger != null) || (device.match < 1 && app != null && finger != null)) {
 				if (!RANDOM_OUT && RANDOM_CHANGE) {
-					device.random_num = IdUtil.uuid();
+					device.random_num = Stringz.randomUUID().toUpperCase();
 				}
 				device.prop_values = finger;
 				device.channel_deviceid = DeviceUtil.getDeviceToken(finger, app.token_type, app.app_id);
@@ -385,7 +385,7 @@ public class func_device implements func {
 		device.device_id = dao_seq.get("SEQ_TMS_DFP_DEVICE").next();
 		device.channel_deviceid = DeviceUtil.getDeviceToken(finger, app.token_type, app.app_id);
 		if (!RANDOM_OUT) {
-			device.random_num = IdUtil.uuid();
+			device.random_num = Stringz.randomUUID().toUpperCase();
 		} else {
 			device.random_num = random;
 		}

@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cn.com.higinet.tms</groupId>
+	<groupId>cn.com.higinet</groupId>
 	<artifactId>tms-master</artifactId>
 	<version>4.4.0</version>
 	<packaging>jar</packaging>
@@ -30,17 +30,6 @@
 			<groupId>net.vidageek</groupId>
 			<artifactId>mirror</artifactId>
 			<version>1.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>cn.com.higinet</groupId>
-			<artifactId>rapid-server</artifactId>
-			<version>2.0.0.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>org.springframework.jdbc</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- tms-base -->
 		<dependency>
@@ -111,8 +100,6 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-ribbon</artifactId>
 		</dependency>
-		<!-- <dependency> <groupId>org.springframework.cloud</groupId> <artifactId>spring-cloud-starter-zookeeper-config</artifactId> 
-			</dependency> -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -15,6 +16,7 @@ public class dao_base
 {
 
 	@Autowired
+	@Qualifier("tmsJdbcTemplate")
 	private JdbcTemplate tmsJdbcTemplate;
 
 	public int update(String sql)

@@ -8,86 +8,63 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.rapid.server.core.AsyncService;
-import cn.com.higinet.rapid.server.core.Request;
-import cn.com.higinet.rapid.server.core.Response;
+import cn.com.higinet.tms35.comm.Request;
+import cn.com.higinet.tms35.comm.Response;
 import cn.com.higinet.tms35.comm.clock;
 import cn.com.higinet.tms35.comm.str_tool;
-import cn.com.higinet.tms35.comm.tmsapp;
 import cn.com.higinet.tms35.comm.trans_pin;
 
-public class io_env extends trans_pin
-{
-	static Logger log = LoggerFactory.getLogger(io_env.class);
-	static AtomicLong g_counter = new AtomicLong(0);
+public class io_env extends trans_pin {
+	static Logger log = LoggerFactory.getLogger( io_env.class );
+	static AtomicLong g_counter = new AtomicLong( 0 );
 	AtomicBoolean returned;
 	clock m_clock = new clock();
 	Request req;
-	AsyncService.AsyncResponseImple res;
+	Object res;
 
-	public io_env(Request req, Response res)
-	{
+	public io_env( Request req, Response res ) {
 		super();
 		this.req = req;
-		this.res = (AsyncService.AsyncResponseImple) res;
-		returned = new AtomicBoolean(false);
-		this.pin_thread(INDEX_IO_THREADID);
-		this.pin_time(INDEX_IO_ENV_INIT_END);
+		this.res = res;
+		returned = new AtomicBoolean( false );
+		this.pin_thread( INDEX_IO_THREADID );
+		this.pin_time( INDEX_IO_ENV_INIT_END );
 	}
 
-	public Map<String, Object> getHeadMap()
-	{
+	public Map<String, Object> getHeadMap() {
 		return req.getHeadMap();
 	}
 
-	public TreeMap<String, String> getParameterMap()
-	{
-		return map_cast(req.getParameterMap());
+	public TreeMap<String, String> getParameterMap() {
+		return map_cast( req.getParameterMap() );
 	}
 
-	public Map<String, Object> getParameterOriMap()
-	{
+	public Map<String, Object> getParameterOriMap() {
 		return req.getParameterMap();
 	}
 
-	public void done()
-	{
-		done(null);
+	public void done() {
+		done( null );
 	}
 
-	public void done(Exception ex)
-	{
+	public void done( Exception ex ) {
 		boolean is_returned = false;
-		try
-		{
-			if (!returned.compareAndSet(false, true))
-			{
+		try {
+			if( !returned.compareAndSet( false, true ) ) {
 				is_returned = true;
 				return;
 			}
-			if (res == null)
-			{
+			if( res == null ) {
 				is_returned = true;
 				return;
 			}
-			this.pin_time(INDEX_RETURN_RESULT_BG);
-			res.done(req, ex);
+			this.pin_time( INDEX_RETURN_RESULT_BG );
 		}
-		catch (Exception e)
-		{
-			log.error("", e);
+		catch( Exception e ) {
+			log.error( "", e );
 		}
-		finally
-		{
-			if (!is_returned)
-			{
-				this.pin_time(INDEX_RETURN_RESULT_END);
-				this.setResult(res.getReturnCode(),
-						str_tool.to_str(res.getData("errorInfo")));
-
-				tmsapp.get_monitor().mark(
-						(int) (System.currentTimeMillis() - this
-								.get_base_time()));
+		finally {
+			if( !is_returned ) {
 			}
 
 		}
@@ -109,61 +86,45 @@ public class io_env extends trans_pin
 		// });
 	}
 
-	public void setData(String name, Object value)
-	{
-		if (returned.get())
-			return;
+	public void setData( String name, Object value ) {
+		if( returned.get() ) return;
 
-		res.setData(name, value);
 	}
 
-	public void setReturnCode(String code)
-	{
-		if (returned.get())
-			return;
+	public void setReturnCode( String code ) {
+		if( returned.get() ) return;
 
-		res.setReturnCode(code);
 	}
 
-	protected TreeMap<String, String> map_cast(Map<String, Object> s)
-	{
+	protected TreeMap<String, String> map_cast( Map<String, Object> s ) {
 		TreeMap<String, String> ret = new TreeMap<String, String>();
-		map_cast(ret, s, "");
+		map_cast( ret, s, "" );
 		return ret;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void map_cast(Map<String, String> d, Map<String, Object> s,
-			String prefix)
-	{
-		if (!str_tool.is_empty(prefix))
-			prefix = prefix + '.';
-		else
-			prefix = "";
+	private void map_cast( Map<String, String> d, Map<String, Object> s, String prefix ) {
+		if( !str_tool.is_empty( prefix ) ) prefix = prefix + '.';
+		else prefix = "";
 
-		for (Map.Entry<String, Object> e : s.entrySet())
-		{
+		for( Map.Entry<String, Object> e : s.entrySet() ) {
 			String k = e.getKey();
 			Object v = e.getValue();
 
-			if (v instanceof String)
-			{
-				d.put(prefix + k, str_tool.to_str(v));
+			if( v instanceof String ) {
+				d.put( prefix + k, str_tool.to_str( v ) );
 			}
-			else if (v instanceof Map)
-			{
-				map_cast(d, (Map<String, Object>) v, k);
+			else if( v instanceof Map ) {
+				map_cast( d, (Map<String, Object>) v, k );
 			}
 		}
 	}
 
-	public TreeMap<String, Object> getResultData()
-	{
+	public TreeMap<String, Object> getResultData() {
 		return null;
 	}
 
-	public String getResultCode()
-	{
+	public String getResultCode() {
 		return null;
 	}
 }

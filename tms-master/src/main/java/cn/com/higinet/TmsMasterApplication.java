@@ -1,4 +1,4 @@
-package cn.com.higinet.tms;
+package cn.com.higinet;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +11,7 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 @EnableZuulProxy
 public class TmsMasterApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TmsMasterApplication.class, args);
+	public static void main( String[] args ) {
+		SpringApplication.run( TmsMasterApplication.class, args );
 	}
 }

@@ -4,13 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms35.comm.str_tool;
 
 public class dispacther
 {
-	Logger log = Logger.getLogger(dispacther.class);
+	
+	private static final Logger log = LoggerFactory.getLogger( dispacther.class );
 
 	// 实现原则：
 	// 1）如果一个用户现有交易已经分发到某线程并且还未处理完成，依旧分发到这个线程

@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.core.cache.db_fd;
@@ -21,7 +22,8 @@ public class dao_trafficdata_update extends batch_stmt_jdbc_obj<run_txn_values> 
 
 	private static final String CREATETIME = "CREATETIME";//第一次评估时间
 
-	static Logger log = Logger.getLogger(dao_trafficdata_update.class);
+	
+	private static final Logger log = LoggerFactory.getLogger( dao_trafficdata_update.class );
 
 	static db_tab base_tab; // 交易数据基本表
 

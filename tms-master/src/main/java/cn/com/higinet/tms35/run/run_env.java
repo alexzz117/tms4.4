@@ -8,9 +8,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.rapid.server.message.Message;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms35.comm.MapUtil;
+import cn.com.higinet.tms35.comm.Message;
 import cn.com.higinet.tms35.comm.NotErrorException;
 import cn.com.higinet.tms35.comm.StaticParameters;
 import cn.com.higinet.tms35.comm.TransNotFoundException;

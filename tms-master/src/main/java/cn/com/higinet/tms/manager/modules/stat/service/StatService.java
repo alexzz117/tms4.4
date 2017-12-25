@@ -56,14 +56,6 @@ public class StatService {
 	private DataSourceTransactionManager offlineTransactionManager;
 
 	@Autowired
-	@Qualifier("onlineDataSource")
-	DataSource onlineDataSource;
-
-	@Autowired
-	@Qualifier("offlineDataSource")
-	DataSource offlineDataSource;
-
-	@Autowired
 	private CommonCheckService commonCheckService;
 
 	@Autowired
@@ -234,12 +226,12 @@ public class StatService {
 
 		Map<String, Object> rmap = new HashMap<String, Object>();
 
-		//DataSource officialTmsDataSource = onlineTransactionManager.getDataSource();
-		//DataSource tmpTmsDataSource = offlineTransactionManager.getDataSource();
+		DataSource officialTmsDataSource = onlineTransactionManager.getDataSource();
+		DataSource tmpTmsDataSource = offlineTransactionManager.getDataSource();
 
 		// 删除
 		if( delList != null && delList.size() > 0 ) {
-			cachInit( offlineDataSource );
+			cachInit( tmpTmsDataSource );
 			for( Map<String, ?> map : delList ) {
 				String stat_name = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_NAME );
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
@@ -249,7 +241,7 @@ public class StatService {
 					throw new TmsMgrServiceException( "[" + MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_DESC ) + "]被引用，不能删除" );
 			}
 
-			cachInit( onlineDataSource );
+			cachInit( officialTmsDataSource );
 			for( Map<String, ?> map : delList ) {
 				String stat_name = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_NAME );
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
@@ -265,7 +257,7 @@ public class StatService {
 
 		// 新增
 		if( addList != null && addList.size() > 0 ) {
-			cachInit( offlineDataSource );
+			cachInit( tmpTmsDataSource );
 			for( Map<String, Object> map : addList ) {
 				// 校验能否修改
 				checkCond( map );
@@ -279,7 +271,7 @@ public class StatService {
 
 		// 修改
 		if( modList != null && modList.size() > 0 ) {
-			cachInit( offlineDataSource );
+			cachInit( tmpTmsDataSource );
 			db_stat.cache d = db_cache.get().stat();
 
 			for( Map<String, Object> map : modList ) {
@@ -294,7 +286,7 @@ public class StatService {
 				checkDuplicateStatDesc( map );
 			}
 
-			cachInit( onlineDataSource );
+			cachInit( officialTmsDataSource );
 			for( Map<String, Object> map : modList ) {
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
 				String stat_name = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_NAME );
@@ -319,7 +311,7 @@ public class StatService {
 
 		// 有效性-停用
 		if( validNList != null && validNList.size() > 0 ) {
-			cachInit( offlineDataSource );
+			cachInit( tmpTmsDataSource );
 			for( Map<String, Object> map : validNList ) {
 				// 校验能否被引用
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );
@@ -330,7 +322,7 @@ public class StatService {
 				if( commonCheckService.find_ref_valid_stat( txnId, stat_name ) ) throw new TmsMgrServiceException( "[" + stat_desc + "]被引用，不能停用" );
 			}
 
-			cachInit( onlineDataSource );
+			cachInit( officialTmsDataSource );
 			for( Map<String, Object> map : validNList ) {
 				// 校验能否被引用
 				String txnId = MapUtil.getString( map, DBConstant.TMS_COM_STAT_STAT_TXN );

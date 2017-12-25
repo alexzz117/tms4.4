@@ -3,7 +3,7 @@ package cn.com.higinet.tms35.service;
 import java.util.Map;
 import java.util.TreeMap;
 
-import cn.com.higinet.rapid.server.core.Response;
+import cn.com.higinet.tms35.comm.Response;
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.core.concurrent.counter;
 

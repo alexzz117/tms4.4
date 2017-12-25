@@ -20,7 +20,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cn.com.higinet.rapid.base.dao.SqlMap;
+
+import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms35.core.bean;
 import cn.com.higinet.tms35.core.concurrent.tms_worker;
 import cn.com.higinet.tms35.core.concurrent.tms_worker_base;

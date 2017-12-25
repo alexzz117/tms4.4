@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc;
-import cn.com.higinet.tms35.core.dao.stmt.data_source;
 import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc.row_fetch;
+import cn.com.higinet.tms35.core.dao.stmt.data_source;
 
 public class db_cache {
 	static Logger log = LoggerFactory.getLogger(db_cache.class);
@@ -89,7 +89,7 @@ public class db_cache {
 	}
 
 	private long get_trans_mode_version(data_source ds) {
-		final AtomicLong tmver = new AtomicLong(0);//交易模型配置版本号
+		AtomicLong tmver = new AtomicLong(0);//交易模型配置版本号
 		batch_stmt_jdbc stmt = null;
 		try {
 			stmt = new batch_stmt_jdbc(ds, 

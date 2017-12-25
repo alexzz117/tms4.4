@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.rapid.base.dao.SqlMap;
+import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms35.comm.tms_exception;
 import cn.com.higinet.tms35.core.bean;
 

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import cn.com.higinet.rapid.base.dao.SqlMap;
+import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms35.comm.MD5Util;
 import cn.com.higinet.tms35.comm.comp_tool;
 import cn.com.higinet.tms35.comm.hash;

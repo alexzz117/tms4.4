@@ -4,8 +4,6 @@
  */
 package cn.com.higinet.tms35.comm;
 
-import cn.com.higinet.rapid.server.core.Request;
-
 /**
  * 功能/模块:IP地址工具类
  * @author zhanglq

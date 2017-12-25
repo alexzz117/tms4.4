@@ -12,13 +12,14 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms35.comm.delay_tool;
 
 public class worker implements Runnable
 {
-	static Logger log = Logger.getLogger(net_main.class);
+	static Logger log = LoggerFactory.getLogger( worker.class );
 	static Map<String, cmd> g_cmd_disp = new TreeMap<String, cmd>();
 	static
 	{
