@@ -224,7 +224,7 @@
           type: 'warning'
         }).then(() => {
           ajax.post({
-            url: 'manager/codedict/code/del',
+            url: '/codedict/code/del',
             param: {
               codeId: data.code_id
             },
@@ -260,7 +260,7 @@
         })
       },
       back () {
-        this.$router.push({name: 'Codedict'})
+        this.$router.push({name: 'codedict'})
       }
     }
   }

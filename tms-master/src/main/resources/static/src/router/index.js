@@ -42,7 +42,7 @@ export default new Router({
   linkActiveClass: 'active',
   routes: [
     {
-      path: '/login',
+      path: '/login.vue',
       name: 'login',
       component: Login
     },
@@ -55,32 +55,32 @@ export default new Router({
       },
       children: [
         {
-          path: 'user',
+          path: 'user.vue',
           name: 'user',
           component: User
         },
         {
-          path: 'role',
+          path: 'role.vue',
           name: 'role',
           component: Role
         },
         {
-          path: 'func',
+          path: 'func.vue',
           name: 'func',
           component: Func
         },
         {
-          path: 'valuelist/:rosterid/:datatype',
+          path: 'valuelist.vue',
           name: 'valuelist',
           component: ValueList
         },
         {
-          path: 'list',
+          path: 'list.vue',
           name: 'list',
           component: List
         },
         {
-          path: 'txn',
+          path: 'txn.vue',
           name: 'txn',
           component: Txn
         },
@@ -125,17 +125,17 @@ export default new Router({
           component: Ipaddr
         },
         {
-          path: 'log',
+          path: 'log.vue',
           name: 'log',
           component: Log
         },
         {
-          path: 'txnEventQuery',
+          path: 'txnEventQuery.vue',
           name: 'txnEventQuery',
           component: TxnEventQuery
         },
         {
-          path: 'alarmEventQuery',
+          path: 'alarmEventQuery.vue',
           name: 'alarmEventQuery',
           component: AlarmEventQuery
         }

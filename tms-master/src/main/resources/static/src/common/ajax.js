@@ -2,9 +2,9 @@ import axios from 'axios'
 import util from '@/common/util'
 
 var config = {
-  // prefix: util.getWebRootPath() + '/manager',  // 正式测试环境
   suffix: '?format=json',
-  prefix: '/context' // 分离测试环境
+  prefix: util.getWebRootPath()  // 正式测试环境
+  // prefix: '/context' // 分离测试环境
   // prefix: '/api' // local mock
 }
 

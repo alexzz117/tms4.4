@@ -1,6 +1,6 @@
 <template>
   <el-select v-model="selectedRows" class="query-form-item" placeholder="请选择"
-             multiple collapse-tags :disabled="selectDisabled"
+             multiple :collapse-tags="selectCollapseTags" :disabled="selectDisabled"
              @change="selectChange">
 
     <el-option key="&ALLPICK&" label="全选" value="&ALLPICK&">
@@ -27,6 +27,9 @@
       },
       selectDisabled () {
         return this.disabled
+      },
+      selectCollapseTags () {
+        return this.collapseTags
       }
     },
     data () {
@@ -53,6 +56,10 @@
       disabled: {
         type: Boolean,
         default: false
+      },
+      collapseTags: {
+        type: Boolean,
+        default: true
       }
     },
     mounted: function () {
@@ -67,6 +74,7 @@
         this.value = this.selectedRows
         let realSelectRow = this.selectedRows.filter(x => x !== '&ALLPICK&')
         this.$emit('dataChange', realSelectRow)
+        // this.$emit('dataChange', realSelectRow.join(','))
       },
       selectedList () {
         this.selectedRows = this.selectedList
@@ -76,6 +84,9 @@
       }
     },
     methods: {
+      setRows (rows) {
+        this.selectedRows = rows
+      },
       // 下面这个方法支持了查询中的全选操作
       selectChange (val) {
         let a = new Set(this.selectedCached)

@@ -114,7 +114,7 @@
         </el-form-item>
 
         <el-form-item label="统计引用对象:" class="is-required" :label-width="formLabelWidth" prop="stat_param" :style="formItemStyle" v-show="formStatParamShow">
-          <AllPickSelect :selectedList="statParamInitList" :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"></AllPickSelect>
+          <AllPickSelect :collapseTags="allPickCollapse" :selectedList="statParamInitList" :dataList="statParamList" @dataChange="addStatParamDataChange" :style="formItemContentStyle" :disabled="modDisabled || viewDisabled"></AllPickSelect>
         </el-form-item>
 
         <el-form-item label="统计函数:" :label-width="formLabelWidth" prop="stat_fn" :style="formItemStyle" v-show="formStatFnShow">
@@ -213,7 +213,9 @@
             v-model="dialogForm.continues"
             :disabled="viewDisabled"
             active-color="#13ce66"
-            inactive-color="#ff4949">
+            inactive-color="#ff4949"
+            active-value="1"
+            inactive-value="0">
           </el-switch>
         </el-form-item>
 
@@ -222,7 +224,9 @@
             v-model="dialogForm.stat_unresult"
             :disabled="viewDisabled"
             active-color="#13ce66"
-            inactive-color="#ff4949">
+            inactive-color="#ff4949"
+            active-value="1"
+            inactive-value="0">
           </el-switch>
         </el-form-item>
 
@@ -374,6 +378,7 @@
         },
         statParamInitList: [],
         dialogForm: this.initDialogForm(),
+        allPickCollapse: false, // 控制多选是否隐藏多的被选项
         statCondInDictDialogForm: {},
         // 下面这几条都是下拉框取值用的
         statParamList: [],
@@ -403,40 +408,40 @@
         viewDisabled: false,
         dialogFormRules: {
           stat_desc: [
-            { required: true, message: '统计描述不能为空', trigger: 'none' },
-            { max: 200, message: '长度在200个字符以内', trigger: 'none' },
-            { validator: check.checkFormZhSpecialCharacter, trigger: 'none' }
+            { required: true, message: '统计描述不能为空', trigger: 'blur' },
+            { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
+            { validator: check.checkFormZhSpecialCharacter, trigger: 'blur' }
           ],
           stat_cond: [
-            { validator: this.checkStatCond, trigger: 'none' }
+            { validator: this.checkStatCond, trigger: 'blur' }
           ],
           stat_fn: [
-            { required: true, message: '统计函数不能为空', trigger: 'none' }
+            { required: true, message: '统计函数不能为空', trigger: 'change' }
           ],
           stat_param: [
             // { required: true, message: '统计引用对象不能为空', trigger: 'none' }
-            { validator: this.checkStatParam, trigger: 'none' }
+            { validator: this.checkStatParam, trigger: 'blur' }
           ],
           stat_datafd: [
-            { validator: this.checkStatDataFd, trigger: 'none' }
+            { validator: this.checkStatDataFd, trigger: 'change' }
           ],
           fn_param: [
-            { validator: this.checkFnParam, trigger: 'none' }
+            { validator: this.checkFnParam, trigger: 'change' }
           ],
           coununit: [
-            { validator: this.checkCoununit, trigger: 'none' }
+            { validator: this.checkCoununit, trigger: 'change' }
           ],
           countround: [
-            { validator: this.checkCountround, trigger: 'none' }
+            { validator: this.checkCountround, trigger: 'blur' }
           ],
           result_cond: [
-            { validator: this.checkResultCond, trigger: 'none' }
+            { validator: this.checkResultCond, trigger: 'change' }
           ],
           datatype: [
-            { validator: this.checkDatatype, trigger: 'none' }
+            { validator: this.checkDatatype, trigger: 'change' }
           ],
           stat_valid: [
-            { validator: this.checkStatValid, trigger: 'none' }
+            { validator: this.checkStatValid, trigger: 'change' }
           ]
         },
         currentPage: 1,
@@ -565,8 +570,8 @@
           result_cond: '',
           datatype: '',
           storecolumn: '',
-          continues: '',
-          stat_unresult: '',
+          continues: 0,
+          stat_unresult: 0,
           stat_valid: 0
         }
       },
@@ -654,6 +659,7 @@
         this.dialogType = dialogType
         let self = this
         if (dialogType === 'edit') {
+          this.allPickCollapse = true // 编辑时多选为隐藏多的标签
           this.dialogTitle = '编辑交易统计'
           let length = this.selectedRows.length
           if (length !== 1) {
@@ -663,7 +669,7 @@
           this.modDisabled = true
           this.viewDisabled = false
           // 拷贝而不是赋值
-          Object.assign(this.dialogForm, this.selectedRows[0])
+          Object.assign(this.dialogForm, this.selectRowNum2Str(this.selectedRows[0]))
           setTimeout(function () {
             if (self.dialogForm.stat_param !== '') {
               self.statParamInitList = self.selectedRows[0].stat_param.split(',')
@@ -671,12 +677,14 @@
             self.dialogForm.fn_param = self.selectedRows[0].fn_param
           }, 300)
         } else if (dialogType === 'add') {
+          this.allPickCollapse = true // 新增时多选为隐藏多的标签
           this.dialogTitle = '新建交易统计'
           this.modDisabled = false
           this.viewDisabled = false
           this.dialogForm = this.initDialogForm()
           this.statParamInitList = []
         } else if (dialogType === 'view') {
+          this.allPickCollapse = false // 查看时多选为显示多的标签
           this.dialogTitle = '查看交易统计'
           let length = this.selectedRows.length
           if (length !== 1) {
@@ -691,19 +699,63 @@
             }
             self.dialogForm.fn_param = self.selectedRows[0].fn_param
           }, 300)
-          Object.assign(this.dialogForm, this.selectedRows[0])
+          console.log('selectedRows')
+          console.log(this.selectedRows[0])
+          Object.assign(this.dialogForm, this.selectRowNum2Str(this.selectedRows[0]))
         }
         this.dialogVisible = true
-        if (this.$refs['dialogForm']) {
-          this.$refs['dialogForm'].clearValidate()
-        }
         this.dialogOpenHandle()
+        setTimeout(function () {
+          if (self.$refs['dialogForm']) {
+            self.$refs['dialogForm'].clearValidate()
+          }
+        }, 100)
+      },
+      selectRowNum2Str (row) {
+        let tempObj = {}
+        Object.assign(tempObj, row)
+        for (let field in tempObj) {
+          if (typeof (tempObj[field]) === 'number' && field !== 'stat_valid') {
+            tempObj[field] = tempObj[field].toString()
+          }
+        }
+        return tempObj
       },
       submitForm (formName) {
         console.log(formName)
         this.$refs[formName].validate((valid) => {
-          console.log(valid)
           if (valid) {
+            let self = this
+            console.log(this.dialogForm)
+            let submitParam = {}
+            Object.assign(submitParam, this.dialogForm)
+            submitParam.stat_txn = this.txnIdParent
+            submitParam.continues = submitParam.continues == '1' ? '1' : '0'
+            submitParam.stat_unresult = submitParam.stat_unresult == '1' ? '1' : '0'
+            if (submitParam.stat_param !== null && submitParam.stat_param.length > 0) {
+              submitParam.stat_param = submitParam.stat_param.join(',')
+            }
+            // var jsonData =  ? JSON.stringify({'add': [submitParam]}) : JSON.stringify({'mod': [submitParam]})
+            // var jsonDataEncode = encodeURIComponent(jsonData)
+            let jsonData = {}
+            if (this.dialogType === 'add') {
+              jsonData.add = [submitParam]
+            } else {
+              jsonData.mod = [submitParam]
+            }
+            let finalJsonData = {}
+            finalJsonData.postData = jsonData
+            finalJsonData.txnId = this.txnIdParent
+
+            ajax.post({
+              url: '/stat/save',
+              param: finalJsonData,
+              success: function (data) {
+                self.getData()
+                self.$message('添加成功')
+                self.dictDialogVisible = false
+              }
+            })
             alert('提交')
           }
         })
@@ -713,20 +765,22 @@
       },
       // 函数参数弹窗
       fnParamPopup () {
-        console.log('fnParamPopup')
-        var objectValue = this.dialogForm.stat_fn
-        var statDatafd = this.dialogForm.stat_datafd
-        // 区间统计类函数需要修改区间参数
-        if (objectValue === 'rang_bin_dist') {
-          var fnParam = this.dialogForm.fn_param
-          var paramType = ''
-          var oneFeature = this.queryTxnFeature(statDatafd)
-          if (oneFeature) {
-            paramType = oneFeature.type
+        if (!this.viewDisabled) {
+          var objectValue = this.dialogForm.stat_fn
+          var statDatafd = this.dialogForm.stat_datafd
+          // 区间统计类函数需要修改区间参数
+          if (objectValue === 'rang_bin_dist') {
+            var fnParam = this.dialogForm.fn_param
+            var paramType = ''
+            var oneFeature = this.queryTxnFeature(statDatafd)
+            if (oneFeature) {
+              paramType = oneFeature.type
+            }
+            this.$refs.FuncParamPickerDialog.open(fnParam, paramType)
+            // params.initParamList(fnParam, paramType)
           }
-          this.$refs.FuncParamPickerDialog.open(fnParam, paramType)
-          // params.initParamList(fnParam, paramType)
         }
+
       },
       statCondInPopup () {
         if (!this.viewDisabled) {
@@ -747,6 +801,8 @@
       },
       addStatParamDataChange (value) {
         this.dialogForm.stat_param = value
+        this.$refs.dialogForm.validateField('stat_param', (valid) => {
+        })
       },
       statCondInValueCallBack (value) {
         this.dialogForm.stat_cond = value.stat_cond_value

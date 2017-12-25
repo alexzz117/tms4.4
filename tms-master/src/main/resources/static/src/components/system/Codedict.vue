@@ -261,7 +261,7 @@
           this.$message('请选择一行代码类别信息。')
           return
         }
-        this.$router.push({name: 'CodeDictInfo', query: { category_id: this.selectedRows[0].category_id }})
+        this.$router.push({name: 'codeDictInfo', query: { category_id: this.selectedRows[0].category_id }})
       },
       submitForm (formName) {
         if (this.dialogType === 'add') {
