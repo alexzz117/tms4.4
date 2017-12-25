@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
@@ -101,6 +102,9 @@ public class StatController {
 	 */
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public Model saveStatAction( @RequestBody Map<String, Object> reqs ) {
+		
+		logger.info( JSON.toJSONString( reqs ) );
+		
 		String json = MapUtil.getString( reqs, "postData" );
 
 		Map<String, List<Map<String, ?>>> formList = null;

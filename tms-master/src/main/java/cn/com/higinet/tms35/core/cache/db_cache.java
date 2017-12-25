@@ -89,7 +89,7 @@ public class db_cache {
 	}
 
 	private long get_trans_mode_version(data_source ds) {
-		AtomicLong tmver = new AtomicLong(0);//交易模型配置版本号
+		final AtomicLong tmver = new AtomicLong(0);//交易模型配置版本号
 		batch_stmt_jdbc stmt = null;
 		try {
 			stmt = new batch_stmt_jdbc(ds, 
