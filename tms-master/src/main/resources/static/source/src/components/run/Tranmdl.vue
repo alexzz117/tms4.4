@@ -36,8 +36,39 @@
     </el-container>
     <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible">
       <el-form :model="tmForm">
-        <el-form-item label="活动名称" :label-width="formLabelWidth">
+        <el-form-item label="交易名称" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.tab_name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="属性名称" :label-width="formLabelWidth">
           <el-input v-model="tmForm.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="属性代码" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.ref_name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="数据来源" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.src_id" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="类型" :label-width="formLabelWidth">
+          <el-select v-model="tmForm.type" placeholder="请选择">
+            <el-option
+              v-for="item in tmTypeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="存储字段" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.fd_name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="关联代码集" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.code" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="默认值" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.src_default" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="处理函数" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.genesisrul" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -130,6 +161,7 @@
         tmTitle: '',
         tmDialogVisible: false,
         tmForm: [],
+        tmTypeList: [{label: '整数类型', value: '1'}],
         formLabelWidth: '120px'
       }
     },
