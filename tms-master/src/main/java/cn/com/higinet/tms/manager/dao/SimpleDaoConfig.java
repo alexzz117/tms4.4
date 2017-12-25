@@ -32,6 +32,16 @@ public class SimpleDaoConfig {
 	@Qualifier("dynamicDataSource")
 	DataSource dynamicDataSource;
 
+	@Bean("tmsSqlMap")
+	public SqlMap tmsSqlMap() {
+		SqlMap sqlmap = new SqlMap();
+		sqlmap.setDbtype( "mysql" );
+		sqlmap.setBasenames( new String[] {
+				"classpath:/dbsql/tmsweb-sql"
+		} );
+		return sqlmap;
+	}
+
 	@Bean("cmcSimpleDao")
 	public SimpleDao cmcSimpleDao() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
@@ -92,15 +102,5 @@ public class SimpleDaoConfig {
 	@Bean("offlineTransactionManager")
 	public DataSourceTransactionManager offlineTransactionManager() {
 		return new DataSourceTransactionManager( offlineDataSource );
-	}
-
-	@Bean("tmsSqlMap")
-	public SqlMap tmsSqlMap() {
-		SqlMap sqlmap = new SqlMap();
-		sqlmap.setDbtype( "mysql" );
-		sqlmap.setBasenames( new String[] {
-				"classpath:/dbsql/tmsweb-sql"
-		} );
-		return sqlmap;
 	}
 }

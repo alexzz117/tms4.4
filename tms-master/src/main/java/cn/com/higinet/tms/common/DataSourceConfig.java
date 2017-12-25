@@ -55,7 +55,7 @@ public class DataSourceConfig {
 		map.put( DSType.DS_TEMP, offlineDataSource() );
 
 		dynamicDataSource.setTargetDataSources( map );
-		dynamicDataSource.setDefaultTargetDataSource( onlineDataSource() );
+		dynamicDataSource.setDefaultTargetDataSource( offlineDataSource() );
 		return dynamicDataSource;
 	}
 
