@@ -13,7 +13,6 @@ public class StaticResourcesConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/static/");
-//        registry.addResourceHandler("/tms/static/**").addResourceLocations("classpath:/static/static/");
         super.addResourceHandlers(registry);
     }
 
