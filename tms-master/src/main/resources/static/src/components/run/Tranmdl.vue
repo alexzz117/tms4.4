@@ -35,8 +35,6 @@
       txnIdParent () { return this.txnId },
       isVisibilityParent () { return this.isVisibility },
       tableData () {
-        console.info(this.dataList)
-        console.info(this.expendNodeKey)
         var expendNodeKey = this.expendNodeKey
         var dataList = this.dataList
         var tableData = []
@@ -136,6 +134,10 @@
         }
       },
       toggleListHandle (row, e) {
+        let self = this
+        if (row.group_type !== 'group') {
+          return
+        }
         let path = e.path
         let cellItem = null
         for (let i in path) {
@@ -143,12 +145,19 @@
             cellItem = path[i]
           }
         }
+        let key = row.tab_name + '____' + row.name
+        let expendNodeKey = self.expendNodeKey
         let iconItem = cellItem.getElementsByTagName('i')
         if (iconItem[0].getAttribute('class') === 'el-icon-arrow-up') {
           iconItem[0].setAttribute('class', 'el-icon-arrow-down')
+          if (expendNodeKey.indexOf(key) > -1) {
+            expendNodeKey.splice(expendNodeKey.indexOf(key), 1)
+          }
         } else if (iconItem[0].getAttribute('class') === 'el-icon-arrow-down') {
           iconItem[0].setAttribute('class', 'el-icon-arrow-up')
+          expendNodeKey.push(key)
         }
+        self.expendNodeKey = expendNodeKey
       }
     }
   }
