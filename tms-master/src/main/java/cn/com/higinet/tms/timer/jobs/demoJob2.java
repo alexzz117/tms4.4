@@ -18,7 +18,7 @@ public class demoJob2 implements TmsJob {
 
 	@Override
 	public String getJobName() {
-		return null;
+		return "demoJob2";
 	}
 
 }
