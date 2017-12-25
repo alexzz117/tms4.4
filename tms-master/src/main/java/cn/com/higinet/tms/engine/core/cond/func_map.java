@@ -1,12 +1,8 @@
 package cn.com.higinet.tms.engine.core.cond;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +10,6 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import cn.com.higinet.tms.base.util.Arrayz;
 import cn.com.higinet.tms.engine.comm.str_tool;
-import cn.com.higinet.tms.engine.comm.tm_tool;
-import cn.com.higinet.tms.engine.comm.tms_exception;
-import cn.com.higinet.tms.engine.core.cache.db_cache;
-import cn.com.higinet.tms.engine.core.cache.db_roster;
-import cn.com.higinet.tms.engine.core.cache.ip_cache;
 import cn.com.higinet.tms.engine.core.dao.dao_base;
 import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
 
@@ -159,7 +150,7 @@ public class func_map
 		try
 		{
 			Class<?> c = java.lang.Class
-					.forName("cn.com.higinet.tms35.core.cond.func_impl." + clsName);
+					.forName("cn.com.higinet.tms.engine.core.cond.func_impl." + clsName);
 			return (func) c.newInstance();
 		}
 		catch (Exception e)
