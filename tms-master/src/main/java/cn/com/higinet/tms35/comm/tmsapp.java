@@ -1,3 +1,4 @@
+
 package cn.com.higinet.tms35.comm;
 
 import java.net.Inet4Address;
@@ -48,8 +49,7 @@ public final class tmsapp
 		try
 		{
 			Inet4Address myip = (Inet4Address) Inet4Address.getLocalHost();
-			if (myip.isLoopbackAddress())
-				throw new Error("无法获取本机IP地址，请正确配置/etc/hosts文件");
+			//if (myip.isLoopbackAddress()) throw new Error("无法获取本机IP地址，请正确配置/etc/hosts文件");
 			serv_ip = myip.getHostAddress();
 			serv_ip_byte = myip.getAddress();
 			serv_ips = new ArrayList<String>(8);
