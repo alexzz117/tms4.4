@@ -16,7 +16,7 @@ public class StaticResourcesFilter implements Filter {
         String servletPath = request.getServletPath();
 //        String context = request.getContextPath();
         //匹配的路径重写
-        if (servletPath.endsWith(".vue")) {
+        if (servletPath.endsWith("_vue")) {
             servletRequest.getRequestDispatcher("/").forward(servletRequest, servletResponse);
         } else {
             filterChain.doFilter(servletRequest, servletResponse);
