@@ -1,26 +1,33 @@
 <template>
   <div>
-    <el-table :data="tableData" ref="formList"
-              :span-method="groupHandle"
-              :row-class-name="groupClassName"
-              @row-dblclick="toggleListHandle"
-              max-height="430"
-      style="width: 100%">
-      <el-table-column type="selection" width="35" align="left"></el-table-column>
-      <el-table-column label="属性名称" prop="name">
-        <template slot-scope="scope">
-          <i v-if="scope.row.group_type==='group'" class="el-icon-arrow-up"></i>
-          <span style="margin-left: 10px">{{scope.row.name}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="属性代码" prop="ref_name"></el-table-column>
-      <el-table-column label="数据来源" prop="src_id"></el-table-column>
-      <el-table-column label="类型" prop="type"></el-table-column>
-      <el-table-column label="存储字段" prop="fd_name"></el-table-column>
-      <el-table-column label="关联代码集" prop="code"></el-table-column>
-      <el-table-column label="默认值" prop="src_default"></el-table-column>
-      <el-table-column label="处理函数" prop="genesisrul"></el-table-column>
-    </el-table>
+    <el-container>
+      <el-header height="30px" style="text-align: left;line-height: 2em">
+          <div>交易模型</div>
+      </el-header>
+      <el-main>
+        <el-table :data="tableData" ref="formList"
+                  :span-method="groupHandle"
+                  :row-class-name="groupClassName"
+                  @row-dblclick="toggleListHandle"
+                  max-height="430"
+                  style="width: 100%">
+          <el-table-column type="selection" width="35" align="left"></el-table-column>
+          <el-table-column label="属性名称" prop="name">
+            <template slot-scope="scope">
+              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row)></i>
+              <span style="margin-left: 10px">{{scope.row.name}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="属性代码" prop="ref_name"></el-table-column>
+          <el-table-column label="数据来源" prop="src_id"></el-table-column>
+          <el-table-column label="类型" prop="type"></el-table-column>
+          <el-table-column label="存储字段" prop="fd_name"></el-table-column>
+          <el-table-column label="关联代码集" prop="code"></el-table-column>
+          <el-table-column label="默认值" prop="src_default"></el-table-column>
+          <el-table-column label="处理函数" prop="genesisrul"></el-table-column>
+        </el-table>
+      </el-main>
+    </el-container>
   </div>
 </template>
 
@@ -66,7 +73,7 @@
     props: ['txnId', 'isVisibility'],
     data () {
       return {
-        toggleIcon: ['el-icon-arrow-up', 'el-icon-arrow-dowm'],
+        toggleIcon: ['el-icon-arrow-up', 'el-icon-arrow-down'],
         dataList: [],
         expendNodeKey: []
       }
@@ -133,6 +140,18 @@
           return ''
         }
       },
+      groupIcon (row) {
+        if (row.group_type !== 'group') {
+          return ''
+        }
+        let expendNodeKey = this.expendNodeKey
+        let key = row.tab_name + '____' + row.name
+        if (expendNodeKey.indexOf(key) > -1) {
+          return this.toggleIcon[0]
+        } else {
+          return this.toggleIcon[1]
+        }
+      },
       toggleListHandle (row, e) {
         let self = this
         if (row.group_type !== 'group') {
@@ -149,12 +168,10 @@
         let expendNodeKey = self.expendNodeKey
         let iconItem = cellItem.getElementsByTagName('i')
         if (iconItem[0].getAttribute('class') === 'el-icon-arrow-up') {
-          iconItem[0].setAttribute('class', 'el-icon-arrow-down')
           if (expendNodeKey.indexOf(key) > -1) {
             expendNodeKey.splice(expendNodeKey.indexOf(key), 1)
           }
         } else if (iconItem[0].getAttribute('class') === 'el-icon-arrow-down') {
-          iconItem[0].setAttribute('class', 'el-icon-arrow-up')
           expendNodeKey.push(key)
         }
         self.expendNodeKey = expendNodeKey
