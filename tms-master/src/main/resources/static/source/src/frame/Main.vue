@@ -22,6 +22,9 @@
             <router-link :to="{ name:'list'}" tag="li" replace>
               <el-menu-item index="1-2">名单管理</el-menu-item>
             </router-link>
+            <router-link :to="{ name:'Namelist'}" tag="li" replace>
+              <el-menu-item index="1-3">名单查看</el-menu-item>
+            </router-link>
           </el-submenu>
           <el-submenu index="3">
             <template slot="title"><i class="el-icon-setting"></i>权限管理</template>
