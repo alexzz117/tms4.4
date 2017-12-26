@@ -50,8 +50,8 @@ public class IPProtectService extends ApplicationObjectSupport {
 	@Qualifier("onlineSimpleDao")
 	private SimpleDao onlineSimpleDao;
 	@Autowired
-	@Qualifier("tmpJdbcTemplate")
-	private JdbcTemplate tmpJdbcTemplate;
+	@Qualifier("officialJdbcTemplate")
+	private JdbcTemplate officialJdbcTemplate;
 	@Autowired
 	private SqlMap tmsSqlMap;
 	@Autowired
@@ -299,10 +299,10 @@ public class IPProtectService extends ApplicationObjectSupport {
 		String tabName = ipLocationService.getLocationOperName( importTables[3] );
 		String delete = "delete from %s where ID = 1";
 		String insert = "insert into %s(ID,NAME,DATA) values (?, ?, ?)";
-		tmpJdbcTemplate.execute( String.format( delete, tabName ) );
+		officialJdbcTemplate.execute( String.format( delete, tabName ) );
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream( 1 << 20 );
 		IPCache.initdb( IPFile, cityFile, cardFile, mobileFile, bos );
-		tmpJdbcTemplate.execute( String.format( insert, tabName ), new AbstractLobCreatingPreparedStatementCallback( new DefaultLobHandler() ) {
+		officialJdbcTemplate.execute( String.format( insert, tabName ), new AbstractLobCreatingPreparedStatementCallback( new DefaultLobHandler() ) {
 			@Override
 			protected void setValues( PreparedStatement pstm, LobCreator lobCreator ) throws SQLException, DataAccessException {
 				pstm.setInt( 1, 1 );
@@ -552,10 +552,10 @@ public class IPProtectService extends ApplicationObjectSupport {
 				String tabName = ipLocationService.getLocationOperName( this.tabName );
 				String delete = "delete from %s where ID = 1";
 				String insert = "insert into %s(ID,NAME,DATA) values (?, ?, ?)";
-				tmpJdbcTemplate.execute( String.format( delete, tabName ) );
+				officialJdbcTemplate.execute( String.format( delete, tabName ) );
 				final ByteArrayOutputStream bos = new ByteArrayOutputStream( 1 << 20 );
 				IPCache.initdb( this.ipReader, this.cityReader, this.cardReader, this.mobileReader, bos );
-				tmpJdbcTemplate.execute( String.format( insert, tabName ), new AbstractLobCreatingPreparedStatementCallback( new DefaultLobHandler() ) {
+				officialJdbcTemplate.execute( String.format( insert, tabName ), new AbstractLobCreatingPreparedStatementCallback( new DefaultLobHandler() ) {
 					@Override
 					protected void setValues( PreparedStatement pstm, LobCreator lobCreator ) throws SQLException, DataAccessException {
 						pstm.setInt( 1, 1 );
