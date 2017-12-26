@@ -32,25 +32,23 @@
 
     <el-table
       :data="gridData"
-      stripe
-      border
       style="width: 100%"
       @selection-change="handleSelectionChange">
       <el-table-column
-        fixed="right"
+        fixed="left"
         label="操 作"
         width="140">
         <template slot-scope="scope" >
           <el-button type="text"  @click="openDialog(scope.$index, scope.row)" size="mini"  icon="el-icon-view"  v-show="typeof(scope.row.rosterid)=='number'">查看</el-button>
-          <el-button type="text"  @click="showValueList(scope.$index, scope.row)" size="mini" icon="el-icon-tickets" v-show="typeof(scope.row.rosterid)=='number'">名单值</el-button>
+          <el-button type="text"  @click="showValueList(scope.$index, scope.row)" size="mini" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'">名单值</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="rostername" label="名单英文名" align="left" width="160"></el-table-column>
-      <el-table-column prop="rosterdesc" label="名单名称" align="left" width="140"></el-table-column>
-      <el-table-column prop="datatype" label="名单数据类型" align="left" width="140" :formatter="formatter"></el-table-column>
-      <el-table-column prop="rostertype" label="名单类型" align="left" width="140" :formatter="formatter"></el-table-column>
+      <el-table-column prop="rosterdesc" label="名单名称" align="left" width="160"></el-table-column>
+      <el-table-column prop="datatype" label="名单数据类型" align="left" width="160" :formatter="formatter"></el-table-column>
+      <el-table-column prop="rostertype" label="名单类型" align="left" width="160" :formatter="formatter"></el-table-column>
       <el-table-column prop="valuecount" label="值数量" align="left" width="100"></el-table-column>
-      <el-table-column prop="createtime" label="创建时间" align="left" width="150" :formatter="formatter"></el-table-column>
+      <el-table-column prop="createtime" label="创建时间" align="left" width="160" :formatter="formatter"></el-table-column>
       <el-table-column prop="iscache" label="是否缓存" align="left" width="120" :formatter="formatter"></el-table-column>
     </el-table>
     <el-pagination background class="block" label="left" label-width="100px"
