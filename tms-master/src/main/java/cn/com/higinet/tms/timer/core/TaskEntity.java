@@ -5,15 +5,39 @@ import java.util.Date;
 public class TaskEntity {
 
 	private String name;
-	private String jobName;
-	private String groupName;
+	private String taskId;
+	private String group;
 	private String className;
 	private String description;
 	private String status;
-	private String cronExpression;
+	private String cron;
 	private Date createTime;
 	private Date previousFireTime;
 	private Date nextFireTime;
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup( String group ) {
+		this.group = group;
+	}
+
+	public String getCron() {
+		return cron;
+	}
+
+	public void setCron( String cron ) {
+		this.cron = cron;
+	}
+
+	public String getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId( String taskId ) {
+		this.taskId = taskId;
+	}
 
 	public String getClassName() {
 		return className;
@@ -55,22 +79,6 @@ public class TaskEntity {
 		this.name = name;
 	}
 
-	public String getJobName() {
-		return jobName;
-	}
-
-	public void setJobName( String jobName ) {
-		this.jobName = jobName;
-	}
-
-	public String getGroupName() {
-		return groupName;
-	}
-
-	public void setGroupName( String groupName ) {
-		this.groupName = groupName;
-	}
-
 	public String getDescription() {
 		return description;
 	}
@@ -85,14 +93,6 @@ public class TaskEntity {
 
 	public void setStatus( String status ) {
 		this.status = status;
-	}
-
-	public String getCronExpression() {
-		return cronExpression;
-	}
-
-	public void setCronExpression( String cronExpression ) {
-		this.cronExpression = cronExpression;
 	}
 
 }
