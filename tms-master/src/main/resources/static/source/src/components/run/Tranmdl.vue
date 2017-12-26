@@ -11,7 +11,7 @@
           <el-button type="text" class="el-icon-delete" @click="tmDelFunc">删除</el-button>
           <el-button type="text" class="el-icon-search" @click="tmInfoFunc">查看</el-button>
         </div>
-        <el-table :data="tableData" ref="formList"
+        <el-table :data="tmTableData" ref="tmTable"
                   :span-method="groupHandle"
                   :row-class-name="groupClassName"
                   @row-dblclick="toggleListHandle"
@@ -28,14 +28,14 @@
           <el-table-column label="数据来源" prop="src_id"></el-table-column>
           <el-table-column label="类型" prop="type"></el-table-column>
           <el-table-column label="存储字段" prop="fd_name"></el-table-column>
-          <el-table-column label="关联代码集" prop="code"></el-table-column>
+          <el-table-column label="关联代码集" prop="code" :formatter="formatterCode"></el-table-column>
           <el-table-column label="默认值" prop="src_default"></el-table-column>
           <el-table-column label="处理函数" prop="genesisrul"></el-table-column>
         </el-table>
       </el-main>
     </el-container>
-    <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible">
-      <el-form :model="tmForm">
+    <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible" @open="openTmDialog">
+      <el-form :model="tmForm" style="text-align: left;">
         <el-form-item label="交易名称" :label-width="formLabelWidth">
           <el-input v-model="tmForm.tab_name" auto-complete="off"></el-input>
         </el-form-item>
@@ -49,7 +49,7 @@
           <el-input v-model="tmForm.src_id" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型" :label-width="formLabelWidth">
-          <el-select v-model="tmForm.type" placeholder="请选择">
+          <el-select v-model="tmForm.type" placeholder="请选择" @change="getEnableStorageFdByDataType">
             <el-option
               v-for="item in tmTypeList"
               :key="item.value"
@@ -59,16 +59,37 @@
           </el-select>
         </el-form-item>
         <el-form-item label="存储字段" :label-width="formLabelWidth">
-          <el-input v-model="tmForm.fd_name" auto-complete="off"></el-input>
+          <el-select v-model="tmForm.fd_name" placeholder="请选择">
+            <el-option
+              v-for="item in tmFdNameList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="关联代码集" :label-width="formLabelWidth">
-          <el-input v-model="tmForm.code" auto-complete="off"></el-input>
+          <el-select v-model="tmForm.code" placeholder="请选择">
+            <el-option
+              v-for="item in tmCodeList"
+              :key="item.category_id"
+              :label="item.category_name"
+              :value="item.category_id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="默认值" :label-width="formLabelWidth">
           <el-input v-model="tmForm.src_default" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="处理函数" :label-width="formLabelWidth">
-          <el-input v-model="tmForm.genesisrul" auto-complete="off"></el-input>
+          <el-select v-model="tmForm.genesisrul" placeholder="请选择">
+            <el-option
+              v-for="item in tmGenesisRulList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -82,31 +103,33 @@
       </el-header>
       <el-main style="padding: 0px;">
         <div style="padding-left: 10px;text-align: left;border-bottom: 1px solid #eee;">
-          <el-button type="text" class="el-icon-plus" @click="">新建</el-button>
-          <el-button type="text" class="el-icon-edit" @click="">编辑</el-button>
-          <el-button type="text" class="el-icon-delete" @click="">删除</el-button>
-          <el-button type="text" class="el-icon-search" @click="">查看</el-button>
+          <el-button type="text" class="el-icon-plus" @click="">新建引用表</el-button>
+          <el-button type="text" class="el-icon-edit" @click="">编辑引用表</el-button>
+          <el-button type="text" class="el-icon-delete" @click="">删除引用表</el-button>
+          <el-button type="text" class="el-icon-plus" @click="">新建行字段</el-button>
+          <el-button type="text" class="el-icon-edit" @click="">编辑行字段</el-button>
+          <el-button type="text" class="el-icon-delete" @click="">删除行字段</el-button>
+          <el-button type="text" class="el-icon-search" @click="">查询引用表</el-button>
         </div>
-        <el-table :data="tableData" ref="formList"
+        <el-table :data="refTableData" ref="refTable"
                   :span-method="groupHandle"
                   :row-class-name="groupClassName"
                   @row-dblclick="toggleListHandle"
                   max-height="430"
                   style="width: 100%">
           <el-table-column type="selection" width="35" align="left"></el-table-column>
-          <el-table-column label="属性名称" prop="name">
+          <el-table-column label="属性名称" prop="ref_desc">
             <template slot-scope="scope">
               <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row)></i>
-              <span style="margin-left: 10px">{{scope.row.name}}</span>
+              <span style="margin-left: 10px">{{scope.row.ref_desc}}</span>
             </template>
           </el-table-column>
           <el-table-column label="属性代码" prop="ref_name"></el-table-column>
-          <el-table-column label="数据来源" prop="src_id"></el-table-column>
-          <el-table-column label="类型" prop="type"></el-table-column>
-          <el-table-column label="存储字段" prop="fd_name"></el-table-column>
-          <el-table-column label="关联代码集" prop="code"></el-table-column>
-          <el-table-column label="默认值" prop="src_default"></el-table-column>
-          <el-table-column label="处理函数" prop="genesisrul"></el-table-column>
+          <el-table-column label="数据来源" prop="ref_fd_name"></el-table-column>
+          <el-table-column label="条件" prop="src_cond_in"></el-table-column>
+          <el-table-column label="表达式" prop="src_expr_in"></el-table-column>
+          <el-table-column label="存储字段" prop="storecolumn"></el-table-column>
+          <el-table-column label="所属节点" prop="tab_desc"></el-table-column>
         </el-table>
       </el-main>
     </el-container>
@@ -115,6 +138,8 @@
 
 <script>
   import ajax from '@/common/ajax'
+  import dictCode from '@/common/dictCode'
+
   let vm = null
   export default {
     create () {
@@ -123,7 +148,7 @@
     computed: {
       txnIdParent () { return this.txnId },
       isVisibilityParent () { return this.isVisibility },
-      tableData () {
+      tmTableData () {
         var expendNodeKey = this.expendNodeKey
         var dataList = this.dataList
         var tableData = []
@@ -160,8 +185,13 @@
         expendNodeKey: [],
         tmTitle: '',
         tmDialogVisible: false,
-        tmForm: [],
+        tmForm: {},
         tmTypeList: [{label: '整数类型', value: '1'}],
+        tmFdNameList: [{label: '整数类型', value: '1'}],
+        tmCodeList: [],
+        tmGenesisRulList: [{label: '整数类型', value: '1'}],
+        refTableData: [],
+        codeList: [],
         formLabelWidth: '120px'
       }
     },
@@ -189,7 +219,7 @@
     methods: {
       initForm () {
         var self = this
-        var option = {
+        var option1 = {
           url: '/tranmdl/query',
           param: {
             tab_name: self.txnId
@@ -208,7 +238,17 @@
             }
           }
         }
-        ajax.post(option)
+        ajax.post(option1)
+        var option2 = {
+          url: '/tranmdl/queryOf',
+          param: {
+            tab_name: self.txnId
+          },
+          success: function (data) {
+            self.tmCodeList = data.sourcetype // 关联代码集
+          }
+        }
+        ajax.post(option2)
       },
       groupHandle ({ row, column, rowIndex, columnIndex }) {
         if (row.group_type === 'group') {
@@ -262,6 +302,26 @@
           expendNodeKey.push(key)
         }
         self.expendNodeKey = expendNodeKey
+      },
+      formatterCode (row, column) {
+        let self = this
+        if (row.code === undefined || row.code === null || row.code === '') {
+          return ''
+        } else {
+          let codeList = self.tmCodeList
+          for (let i in codeList) {
+            if (codeList[i].category_id === row.code) {
+              return codeList[i].category_name
+            }
+          }
+          return row.code
+        }
+      },
+      openTmDialog () { // 当新建交易模型窗口打开时触发
+        this.tmTypeList = dictCode.getCodeItems('tms.model.datatype') // 加载类型下拉列表
+      },
+      getEnableStorageFdByDataType (a, b) {
+        console.info(a, b)
       },
       tmAddFunc () {
         let self = this
