@@ -372,7 +372,7 @@
         ajax.post({
           url: '/tranmdl/queryAvailableStoreFd',
           param: {
-            tab_name: tabName ? tabName : self.txnId
+            tab_name: (tabName?tabName:self.txnId)
           },
           success: function (data) {
             self.enableStoreFds = data.enableStoreFd // 存储字段
