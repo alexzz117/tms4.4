@@ -4,15 +4,24 @@ import java.util.Date;
 
 public class TaskEntity {
 
-	String name;
-	String jobName;
-	String groupName;
-	String description;
-	String status;
-	String cronExpression;
-	Date createTime;
-	Date previousFireTime;
-	Date nextFireTime;
+	private String name;
+	private String jobName;
+	private String groupName;
+	private String className;
+	private String description;
+	private String status;
+	private String cronExpression;
+	private Date createTime;
+	private Date previousFireTime;
+	private Date nextFireTime;
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName( String className ) {
+		this.className = className;
+	}
 
 	public Date getCreateTime() {
 		return createTime;
