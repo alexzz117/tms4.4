@@ -61,23 +61,24 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="roleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('roleDialogform')">保 存</el-button>
+        <el-button type="primary" @click="submitForm('roleDialogform')" :disabled="savebtnStatus">保 存</el-button>
       </div>
     </el-dialog>
 
     <el-dialog title="功能授权" :visible.sync="grantDialogVisible">
       <el-tree
         :data="grantData"
+        :default-expanded-keys="expendKey"
+        :default-checked-keys="checkedKeys"
         show-checkbox
-        default-expand-all
         node-key="id"
-        ref="tree"
+        ref="grantTree"
         highlight-current
         :props="defaultProps">
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="roleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('roleDialogform')">保 存</el-button>
+        <el-button type="primary" @click="saveGrant" :disabled="savebtnStatus">保 存</el-button>
       </div>
     </el-dialog>
   </div>
@@ -107,6 +108,7 @@
         })
       },
       openDialog(flag) {
+        this.savebtnStatus = false
         this.flag = flag
         if (flag === 'edit') {
           this.dialogTitle = '编辑角色'
@@ -129,6 +131,9 @@
           }
         }
         this.roleDialogVisible = true
+        if (this.$refs['roleDialogform']) {
+          this.$refs['roleDialogform'].clearValidate()
+        }
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
@@ -161,11 +166,13 @@
       },
       add() {
         var self = this
+        this.savebtnStatus = true
         ajax.post({
           url: '/role/add',
           param: this.roleDialogform,
           success: function (data) {
             self.$message('创建成功。')
+            this.savebtnStatus = false
             self.roleDialogVisible = false
             self.sel()
           }
@@ -174,15 +181,29 @@
       del() {
         var self = this
         var data = this.multipleSelection[0]
-        ajax.post({
-          url: '/role/del',
-          param: {
-            roleid: data.role_id
-          },
-          success: function (data) {
-            self.$message('删除成功。')
-            self.sel()
-          }
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          ajax.post({
+            url: '/role/del',
+            param: {
+              roleid: data.role_id
+            },
+            success: function (data) {
+              self.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              self.sel()
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
         })
       },
       sel(pageinfo) {
@@ -212,53 +233,65 @@
       },
       update() {
         var self = this;
+        this.savebtnStatus = true
         ajax.post({
           url: '/role/mod',
           param: this.roleDialogform,
           success: function (data) {
             self.$message('更新成功。')
+            this.savebtnStatus = false
             self.roleDialogVisible = false
             self.sel()
           }
         })
       },
       grant() {
-        this.grantData = [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2'
-          }]
-        }]
-        this.grantDialogVisible = true
+        var self = this
+        var data = this.multipleSelection[0]
+        ajax.post({
+          url: '/role/grant/list',
+          param: {
+            roleid: data.role_id
+          },
+          success: function (data) {
+            if (data.list) {
+              var rootNodes = { // 根节点
+                id: '-1',
+                fid: '',
+                func_type: '-1',
+                flag: '1',
+                ftype_name: '',
+                text: '功能树',
+                icon: 'ticon-root',
+                onum: 0
+              }
+              var treeList = [rootNodes]
+              treeList = treeList.concat(data.list)
+              self.treeList = treeList
+              self.grantData = util.formatTreeData(treeList)
+              self.expendKey = util.expendNodesByLevel(self.grantData, 2)
+              self.checkedKeys = util.checkKeys(self.grantData, 'grant', '1')
+              self.grantDialogVisible = true
+            }
+          }
+        })
+      },
+      saveGrant () {
+        var self = this
+        this.savebtnStatus = true
+        ajax.post({
+          url: '/role/grant/mod',
+          param: {
+            roleid: this.multipleSelection[0].role_id,
+            funcs: this.$refs.grantTree.getCheckedNodes()
+          },
+          success: function (data) {
+            self.$message('更新成功。')
+            self.savebtnStatus = false
+            self.grantDialogVisible = false
+            self.sel()
+          }
+        })
       },
       selectFocus () {
         this.flagOptions = dictCode.getCodeItems('cmc.cmc_role.flag')
@@ -276,10 +309,29 @@
       }
     },
     data() {
+      var self = this
+      var roleNameExist = function (rule, value, callback) {
+        if (value === self.multipleSelection[0].role_name) {
+          return callback();
+        }
+        ajax.post({
+          url: '/role/checkUserName',
+          param: {
+            role_name: self.roleDialogform.role_name
+          },
+          success: function (data) {
+            if('false' === data.checke_result){
+              callback(new Error('角色名称已被占用'));
+            }else{
+              callback();
+            }
+          }
+        })
+      }
       return {
         inline: true,
         roleForm: {
-          ROLE_NAME:''
+          role_name:''
         },
         roleData: [],
         pageindex: 1,
@@ -295,15 +347,15 @@
         dialogTitle: '',
         formLabelWidth: '100px',
         btnStatus: true,
+        savebtnStatus: false,
         rules: {
-          ROLE_NAME: [
+          role_name: [
             { required: true, message: '请输入角色名称', trigger: 'blur' },
             { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
-            { validator: check.checkFormSpecialCode, trigger: 'blur' }
-//            ,
-//            { validator: roleNameExist, trigger: 'blur' }
+            { validator: check.checkFormSpecialCode, trigger: 'blur' },
+            { validator: roleNameExist, trigger: 'blur' }
           ],
-          INFO: [
+          info: [
             { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
             { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
@@ -313,9 +365,11 @@
         flagOptions: [],
         clearable: true,
         grantData: [],
+        expendKey: ['-1'], // 默认展开的功能节点id
+        checkedKeys: [],   // 默认选中功能
         defaultProps: {
           children: 'children',
-          label: 'label'
+          label: 'text'
         }
       }
     }

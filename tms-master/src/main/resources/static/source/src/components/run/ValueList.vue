@@ -126,6 +126,9 @@
           }
         }
         this.valueListDialogVisible = true
+        if (this.$refs['valueListDialogform']) {
+          this.$refs['valueListDialogform'].clearValidate()
+        }
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
@@ -200,18 +203,31 @@
       },
       del() {
         var self = this
-
-        ajax.post({
-          url: '/mgr/valuedel',
-          param: {
-            postData: {
-              del: this.multipleSelection
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          ajax.post({
+            url: '/mgr/valuedel',
+            param: {
+              postData: {
+                del: this.multipleSelection
+              }
+            },
+            success: function (data) {
+              self.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              self.sel()
             }
-          },
-          success: function (data) {
-            self.$message('删除成功。')
-            self.sel()
-          }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
         })
       },
       sel(pageinfo) {

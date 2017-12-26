@@ -4,6 +4,7 @@
  * @createtime 2017-12-06
  */
 
+import crypt from '@/common/crypt'
 var toString = Object.prototype.toString,
   hasOwn = Object.prototype.hasOwnProperty,
   push = Array.prototype.push,
@@ -32,14 +33,14 @@ function isNumeric( obj ) {
 
 /*
 
-IsNumber(string,string,string):
+ IsNumber(string,string,string):
 
-功能：判断是否为浮点数、整数
+ 功能：判断是否为浮点数、整数
 
-add by caiqian 2012-2-16修改校验浮点数，只需判断是否是数字，小数点后保留几位
-sign:null表示没有正负号，"+"：正；"-"：负
-deci:小数点的精度，如果此参数没有，默认是无限浮点数，如果为0，表示整数，如果不为0，表示具体的精度
-*/
+ add by caiqian 2012-2-16修改校验浮点数，只需判断是否是数字，小数点后保留几位
+ sign:null表示没有正负号，"+"：正；"-"：负
+ deci:小数点的精度，如果此参数没有，默认是无限浮点数，如果为0，表示整数，如果不为0，表示具体的精度
+ */
 
 function isNumber(objStr,sign,deci)
 {
@@ -377,6 +378,78 @@ var util = {
       }
     }
     return str
+  },
+  crypt: crypt,
+  // 把功能节点列表格式化为树形Json结构
+  formatTreeData (list, rootNodes) {
+    var tree = []
+    // 如果根节点数组不存在，则取fid不存在或为空字符的节点为父节点
+    if (rootNodes === undefined || rootNodes.length === 0) {
+      rootNodes = []
+      for (var i in list) {
+        if (list[i].fid === undefined || list[i].fid === null || list[i].fid === '') {
+          if (list[i].id !== undefined && list[i].id !== null && list[i].id !== '') {
+            rootNodes.push(list[i])
+          }
+        }
+      }
+    }
+    // 根节点不存在判断
+    if (rootNodes.length === 0) {
+      console.error('根节点不存在，请确认树结构是否正确')
+      console.info('树结构的根节点是fid不存在（或为空）的节点，否则需手动添加指定得根节点（参数）')
+    }
+    // 根据根节点遍历组装数据
+    for (var r in rootNodes) {
+      var node = rootNodes[r]
+      node.children = getChildren(list, node.id)
+      tree.push(node)
+    }
+
+    // 递归查询节点的子节点
+    function getChildren (list, id) {
+      var childs = []
+      for (var i in list) {
+        var node = list[i]
+        if (node.fid === id) {
+          node.children = getChildren(list, node.id)
+          // node.icon = 'el-icon-message'
+          childs.push(node)
+        }
+      }
+      return childs
+    }
+
+    return tree  // 返回树结构Json
+  },
+  // 展开前几层功能树
+  expendNodesByLevel (node, deep) {
+    let nodeIds = []
+    if (deep > 0) {
+      deep--
+      for (let i = 0; i < node.length; i++) {
+        nodeIds.push(node[i].id)
+        if (deep > 0 && node[i].children && node[i].children.length > 0) {
+          nodeIds = nodeIds.concat(util.expendNodesByLevel(node[i].children, deep))
+        }
+      }
+    }
+    return nodeIds
+  },
+  // 获取勾选的树节点
+  checkKeys (treedata, name, val) {
+    let keys = []
+    for (let i = 0; i < treedata.length; i++) {
+      let item = treedata[i]
+      if (item[name] === val) {
+        keys.push(item.id)
+      }
+
+      if (item.children) {
+        keys = keys.concat(util.checkKeys (item.children, name, val))
+      }
+    }
+    return keys
   }
 }
 
