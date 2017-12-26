@@ -36,17 +36,17 @@
       border
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column label="序号"
+      <el-table-column label="序 号"
         type="index"
         width="50">
       </el-table-column>
       <el-table-column
         fixed="right"
-        label="操作"
+        label="操 作"
         width="100">
         <template slot-scope="scope">
-          <el-button plain class="el-icon-edit" @click="openDialog()" size="mini">查看</el-button>
-          <el-button plain class="el-icon-edit" @click="showValueList" size="mini">名单值</el-button>
+          <el-button type="text"  @click="openDialog(scope.$index, scope.row)" size="mini">查看</el-button>
+          <el-button type="text"  @click="showValueList(scope.$index, scope.row)" size="mini">名单值</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="rostername" label="名单英文名" align="left" width="120"></el-table-column>
@@ -107,15 +107,14 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="listDialogVisible = false" data="cancelBtn">返 回</el-button>
-      </div>
+      <el-button @click="listDialogVisible = false" data="cancelBtn">返 回</el-button>
+    </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
   import util from '@/common/util'
-  import check from '@/common/check'
   import ajax from '@/common/ajax'
   import dictCode from '@/common/dictCode'
 
@@ -136,12 +135,12 @@
           pagesize:this.pagesize
         })
       },
-      openDialog() {
+      openDialog(index, row) {
+        console.log(index, row);
           this.dialogTitle = '查看名单'
           this.status = true
           var length = this.multipleSelection.length
           if (length !== 1) {
-            this.$message('请选择一行名单信息。')
             return
           }
           this.listDialogform = util.extend({}, this.multipleSelection[0])
@@ -171,7 +170,7 @@
         }
 
         ajax.post({
-          url: '/mgr/Namelist',
+          url: '/mgrView/list',
           param: param,
           success: function (data) {
             if (data.page) {
@@ -180,7 +179,7 @@
           }
         })
       },
-      showValueList() {
+      showValueList(index, row) {
         var rosterid = this.multipleSelection[0].rosterid
         var datatype = this.multipleSelection[0].datatype
         this.$router.push({ name: 'valuelist', params: { rosterid: rosterid, datatype: datatype}})
