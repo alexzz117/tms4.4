@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import cn.com.higinet.tms.manager.common.DynamicDataSource;
+
 /**
  * @author zhang.lei
  * */
@@ -26,7 +28,7 @@ public class TemplateConifg {
 
 	@Autowired
 	@Qualifier("dynamicDataSource")
-	DataSource dynamicDataSource;
+	DynamicDataSource dynamicDataSource;
 	
 	
 	

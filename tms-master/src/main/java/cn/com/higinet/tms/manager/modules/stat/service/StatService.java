@@ -11,8 +11,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -44,8 +44,10 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
  *
  */
 @Service("statService")
-//@Transactional("tms")
+@Transactional
 public class StatService {
+
+	private static final Logger log = LoggerFactory.getLogger( StatService.class );
 
 	@Autowired
 	@Qualifier("onlineTransactionManager")
@@ -54,7 +56,7 @@ public class StatService {
 	@Autowired
 	@Qualifier("offlineTransactionManager")
 	private DataSourceTransactionManager offlineTransactionManager;
-	
+
 	@Autowired
 	@Qualifier("onlineDataSource")
 	DataSource onlineDataSource;
@@ -78,10 +80,9 @@ public class StatService {
 	 */
 	private static final String RANG_BIN_DIST = "rang_bin_dist";
 
-	private static Log log = LogFactory.getLog( StatService.class );
 	@Autowired
-	@Qualifier("dynamicSimpleDao")
-	private SimpleDao dynamicSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 	@Autowired
 	@Qualifier("onlineSimpleDao")
 	private SimpleDao onlineSimpleDao;
@@ -95,7 +96,7 @@ public class StatService {
 	* @return 统计配置列表
 	 */
 	public List<Map<String, Object>> statList( Map<String, Object> conds ) {
-		return dynamicSimpleDao.queryForList(
+		return offlineSimpleDao.queryForList(
 				"SELECT STAT_ID,STAT_NAME,STAT_DESC,STAT_TXN,STAT_PARAM,STAT_COND, STAT_COND_IN, RESULT_COND,STAT_DATAFD,STAT_FN,COUNUNIT,COUNTROUND,STAT_UNRESULT,DATATYPE,CONTINUES,STAT_VALID,FN_PARAM,'' MARK ,STORECOLUMN FROM TMS_COM_STAT WHERE STAT_TXN=:txnId ORDER BY STAT_NAME",
 				conds );
 	}
@@ -107,7 +108,7 @@ public class StatService {
 	 */
 	public List<Map<String, Object>> txnFeatureList( String txnId ) {
 		String sql = "select * from tms_com_fd where tab_name like '" + txnId + "%'";
-		return dynamicSimpleDao.queryForList( sql, new HashMap<String, Object>() );
+		return offlineSimpleDao.queryForList( sql, new HashMap<String, Object>() );
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class StatService {
 	* @return
 	 */
 	public Map<String, Object> getOneStat( String statId ) {
-		return dynamicSimpleDao.retrieve( "TMS_COM_STAT", MapWrap.map( DBConstant.TMS_COM_STAT_STAT_ID, Long.parseLong( statId ) ).getMap() );
+		return offlineSimpleDao.retrieve( "TMS_COM_STAT", MapWrap.map( DBConstant.TMS_COM_STAT_STAT_ID, Long.parseLong( statId ) ).getMap() );
 	}
 
 	/* (non-Javadoc)
@@ -124,14 +125,14 @@ public class StatService {
 	 */
 	public List<Map<String, Object>> codeList( String category_id, String[] conds ) {
 		String sql = "SELECT * FROM CMC_CODE_CATEGORY WHERE CATEGORY_ID = ?";
-		List<Map<String, Object>> categoryList = dynamicSimpleDao.queryForList( sql, category_id );
+		List<Map<String, Object>> categoryList = offlineSimpleDao.queryForList( sql, category_id );
 		if( categoryList != null && categoryList.size() > 0 ) {
 			String category_sql = MapUtil.getString( categoryList.get( 0 ), "CATEGORY_SQL" );
 			for( int i = 0; conds != null && i < conds.length; i++ ) {
 				category_sql = category_sql.replace( "${" + i + "}", conds[i] );
 			}
 
-			return dynamicSimpleDao.queryForList( category_sql );
+			return offlineSimpleDao.queryForList( category_sql );
 		}
 		return null;
 	}
@@ -146,7 +147,7 @@ public class StatService {
 		for( int i = 0; i < stat_ids.length; i++ ) {
 			sqls[i] = "UPDATE TMS_COM_STAT SET STAT_VALID=" + stat_status + " WHERE STAT_ID=" + stat_ids[i];
 		}
-		dynamicSimpleDao.batchUpdate( sqls );
+		offlineSimpleDao.batchUpdate( sqls );
 
 	}
 
@@ -159,7 +160,7 @@ public class StatService {
 		for( int i = 0; i < stat_ids.length; i++ ) {
 			sqls[i] = "DELETE FROM TMS_COM_STAT WHERE STAT_ID=" + stat_ids[i];
 		}
-		dynamicSimpleDao.batchUpdate( sqls );
+		offlineSimpleDao.batchUpdate( sqls );
 	}
 
 	/**
@@ -174,7 +175,7 @@ public class StatService {
 		sql.append( " LEFT JOIN TMS_COM_FD FD ON STAT.STAT_TXN=FD.TAB_NAME AND STAT.STAT_PARAM=FD.REF_NAME" );
 		sql.append( " LEFT JOIN TMS_COM_FUNC FUNC ON STAT.STAT_FN=FUNC.FUNC_CODE" );
 		sql.append( " WHERE STAT.STAT_ID = ?" );
-		List<Map<String, Object>> statList = dynamicSimpleDao.queryForList( sql.toString(), Long.parseLong( statId ) );
+		List<Map<String, Object>> statList = offlineSimpleDao.queryForList( sql.toString(), Long.parseLong( statId ) );
 		for( Map<String, Object> map : statList ) {
 			return map;
 		}
@@ -188,7 +189,7 @@ public class StatService {
 	public void updateStatCond( Map<String, Object> input ) {
 		String sql = "UPDATE TMS_COM_STAT SET STAT_COND=:STAT_COND_VALUE WHERE STAT_ID=:STAT_ID";
 		input.put( "STAT_ID", MapUtil.getLong( input, "STAT_ID" ) );
-		dynamicSimpleDao.executeUpdate( sql, input );
+		offlineSimpleDao.executeUpdate( sql, input );
 	}
 
 	/**
@@ -200,7 +201,7 @@ public class StatService {
 		//String sql = tmsSqlMap.getSql("tms.stat.queryTxnTree");
 		String sql = "select distinct(tab_name),parent_tab,tab_desc from tms_com_tab tab where tab.tab_name in (:tab_name) order by tab_name";
 		sql = sql.replace( ":tab_name", MapUtil.getString( tab, "tab_name" ) );
-		return dynamicSimpleDao.queryForList( sql, tab );
+		return offlineSimpleDao.queryForList( sql, tab );
 	}
 
 	/**
@@ -213,7 +214,7 @@ public class StatService {
 		condData.put( "TAB_NAME", MapUtil.getString( reqs, "txnId" ) );
 		condData.put( "REF_NAME", MapUtil.getString( reqs, "stat_datafd" ) );
 
-		List<Map<String, Object>> featureList = dynamicSimpleDao.queryForList( txnFeatureSql, condData );
+		List<Map<String, Object>> featureList = offlineSimpleDao.queryForList( txnFeatureSql, condData );
 		if( featureList != null && featureList.size() > 0 ) {
 			return featureList.get( 0 );
 		}
@@ -383,7 +384,7 @@ public class StatService {
 			commonCheckService.initCache( ds );
 		}
 		catch( Exception e ) {
-			log.error( e );
+			log.error( e.getMessage(), e );
 			throw new TmsMgrServiceException( "条件初始化错误，由于" + e.getLocalizedMessage() );
 		}
 	}
@@ -408,7 +409,7 @@ public class StatService {
 
 			}
 			catch( Exception e ) {
-				log.error( e );
+				log.error( e.toString(), e );
 				throw new TmsMgrServiceException( "条件表达式不合法，由于" + e.getLocalizedMessage() );
 			}
 
@@ -424,7 +425,7 @@ public class StatService {
 
 	private String code2name( String type ) {
 		String sql = "SELECT * FROM CMC_CODE WHERE CATEGORY_ID='tms.stat.datatype'";
-		List<Map<String, Object>> codeList = dynamicSimpleDao.queryForList( sql );
+		List<Map<String, Object>> codeList = offlineSimpleDao.queryForList( sql );
 		String mess = type;
 		for( Map<String, Object> map2 : codeList ) {
 			if( type.equalsIgnoreCase( MapUtil.getString( map2, "CODE_KEY" ) ) ) {
@@ -442,7 +443,7 @@ public class StatService {
 	}
 
 	private void deleteStat( Map<String, ?> input ) {
-		dynamicSimpleDao.delete( "TMS_COM_STAT", MapWrap.map( "STAT_ID", MapUtil.getLong( input, "STAT_ID" ) ).getMap() );
+		offlineSimpleDao.delete( "TMS_COM_STAT", MapWrap.map( "STAT_ID", MapUtil.getLong( input, "STAT_ID" ) ).getMap() );
 	}
 
 	private Map<String, Object> createStat( Map<String, Object> input ) {
@@ -450,7 +451,7 @@ public class StatService {
 
 		// 查询当前交易下最大的统计名称
 		String sql = tmsSqlMap.getSql( "tms.stat.queryMaxStatName" );
-		List<Map<String, Object>> maxList = dynamicSimpleDao.queryForList( sql );
+		List<Map<String, Object>> maxList = offlineSimpleDao.queryForList( sql );
 		List<Map<String, Object>> maxOnList = onlineSimpleDao.queryForList( sql );
 		Map<String, Object> stat = new HashMap<String, Object>();
 		stat.put( DBConstant.TMS_COM_STAT_STAT_ID, Long.parseLong( sequenceId ) );
@@ -503,7 +504,7 @@ public class StatService {
 
 		input.put( DBConstant.TMS_COM_STAT_STAT_ID, sequenceId );
 
-		dynamicSimpleDao.create( "TMS_COM_STAT", stat );
+		offlineSimpleDao.create( "TMS_COM_STAT", stat );
 		return stat;
 	}
 
@@ -521,7 +522,7 @@ public class StatService {
 			sql += " and stat_id != " + stat_id;
 		}
 
-		List<Map<String, Object>> statList = dynamicSimpleDao.queryForList( sql, stat_desc );
+		List<Map<String, Object>> statList = offlineSimpleDao.queryForList( sql, stat_desc );
 
 		if( statList != null && statList.size() > 0 ) {
 			String txnName = transDefService.getSelfAndParentTranDefAsStr( MapUtil.getString( statList.get( 0 ), DBConstant.TMS_COM_STAT_STAT_TXN ) );
@@ -584,6 +585,6 @@ public class StatService {
 	}
 
 	private void updateOneStat( Map<String, Object> input ) {
-		dynamicSimpleDao.update( "TMS_COM_STAT", input, MapWrap.map( DBConstant.TMS_COM_STAT_STAT_ID, MapUtil.getLong( input, DBConstant.TMS_COM_STAT_STAT_ID ) ).getMap() );
+		offlineSimpleDao.update( "TMS_COM_STAT", input, MapWrap.map( DBConstant.TMS_COM_STAT_STAT_ID, MapUtil.getLong( input, DBConstant.TMS_COM_STAT_STAT_ID ) ).getMap() );
 	}
 }

@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.common.Model;
@@ -65,20 +64,15 @@ public class StatController {
 	@Autowired
 	private ObjectMapper objectMapper;
 	@Autowired
-	@Qualifier("dynamicDataSource")
-	private DataSource dynamicDataSource;
+	@Qualifier("offlineDataSource")
+	private DataSource offlineDataSource;
 	@Autowired
 	private CommonCheckService commonCheckService;
 	@Autowired
-	@Qualifier("dynamicSimpleDao")
-	private SimpleDao dynamicSimpleDao;
+	@Qualifier("offlineSimpleDao")
+	private SimpleDao offlineSimpleDao;
 	@Autowired
 	private TransModelService transModelService;
-
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String listStatView() {
-		return "tms35/stat/stat_list";
-	}
 
 	/**
 	* 方法描述:查询统计列表
@@ -102,11 +96,7 @@ public class StatController {
 	 */
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public Model saveStatAction( @RequestBody Map<String, Object> reqs ) {
-		
-		logger.info( JSON.toJSONString( reqs ) );
-		
 		String json = MapUtil.getString( reqs, "postData" );
-
 		Map<String, List<Map<String, ?>>> formList = null;
 		try {
 			formList = objectMapper.readValue( json, Map.class );
@@ -166,7 +156,6 @@ public class StatController {
 		Map<String, List<Map<String, Object>>> codeMap = new HashMap<String, List<Map<String, Object>>>();
 
 		String[] caids = category_ids.split( "|" );
-
 		for( String args : caids ) {
 			String[] p = args.split( "," );
 			String[] a = null;
@@ -182,15 +171,6 @@ public class StatController {
 
 		model.setRow( codeMap );
 		return model;
-	}
-
-	/**
-	 * 统计编辑页面
-	 * @return
-	 */
-	@RequestMapping(value = "/edit", method = RequestMethod.GET)
-	public String editStatView() {
-		return "tms35/stat/stat_edit";
 	}
 
 	/**
@@ -233,7 +213,7 @@ public class StatController {
 		if( !operation.equals( "A" ) ) {
 			// 校验是否被引用
 			// 初始化缓存
-			commonCheckService.initCache( dynamicDataSource );
+			commonCheckService.initCache( offlineDataSource );
 			// 缓存中查找引用
 			if( commonCheckService.find_ref_stat( txnId, stat_name ) ) return model.addError( "[" + stat_name + "]被引用！" );
 		}
@@ -279,7 +259,7 @@ public class StatController {
 		Model model = new Model();
 		String stat_sql = "SELECT STAT_ID ID,STAT_TXN,STAT_NAME, stat_txn fid,STAT_DESC CODE_VALUE,'2' ftype,STAT_TXN FROM TMS_COM_STAT where STAT_VALID =1";
 		// 查询统计
-		List<Map<String, Object>> stat_list = dynamicSimpleDao.queryForList( stat_sql );
+		List<Map<String, Object>> stat_list = offlineSimpleDao.queryForList( stat_sql );
 
 		if( stat_list == null || stat_list.size() == 0 ) {
 			model.setRow( stat_list );
@@ -292,10 +272,9 @@ public class StatController {
 			String txnid = MapUtil.getString( map, "fid" );
 			String stat_txn = MapUtil.getString( map, "STAT_TXN" );
 			String stat_name = MapUtil.getString( map, "STAT_NAME" );
-
 			map.put( "CODE_KEY", stat_txn + ":" + stat_name );
-
 			String[] id_arr = TransCommon.cutToIds( txnid );
+			
 			for( String id : id_arr ) {
 				id_m.put( id, id );
 			}
@@ -311,7 +290,7 @@ public class StatController {
 
 		String txn_sql = "SELECT TAB_NAME ID,M.TAB_NAME CODE_KEY,m.parent_tab fid,m.tab_desc CODE_VALUE ,'1' ftype, TAB_NAME STAT_TXN FROM TMS_COM_TAB M WHERE M.TAB_NAME in (" + txn_id + ") order by STAT_TXN";
 		// 查询交易树
-		List<Map<String, Object>> txn_list = dynamicSimpleDao.queryForList( txn_sql );
+		List<Map<String, Object>> txn_list = offlineSimpleDao.queryForList( txn_sql );
 
 		stat_list.addAll( txn_list );
 		model.setRow( stat_list );
@@ -329,7 +308,7 @@ public class StatController {
 		String txn_id = MapUtil.getString( reqs, "txn_id" );
 
 		String txn_rule_sql = "SELECT RULE_TXN,RULE_NAME, RULE_SHORTDESC CODE_VALUE,R.RULE_TXN P FROM TMS_COM_RULE R WHERE RULE_ENABLE = 1 AND RULE_TXN IN (" + TransCommon.arr2str( TransCommon.cutToIds( txn_id ) ) + ")  ORDER BY RULE_TXN";
-		List<Map<String, Object>> txn_rule_list = dynamicSimpleDao.queryForList( txn_rule_sql );
+		List<Map<String, Object>> txn_rule_list = offlineSimpleDao.queryForList( txn_rule_sql );
 
 		if( txn_rule_list != null && txn_rule_list.size() > 0 ) {
 			for( Map<String, Object> map : txn_rule_list ) {
@@ -355,7 +334,7 @@ public class StatController {
 		String txn_rule_sql = "SELECT CODE_KEY, CODE_VALUE, type, code fd_code FROM (SELECT REF_NAME CODE_KEY, NAME CODE_VALUE, type, code, TAB_NAME FROM TMS_COM_FD UNION SELECT crf.REF_NAME CODE_KEY, crf.REF_DESC CODE_VALUE, cf.type TYPE, cf.code code, crf.TAB_NAME from TMS_COM_REFFD crf left join tms_com_reftab crt on crf.ref_id = crt.ref_id left join tms_com_fd cf on crt.ref_tab_name = cf.tab_name and crf.ref_name = cf.fd_name) F where TAB_NAME in ("
 				+ TransCommon.arr2str( TransCommon.cutToIds( txn_id ) ) + ") ORDER BY TAB_NAME";
 
-		List<Map<String, Object>> txn_rule_list = dynamicSimpleDao.queryForList( txn_rule_sql );
+		List<Map<String, Object>> txn_rule_list = offlineSimpleDao.queryForList( txn_rule_sql );
 
 		model.setRow( txn_rule_list );
 		return model;
@@ -364,7 +343,7 @@ public class StatController {
 	private boolean checkCond( String stat_cond_value, String txnid, StringBuffer error ) {
 		if( StringUtil.isEmpty( stat_cond_value ) ) return true;
 		// 初始化缓存
-		cache_init.init( new data_source( dynamicDataSource ) );
+		cache_init.init( new data_source( offlineDataSource ) );
 		// 检查条件正确性
 		boolean isTrue = web_tool.compile_expr( txnid, stat_cond_value, error );
 		return isTrue;
@@ -383,7 +362,7 @@ public class StatController {
 
 		// 初始化缓存
 		try {
-			cache_init.init( new data_source( dynamicDataSource ) );
+			cache_init.init( new data_source( offlineDataSource ) );
 		}
 		catch( Exception e ) {
 			logger.error( e.getMessage(), e );
@@ -565,9 +544,7 @@ public class StatController {
 
 					txnsMap.put( ps.ps_txn, ps.ps_txn );
 				}
-
 			}
-
 		}
 
 		if( !MapUtil.isEmpty( txnidMap ) ) {

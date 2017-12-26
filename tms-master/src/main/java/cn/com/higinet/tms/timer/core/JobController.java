@@ -1,5 +1,6 @@
 package cn.com.higinet.tms.timer.core;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -49,25 +50,36 @@ public class JobController {
 			for( JobKey jobKey : scheduler.getJobKeys( GroupMatcher.<JobKey> groupEquals( groupJob ) ) ) {
 				List<? extends Trigger> triggers = scheduler.getTriggersOfJob( jobKey );
 				for( Trigger trigger : triggers ) {
-					Trigger.TriggerState triggerState = scheduler.getTriggerState( trigger.getKey() );
 					JobDetail jobDetail = scheduler.getJobDetail( jobKey );
-
+					
+					String name = trigger.getDescription();
+					String jobName = jobKey.getName();
+					String groupName = jobKey.getGroup();
+					String description = jobDetail.getDescription();
+					String status = scheduler.getTriggerState( trigger.getKey() ).name();
 					String cronExpression = "";
-					String createTime = "";
+					Date createTime = null;
+					Date previousFireTime = null;
+					Date nextFireTime = null;
 
 					if( trigger instanceof CronTrigger ) {
 						CronTrigger cronTrigger = (CronTrigger) trigger;
 						cronExpression = cronTrigger.getCronExpression();
-						createTime = cronTrigger.getDescription();
+						createTime = cronTrigger.getStartTime();
+						previousFireTime = cronTrigger.getPreviousFireTime();
+						nextFireTime = cronTrigger.getNextFireTime();
 					}
-
+					
 					TaskEntity task = new TaskEntity();
-					task.setName( jobKey.getName() );
-					task.setGroup( jobKey.getGroup() );
-					task.setDescription( jobDetail.getDescription() );
-					task.setCronExpression( cronExpression );
-					task.setStatus( triggerState.name() );
-					task.setCreateTime( createTime );
+					task.setName( name ); //执行名称
+					task.setJobName( jobName ); //任务名称
+					task.setGroupName( groupName ); //
+					task.setDescription( description ); //任务说明
+					task.setCronExpression( cronExpression ); //执行表达式
+					task.setStatus( status ); //任务状态
+					task.setCreateTime( createTime ); //创建时间
+					task.setPreviousFireTime( previousFireTime ); //上一次执行时间
+					task.setNextFireTime( nextFireTime ); //下一次执行时间
 					taskList.add( task );
 				}
 			}

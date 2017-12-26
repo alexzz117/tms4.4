@@ -49,10 +49,10 @@ public class AuthController extends ApplicationObjectSupport {
 	 * 跳转到授权中心模块首页：待授权模块列表页面
 	 * @return
 	 */
-	@RequestMapping(value = "/modelList", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/modelList", method = RequestMethod.GET)
 	public String centerView() {
 		return "tms/auth/auth_center";
-	}
+	}*/
 
 	/**
 	 * 显示待授权授权模块列表
@@ -72,10 +72,10 @@ public class AuthController extends ApplicationObjectSupport {
 	 * 跳转到待授权列表
 	 * @return
 	 */
-	@RequestMapping(value = "/authDataList", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/authDataList", method = RequestMethod.GET)
 	public String dataListView() {
 		return "tms/auth/auth_datalist";
-	}
+	}*/
 
 	/**
 	 * 显示待授权列表
@@ -93,10 +93,10 @@ public class AuthController extends ApplicationObjectSupport {
 	 * 跳转到数据对比页面
 	 * @return
 	 */
-	@RequestMapping(value = "/dataCompare", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/dataCompare", method = RequestMethod.GET)
 	public String dataCompareView() {
 		return "tms/auth/auth_dataCompare";
-	}
+	}*/
 
 	/**
 	 * 获取需要对比的新旧数据
@@ -116,10 +116,10 @@ public class AuthController extends ApplicationObjectSupport {
 	 * 跳转到授权信息详细页面
 	 * @return
 	 */
-	@RequestMapping(value = "/authOperate", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/authOperate", method = RequestMethod.GET)
 	public String toAuthView() {
 		return "tms/auth/auth_operate";
-	}
+	}*/
 
 	/**
 	 * 更新授权信息
@@ -187,10 +187,10 @@ public class AuthController extends ApplicationObjectSupport {
 	 * 转向授权日志列表页面
 	 * @return
 	 */
-	@RequestMapping(value = "/toLog", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/toLog", method = RequestMethod.GET)
 	public String toLogView() {
 		return "tms/auth/auth_loglist";
-	}
+	}*/
 
 	/**
 	 * 修改授权信息
@@ -246,10 +246,10 @@ public class AuthController extends ApplicationObjectSupport {
 	 * 转向授权信息列表页面
 	 * @return
 	 */
-	@RequestMapping(value = "/dataquary", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/dataquary", method = RequestMethod.GET)
 	public String dataQueryView() {
 		return "tms/auth/auth_dataquary";
-	}
+	}*/
 
 	/**
 	 * 授权信息查询
