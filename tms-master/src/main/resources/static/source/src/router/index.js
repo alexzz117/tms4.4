@@ -9,8 +9,8 @@ import User from '@/components/auth/User'
 import Role from '@/components/auth/Role'
 import Func from '@/components/auth/Func'
 
-import NameList from '@/components/mgr/NameList'
 import List from '@/components/run/List'
+import NameList from '@/components/mgr/NameList'
 import ValueList from '@/components/run/ValueList'
 import Txn from '@/components/run/Txn'
 import Rule from '@/components/run/Rule'
@@ -81,8 +81,8 @@ export default new Router({
           component: List
         },
         {
-          path: 'Namelist_vue',
-          name: 'Namelist',
+          path: 'namelist_vue',
+          name: 'namelist',
           component: NameList
         },
         {
