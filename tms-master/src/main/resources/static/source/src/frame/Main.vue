@@ -22,7 +22,7 @@
             <router-link :to="{ name:'list'}" tag="li" replace>
               <el-menu-item index="1-2">名单管理</el-menu-item>
             </router-link>
-            <router-link :to="{ name:'Namelist'}" tag="li" replace>
+            <router-link :to="{ name:'namelist'}" tag="li" replace>
               <el-menu-item index="1-3">名单查看</el-menu-item>
             </router-link>
           </el-submenu>
