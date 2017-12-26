@@ -49,7 +49,7 @@
           <el-input v-model="tmForm.src_id" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型" :label-width="formLabelWidth">
-          <el-select v-model="tmForm.type" placeholder="请选择" @change="getEnableStorageFdByDataType">
+          <el-select v-model="tmForm.type" placeholder="请选择">
             <el-option
               v-for="item in tmTypeList"
               :key="item.value"
@@ -62,9 +62,9 @@
           <el-select v-model="tmForm.fd_name" placeholder="请选择">
             <el-option
               v-for="item in tmFdNameList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.fd_name"
+              :label="item.fd_name"
+              :value="item.fd_name">
             </el-option>
           </el-select>
         </el-form-item>
@@ -93,8 +93,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="tmDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="tmDialogVisible = false">确 定</el-button>
       </div>
     </el-dialog>
     <el-container style="border: 1px solid #eee;">
@@ -175,6 +175,47 @@
           }
         }
         return tableData
+      },
+      tmFdNameList () {
+        let self = this
+        let dataType = self.tmForm.type
+        let enableStoreFds = self.enableStoreFds
+        let dataTypeClassify = self.dataTypeClassify
+        console.info(dataType, enableStoreFds ,dataTypeClassify)
+        var sfdItems = []
+        if (dataType && enableStoreFds) {
+          for (let i in enableStoreFds) {
+            let fd = enableStoreFds[i]
+            for (let d in dataTypeClassify) {
+              let dt = dataTypeClassify[d]
+              if (dt.type.indexOf(dataType) !== -1) {
+                if (dt.recap === 'long' || dt.recap === 'decimal') {
+                  if (dataType !== 'double' && dataType !== 'long') {
+                    if (fd['type'] === dataType) {
+                      sfdItems.push(fd)
+                    }
+                  }
+                  if (fd['type'] === 'double' || fd['type'] === 'long') {
+                    sfdItems.push(fd)
+                  }
+                } else if (dt.recap === 'string') {
+                  if (dataType !== 'string') {
+                    if (fd['type'] === dataType) {
+                      sfdItems.push(fd)
+                    }
+                  }
+                }
+                if (fd['type'] === 'string') {
+                  sfdItems.push(fd)
+                }
+              }
+            }
+          }
+        } else {
+          // $.extend(sfdItems, enableStoreFds)
+        }
+        console.info(sfdItems)
+        return sfdItems
       }
     },
     props: ['txnId', 'isVisibility'],
@@ -187,11 +228,16 @@
         tmDialogVisible: false,
         tmForm: {},
         tmTypeList: [{label: '整数类型', value: '1'}],
-        tmFdNameList: [{label: '整数类型', value: '1'}],
+        enableStoreFds: [],
         tmCodeList: [],
         tmGenesisRulList: [{label: '整数类型', value: '1'}],
         refTableData: [],
         codeList: [],
+        dataTypeClassify: [
+          {recap: 'long', type: ['long', 'time', 'datetime']},
+          {recap: 'decimal', type: ['double', 'money']},
+          {recap: 'string', type: ['string', 'devid', 'ip', 'userid', 'acc', 'code']}
+        ],
         formLabelWidth: '120px'
       }
     },
@@ -235,6 +281,7 @@
                 }
               }
               self.expendNodeKey = expendNodeKey
+              self.enableStoreFds = data.enablestorefd
             }
           }
         }
@@ -308,7 +355,7 @@
         if (row.code === undefined || row.code === null || row.code === '') {
           return ''
         } else {
-          let codeList = self.tmCodeList
+          let codeList = self.enableStoreFds
           for (let i in codeList) {
             if (codeList[i].category_id === row.code) {
               return codeList[i].category_name
@@ -320,8 +367,17 @@
       openTmDialog () { // 当新建交易模型窗口打开时触发
         this.tmTypeList = dictCode.getCodeItems('tms.model.datatype') // 加载类型下拉列表
       },
-      getEnableStorageFdByDataType (a, b) {
-        console.info(a, b)
+      getTmFdNameList (tabName) {
+        let self = this
+        ajax.post({
+          url: '/tranmdl/queryAvailableStoreFd',
+          param: {
+            tab_name: tabName ? tabName : self.txnId
+          },
+          success: function (data) {
+            self.enableStoreFds = data.enableStoreFd // 存储字段
+          }
+        })
       },
       tmAddFunc () {
         let self = this
