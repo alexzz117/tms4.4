@@ -47,8 +47,8 @@ import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
 public class IPProtectService extends ApplicationObjectSupport {
 
 	@Autowired
-	@Qualifier("dynamicSimpleDao")
-	private SimpleDao dynamicSimpleDao;
+	@Qualifier("onlineSimpleDao")
+	private SimpleDao onlineSimpleDao;
 	@Autowired
 	@Qualifier("tmsJdbcTemplate")
 	private JdbcTemplate tmsJdbcTemplate;
@@ -192,7 +192,7 @@ public class IPProtectService extends ApplicationObjectSupport {
 	public void importBatchUpdate( String[] sqls, List<Map<String, ?>>... lists ) {
 		if( sqls != null && lists != null && sqls.length == lists.length ) {
 			for( int i = 0, len = sqls.length; i < len; i++ ) {
-				dynamicSimpleDao.batchUpdate( sqls[i], lists[i] );
+				onlineSimpleDao.batchUpdate( sqls[i], lists[i] );
 			}
 		}
 	}
@@ -347,7 +347,7 @@ public class IPProtectService extends ApplicationObjectSupport {
 	private Map<String, Object> lastImportIpAddressLog() {
 		String sql = "select max(" + TMS_MGR_IPLOG.IPLOG_ID + ") as " + TMS_MGR_IPLOG.IPLOG_ID + ", " + TMS_MGR_IPLOG.OPERATE_RESULT + ", " + TMS_MGR_IPLOG.IS_SUFFIX + " from "
 				+ TMS_MGR_IPLOG.TABLE_NAME + " group by " + TMS_MGR_IPLOG.IS_SUFFIX + ", " + TMS_MGR_IPLOG.OPERATE_RESULT;
-		List<Map<String, Object>> iplogList = dynamicSimpleDao.queryForList( sql );
+		List<Map<String, Object>> iplogList = onlineSimpleDao.queryForList( sql );
 		if( iplogList == null || iplogList.size() == 0 ) {
 			return null;
 		}
@@ -372,7 +372,7 @@ public class IPProtectService extends ApplicationObjectSupport {
 			log.put( TMS_MGR_IPLOG.IPLOG_ID, sequenceService.getSequenceId( "SEQ_TMS_MGR_IPLOG_ID" ) );
 		}
 		log.put( TMS_MGR_IPLOG.OPERATE_TIME, System.currentTimeMillis() );
-		dynamicSimpleDao.create( TMS_MGR_IPLOG.TABLE_NAME, log );
+		onlineSimpleDao.create( TMS_MGR_IPLOG.TABLE_NAME, log );
 		return log;
 	}
 
@@ -400,7 +400,7 @@ public class IPProtectService extends ApplicationObjectSupport {
 			try {
 				String tabName = ipLocationService.getLocationOperName( this.tabName );
 				String truncateSql = getTruncateTableSql( tabName );
-				dynamicSimpleDao.executeUpdate( truncateSql );
+				onlineSimpleDao.executeUpdate( truncateSql );
 				ipFileBr = new BufferedReader( this.in, 10 * 1024 * 1024 );
 				String sql = String.format( importSQL[0], tabName );
 				do {
@@ -446,7 +446,7 @@ public class IPProtectService extends ApplicationObjectSupport {
 			try {
 				String cityTabName = ipLocationService.getLocationOperName( this.tabName );
 				String cTruncateSql = getTruncateTableSql( cityTabName );
-				dynamicSimpleDao.executeUpdate( cTruncateSql );
+				onlineSimpleDao.executeUpdate( cTruncateSql );
 				cityFileBr = new BufferedReader( this.in, 10 * 1024 * 1024 );
 				String cSql = String.format( importSQL[1], cityTabName );
 				do {
@@ -503,7 +503,7 @@ public class IPProtectService extends ApplicationObjectSupport {
 					String tabName = ipLocationService.getLocationOperName( this.tabNames[i] );
 					String cTruncateSql = getTruncateTableSql( tabName );
 					System.out.println( "----------cTruncateSql----len:" + cTruncateSql );
-					dynamicSimpleDao.executeUpdate( cTruncateSql );
+					onlineSimpleDao.executeUpdate( cTruncateSql );
 					fileBr = new BufferedReader( this.ins[i], 5 * 1024 * 1024 );
 					String sql = String.format( this.sqls[i], tabName );
 					Object[][] field = (Object[][]) fields[i];
