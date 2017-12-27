@@ -15,7 +15,7 @@ public class ConsumerDemo {
 
 	@KafkaListener(topics = { "test3" })
 	public void listen( ConsumerRecord<String, String> record ) {
-		logger.info("TOPIC:"+record.topic() + "--PARTION:" + record.partition() + "--MSG:" +record.value());
+		logger.info( "TOPIC:" + record.topic() + "--PARTION:" + record.partition() + "--MSG:" + record.value() );
 		//count = count + 1;
 		//logger.info( Stringz.valueOf( count ) );
 	}
