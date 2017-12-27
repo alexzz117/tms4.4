@@ -2,9 +2,9 @@
   <div>
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
-      <el-button plain class="el-icon-tickets" @click="auth" :disabled="notSelectOne">授权</el-button>
-      <el-button plain class="el-icon-view" @click="showSub" :disabled="notSelectOne">查看子操作</el-button>
-      <el-button plain class="el-icon-view" @click="showLog()" :disabled="notSelectOne">查看日志</el-button>
+      <!--<el-button plain class="el-icon-tickets" @click="auth" :disabled="notSelectOne">授权</el-button>-->
+      <!--<el-button plain class="el-icon-view" @click="showSub" :disabled="notSelectOne">查看子操作</el-button>-->
+      <!--<el-button plain class="el-icon-view" @click="showLog()" :disabled="notSelectOne">查看日志</el-button>-->
     </div>
 
     <el-table
@@ -13,7 +13,16 @@
       border
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
+      <el-table-column
+        fixed="left"
+        label="操作"
+        width="200">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="auth(scope.row)">授权</el-button>
+          <el-button type="text" size="small" @click="showSub(scope.row)">查看子操作</el-button>
+          <el-button type="text" size="small" @click="showLog(scope.row)">查看日志</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="操作数据" align="left">
         <template slot-scope="scope">
           <a v-if="datavalueLink" href="javascript:void(0)" @click="toCompare(scope.row)">{{scope.row.datavalue}}</a>
@@ -101,6 +110,7 @@
         currentPage: 1,
         pageSize: 10,
         total: 0,
+        selectRow: {},
         selectedRows: []
       }
     },
@@ -123,7 +133,6 @@
         }
       },
       handleSizeChange (val) {
-        // console.log(`每页 ${val} 条`)
         this.currentPage = 1
         this.pageSize = val
         this.getData()
@@ -153,7 +162,6 @@
           flag: 1
         }
         this.$router.push({name: 'authDataCompare', query: params})
-        console.log(row)
       },
       addData (formName) {
         this.$refs[formName].validate((valid) => {
@@ -166,7 +174,7 @@
             let txnname = ''
             let operatename = ''
 
-            let selectedRow = this.selectedRows[0]
+            let selectedRow = this.selectRow
             authIds = selectedRow.auth_id
             funcName = selectedRow.funcname
             operatedataValue = selectedRow.operatedata_value
@@ -221,31 +229,22 @@
           }
         })
       },
-      showSub () {
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行授权信息。')
-          return
-        }
+      showSub (row) {
         let params = {
-          authId: this.selectedRows[0].auth_id,
+          authId: row.auth_id,
           modelName: this.modelName
         }
         this.$router.push({name: 'authSubDataList', query: params})
       },
-      showLog () {
-        let length = this.selectedRows.length
-        if (length !== 1) {
-          this.$message('请选择一行授权信息。')
-          return
-        }
+      showLog (row) {
         let params = {
-          authId: this.selectedRows[0].auth_id,
+          authId: row.auth_id,
           modelName: this.modelName
         }
         this.$router.push({name: 'authLogList', query: params})
       },
-      auth () {
+      auth (row) {
+        this.selectRow = row
         this.dialogForm = this.initDialogForm()
         this.dictDialogVisible = true
       },

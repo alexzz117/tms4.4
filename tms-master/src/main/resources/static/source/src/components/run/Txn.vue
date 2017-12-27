@@ -30,7 +30,7 @@
           <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;"><trandef :txnId='txnId' :isVisibility="tabVisibility.trandefVisibility" ref="trandef"></trandef></el-tab-pane>
           <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl :txnId='txnId' :isVisibility="tabVisibility.tranmdlVisibility"></tranmdl></el-tab-pane>
           <el-tab-pane label="交易统计" name="stat"><stat :txnId='txnId' :isVisibility="tabVisibility.statVisibility"></stat></el-tab-pane>
-          <el-tab-pane label="交易规则" name="rule"><rule></rule></el-tab-pane>
+          <el-tab-pane label="交易规则" name="rule"><rule :txnId='txnId' :isVisibility="tabVisibility.ruleVisibility"></rule></el-tab-pane>
         </el-tabs>
       </el-main>
     </el-container>

@@ -126,7 +126,6 @@
     },
     methods: {
       handleSizeChange (val) {
-        // console.log(`每页 ${val} 条`)
         this.currentPage = 1
         this.pageSize = val
         this.getData()

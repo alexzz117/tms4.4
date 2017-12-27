@@ -220,20 +220,11 @@
       }
     },
     watch: {
-      txnIdParent: {
-        handler: (val, oldVal) => {
-          // vm.reloadData()
-        }
+      'statCondInDictDialogForm.stat_cond_value': function (val) {
+        this.searchCondName(val, 1)
       },
-      'statCondInDictDialogForm.stat_cond_value': {
-        handler: (val, oldVal) => {
-          vm.searchCondName(val, 1)
-        }
-      },
-      'statCondInDictDialogForm.stat_cond_in': {
-        handler: (val, oldVal) => {
-          vm.searchCondName(val, 2)
-        }
+      'statCondInDictDialogForm.stat_cond_in': function (val) {
+        this.searchCondName(val, 2)
       }
     },
     mounted: function () {
@@ -306,7 +297,6 @@
         let self = this
         let to = this.statCondInDictDialogForm.stat_cond_value
         let area = this.selectArea
-        console.log(area)
         var pre = to.substr(0, area[0])
         var post = to.substr(area[1])
         var _val = [pre, value, post]

@@ -10,7 +10,7 @@
       stripe
       border
       style="width: 100%">
-      <el-table-column prop="col_num" label="序号" align="left"></el-table-column>
+      <el-table-column prop="col_num" label="序号" align="left" width="80"></el-table-column>
       <el-table-column prop="field_name" label="属性名称" align="left"></el-table-column>
       <el-table-column label="新值" align="left">
         <template slot-scope="scope">
@@ -86,7 +86,6 @@
         })
       },
       back () {
-        console.log(123231)
         this.$router.go(-1)
       }
     }

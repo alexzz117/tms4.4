@@ -10,7 +10,7 @@
       border
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
+      <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
       <el-table-column label="操作数据" align="left">
         <template slot-scope="scope">
           <a v-if="datavalueLink(scope.row)" href="javascript:void(0)" @click="toCompare(scope.row)">{{scope.row.operatedata_value}}</a>
@@ -78,7 +78,6 @@
     },
     methods: {
       handleSizeChange (val) {
-        // console.log(`每页 ${val} 条`)
         this.currentPage = 1
         this.pageSize = val
         this.getData()
@@ -91,7 +90,6 @@
         this.selectedRows = rows
       },
       bindGridData (data) {
-        console.log(data.page.list)
         this.tableData = data.page.list
         this.currentPage = data.page.index
         this.pageSize = data.page.size
@@ -103,16 +101,16 @@
       // 点击标题的事件
       toCompare (row) {
         let params = {
-          operate_name: row.orig_operatename,
-          table_name: row.query_table_name,
-          table_pk: row.query_table_pk,
-          table_pkvalue: row.query_pkvalue,
+          operate_name: row.operate_name,
+          table_name: row.table_name,
+          table_pk: row.table_pk,
+          table_pkvalue: row.table_pkvalue,
           auth_id: row.auth_id,
           modelName: this.modelName,
           flag: 1
         }
         this.$router.push({name: 'authDataCompare', query: params})
-        console.log(row)
+
       },
       getData () {
         let self = this
