@@ -630,7 +630,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	/**
 	 * 执行批量授权
 	 */
-	@Transactional("tmp")
+	@Transactional
 	// 授权都改为离线库
 	public void batchUpadteAuth( Map<String, String> reqs ) {
 		String authIds = StringUtil.parseToString( reqs.get( "AUTH_IDS" ) );

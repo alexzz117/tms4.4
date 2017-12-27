@@ -46,10 +46,10 @@ public class CodeDictService {
 	 */
 	public Page<Map<String, Object>> listCodeCategory(Map<String, String> conds) {
 		String sql  = "select * from "+DBConstant.CMC_CODE_CATEGORY;
-		conds.put("CATEGORY_NAME", ConditionUtil.like(conds.get("CATEGORY_NAME")));
+//		conds.put("CATEGORY_NAME", ConditionUtil.like(conds.get("CATEGORY_NAME")));
 		conds.put("CATEGORY_ID", ConditionUtil.like(conds.get("CATEGORY_ID")));
-		String where = ConditionUtil.and(conds, new String[][]{
-				{"like", "CATEGORY_NAME", "CATEGORY_NAME"},
+		String where = ConditionUtil.or(conds, new String[][]{
+				{"like", "CATEGORY_NAME", "CATEGORY_ID"},
 				{"like", "CATEGORY_ID", "CATEGORY_ID"}
 		});
 		sql += ConditionUtil.where(where);

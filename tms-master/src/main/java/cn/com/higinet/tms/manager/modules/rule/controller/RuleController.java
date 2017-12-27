@@ -85,7 +85,8 @@ public class RuleController {
 		}
 		Model m = new Model();
 		try {
-			m.setRow( ruleService35.saveRule( formList ) );
+			Map<String, List<Map<String, ?>>> formListUpperCase = saveParams2UpperCase(formList);
+			m.setRow( ruleService35.saveRule( formListUpperCase ) );
 		}
 		catch( Exception e ) {
 			m.addError( e.getMessage() );
@@ -95,8 +96,6 @@ public class RuleController {
 
 	/**
 	* 方法描述:查询处置方式下拉列表
-	* @param category_id 代码
-	* @param args sql参数
 	* @return
 	 */
 	@RequestMapping(value = "/disposal", method = RequestMethod.POST)
@@ -158,6 +157,86 @@ public class RuleController {
 		Model model = new Model();
 		model.setRow( ruleService35.getRule( reqs ) );
 		return model;
+	}
+
+	private Map<String, List<Map<String, ?>>> saveParams2UpperCase(Map<String, List<Map<String, ?>>> formMap) {
+		Map<String, List<Map<String, ?>>> resultMap = new HashMap<>();
+		List<Map<String, Object>> delList = MapUtil.getList( formMap, "del" );
+		List<Map<String, Object>> modList = MapUtil.getList( formMap, "mod" );
+		List<Map<String, Object>> addList = MapUtil.getList( formMap, "add" );
+		List<Map<String, Object>> copyList = MapUtil.getList( formMap, "copy" );
+
+		List<Map<String, Object>> validYList = MapUtil.getList( formMap, "valid-y" );
+		List<Map<String, Object>> validNList = MapUtil.getList( formMap, "valid-n" );
+
+		List<Map<String, ?>> delListTemp = new ArrayList<>();
+		List<Map<String, ?>> modListTemp = new ArrayList<>();
+		List<Map<String, ?>> addListTemp = new ArrayList<>();
+		List<Map<String, ?>> copyListTemp = new ArrayList<>();
+		List<Map<String, ?>> validYListTemp = new ArrayList<>();
+		List<Map<String, ?>> validNListTemp = new ArrayList<>();
+
+		if(delList != null){
+			for(Map<String, Object> loop : delList) {
+				Map<String, Object> loopMapTemp = new HashMap<>();
+				for (Map.Entry<String, Object> entry : loop.entrySet()) {
+					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+				}
+				delListTemp.add(loopMapTemp);
+			}
+			resultMap.put("del", delListTemp);
+		}
+		if(modList != null){
+			for(Map<String, Object> loop : modList) {
+				Map<String, Object> loopMapTemp = new HashMap<>();
+				for (Map.Entry<String, Object> entry : loop.entrySet()) {
+					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+				}
+				modListTemp.add(loopMapTemp);
+			}
+			resultMap.put("mod", modListTemp);
+		}
+		if(addList != null){
+			for(Map<String, Object> loop : addList) {
+				Map<String, Object> loopMapTemp = new HashMap<>();
+				for (Map.Entry<String, Object> entry : loop.entrySet()) {
+					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+				}
+				addListTemp.add(loopMapTemp);
+			}
+			resultMap.put("add", addListTemp);
+		}
+		if(copyList != null){
+			for(Map<String, Object> loop : copyList) {
+				Map<String, Object> loopMapTemp = new HashMap<>();
+				for (Map.Entry<String, Object> entry : loop.entrySet()) {
+					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+				}
+				copyListTemp.add(loopMapTemp);
+			}
+			resultMap.put("copy", copyListTemp);
+		}
+		if(validYList != null){
+			for(Map<String, Object> loop : validYList) {
+				Map<String, Object> loopMapTemp = new HashMap<>();
+				for (Map.Entry<String, Object> entry : loop.entrySet()) {
+					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+				}
+				validYListTemp.add(loopMapTemp);
+			}
+			resultMap.put("valid-y", validYListTemp);
+		}
+		if(validNList != null){
+			for(Map<String, Object> loop : validNList) {
+				Map<String, Object> loopMapTemp = new HashMap<>();
+				for (Map.Entry<String, Object> entry : loop.entrySet()) {
+					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+				}
+				validNListTemp.add(loopMapTemp);
+			}
+			resultMap.put("valid-n", validNListTemp);
+		}
+		return resultMap;
 	}
 
 }
