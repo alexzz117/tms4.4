@@ -290,8 +290,9 @@ public class RuleServiceImpl implements RuleService {
 		// 修改
 		dynamicSimpleDao.update( "TMS_COM_RULE", ruleData, condData );
 
-		ruleData.put( "UPDATE_DATE", sysdate );
-		offlineSimpleDao.update( "TMS_COM_RULE_TEMP", ruleData, condData );
+		//注释掉顺丰客制化代码 zhang.lei
+		//ruleData.put( "UPDATE_DATE", sysdate );
+		//offlineSimpleDao.update( "TMS_COM_RULE_TEMP", ruleData, condData );
 
 		return ruleData;
 	}
@@ -405,8 +406,9 @@ public class RuleServiceImpl implements RuleService {
 
 		dynamicSimpleDao.create( "TMS_COM_RULE", ruleData );
 
-		ruleData.put( "UPDATE_DATE", sysdate );
-		offlineSimpleDao.create( "TMS_COM_RULE_TEMP", ruleData );
+		//注释掉顺丰客制化代码 zhang.lei
+		//ruleData.put( "UPDATE_DATE", sysdate );
+		//offlineSimpleDao.create( "TMS_COM_RULE_TEMP", ruleData );
 
 		map.put( DBConstant.TMS_COM_RULE_RULE_ID, sequenceId );
 
