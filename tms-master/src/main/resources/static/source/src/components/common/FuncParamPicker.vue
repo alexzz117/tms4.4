@@ -26,13 +26,12 @@
             <el-button type="danger" @click="delRow(item)">删 除</el-button>
           </div>
           </el-form>
-
         </div>
       </div>
 
-      <div class="stat-cond-form-footer">
-        <el-button @click="addRow">增 加</el-button>
+      <div style="margin-top:15px; text-align: left">
         <el-button type="primary" @click="callback">确 定</el-button>
+        <el-button @click="addRow">增 加</el-button>
       </div>
     </el-dialog>
   </div>

@@ -73,22 +73,21 @@
 
         ref="dataTable"
         :data="tableDataShow"
-        stripe
-        border
         style="width: 100%"
         @selection-change="handleSelectionChange">
+
         <el-table-column
-          fixed="left"
           label="操作"
-          width="150">
+          width="100">
           <template slot-scope="scope">
 
-            <el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
-            <el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>
-            <el-button type="text" size="small" @click="openRefsDialog(scope.row)">引用点</el-button>
+            <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="openDialog('edit', scope.row)"></el-button>
+            <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)"></el-button>
+            <el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>
 
           </template>
         </el-table-column>
+
         <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
         <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
         <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
@@ -114,10 +113,9 @@
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.stat_valid"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
               :active-value=1
               :inactive-value=0
+              :disabled="statValidBtnDisabled"
               @change="statValidChange(scope.row)">
             </el-switch>
           </template>
@@ -231,8 +229,6 @@
           <el-switch
             v-model="dialogForm.continues"
             :disabled="viewDisabled"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
             active-value="1"
             inactive-value="0">
           </el-switch>
@@ -242,8 +238,6 @@
           <el-switch
             v-model="dialogForm.stat_unresult"
             :disabled="viewDisabled"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
             active-value="1"
             inactive-value="0">
           </el-switch>
@@ -254,19 +248,22 @@
           <el-switch
             v-model="dialogForm.stat_valid"
             :disabled="viewDisabled"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
             active-value="1"
             inactive-value="0"
             >
           </el-switch>
 
         </el-form-item>
+
+        <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+          <el-button type="primary" @click="submitForm('dialogForm')" v-show="!viewDisabled" :disabled="dialogFormSureBtnDisabled">保 存</el-button>
+          <el-button @click="dialogVisible = false" v-show="!viewDisabled">取 消</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" v-show="!viewDisabled">取 消</el-button>
-        <el-button type="primary" @click="submitForm('dialogForm')" v-show="!viewDisabled" :disabled="dialogFormSureBtnDisabled">保 存</el-button>
-      </div>
+      <!--<div slot="footer" class="dialog-footer">-->
+        <!--<el-button @click="dialogVisible = false" v-show="!viewDisabled">取 消</el-button>-->
+        <!--<el-button type="primary" @click="submitForm('dialogForm')" v-show="!viewDisabled" :disabled="dialogFormSureBtnDisabled">保 存</el-button>-->
+      <!--</div>-->
     </el-dialog>
 
     <StatCondPicker ref="StatCondDialog" @valueCallback="statCondInValueCallBack"
@@ -419,6 +416,7 @@
         statParamInitList: [],
         dialogForm: this.initDialogForm(),
         dialogFormSureBtnDisabled: false,
+        statValidBtnDisabled: false,
         allPickCollapse: false, // 控制多选是否隐藏多的被选项
         statCondInDictDialogForm: {},
         // 下面这几条都是下拉框取值用的
@@ -709,7 +707,7 @@
             param: finalJsonData,
             success: function (data) {
               self.getData()
-              self.$message('删除成功')
+              self.$message.success('删除成功')
             }
           })
         }).catch(() => {
@@ -722,6 +720,7 @@
       // 表格中的可用性按钮点击
       statValidChange (row) {
         let jsonData = {}
+        this.statValidBtnDisabled = true
         jsonData['valid-y'] = [row]
         let finalJsonData = {}
         finalJsonData.postData = jsonData
@@ -739,7 +738,19 @@
           param: finalJsonData,
           success: function (data) {
             // self.getData()
-            self.$message(message)
+            self.statValidBtnDisabled = false
+            self.$message.success(message)
+          },
+          error: function (data) {
+            if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+              self.$message.error(data.error.join('|'))
+            } else {
+              self.$message.error(data.error)
+            }
+            self.statValidBtnDisabled = false
+          },
+          fail: function () {
+            self.statValidBtnDisabled = false
           }
         })
       },
@@ -845,15 +856,15 @@
               param: finalJsonData,
               success: function (data) {
                 self.getData()
-                self.$message(message)
+                self.$message.success(message)
                 self.dialogVisible = false
                 self.dialogFormSureBtnDisabled = false
               },
-              error: function (error) {
-                if (error && error.length > 0) {
-                  self.$message(error.join('|'))
+              error: function (data) {
+                if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+                  self.$message.error(data.error.join('|'))
                 } else {
-                  self.$message(error)
+                  self.$message.error(data.error)
                 }
                 self.dialogFormSureBtnDisabled = false
               },
@@ -1360,17 +1371,6 @@
 <style>
   .query-form-item{
     width: 200px;
-  }
-  .stat-expand-table-box .el-table__expand-column{
-    /*visibility: hidden;*/
-    width: 0px;
-    border-right: none !important;
-  }
-  .stat-expand-table-box .el-table__expand-icon{
-    visibility: hidden;
-  }
-  .stat-expand-table-box .el-table__body-wrapper{
-    overflow: hidden;
   }
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s

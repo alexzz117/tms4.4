@@ -6,8 +6,6 @@
 
     <el-table
       :data="tableData"
-      stripe
-      border
       style="width: 100%"
       @selection-change="handleSelectionChange">
       <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->

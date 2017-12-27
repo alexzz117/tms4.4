@@ -3,8 +3,6 @@
 
     <el-table
       :data="tableData"
-      stripe
-      border
       style="width: 100%">
       <el-table-column label="模块名称" align="left">
         <template slot-scope="scope">

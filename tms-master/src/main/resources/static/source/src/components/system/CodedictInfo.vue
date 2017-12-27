@@ -7,8 +7,6 @@
 
     <el-table
       :data="tableData"
-      stripe
-      border
       style="width: 100%"
       @selection-change="handleSelectionChange">
       <el-table-column
@@ -185,7 +183,7 @@
               param: paramsObj,
               success: function (data) {
                 self.getData()
-                self.$message('添加成功')
+                self.$message.success('添加成功')
                 self.dictDialogVisible = false
               }
             })
@@ -224,7 +222,7 @@
               codeId: data.code_id
             },
             success: function (data) {
-              self.$message('删除成功')
+              self.$message.success('删除成功')
               self.getData()
             }
           })
@@ -245,7 +243,7 @@
               param: paramsObj,
               success: function (data) {
                 self.getData()
-                self.$message('编辑成功')
+                self.$message.success('编辑成功')
                 self.dictDialogVisible = false
               }
             })

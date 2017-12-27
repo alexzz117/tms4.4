@@ -1,6 +1,6 @@
 <template>
   <!--<div>-->
-  <el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible">
+  <el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible" width="770px" :modal="false">
     <el-form :model="statCondInDictDialogForm"  ref="statCondInDictDialogForm" style="text-align: left"  :inline="true">
       <el-form-item label="交易属性:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="itemShow.stat_datafd">
         <el-select v-model="statCondInDictDialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle"
@@ -116,14 +116,15 @@
         </el-form-item>
       </div>
 
-    </el-form>
-    <div class="stat-cond-form-footer">
-      <el-button @click="closeDialog">取 消</el-button>
-      <el-button @click="reset">重 置</el-button>
-      <el-button type="primary" @click="callback">确 定</el-button>
-    </div>
+      <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+        <el-button type="primary" @click="callback">确 定</el-button>
+        <el-button @click="reset">重 置</el-button>
+        <el-button @click="closeDialog">取 消</el-button>
+      </el-form-item>
 
-    <el-dialog title="交易统计" :visible.sync="statFnDialogVisible" width="400px" append-to-body>
+    </el-form>
+
+    <el-dialog title="交易统计" :visible.sync="statFnDialogVisible" width="400px" :modal="false">
       <el-tree :data="treeData" node-key="id" ref="tree"
                :props="defaultProps"
                :highlight-current=true
@@ -147,7 +148,6 @@
   import util from "../../common/util";
   // import dictCode from "../../common/dictCode";
 
-  let vm = null
   export default {
     computed: {
       txnIdParent () {
@@ -229,7 +229,6 @@
     },
     mounted: function () {
       this.$nextTick(function () {
-        vm = this
         this.statCondInDictDialogForm.stat_cond_value = this.statCond
         this.statCondInDictDialogForm.stat_cond_in = this.statCondIn
         let hideArr = this.hideItems

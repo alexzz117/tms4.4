@@ -1,54 +1,129 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
-             :inline="inline" style="text-align: left">
-      <el-form-item label="代码类别key:" prop="category_id">
-        <el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50></el-input>
-      </el-form-item>
-      <el-form-item label="代码类别value:" prop="category_name">
-        <el-input v-model="queryShowForm.category_name" auto-complete="off" :maxlength=50></el-input>
-      </el-form-item>
-    </el-form>
 
-    <div style="margin-bottom: 10px;text-align: left ">
-      <el-button class="el-icon-search" type="primary" @click="searchData('queryShowForm')">查询</el-button>
-      <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-    </div>
+    <el-row style="height: 100%;border: 1px solid #eee">
+      <el-col :span="12" style="border-right: 1px solid #eee">
+        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee; margin-left: 10px;">
+          <el-row>
+            <el-col :span="16">
+                <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
+            </el-col>
+            <el-col :span="8">
+                <div style="margin-right: 10px">
+                  <el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50
+                            @keyup.enter.native="searchData('queryShowForm')"  placeholder="请输入搜索内容"></el-input>
 
-    <el-table
-      :data="dictData"
-      stripe
-      border
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
+                </div>
+            </el-col>
+          </el-row>
+        </div>
+        <el-table
+        :data="dictData"
+        highlight-current-row
+        style="width: 100%"
+        @current-change="handleSelectionChange">
 
-      <el-table-column
-        fixed="left"
+        <el-table-column
         label="操作"
-        width="150">
+        width="80">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
-          <el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>
-          <el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>
+        <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="openDialog('edit', scope.row)"></el-button>
+        <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)"></el-button>
+        <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
         </template>
-      </el-table-column>
+        </el-table-column>
 
-      <el-table-column prop="category_id" label="代码类别key" align="left" width="180"></el-table-column>
-      <el-table-column prop="category_name" label="代码类别value" align="left" width="180"></el-table-column>
-      <el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>
-    </el-table>
-    <el-pagination style="margin-top: 10px; text-align: right;"
-                   :current-page="currentPage"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :page-sizes="[10, 25, 50, 100]"
-                   :page-size="pageSize"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="total">
-    </el-pagination>
+        <el-table-column prop="category_id" label="代码类别key" align="left"></el-table-column>
+        <el-table-column prop="category_name" label="代码类别value" align="left"></el-table-column>
+        <!--<el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>-->
+        </el-table>
+
+        <el-pagination style="margin-top: 10px; text-align: right;"
+        :current-page="currentPage"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :page-sizes="[10, 25, 50, 100]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, next, jumper"
+        :total="total">
+        </el-pagination>
+      </el-col>
+
+      <el-col :span="12" style="border-right: 1px solid #eee">
+        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee; margin-left: 10px;">
+          <el-row v-show="dictInfoShow">
+            <el-button plain class="el-icon-plus" @click="openInfoDialog('add')">新建</el-button>
+          </el-row>
+        </div>
+        <el-table
+          :data="dictInfoData"
+          style="width: 100%"
+          v-show="dictInfoShow"
+          >
+
+          <el-table-column
+            label="操作"
+            width="80">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="openInfoDialog('edit', scope.row)"></el-button>
+              <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delInfoData(scope.row)"></el-button>
+              <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="code_key" label="代码key" align="left"></el-table-column>
+          <el-table-column prop="code_value" label="代码value" align="left"></el-table-column>
+        </el-table>
+      </el-col>
+    </el-row>
+
+    <!--<el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"-->
+             <!--:inline="inline" style="text-align: left">-->
+      <!--<el-form-item label="代码类别key:" prop="category_id">-->
+        <!--<el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50></el-input>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="代码类别value:" prop="category_name">-->
+        <!--<el-input v-model="queryShowForm.category_name" auto-complete="off" :maxlength=50></el-input>-->
+      <!--</el-form-item>-->
+    <!--</el-form>-->
+
+    <!--<div style="margin-bottom: 10px;text-align: left ">-->
+      <!--<el-button class="el-icon-search" type="primary" @click="searchData('queryShowForm')">查询</el-button>-->
+      <!--<el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>-->
+    <!--</div>-->
+
+    <!--<el-table-->
+      <!--:data="dictData"-->
+      <!--style="width: 100%"-->
+      <!--@selection-change="handleSelectionChange">-->
+
+      <!--<el-table-column-->
+        <!--fixed="left"-->
+        <!--label="操作"-->
+        <!--width="150">-->
+        <!--<template slot-scope="scope">-->
+          <!--<el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>-->
+          <!--<el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>-->
+          <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
+
+      <!--<el-table-column prop="category_id" label="代码类别key" align="left" width="180"></el-table-column>-->
+      <!--<el-table-column prop="category_name" label="代码类别value" align="left" width="180"></el-table-column>-->
+      <!--<el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>-->
+    <!--</el-table>-->
+    <!--<el-pagination style="margin-top: 10px; text-align: right;"-->
+                   <!--:current-page="currentPage"-->
+                   <!--@size-change="handleSizeChange"-->
+                   <!--@current-change="handleCurrentChange"-->
+                   <!--:page-sizes="[10, 25, 50, 100]"-->
+                   <!--:page-size="pageSize"-->
+                   <!--layout="total, sizes, prev, pager, next, jumper"-->
+                   <!--:total="total">-->
+    <!--</el-pagination>-->
 
     <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible">
-      <el-form :model="dictDialogForm" :rules="rules" ref="dictDialogForm">
+      <el-form :model="dictDialogForm" :rules="rules" ref="dictDialogForm" style="text-align: left">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
           <el-input v-model="dictDialogForm.category_id" auto-complete="off" :disabled="categoryIdReadonly" :maxlength="50"></el-input>
         </el-form-item>
@@ -61,11 +136,37 @@
         <el-form-item label="描述信息:" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="dictDialogForm.info" :maxlength="200"></el-input>
         </el-form-item>
+
+        <el-form-item label=" " :label-width="formLabelWidth">
+          <el-button type="primary" @click="submitForm('dictDialogForm')">保 存</el-button>
+          <el-button @click="dictDialogVisible = false">取 消</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dictDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('dictDialogForm')">保 存</el-button>
-      </div>
+    </el-dialog>
+
+    <el-dialog :title="infoDialogTitle" :visible.sync="infoDialogVisible" style="text-align: left">
+      <el-form :model="dictInfoDialogForm" :rules="infoRules" ref="dictInfoDialogForm">
+        <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
+          <el-input v-model="dictInfoDialogForm.category_id" auto-complete="off" :disabled="true" :maxlength=50></el-input>
+        </el-form-item>
+        <el-form-item label="代码key:" :label-width="formLabelWidth" prop="code_key">
+          <el-input v-model="dictInfoDialogForm.code_key" auto-complete="off" :maxlength=50></el-input>
+        </el-form-item>
+        <el-form-item label="代码value:" :label-width="formLabelWidth" prop="code_value">
+          <el-input v-model="dictInfoDialogForm.code_value" auto-complete="off" :maxlength=50></el-input>
+        </el-form-item>
+        <el-form-item label="顺序:" :label-width="formLabelWidth" prop="onum">
+          <el-input v-model="dictInfoDialogForm.onum" auto-complete="off" :maxlength=3></el-input>
+        </el-form-item>
+        <el-form-item label="描述信息:" :label-width="formLabelWidth" prop="info">
+          <el-input type="textarea" v-model="dictInfoDialogForm.info"  :maxlength=200></el-input>
+        </el-form-item>
+
+        <el-form-item label=" " :label-width="formLabelWidth">
+          <el-button type="primary" @click="infoSubmitForm('dictInfoDialogForm')">保 存</el-button>
+          <el-button @click="infoDialogVisible = false">取 消</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -105,9 +206,12 @@
       return {
         inline: true,
         dialogTitle: '',
+        infoDialogTitle: '',
         dictDialogVisible: false,
+        infoDialogVisible: false,
         formLabelWidth: '130px',
         dialogType: '',
+        infoDialogType: '',
         currentPage: 1,
         pageSize: 10,
         total: 0,
@@ -120,9 +224,20 @@
           category_name: ''
         },
         dictData: [],
+        dictInfoData: [],
+        dictInfoShow: false,
         selectedRows: [],
         selectRow: {},
+        showDictInfoRow: {},
         dictDialogForm: this.initDialogForm(),
+        dictInfoDialogForm: {
+          code_id: '',
+          category_id: '',
+          code_key: '',
+          code_value: '',
+          onum: '',
+          info: ''
+        },
         queryRules: {
           category_id: [
             { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
@@ -153,6 +268,30 @@
             { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
             { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ]
+        },
+        infoRules: {
+          category_id: [
+            { required: true, message: '请输入代码类别key', trigger: 'blur' },
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
+          ],
+          code_key: [
+            { required: true, message: '请输入代码key', trigger: 'blur' },
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
+          ],
+          code_value: [
+            { required: true, message: '请输入代码value', trigger: 'blur' },
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
+          ],
+          onum: [
+            { pattern: /^[1-9]\d{0,2}$/, message: '顺序最多只能输入3位数字' }
+          ],
+          info: [
+            { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
+            { validator: check.checkFormSpecialCode, trigger: 'blur' }
+          ]
         }
       }
     },
@@ -170,13 +309,23 @@
           info: ''
         }
       },
+      initInfoDialogForm () {
+        return {
+          category_id: '',
+          code_key: '',
+          code_value: '',
+          onum: '',
+          info: ''
+        }
+      },
       searchData (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            Object.assign(this.queryForm, this.queryShowForm)
-            this.getData()
-          }
-        })
+        this.dictInfoShow = false
+        // this.$refs[formName].validate((valid) => {
+        //   if (valid) {
+        Object.assign(this.queryForm, this.queryShowForm)
+        this.getData()
+        //   }
+        // })
       },
       getData () {
         let self = this
@@ -184,6 +333,7 @@
           pageindex: this.currentPage,
           pagesize: this.pageSize
         }
+        this.dictInfoShow = false
         let upperParams = util.toggleObjKey(this.queryForm, 'upper')
         Object.assign(paramsObj, upperParams)
         ajax.post({
@@ -206,8 +356,27 @@
               param: paramsObj,
               success: function (data) {
                 self.getData()
-                self.$message('添加成功')
+                self.$message.success('添加成功')
                 self.dictDialogVisible = false
+              }
+            })
+          } else {
+            return false
+          }
+        })
+      },
+      addInfoData (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let self = this
+            let paramsObj = this.dictInfoDialogForm
+            ajax.post({
+              url: '/codedict/code/add',
+              param: paramsObj,
+              success: function (data) {
+                self.handleSelectionChange(self.showDictInfoRow)
+                self.$message.success('添加成功')
+                self.infoDialogVisible = false
               }
             })
           } else {
@@ -228,8 +397,32 @@
               categoryId: data.category_id
             },
             success: function (data) {
-              self.$message('删除成功')
+              self.$message.success('删除成功')
               self.getData()
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
+      delInfoData (data) {
+        let self = this
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          ajax.post({
+            url: '/codedict/code/del',
+            param: {
+              codeId: data.code_id
+            },
+            success: function (data) {
+              self.$message.success('删除成功')
+              self.handleSelectionChange(self.showDictInfoRow)
             }
           })
         }).catch(() => {
@@ -249,8 +442,27 @@
               param: paramsObj,
               success: function (data) {
                 self.getData()
-                self.$message('编辑成功')
+                self.$message.success('编辑成功')
                 self.dictDialogVisible = false
+              }
+            })
+          } else {
+            return false
+          }
+        })
+      },
+      updInfoData (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let self = this
+            let paramsObj = this.dictInfoDialogForm
+            ajax.post({
+              url: '/codedict/code/update',
+              param: paramsObj,
+              success: function (data) {
+                self.handleSelectionChange(self.showDictInfoRow)
+                self.$message.success('编辑成功')
+                self.infoDialogVisible = false
               }
             })
           } else {
@@ -266,6 +478,13 @@
           this.addData(formName)
         } else if (this.dialogType === 'edit') {
           this.updData(formName)
+        }
+      },
+      infoSubmitForm (formName) {
+        if (this.infoDialogType === 'add') {
+          this.addInfoData(formName)
+        } else if (this.infoDialogType === 'edit') {
+          this.updInfoData(formName)
         }
       },
       bindGridData (data) {
@@ -284,8 +503,28 @@
         this.currentPage = val
         this.getData()
       },
-      handleSelectionChange (rows) {
-        this.selectedRows = rows
+      handleSelectionChange (row) {
+        if (row == null) {
+          this.dictInfoShow = false
+          return
+        }
+        this.dictInfoShow = true
+        this.showDictInfoRow = row
+        let self = this
+        let paramsObj = {
+          categoryId: this.showDictInfoRow.category_id,
+          pageindex: 1,
+          pagesize: 2147483647
+        }
+        ajax.post({
+          url: '/codedict/category/codelist',
+          param: paramsObj,
+          success: function (data) {
+            if (data.page) {
+              self.dictInfoData = data.page.list
+            }
+          }
+        })
       },
       openDialog (dialogType, row) {
         this.dialogType = dialogType
@@ -302,7 +541,23 @@
         if (this.$refs['dictDialogForm']) {
           this.$refs['dictDialogForm'].clearValidate()
         }
-      }
+      },
+      openInfoDialog (dialogType, row) {
+        this.infoDialogType = dialogType
+        if (dialogType === 'edit') {
+          this.infoDialogTitle = '编辑字典信息'
+          // 拷贝而不是赋值
+          Object.assign(this.dictInfoDialogForm, row)
+        } else if (dialogType === 'add') {
+          this.infoDialogTitle = '新建字典信息'
+          this.dictInfoDialogForm = this.initInfoDialogForm()
+          this.dictInfoDialogForm.category_id = this.showDictInfoRow.category_id
+        }
+        this.infoDialogVisible = true
+        if (this.$refs['dictInfoDialogForm']) {
+          this.$refs['dictInfoDialogForm'].clearValidate()
+        }
+      },
     }
   }
 </script>

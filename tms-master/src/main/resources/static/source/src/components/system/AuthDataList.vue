@@ -9,8 +9,6 @@
 
     <el-table
       :data="tableData"
-      stripe
-      border
       style="width: 100%"
       @selection-change="handleSelectionChange">
       <el-table-column
@@ -53,17 +51,24 @@
     <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible">
       <el-form :model="dialogForm" :rules="rules" ref="dialogForm" style="text-align: left;">
         <el-form-item label="是否通过授权:" :label-width="formLabelWidth" prop="auth_status">
-          <el-radio v-model="dialogForm.auth_status" label="1">是</el-radio>
-          <el-radio v-model="dialogForm.auth_status" label="2">否</el-radio>
+          <!--<el-radio v-model="dialogForm.auth_status" label="1">是</el-radio>-->
+          <!--<el-radio v-model="dialogForm.auth_status" label="2">否</el-radio>-->
+          <el-switch
+            v-model="dialogForm.auth_status"
+            active-value="1"
+            inactive-value="2"
+          >
+          </el-switch>
         </el-form-item>
         <el-form-item label="授权说明:" :label-width="formLabelWidth" prop="auth_msg">
           <el-input type="textarea" v-model="dialogForm.auth_msg" :maxlength="2048"></el-input>
         </el-form-item>
+
+        <el-form-item label=" " :label-width="formLabelWidth">
+          <el-button type="primary" @click="submitForm('dialogForm')">保 存</el-button>
+          <el-button @click="dictDialogVisible = false">取 消</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dictDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('dialogForm')">保 存</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -203,7 +208,7 @@
               param: paramsObj,
               success: function (data) {
                 self.getData()
-                self.$message('授权成功')
+                self.$message.success('授权成功')
                 self.dictDialogVisible = false
               }
             })
