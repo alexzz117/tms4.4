@@ -274,6 +274,27 @@ function escapeExprSpecialWord (val) {
   }
   return val
 }
+function orderList (list, key) {
+  let resultList = []
+  if (list !== undefined && key !== undefined) {
+    resultList = resultList.concat(list)
+    let len = resultList.length
+    while (len > 1) {
+      for (let i = 0; i < len - 1; i++) {
+        let buff = null
+        let item = resultList[i]
+        let next = resultList[i + 1]
+        if (Number(item[key]) < Number(next[key])) {
+          buff = item
+          resultList[i] = next
+          resultList[i + 1] = buff
+        }
+      }
+      len--
+    }
+  }
+  return resultList
+}
 var util = {
   escapeExprSpecialWord: escapeExprSpecialWord,
   getWebRootPath: getWebRootPath,
@@ -290,6 +311,7 @@ var util = {
   error: error,
   parseJSON: parseJSON,
   noop: noop,
+  orderList: orderList,
   trim: trim ?
     function( text ) {
       return text == null ?
