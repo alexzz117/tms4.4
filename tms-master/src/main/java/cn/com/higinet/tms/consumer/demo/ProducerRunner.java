@@ -1,6 +1,5 @@
 package cn.com.higinet.tms.consumer.demo;
 
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +23,12 @@ public class ProducerRunner implements CommandLineRunner {
 
 	@Override
 	public void run( String... arg0 ) throws Exception {
-		for( int i = 0; i < 900000000; i++ ) {
+		/*for( int i = 0; i < 900000000; i++ ) {
 			String message = String.valueOf( i );
 			ProducerRecord<String, String> record = new ProducerRecord<String, String>( "test3", message, message );
 			kafkaTemplate.send( record );
 			logger.info( String.valueOf( i ) );
-		}
+		}*/
 	}
 
 }
