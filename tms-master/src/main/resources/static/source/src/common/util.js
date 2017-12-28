@@ -471,6 +471,16 @@ var util = {
       }
     }
     return keys
+  },
+  // 查找list数组中对应value的label值
+  renderCellValue (list, cellValue) {
+    cellValue = cellValue + ''
+    for (var i = 0 ; i < list.length; i++){
+      if(list[i].value === cellValue){
+        return list[i].label
+      }
+    }
+    return cellValue
   }
 }
 

@@ -61,4 +61,8 @@
   .el-select{
     width: 100%;
   }
+
+  .el-table {
+    border: 1px solid rgb(238, 241, 246)
+  }
 </style>

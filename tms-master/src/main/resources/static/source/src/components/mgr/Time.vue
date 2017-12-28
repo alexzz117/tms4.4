@@ -1,12 +1,11 @@
 <template>
   <el-container style="height: 100%; border: 1px solid #eee">
-    <el-aside width="60%">
+    <el-aside width="60%" >
       <div style="margin: 10px;text-align: left ">
         <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
       </div>
       <el-table
         :data="timeData"
-        style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column label="操作" width="80">
           <template slot-scope="scope">
@@ -32,9 +31,10 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="任务名称" align="left" width="120"></el-table-column>
-        <el-table-column prop="className" label="类名" align="left" width="120"></el-table-column>
-        <el-table-column prop="group" label="任务组" align="left" width="120"></el-table-column>
+        <el-table-column prop="name" label="任务名称" align="left"></el-table-column>
+        <el-table-column prop="cron" label="时间表达式" align="left"></el-table-column>
+        <el-table-column prop="group" label="任务组" align="left" :formatter="formatter"></el-table-column>
+        <el-table-column prop="className" label="类名" align="left" :formatter="formatter"></el-table-column>
       </el-table>
     </el-aside>
     <el-main>
@@ -46,7 +46,7 @@
           <el-input v-model="timerForm.cron" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类名" :label-width="formLabelWidth" prop="className">
-          <el-select v-model="timerForm.className" @focus="classSelectFocus()" placeholder="请选择"
+          <el-select v-model="timerForm.className" placeholder="请选择"
                      :clearable="clearable">
             <el-option
               v-for="item in classOptions"
@@ -57,7 +57,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="任务组" :label-width="formLabelWidth" prop="group">
-          <el-select v-model="timerForm.group" @focus="groupSelectFocus()" placeholder="请选择"
+          <el-select v-model="timerForm.group" placeholder="请选择"
                      :clearable="clearable">
             <el-option
               v-for="item in groupOptions"
@@ -84,7 +84,7 @@
           <el-input v-model="timerDialogForm.cron" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类名" :label-width="formLabelWidth" prop="className">
-          <el-select v-model="timerDialogForm.className" @focus="classSelectFocus()" placeholder="请选择"
+          <el-select v-model="timerDialogForm.className" placeholder="请选择"
                      :clearable="clearable">
             <el-option
               v-for="item in classOptions"
@@ -95,7 +95,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="任务组" :label-width="formLabelWidth" prop="group">
-          <el-select v-model="timerDialogForm.group" @focus="groupSelectFocus()" placeholder="请选择"
+          <el-select v-model="timerDialogForm.group" placeholder="请选择"
                      :clearable="clearable">
             <el-option
               v-for="item in groupOptions"
@@ -124,7 +124,48 @@
 
   export default {
     created () {
-      this.sel()
+      var vm = this
+      var getOptions = function(url) {
+        var promise = new Promise(function(resolve, reject){
+          let promiseSelf = this
+          ajax.get({
+            url: url,
+            model: ajax.model.timer,
+            success: function (data) {
+              if (data.list) {
+                resolve(data.list)
+              } else {
+                resolve([])
+              }
+            },
+            error: function (data) {
+              reject(new Error(data));
+            },
+            fail: function (error) {
+              reject(new Error(error));
+            }
+          })
+        })
+        return promise
+      }
+
+      var classP = getOptions("/timer/classes").then(function(list) {
+        vm.classOptions = list
+      }, function(error) {
+        console.error(error);
+      });
+
+      var groupsP = getOptions("/timer/groups").then(function(list) {
+        vm.groupOptions = list
+      }, function(error) {
+        console.error(error);
+      });
+
+      Promise.all([classP, groupsP]).then(function(data) {
+        vm.sel()
+      }).catch(function(error){
+        console.error(error);
+      });
     },
     data () {
       var self = this
@@ -308,30 +349,6 @@
           }
         })
       },
-      classSelectFocus() {
-        var self = this
-        ajax.get({
-          url: '/timer/classes',
-          model: ajax.model.timer,
-          success: function (data) {
-            if (data.list) {
-              self.classOptions = data.list
-            }
-          }
-        })
-      },
-      groupSelectFocus() {
-        var self = this
-        ajax.get({
-          url: '/timer/groups',
-          model: ajax.model.timer,
-          success: function (data) {
-            if (data.list) {
-              self.groupOptions = data.list
-            }
-          }
-        })
-      },
       statusChange(row) {
         var self = this
         if (row.status === 'NORMAL') {
@@ -362,6 +379,20 @@
               })
             }
           })
+        }
+      },
+      formatter(row, column, cellValue) {
+        switch(column.property )
+        {
+          case 'className':
+            return util.renderCellValue(this.classOptions, cellValue)
+            break;
+          case 'group':
+            return util.renderCellValue(this.groupOptions, cellValue)
+            break;
+          default:
+            return cellValue
+            break;
         }
       }
     }
