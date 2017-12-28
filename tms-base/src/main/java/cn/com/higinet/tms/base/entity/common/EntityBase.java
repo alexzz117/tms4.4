@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 
 /**
  * @author zhang.lei
+ * 
  * */
 public interface EntityBase<T> extends Serializable {
 
