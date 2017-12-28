@@ -78,9 +78,9 @@
             <el-form-item label="日志记录配置" prop="logconf" v-bind:class="{hidden:funcFormVisible.logconf}">
               <el-input v-model="funcForm.logconf" auto-complete="off" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
-            <el-form-item style="text-align: center" v-bind:class="{hidden:funcFormReadonly}">
-              <el-button type="primary" @click="submitFunc">保 存</el-button>
-              <el-button @click="closeFuncForm">取 消</el-button>
+            <el-form-item v-bind:class="{hidden:funcFormReadonly}">
+              <el-button type="primary" @click="submitFunc" size="large">保 存</el-button>
+              <el-button @click="closeFuncForm" size="large">取 消</el-button>
             </el-form-item>
           </el-form>
         </el-main>
