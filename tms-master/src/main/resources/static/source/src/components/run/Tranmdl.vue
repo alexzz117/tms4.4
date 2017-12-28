@@ -18,8 +18,8 @@
                   style="width: 100%">
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button type="text" icon="el-icon-edit" title="编辑" @click="tmEditFunc(scope.$index, scope.row)"></el-button>
-              <el-button type="text" icon="el-icon-delete" title="删除" @click="tmDelFunc(scope.$index, scope.row)"></el-button>
+              <el-button type="text" icon="el-icon-edit" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="编辑" @click="tmEditFunc(scope.$index, scope.row)"></el-button>
+              <el-button type="text" icon="el-icon-delete" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="删除" @click="tmDelFunc(scope.$index, scope.row)"></el-button>
               <el-button type="text" icon="el-icon-search" title="查看" @click="tmInfoFunc(scope.$index, scope.row)"></el-button>
             </template>
           </el-table-column>
@@ -40,21 +40,21 @@
       </el-main>
     </el-container>
     <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible" @open="openTmDialog">
-      <el-form :model="tmForm"  :label-width="formLabelWidth" :rules="tmRules" style="text-align: left;" >
+      <el-form :model="tmForm"  :label-width="formLabelWidth" :rules="tmRules" ref="tmForm" style="text-align: left;" >
         <el-form-item label="交易名称" prop="tab_name" class="hidden">
           <el-input v-model="tmForm.tab_name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="属性名称" prop="name">
-          <el-input v-model="tmForm.name" auto-complete="off"></el-input>
+          <el-input v-model="tmForm.name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="属性代码" prop="ref_name">
-          <el-input v-model="tmForm.ref_name" auto-complete="off"></el-input>
+          <el-input v-model="tmForm.ref_name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="数据来源" prop="src_id">
-          <el-input v-model="tmForm.src_id" auto-complete="off"></el-input>
+          <el-input v-model="tmForm.src_id" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型" prop="type">
-          <el-select v-model="tmForm.type" placeholder="请选择" @change="tmTypeChange">
+          <el-select v-model="tmForm.type" :disabled="tmFormReadOnly" placeholder="请选择" @change="tmTypeChange">
             <el-option
               v-for="item in tmTypeList"
               :key="item.value"
@@ -64,7 +64,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="存储字段" prop="fd_name">
-          <el-select v-model="tmForm.fd_name" placeholder="请选择">
+          <el-select v-model="tmForm.fd_name" :disabled="tmFormReadOnly" placeholder="请选择">
             <el-option
               v-for="item in tmFdNameList"
               :key="item.fd_name"
@@ -73,7 +73,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="关联代码集" prop="code" v-bind:class="{hidden:tmCodeVisible}">
+        <el-form-item label="关联代码集" prop="code" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmCodeVisible}">
           <el-select v-model="tmForm.code" placeholder="请选择">
             <el-option
               v-for="item in tmCodeList"
@@ -83,7 +83,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="默认值"  prop="src_default">
+        <el-form-item label="默认值"  prop="src_default" :disabled="tmFormReadOnly">
           <el-select v-if="tmForm.type.toUpperCase() === 'CODE'" v-model="tmForm.src_default" placeholder="请选择">
             <el-option
               v-for="item in codeDefaultList"
@@ -92,26 +92,26 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-input v-else v-model="tmForm.src_default" auto-complete="off"></el-input>
+          <el-input v-else v-model="tmForm.src_default" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="处理函数" prop="genesisrul" v-bind:class="{hidden:genesisrulVisible}">
+        <el-form-item label="处理函数" prop="genesisrul" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmFuncVisible}">
           <el-select v-model="tmForm.genesisrul" placeholder="请选择">
             <el-option
-              v-for="item in tmGenesisRulList"
+              v-for="item in tmFuncList"
               :key="item.value"
               :label="item.label"
               :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="处理函数参数1" prop="params1" v-bind:class="{hidden:paramsVisible(1)}">
+        <el-form-item label="处理函数参数1" prop="params1" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(1)}">
           <el-input v-model="tmForm.params1" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="处理函数参数2" prop="params2" v-bind:class="{hidden:paramsVisible(2)}">
+        <el-form-item label="处理函数参数2" prop="params2" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(2)}">
           <el-input v-model="tmForm.params2" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="tmDialogVisible = false">立即创建</el-button>
+          <el-button type="primary" @click="submitTmForm">立即创建</el-button>
           <el-button @click="tmDialogVisible = false">取消</el-button>
         </el-form-item>
       </el-form>
@@ -203,6 +203,8 @@
         let dataType = self.tmForm.type
         let enableStoreFd = self.enableStoreFd
         let dataTypeClassify = self.dataTypeClassify
+        let fdName = self.tmForm.fd_name
+        let hasFdName = false
         var sfdItems = []
         if (dataType && enableStoreFd) {
           for (let i in enableStoreFd) {
@@ -214,26 +216,37 @@
                   if (dataType !== 'double' && dataType !== 'long') {
                     if (fd['type'] === dataType) {
                       sfdItems.push(fd)
+                      hasFdName = hasFdName || fd.fd_name === fdName
                     }
                   }
                   if (fd['type'] === 'double' || fd['type'] === 'long') {
                     sfdItems.push(fd)
+                    hasFdName = hasFdName || fd.fd_name === fdName
                   }
                 } else if (dt.recap === 'string') {
                   if (dataType !== 'string') {
                     if (fd['type'] === dataType) {
                       sfdItems.push(fd)
+                      hasFdName = hasFdName || fd.fd_name === fdName
                     }
                   }
                 }
                 if (fd['type'] === 'string') {
                   sfdItems.push(fd)
+                  hasFdName = hasFdName || fd.fd_name === fdName
                 }
               }
             }
           }
-        } else {
-          // $.extend(sfdItems, enableStoreFd)
+        }
+        // 编辑的时候，如果下拉列表中不存在编辑值，那么插入这条记录
+        if (!hasFdName && fdName !== '') {
+          let allStoreFd = self.allStoreFd
+          for (let i in allStoreFd) {
+            if (allStoreFd[i].fd_name === fdName) {
+              sfdItems.splice(0, 0, allStoreFd[i])
+            }
+          }
         }
         return sfdItems
       },
@@ -250,10 +263,10 @@
         let type = this.tmForm.type
         return !type || type.toUpperCase() !== 'CODE'
       },
-      genesisrulVisible () { // 根据韩式下拉列表值得数量判断显隐
-        return this.tmGenesisRulList.length === 0
+      tmFuncVisible () { // 根据函数下拉列表值得数量判断显隐
+        return this.tmFuncList.length === 0
       },
-      tmGenesisRulList () { // 处理函数列表，根据类型的值筛选
+      tmFuncList () { // 处理函数列表，根据类型的值筛选
         let type = this.tmForm.type
         let func = this.func
         let list = []
@@ -277,7 +290,7 @@
         if (value.trim() === '' && self.tmForm.type.toUpperCase() === 'CODE') {
           return callback(new Error('数据类型为代码类型时，关联代码集不能为空'))
         } else {
-          callback()
+          return callback()
         }
       }
       // 判断存储字段是否合法
@@ -286,18 +299,21 @@
         let list = self.tmFdNameList
         for (let i in list) {
           if (list[i].fd_name === value) {
-            callback()
+            return callback()
           }
         }
         return callback(new Error('存储字段对应类型和数据类型不一致'))
       }
       // 判断函数是否存在
       let genesisrulCheck = (rule, value, callback) => {
+        if (util.trim(value) === '') {
+          return callback()
+        }
         let self = this
-        let list = self.tmGenesisRulList
+        let list = self.tmFuncList
         for (let i in list) {
-          if (list[i].fd_name === value) {
-            callback()
+          if (list[i].value === value) {
+            return callback()
           }
         }
         return callback(new Error('处理函数不存在'))
@@ -306,10 +322,10 @@
       let paramsCheck1 = (rule, value, callback) => {
         let self = this
         if (self.paramsVisible(1)) { // 隐藏参数
-          callback()
+          return callback()
         }
         if (util.trim(value) === '') {
-          callback(new Error('参数不允许为空'))
+          return callback(new Error('参数不允许为空'))
         }
         let funcParam = self.funcParam // 所有的参数集合
         let paramsList = [] // 使用的参数列表
@@ -317,6 +333,9 @@
           if (funcParam[i].func_code === self.tmForm.genesisrul) {
             paramsList.push(funcParam[i])
           }
+        }
+        if (paramsList.length === 0) {
+          return callback()
         }
         paramsList = util.orderList(paramsList, 'param_orderby') // 排序
         let dataTypeClassify = self.dataTypeClassify
@@ -326,24 +345,24 @@
           if (dt.type.indexOf(paramType) > -1) {
             if (dt.recap === 'long' || dt.recap === 'decimal') {
               if (dt.recap === 'long' && !/^[0-9]*$/.test(value)) {
-                callback(new Error('处理函数参数1只能填写非负整数'))
+                return callback(new Error('处理函数参数1只能填写非负整数'))
               }
               if (dt.recap === 'decimal' && !/^\d+(\.\d+)?$/.test(value)) {
-                callback(new Error('处理函数参数1只能填写非负数'))
+                return callback(new Error('处理函数参数1只能填写非负数'))
               }
               if ((value * 1 + '') !== (value + '')) {
-                callback(new Error('处理函数参数1所填数据的格式不正确')) // 说明，数字是已0开头的
+                return callback(new Error('处理函数参数1所填数据的格式不正确')) // 说明，数字是已0开头的
               }
               if (self.tmForm.params2 !== '') {
                 let params1 = Number(value)
                 let params2 = Number(self.tmForm.params2)
                 if (params2 < params1) {
-                  callback(new Error('处理函数参数1必须小于参数2')) // 后面的值小于等于前面的值
+                  return callback(new Error('处理函数参数1必须小于参数2')) // 后面的值小于等于前面的值
                 }
               }
             } else if (dt.recap === 'string') {
               if (!(value.charAt(0) === '"' && value.charAt(value.length - 1) === '"')) {
-                callback(new Error('处理函数参数为字符类型，请使用双引号包裹，如：["\' + value + \'"]'))
+                return callback(new Error('处理函数参数为字符类型，请使用双引号包裹，如：["\' + value + \'"]'))
               }
             }
           }
@@ -354,10 +373,10 @@
       let paramsCheck2 = (rule, value, callback) => {
         let self = this
         if (self.paramsVisible(2)) { // 隐藏参数
-          callback()
+          return callback()
         }
         if (util.trim(value) === '') {
-          callback(new Error('参数不允许为空'))
+          return callback(new Error('参数不允许为空'))
         }
         let funcParam = self.funcParam // 所有的参数集合
         let paramsList = [] // 使用的参数列表
@@ -365,6 +384,9 @@
           if (funcParam[i].func_code === self.tmForm.genesisrul) {
             paramsList.push(funcParam[i])
           }
+        }
+        if (paramsList.length === 0) {
+          return callback()
         }
         paramsList = util.orderList(paramsList, 'param_orderby') // 排序
         let dataTypeClassify = self.dataTypeClassify
@@ -374,24 +396,24 @@
           if (dt.type.indexOf(paramType) > -1) {
             if (dt.recap === 'long' || dt.recap === 'decimal') {
               if (dt.recap === 'long' && !/^[0-9]*$/.test(value)) {
-                callback(new Error('处理函数参数1只能填写非负整数'))
+                return callback(new Error('处理函数参数1只能填写非负整数'))
               }
               if (dt.recap === 'decimal' && !/^\d+(\.\d+)?$/.test(value)) {
-                callback(new Error('处理函数参数2只能填写非负数'))
+                return callback(new Error('处理函数参数2只能填写非负数'))
               }
               if ((value * 1 + '') !== (value + '')) {
-                callback(new Error('处理函数参数2所填数据的格式不正确')) // 说明，数字是已0开头的
+                return callback(new Error('处理函数参数2所填数据的格式不正确')) // 说明，数字是已0开头的
               }
               if (self.tmForm.params1 !== '') {
                 let params1 = Number(self.tmForm.params1)
                 let params2 = Number(value)
                 if (params2 < params1) {
-                  callback(new Error('处理函数参数2必须大于参数1')) // 后面的值小于等于前面的值
+                  return  callback(new Error('处理函数参数2必须大于参数1')) // 后面的值小于等于前面的值
                 }
               }
             } else if (dt.recap === 'string') {
               if (!(value.charAt(0) === '"' && value.charAt(value.length - 1) === '"')) {
-                callback(new Error('处理函数参数为字符类型，请使用双引号包裹，如：["\' + value + \'"]'))
+                return callback(new Error('处理函数参数为字符类型，请使用双引号包裹，如：["\' + value + \'"]'))
               }
             }
           }
@@ -399,11 +421,14 @@
         callback()
       }
       return {
+        op: '',
         toggleIcon: ['el-icon-arrow-down', 'el-icon-arrow-right'], // 交易模型Table中分类[分组]中：展开与收起的Icon
         tranModelList: [],      // 交易模型列表
         expendNodeKey: [],      // 展开的交易模型分类节点
         tmTitle: '',            // 交易模型弹窗标题
         tmDialogVisible: false, // 交易模型弹窗显隐
+        tmFormReadOnly: true,   // 表单只读属性
+        selectTmRows: [],
         tmForm: {
           params1: '',
           params2: '',
@@ -462,7 +487,6 @@
             {max: 50, message: '存储字段不能超过20个字符', trigger: 'blur'}
           ],
           code: [
-            {required: true, message: '请选择关联代码集', trigger: 'blur'},
             {validator: check.checkFormSpecialCode, trigger: 'blur'}, // 特殊字符校验
             {validator: codeCheck, trigger: 'blur'}, // 关联代码集合法校验
             {max: 50, message: '关联代码集不能超过20个字符', trigger: 'blur'}
@@ -633,12 +657,22 @@
         self.tmForm['params' + index] = ''
         return true
       },
+      getToolBtnVisible (index, row) { // 只读控制方法
+        if (row.tab_name === this.txnId && (row.is_sys + '') !== '1') {
+          return false
+        }
+        return true
+      },
       tmTypeChange () {
         this.tmForm.src_default = ''
+        this.tmForm.fd_name = ''
       },
       openTmDialog () { // 当新建交易模型窗口打开时触发
         this.tmTypeList = dictCode.getCodeItems('tms.model.datatype') // 加载类型下拉列表
         this.getFuncList()
+        if (this.$refs['tmForm']) { // 如果Form存在，则初始化；第一次打开为undefined
+          this.$refs['tmForm'].resetFields()
+        }
       },
       getTmFdNameList (tabName) { // 查询存储字段列表
         let self = this
@@ -666,22 +700,141 @@
         self.tmTitle = '新建交易模型'
         self.tmDialogVisible = true
         self.tmFormReadOnly = false
+        self.op = 'add'
       },
-      tmEditFunc () { // 编辑交易模型定义事件处理
+      tmEditFunc (index, row) { // 编辑交易模型定义事件处理
         let self = this
         self.tmTitle = '编辑交易模型'
         self.tmDialogVisible = true
         self.tmFormReadOnly = false
+        self.op = 'mod'
+        let genesisrul = ''
+        let params1 = ''
+        let params2 = ''
+        let genesisrulStr = row.genesisrul
+        if (util.trim(genesisrulStr) !== '') {
+          genesisrul = genesisrulStr.substring(0, genesisrulStr.indexOf('('))
+          let params = genesisrulStr.substring(genesisrulStr.indexOf('(') + 1, genesisrulStr.indexOf(')'))
+          if (params.length > 1) {
+            params1 = params[1]
+          }
+          if (params.length > 2) {
+            params2 = params[2]
+          }
+        }
+        self.tmForm = {
+          params1: params1,
+          params2: params2,
+          tab_name: row.tab_name,
+          name: row.name,
+          ref_name: row.ref_name,
+          src_id: row.src_id,
+          type: row.type,
+          fd_name: row.fd_name,
+          code: row.code,
+          src_default: row.src_default,
+          genesisrul: genesisrul
+        }
+        self.selectTmRows = [row]
+      },
+      submitTmForm () {
+        let self = this
+        this.$refs['tmForm'].validate((valid) => {
+          if (valid) {
+            // self.tmDialogVisible = false
+            let op = self.op
+            let rowData = self.selectTmRows[0]
+            let formData = self.tmForm
+            let row = {}
+            if (op === 'mod' && rowData.type !== formData.type && rowData.link.length > 0) {
+              this.$confirm('该字段已在自定义查询中引用，确认修改？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                rowData.link = ''
+              }).catch(() => {
+                this.$message({
+                  type: 'info',
+                  message: '已取消操作'
+                })
+                return false
+              })
+              row = Object.assign({}, rowData, formData)
+              row = Object.assign(row, {old: rowData})
+            } else {
+              row = Object.assign(row, formData)
+            }
+            let genesisrul = ''
+            if (util.trim(row.genesisrul) !== '') {
+              genesisrul = util.trim(row.genesisrul) + '(?'
+              if (util.trim(row.params1) !== '') {
+                genesisrul = genesisrul + ',' + row.params1
+                if (util.trim(row.params2) !== '') {
+                  genesisrul = genesisrul + ',' + row.params2
+                }
+              }
+            }
+            row.genesisrul = genesisrul + ')'
+            let jsonData = {}
+            let finalJsonData = {}
+            if (op === 'add') {
+              jsonData.add = [row]
+            } else {
+              jsonData.mod = [row]
+            }
+            finalJsonData.postData = jsonData
+            ajax.post({
+              url: '/tranmdl/saveModel',
+              param: finalJsonData,
+              success: function (data) {
+                self.$message('操作成功。')
+                // self.selUser()
+              }
+            })
+          } else {
+            this.$message('请正确填写交易模型信息')
+            return false
+          }
+        })
       },
       tmDelFunc () { // 删除交易模型定义事件处理
         // let self = this
         console.info('删除交易模型')
       },
-      tmInfoFunc () { // 查看交易模型定义事件处理
+      tmInfoFunc (index, row) { // 查看交易模型定义事件处理
         let self = this
         self.tmTitle = '交易模型信息'
         self.tmDialogVisible = true
         self.tmFormReadOnly = true
+        self.op = 'info'
+        let genesisrul = ''
+        let params1 = ''
+        let params2 = ''
+        let genesisrulStr = row.genesisrul
+        if (util.trim(genesisrulStr) !== '') {
+          genesisrul = genesisrulStr.substring(0, genesisrulStr.indexOf('('))
+          let params = genesisrulStr.substring(genesisrulStr.indexOf('(') + 1, genesisrulStr.indexOf(')'))
+          if (params.length > 1) {
+            params1 = params[1]
+          }
+          if (params.length > 2) {
+            params2 = params[2]
+          }
+        }
+        self.tmForm = {
+          params1: params1,
+          params2: params2,
+          tab_name: row.tab_name,
+          name: row.name,
+          ref_name: row.ref_name,
+          src_id: row.src_id,
+          type: row.type,
+          fd_name: row.fd_name,
+          code: row.code,
+          src_default: row.src_default,
+          genesisrul: genesisrul
+        }
       }
     }
   }
