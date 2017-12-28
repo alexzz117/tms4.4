@@ -44,13 +44,16 @@
               <el-menu-item index="4-1">数据字典管理</el-menu-item>
             </router-link>
             <router-link :to="{ name:'ipaddr'}" tag="li" replace>
-              <el-menu-item index="4-3">IP地址维护</el-menu-item>
+              <el-menu-item index="4-2">IP地址维护</el-menu-item>
             </router-link>
             <router-link :to="{ name:'authCenter'}" tag="li" replace>
-              <el-menu-item index="4-4">授权中心</el-menu-item>
+              <el-menu-item index="4-3">授权中心</el-menu-item>
             </router-link>
             <router-link :to="{ name:'log'}" tag="li" replace>
               <el-menu-item index="4-4">操作日志管理</el-menu-item>
+            </router-link>
+            <router-link :to="{ name:'time'}" tag="li" replace>
+              <el-menu-item index="4-5">定时任务管理</el-menu-item>
             </router-link>
           </el-submenu>
           <el-submenu index="5">

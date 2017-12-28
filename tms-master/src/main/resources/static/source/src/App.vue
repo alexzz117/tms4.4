@@ -54,4 +54,11 @@
     opacity: 0;
   }
 
+  /*************统一设置样式************/
+  .el-form {
+    text-align: left
+  }
+  .el-select{
+    width: 100%;
+  }
 </style>

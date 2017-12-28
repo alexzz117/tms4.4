@@ -32,6 +32,8 @@ import Log from '@/components/system/Log'
 import TxnEventQuery from '@/components/synquery/TxnEventQuery'
 import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
 
+import Time from '@/components/mgr/Time'
+
 import NotFoundComponent from '@/components/NotFoundComponent'
 import util from '@/common/util'
 
@@ -144,7 +146,12 @@ export default new Router({
           path: 'alarmEventQuery_vue',
           name: 'alarmEventQuery',
           component: AlarmEventQuery
-        }
+        },
+        {
+          path: 'time_vue',
+          name: 'time',
+          component: Time
+        },
       ]
     },
     {

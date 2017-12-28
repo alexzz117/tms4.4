@@ -34,7 +34,7 @@ var config = {
 
 let modelDef = {
   manager: '/manager',
-  timer: '/timer',
+  timer: '',
   plus: '/plus'
 }
 
