@@ -338,17 +338,10 @@ public class TransModelController {
 		List<Map<String, Object>> delList = MapUtil.getList( formMap, "del" );
 		List<Map<String, Object>> modList = MapUtil.getList( formMap, "mod" );
 		List<Map<String, Object>> addList = MapUtil.getList( formMap, "add" );
-		List<Map<String, Object>> copyList = MapUtil.getList( formMap, "copy" );
-
-		List<Map<String, Object>> validYList = MapUtil.getList( formMap, "valid-y" );
-		List<Map<String, Object>> validNList = MapUtil.getList( formMap, "valid-n" );
 
 		List<Map<String, ?>> delListTemp = new ArrayList<>();
 		List<Map<String, ?>> modListTemp = new ArrayList<>();
 		List<Map<String, ?>> addListTemp = new ArrayList<>();
-		List<Map<String, ?>> copyListTemp = new ArrayList<>();
-		List<Map<String, ?>> validYListTemp = new ArrayList<>();
-		List<Map<String, ?>> validNListTemp = new ArrayList<>();
 
 		if(delList != null){
 			for(Map<String, Object> loop : delList) {
@@ -364,7 +357,16 @@ public class TransModelController {
 			for(Map<String, Object> loop : modList) {
 				Map<String, Object> loopMapTemp = new HashMap<>();
 				for (Map.Entry<String, Object> entry : loop.entrySet()) {
-					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+					if(entry.getKey() == "old") {
+						Map<String,Object> tmpMap = new HashMap<>();
+						Map<String,Object> oldMap = (Map<String,Object>)entry.getValue();
+						for (Map.Entry<String, Object> item: loop.entrySet()) {
+							tmpMap.put(item.getKey().toUpperCase(), item.getValue());
+						}
+						loopMapTemp.put(entry.getKey(), tmpMap);
+					}else{
+						loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
+					}
 				}
 				modListTemp.add(loopMapTemp);
 			}
@@ -379,36 +381,6 @@ public class TransModelController {
 				addListTemp.add(loopMapTemp);
 			}
 			resultMap.put("add", addListTemp);
-		}
-		if(copyList != null){
-			for(Map<String, Object> loop : copyList) {
-				Map<String, Object> loopMapTemp = new HashMap<>();
-				for (Map.Entry<String, Object> entry : loop.entrySet()) {
-					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
-				}
-				copyListTemp.add(loopMapTemp);
-			}
-			resultMap.put("copy", copyListTemp);
-		}
-		if(validYList != null){
-			for(Map<String, Object> loop : validYList) {
-				Map<String, Object> loopMapTemp = new HashMap<>();
-				for (Map.Entry<String, Object> entry : loop.entrySet()) {
-					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
-				}
-				validYListTemp.add(loopMapTemp);
-			}
-			resultMap.put("valid-y", validYListTemp);
-		}
-		if(validNList != null){
-			for(Map<String, Object> loop : validNList) {
-				Map<String, Object> loopMapTemp = new HashMap<>();
-				for (Map.Entry<String, Object> entry : loop.entrySet()) {
-					loopMapTemp.put(entry.getKey().toUpperCase(), entry.getValue());
-				}
-				validNListTemp.add(loopMapTemp);
-			}
-			resultMap.put("valid-n", validNListTemp);
 		}
 		return resultMap;
 	}
