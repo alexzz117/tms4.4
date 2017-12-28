@@ -61,8 +61,8 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
-    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="880px">
-      <el-form :model="userDialogForm" :rules="rules" ref="userDialogForm" style=" max-height: 55vh;overflow-y: auto;" :inline="true">
+    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="900px">
+      <el-form :model="userDialogForm" :rules="rules" ref="userDialogForm" :inline="true">
         <el-form-item label="用户名" :label-width="formLabelWidth" prop="login_name" :style="formItemStyle">
           <el-input v-model="userDialogForm.login_name" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
