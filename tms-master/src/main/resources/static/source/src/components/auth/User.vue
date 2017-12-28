@@ -1,56 +1,65 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="80px" :model="userForm"
-             :inline="inline" style="text-align: left">
-      <el-form-item label="用户名" prop="login_name">
-        <el-input v-model="userForm.login_name"></el-input>
-      </el-form-item>
-      <el-form-item label="姓名" prop="real_name">
-        <el-input v-model="userForm.real_name"></el-input>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-select v-model="userForm.flag" placeholder="状态">
-          <el-option label="全部" value=""></el-option>
-          <el-option label="停用" value="1"></el-option>
-          <el-option label="正常" value="2"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="角色">
-        <el-select v-model="userForm.role" placeholder="角色">
-          <el-option label="全部" value=""></el-option>
-          <el-option
-            v-for="item in roles"
-            :key="item.role_id"
-            :label="item.role_name"
-            :value="item.role_id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-    </el-form>
-    <div style="margin-bottom: 10px;text-align: left ">
-      <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="delUser">删除</el-button>
-      <el-button plain class="el-icon-refresh" @click="resetPwd">密码重置</el-button>
-      <el-button plain class="el-icon-setting" @click="resetFlag">用户解锁</el-button>
-      <el-button class="el-icon-search" type="primary" @click="selUser">查询</el-button>
-    </div>
+    <el-row>
+      <el-col :span="24">
+        <div style="float: left ">
+          <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
+        </div>
+        <div style="float: right;">
+          <el-form label-position="right" label-width="80px" :model="userForm"
+                   :inline="inline" style="text-align: left">
+            <el-form-item label="用户名" prop="login_name">
+              <el-input v-model="userForm.login_name"></el-input>
+            </el-form-item>
+            <!--<el-form-item label="姓名" prop="real_name">
+              <el-input v-model="userForm.real_name"></el-input>
+            </el-form-item>-->
+            <el-form-item label="状态">
+              <el-select v-model="userForm.flag" placeholder="状态">
+                <el-option label="全部" value=""></el-option>
+                <el-option label="停用" value="1"></el-option>
+                <el-option label="正常" value="2"></el-option>
+              </el-select>
+            </el-form-item>
+            <!--<el-form-item label="角色">
+              <el-select v-model="userForm.role" placeholder="角色">
+                <el-option label="全部" value=""></el-option>
+                <el-option
+                  v-for="item in roles"
+                  :key="item.role_id"
+                  :label="item.role_name"
+                  :value="item.role_id">
+                </el-option>
+              </el-select>
+            </el-form-item>-->
+            <el-form-item>
+              <el-button class="el-icon-search" type="primary" @click="selUser">查询</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-col>
+    </el-row>
     <el-table
       :data="roleData"
-      stripe
-      border
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="35" align="left"></el-table-column>
-      <el-table-column prop="login_name" label="用户名" align="left" width="160"></el-table-column>
-      <el-table-column prop="real_name" label="姓名" align="left" width="100"></el-table-column>
-      <el-table-column prop="role_name" label="角色" align="left" width="120"></el-table-column>
-      <el-table-column prop="flag" label="状态" align="left" width="50"></el-table-column>
-      <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left" width="95"></el-table-column>
-      <el-table-column prop="lockout" label="锁定次数" align="left" width="75"></el-table-column>
-      <el-table-column prop="lockout_date" label="锁定时间" align="left" width="120"></el-table-column>
+      <el-table-column label="操作" width="120px">
+        <template slot-scope="scope">
+          <el-button type="text" icon="el-icon-edit" title="编辑" @click="openDialog('edit',scope.$index, scope.row)"></el-button>
+          <el-button type="text" icon="el-icon-delete"  title="删除" @click="delUser(scope.$index, scope.row)"></el-button>
+          <el-button type="text" icon="el-icon-refresh" title="重置密码" @click="resetPwd(scope.$index, scope.row)"></el-button>
+          <el-button type="text" icon="el-icon-circle-check-outline" title="解锁" @click="resetFlag(scope.$index, scope.row)"></el-button>
+        </template>
+      </el-table-column>
+      <el-table-column prop="login_name" label="用户名" align="left"></el-table-column>
+      <el-table-column prop="real_name" label="姓名" align="left"></el-table-column>
+      <el-table-column prop="role_name" label="角色" align="left"></el-table-column>
+      <el-table-column prop="flag" label="状态" align="left"></el-table-column>
+      <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left"></el-table-column>
+      <el-table-column prop="lockout" label="锁定次数" align="left"></el-table-column>
+      <el-table-column prop="lockout_date" label="锁定时间" align="left"></el-table-column>
       <el-table-column prop="email" label="电子邮件" align="left"></el-table-column>
-      <el-table-column prop="mobile" label="移动电话" align="left" width="160"></el-table-column>
+      <el-table-column prop="mobile" label="移动电话" align="left"></el-table-column>
     </el-table>
     <el-pagination style="margin-top: 10px; text-align: right;"
                    @size-change="handleSizeChange"
@@ -66,10 +75,6 @@
         <el-form-item label="用户名" :label-width="formLabelWidth" prop="login_name" :style="formItemStyle">
           <el-input v-model="userDialogForm.login_name" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;" :style="formItemStyle">
-          <el-radio v-model="userDialogForm.flag" label="1">正常</el-radio>
-          <el-radio v-model="userDialogForm.flag" label="2">停用</el-radio>
-        </el-form-item>
         <el-form-item label="姓名" :label-width="formLabelWidth" prop="real_name" :style="formItemStyle">
           <el-input v-model="userDialogForm.real_name" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
@@ -83,6 +88,10 @@
               :value="item.role_id">
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;" :style="formItemStyle">
+          <el-radio v-model="userDialogForm.flag" label="1">正常</el-radio>
+          <el-radio v-model="userDialogForm.flag" label="2">停用</el-radio>
         </el-form-item>
         <el-form-item label="证件类型" :label-width="formLabelWidth" prop="credentialtype" style="text-align: left;" :style="formItemStyle">
           <el-select v-model="userDialogForm.credentialtype" placeholder="证件类型" :style="formItemContentStyle">
@@ -211,19 +220,14 @@
         }
         ajax.post(option)
       },
-      openDialog (flag) {
+      openDialog (flag, index, row) {
         let self = this
         this.flag = flag
         if (flag === 'edit') {
           this.dialogTitle = '编辑用户'
-          var length = this.multipleSelection.length
-          if (length !== 1) {
-            this.$message('请选择一行用户信息。')
-            return
-          }
           var option = {
             url: '/operator/get',
-            param: {operatorId: this.multipleSelection[0].operator_id},
+            param: {operatorId: row.operator_id},
             success: function (data) {
               var info = data.row
               self.userDialogForm = {
@@ -295,14 +299,8 @@
         }
         ajax.post(option)
       },
-      delUser () {
+      delUser (index, row) {
         var self = this
-        var length = this.multipleSelection.length
-        if (length !== 1) {
-          this.$message('请选择一行用户信息。')
-          return
-        }
-        var data = this.multipleSelection[0]
         this.$confirm('确定删除', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -311,7 +309,7 @@
           var option = {
             url: '/operator/del',
             param: {
-              operatorId: data.operator_id
+              operatorId: row.operator_id
             },
             success: function (data) {
               self.$message('删除成功。')
@@ -326,16 +324,9 @@
           })
         })
       },
-      resetPwd () {
+      resetPwd (index, row) {
         var self = this
-        var length = this.multipleSelection.length
-        if (length !== 1) {
-          this.$message('请选择一行用户信息。')
-          return
-        }
         var pwd = crypt.md5('123456') // MD5加密
-
-        var data = this.multipleSelection[0]
         this.$confirm('确定重置密码吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -344,8 +335,8 @@
           var option = {
             url: '/operator/reset',
             param: {
-              operatorId: data.operator_id,
-              loginName: data.login_name,
+              operatorId: row.operator_id,
+              loginName: row.login_name,
               passWord: pwd
             },
             success: function (data) {
@@ -361,14 +352,8 @@
           })
         })
       },
-      resetFlag () {
+      resetFlag (index, row) {
         var self = this
-        var length = this.multipleSelection.length
-        if (length !== 1) {
-          this.$message('请选择一行用户信息。')
-          return
-        }
-        var data = this.multipleSelection[0]
         this.$confirm('确定要解锁吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -377,7 +362,7 @@
           var option = {
             url: '/operator/resetLoginFailedAttempts',
             param: {
-              operatorId: data.operator_id
+              operatorId: row.operator_id
             },
             success: function (data) {
               self.$message('用户解锁成功。')
