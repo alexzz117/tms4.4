@@ -1,7 +1,5 @@
 package cn.com.higinet.tms.consumer.demo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProducerRunner implements CommandLineRunner {
 
-	private static final Logger logger = LoggerFactory.getLogger( ProducerRunner.class );
+	//private static final Logger logger = LoggerFactory.getLogger( ProducerRunner.class );
 
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
