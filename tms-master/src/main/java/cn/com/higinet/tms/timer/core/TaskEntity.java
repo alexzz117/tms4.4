@@ -11,7 +11,6 @@ public class TaskEntity {
 	private String description;
 	private String status;
 	private String cron;
-	private Date createTime;
 	private Date previousFireTime;
 	private Date nextFireTime;
 
@@ -45,14 +44,6 @@ public class TaskEntity {
 
 	public void setClassName( String className ) {
 		this.className = className;
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime( Date createTime ) {
-		this.createTime = createTime;
 	}
 
 	public Date getPreviousFireTime() {

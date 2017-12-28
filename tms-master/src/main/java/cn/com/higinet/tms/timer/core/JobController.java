@@ -176,14 +176,12 @@ public class JobController {
 			String status = scheduler.getTriggerState( trigger.getKey() ).name();
 			String className = scheduler.getJobDetail( trigger.getJobKey() ).getJobClass().getName();
 			String cron = "";
-			Date createTime = null;
 			Date previousFireTime = null;
 			Date nextFireTime = null;
 
 			if( trigger instanceof CronTrigger ) {
 				CronTrigger cronTrigger = (CronTrigger) trigger;
 				cron = cronTrigger.getCronExpression();
-				createTime = cronTrigger.getStartTime();
 				previousFireTime = cronTrigger.getPreviousFireTime();
 				nextFireTime = cronTrigger.getNextFireTime();
 			}
@@ -196,7 +194,6 @@ public class JobController {
 			task.setDescription( description ); //任务说明
 			task.setCron( cron ); //执行表达式
 			task.setStatus( status ); //任务状态
-			task.setCreateTime( createTime ); //创建时间
 			task.setPreviousFireTime( previousFireTime ); //上一次执行时间
 			task.setNextFireTime( nextFireTime ); //下一次执行时间
 			taskList.add( task );
@@ -308,11 +305,17 @@ public class JobController {
 		return scheduler.checkExists( triggerKey );
 	}
 
+	/**
+	 * 取得Class实例
+	 * */
 	private Job getClass( String classname ) throws Exception {
 		Class<?> class1 = Class.forName( classname );
 		return (Job) class1.newInstance();
 	}
 
+	/**
+	 * 获取系统当前所有Trigger
+	 * */
 	public List<Trigger> getTriggerList() throws Exception {
 		List<Trigger> list = Lists.newArrayList();
 		for( String groupJob : scheduler.getJobGroupNames() ) {

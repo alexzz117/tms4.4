@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.consumer;
+package cn.com.higinet.tms.common;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;

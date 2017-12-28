@@ -26,11 +26,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>net.vidageek</groupId>
-			<artifactId>mirror</artifactId>
-			<version>1.6.1</version>
-		</dependency>
 		<!-- tms-base -->
 		<dependency>
 			<groupId>cn.com.higinet.tms</groupId>
