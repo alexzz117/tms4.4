@@ -201,7 +201,7 @@ public class TransModelController {
 	 * 保存交易模型
 	 */
 	@RequestMapping(value = "/saveModel", method = RequestMethod.POST)
-	public Model saveModel( @RequestBody Map<String, String> reqs ) {
+	public Model saveModel( @RequestBody Map<String, Object> reqs ) {
 
 		String json = MapUtil.getString( reqs, "postData" );
 		Map<String, List<Map<String, ?>>> formMap = null;
