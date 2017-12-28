@@ -258,16 +258,14 @@
           </el-switch>
 
         </el-form-item>
+        <div>
+          <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+            <el-button type="primary" @click="submitForm('dialogForm')" v-show="!viewDisabled" :disabled="dialogFormSureBtnDisabled" size="large">保 存</el-button>
+            <el-button @click="dialogVisible = false" v-show="!viewDisabled" size="large">取 消</el-button>
+          </el-form-item>
+        </div>
 
-        <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
-          <el-button type="primary" @click="submitForm('dialogForm')" v-show="!viewDisabled" :disabled="dialogFormSureBtnDisabled">保 存</el-button>
-          <el-button @click="dialogVisible = false" v-show="!viewDisabled">取 消</el-button>
-        </el-form-item>
       </el-form>
-      <!--<div slot="footer" class="dialog-footer">-->
-        <!--<el-button @click="dialogVisible = false" v-show="!viewDisabled">取 消</el-button>-->
-        <!--<el-button type="primary" @click="submitForm('dialogForm')" v-show="!viewDisabled" :disabled="dialogFormSureBtnDisabled">保 存</el-button>-->
-      <!--</div>-->
     </el-dialog>
 
     <StatCondPicker ref="StatCondDialog" @valueCallback="statCondInValueCallBack"

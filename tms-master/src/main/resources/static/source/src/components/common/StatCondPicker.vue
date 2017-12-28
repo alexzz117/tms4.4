@@ -116,11 +116,14 @@
         </el-form-item>
       </div>
 
-      <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
-        <el-button type="primary" @click="callback">确 定</el-button>
-        <el-button @click="reset">重 置</el-button>
-        <el-button @click="closeDialog">取 消</el-button>
-      </el-form-item>
+      <div>
+        <el-form-item  label=" " :label-width="formLabelWidth" >
+          <el-button type="primary" @click="callback" size="large">确 定</el-button>
+          <el-button @click="reset" size="large">重 置</el-button>
+          <el-button @click="closeDialog" size="large">取 消</el-button>
+        </el-form-item>
+      </div>
+
 
     </el-form>
 

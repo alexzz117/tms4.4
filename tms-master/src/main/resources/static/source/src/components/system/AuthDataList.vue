@@ -63,11 +63,12 @@
         <el-form-item label="授权说明:" :label-width="formLabelWidth" prop="auth_msg">
           <el-input type="textarea" v-model="dialogForm.auth_msg" :maxlength="2048"></el-input>
         </el-form-item>
-
-        <el-form-item label=" " :label-width="formLabelWidth">
-          <el-button type="primary" @click="submitForm('dialogForm')">保 存</el-button>
-          <el-button @click="dictDialogVisible = false">取 消</el-button>
-        </el-form-item>
+        <div>
+          <el-form-item label=" " :label-width="formLabelWidth">
+            <el-button type="primary" @click="submitForm('dialogForm')" size="large">保 存</el-button>
+            <el-button @click="dictDialogVisible = false" size="large">取 消</el-button>
+          </el-form-item>
+        </div>
       </el-form>
     </el-dialog>
   </div>

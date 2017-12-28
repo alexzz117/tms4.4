@@ -175,10 +175,13 @@
                   </el-form-item>
                 </div>
 
-                <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
-                  <el-button type="primary" @click="submitForm('dialogForm')" :disabled="dialogFormSureBtnDisabled">保 存</el-button>
-                  <el-button @click="dialogVisible = false">取 消</el-button>
-                </el-form-item>
+                <div>
+                  <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+                    <el-button type="primary" @click="submitForm('dialogForm')" :disabled="dialogFormSureBtnDisabled" size="large">保 存</el-button>
+                    <el-button @click="dialogVisible = false" size="large">取 消</el-button>
+                  </el-form-item>
+                </div>
+
 
               </el-form>
             </el-tab-pane>
@@ -247,10 +250,13 @@
                 </el-switch>
               </el-form-item>
 
-              <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
-                <el-button type="primary" @click="submitActionForm('actionDialogForm')" :disabled="actionFormSureBtnDisabled">保 存</el-button>
-                <el-button @click="actionDialogVisible = false">取 消</el-button>
-              </el-form-item>
+              <div>
+                <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+                  <el-button type="primary" @click="submitActionForm('actionDialogForm')" :disabled="actionFormSureBtnDisabled" size="large">保 存</el-button>
+                  <el-button @click="actionDialogVisible = false" size="large">取 消</el-button>
+                </el-form-item>
+              </div>
+
             </el-form>
             <StatCondPicker ref="acCondDialog" @valueCallback="acCondInValueCallBack"
                             :statCond="actionDialogForm.ac_cond" :statCondIn="actionDialogForm.ac_cond_in" :txnId="txnIdParent"

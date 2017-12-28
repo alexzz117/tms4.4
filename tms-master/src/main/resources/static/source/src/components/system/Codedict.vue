@@ -136,11 +136,13 @@
         <el-form-item label="描述信息:" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="dictDialogForm.info" :maxlength="200"></el-input>
         </el-form-item>
+        <div>
+          <el-form-item label=" " :label-width="formLabelWidth">
+            <el-button type="primary" @click="submitForm('dictDialogForm')" size="large">保 存</el-button>
+            <el-button @click="dictDialogVisible = false" size="large">取 消</el-button>
+          </el-form-item>
+        </div>
 
-        <el-form-item label=" " :label-width="formLabelWidth">
-          <el-button type="primary" @click="submitForm('dictDialogForm')">保 存</el-button>
-          <el-button @click="dictDialogVisible = false">取 消</el-button>
-        </el-form-item>
       </el-form>
     </el-dialog>
 
@@ -161,11 +163,13 @@
         <el-form-item label="描述信息:" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="dictInfoDialogForm.info"  :maxlength=200></el-input>
         </el-form-item>
+        <div>
+          <el-form-item label=" " :label-width="formLabelWidth">
+            <el-button type="primary" @click="infoSubmitForm('dictInfoDialogForm')" size="large">保 存</el-button>
+            <el-button @click="infoDialogVisible = false" size="large">取 消</el-button>
+          </el-form-item>
+        </div>
 
-        <el-form-item label=" " :label-width="formLabelWidth">
-          <el-button type="primary" @click="infoSubmitForm('dictInfoDialogForm')">保 存</el-button>
-          <el-button @click="infoDialogVisible = false">取 消</el-button>
-        </el-form-item>
       </el-form>
     </el-dialog>
   </div>

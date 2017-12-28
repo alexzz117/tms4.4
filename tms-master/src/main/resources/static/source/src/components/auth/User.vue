@@ -61,20 +61,20 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
-    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible">
-      <el-form :model="userDialogForm" :rules="rules" ref="userDialogForm" style=" max-height: 55vh;overflow-y: auto;">
-        <el-form-item label="用户名" :label-width="formLabelWidth" prop="login_name">
-          <el-input v-model="userDialogForm.login_name" auto-complete="off"></el-input>
+    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="880px">
+      <el-form :model="userDialogForm" :rules="rules" ref="userDialogForm" style=" max-height: 55vh;overflow-y: auto;" :inline="true">
+        <el-form-item label="用户名" :label-width="formLabelWidth" prop="login_name" :style="formItemStyle">
+          <el-input v-model="userDialogForm.login_name" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;">
+        <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;" :style="formItemStyle">
           <el-radio v-model="userDialogForm.flag" label="1">正常</el-radio>
           <el-radio v-model="userDialogForm.flag" label="2">停用</el-radio>
         </el-form-item>
-        <el-form-item label="姓名" :label-width="formLabelWidth" prop="real_name">
-          <el-input v-model="userDialogForm.real_name" auto-complete="off"></el-input>
+        <el-form-item label="姓名" :label-width="formLabelWidth" prop="real_name" :style="formItemStyle">
+          <el-input v-model="userDialogForm.real_name" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="角色" :label-width="formLabelWidth" prop="role" style="text-align: left;">
-          <el-select v-model="userDialogForm.role" placeholder="角色">
+        <el-form-item label="角色" :label-width="formLabelWidth" prop="role" style="text-align: left;" :style="formItemStyle">
+          <el-select v-model="userDialogForm.role" placeholder="角色" :style="formItemContentStyle">
             <el-option label="全部" value="0"></el-option>
             <el-option
               v-for="item in roles"
@@ -84,8 +84,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="证件类型" :label-width="formLabelWidth" prop="credentialtype" style="text-align: left;">
-          <el-select v-model="userDialogForm.credentialtype" placeholder="证件类型">
+        <el-form-item label="证件类型" :label-width="formLabelWidth" prop="credentialtype" style="text-align: left;" :style="formItemStyle">
+          <el-select v-model="userDialogForm.credentialtype" placeholder="证件类型" :style="formItemContentStyle">
             <el-option label="" value=""></el-option>
             <el-option label="身份证" value="0"></el-option>
             <el-option label="临时居民身份证" value="2"></el-option>
@@ -101,35 +101,39 @@
             <el-option label="边民出入境通行证" value="13"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="证件号码" :label-width="formLabelWidth" prop="credentialnum">
-          <el-input v-model="userDialogForm.credentialnum" auto-complete="off"></el-input>
+        <el-form-item label="证件号码" :label-width="formLabelWidth" prop="credentialnum" :style="formItemStyle">
+          <el-input v-model="userDialogForm.credentialnum" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="固定电话" :label-width="formLabelWidth" prop="phone">
-          <el-input v-model="userDialogForm.phone" auto-complete="off"></el-input>
+        <el-form-item label="固定电话" :label-width="formLabelWidth" prop="phone" :style="formItemStyle">
+          <el-input v-model="userDialogForm.phone" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="移动电话" :label-width="formLabelWidth" prop="mobile">
-          <el-input v-model="userDialogForm.mobile" auto-complete="off"></el-input>
+        <el-form-item label="移动电话" :label-width="formLabelWidth" prop="mobile" :style="formItemStyle">
+          <el-input v-model="userDialogForm.mobile" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="电子邮件" :label-width="formLabelWidth" prop="email">
-          <el-input v-model="userDialogForm.email" auto-complete="off"></el-input>
+        <el-form-item label="电子邮件" :label-width="formLabelWidth" prop="email" :style="formItemStyle">
+          <el-input v-model="userDialogForm.email" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="通讯地址" :label-width="formLabelWidth" prop="address">
-          <el-input v-model="userDialogForm.address" auto-complete="off"></el-input>
+        <el-form-item label="通讯地址" :label-width="formLabelWidth" prop="address" :style="formItemStyle">
+          <el-input v-model="userDialogForm.address" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="备注信息" :label-width="formLabelWidth" prop="memo">
-          <el-input type="textarea" v-model="userDialogForm.memo"></el-input>
+        <el-form-item label="备注信息" :label-width="formLabelWidth" prop="memo" :style="formItemStyle">
+          <el-input type="textarea" v-model="userDialogForm.memo" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="密码1" :label-width="formLabelWidth" prop="repwd" style="display: none">
-          <el-input v-model="userDialogForm.repwd" auto-complete="off"></el-input>
+        <el-form-item label="密码1" :label-width="formLabelWidth" prop="repwd" style="display: none" :style="formItemStyle">
+          <el-input v-model="userDialogForm.repwd" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
-        <el-form-item label="密码2" :label-width="formLabelWidth" prop="password" style="display: none">
-          <el-input v-model="userDialogForm.password" auto-complete="off"></el-input>
+        <el-form-item label="密码2" :label-width="formLabelWidth" prop="password" style="display: none" :style="formItemStyle">
+          <el-input v-model="userDialogForm.password" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
+
+        <div>
+          <el-form-item label=" " :label-width="formLabelWidth" :style="formItemStyle">
+            <el-button type="primary" @click="submitForm('userDialogForm')" size="large">保 存</el-button>
+            <el-button @click="roleDialogVisible = false" size="large">取 消</el-button>
+          </el-form-item>
+        </div>
+
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="roleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('userDialogForm')">保 存</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -477,6 +481,12 @@
       }
 
       return {
+        formItemStyle: {
+          width: '400px'
+        },
+        formItemContentStyle: {
+          width: '250px'
+        },
         inline: true,
         roles: [],
         userForm: {
