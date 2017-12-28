@@ -254,7 +254,7 @@
       update () {
         var self = this;
         ajax.post({
-          url: '/timer/reschedule',
+          url: '/timer/update',
           model: ajax.model.timer,
           param: this.timerForm,
           success: function (data) {
