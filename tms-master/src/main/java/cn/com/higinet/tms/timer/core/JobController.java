@@ -46,6 +46,112 @@ public class JobController {
 	@Qualifier("Scheduler")
 	private Scheduler scheduler;
 
+	/**
+	 * 新增任务
+	 * */
+	@PostMapping("/add")
+	public Model add( @RequestBody TaskEntity task ) throws Exception {
+		Model model = new Model();
+		String name = task.getName();
+		String taskId = Stringz.isNotEmpty( task.getTaskId() ) ? task.getTaskId() : Stringz.randomUUID();
+		String className = task.getClassName();
+		String group = task.getGroup();
+		String cron = task.getCron();
+		String description = task.getDescription();
+
+		if( Stringz.isEmpty( name ) ) model.addError( "name为空" );
+		if( Stringz.isEmpty( className ) ) model.addError( "className为空" );
+		if( Stringz.isEmpty( cron ) ) model.addError( "cron为空" );
+		if( Stringz.isEmpty( CronExpression.isValidExpression( cron ) ) ) model.addError( "cron表达式错误" );
+		if( checkExists( taskId ) ) model.addError( "任务已存在" );
+		if( model.hasError() ) return model;
+
+		// 启动调度器  
+		if( !scheduler.isStarted() ) scheduler.start();
+
+		//构建job信息
+		JobBuilder jobBuilder = JobBuilder.newJob( getClass( className ).getClass() );
+		jobBuilder = jobBuilder.withIdentity( taskId );
+		JobDetail jobDetail = jobBuilder.build();
+
+		//表达式调度构建器(即任务执行的时间)
+		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule( cron );
+
+		//taskName与简介信息以JSON形式存放在trigger Description中
+		JSONObject json = new JSONObject();
+		json.put( "name", name );
+		json.put( "description", description );
+		json.put( "group", group );
+
+		//按新的cronExpression表达式构建一个新的trigger
+		TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+		triggerBuilder = triggerBuilder.withIdentity( taskId );
+		triggerBuilder = triggerBuilder.withDescription( json.toString() );
+		CronTrigger trigger = triggerBuilder.withSchedule( scheduleBuilder ).build();
+
+		//创建任务
+		Date result = scheduler.scheduleJob( jobDetail, trigger );
+		return model.setRow( result );
+	}
+
+	/**
+	 * 修改任务
+	 * */
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public Model update( @RequestBody TaskEntity task ) throws Exception {
+		Model model = new Model();
+		String name = task.getName();
+		String taskId = task.getTaskId();
+		String group = task.getGroup();
+		String cron = task.getCron();
+		String className = task.getClassName();
+		String description = task.getDescription();
+		if( Stringz.isEmpty( name, taskId, cron, className ) ) model.addError( "param is empty" );
+		if( Stringz.isEmpty( CronExpression.isValidExpression( cron ) ) ) model.addError( "cron表达式错误" );
+		if( scheduler.checkExists( TriggerKey.triggerKey( taskId ) ) ) model.addError( "任务不存在" );
+		if( model.hasError() ) return model;
+
+		JSONObject descJson = new JSONObject();
+		descJson.put( "name", name );
+		descJson.put( "description", description );
+		descJson.put( "group", group );
+
+		TriggerKey triggerKey = TriggerKey.triggerKey( taskId );
+		// 表达式调度构建器
+		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule( cron );
+		CronTrigger trigger = (CronTrigger) scheduler.getTrigger( triggerKey );
+		//获得当前定时任务的执行className
+		String oldClassName = scheduler.getJobDetail( trigger.getJobKey() ).getJobClass().getName();
+
+		//假如class没有变动，那只做trigger重新设定
+		if( className.equals( oldClassName ) ) {
+			//按新的cronExpression表达式重新构建trigger
+			trigger = trigger.getTriggerBuilder().withIdentity( triggerKey ).withDescription( descJson.toString() ).withSchedule( scheduleBuilder ).build();
+			//按新的trigger重新设置job执行
+			scheduler.rescheduleJob( triggerKey, trigger );
+		}
+		//否则删除任务，重新添加
+		else {
+			scheduler.pauseTrigger( triggerKey ); //停止任务
+			scheduler.unscheduleJob( triggerKey ); //停用任务
+			scheduler.deleteJob( JobKey.jobKey( taskId ) ); //删除任务
+
+			//构建新Job信息
+			JobBuilder jobBuilder = JobBuilder.newJob( getClass( className ).getClass() );
+			jobBuilder = jobBuilder.withIdentity( taskId );
+			JobDetail jobDetail = jobBuilder.build();
+			//构建一个新的trigger
+			TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+			triggerBuilder = triggerBuilder.withIdentity( taskId );
+			triggerBuilder = triggerBuilder.withDescription( descJson.toString() );
+			CronTrigger newTrigger = triggerBuilder.withSchedule( scheduleBuilder ).build();
+			//创建任务
+			scheduler.scheduleJob( jobDetail, newTrigger );
+		}
+
+		return model;
+	}
+
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public Model list() throws Exception {
 		List<TaskEntity> taskList = Lists.newArrayList();
@@ -137,54 +243,6 @@ public class JobController {
 	}
 
 	/**
-	 * 新增任务
-	 * */
-	@PostMapping("/add")
-	public Model add( @RequestBody TaskEntity task ) throws Exception {
-		Model model = new Model();
-		String name = task.getName();
-		String taskId = Stringz.isNotEmpty( task.getTaskId() ) ? task.getTaskId() : Stringz.randomUUID();
-		String className = task.getClassName();
-		String group = task.getGroup();
-		String cron = task.getCron();
-		String description = task.getDescription();
-
-		if( Stringz.isEmpty( name ) ) model.addError( "name为空" );
-		if( Stringz.isEmpty( className ) ) model.addError( "className为空" );
-		if( Stringz.isEmpty( cron ) ) model.addError( "cron为空" );
-		if( Stringz.isEmpty( CronExpression.isValidExpression( cron ) ) ) model.addError( "cron表达式错误" );
-		if( checkExists( taskId ) ) model.addError( "任务已存在" );
-		if( model.hasError() ) return model;
-
-		// 启动调度器  
-		if( !scheduler.isStarted() ) scheduler.start();
-
-		//构建job信息
-		JobBuilder jobBuilder = JobBuilder.newJob( getClass( className ).getClass() );
-		jobBuilder = jobBuilder.withIdentity( taskId );
-		JobDetail jobDetail = jobBuilder.build();
-
-		//表达式调度构建器(即任务执行的时间)
-		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule( cron );
-
-		//taskName与简介信息以JSON形式存放在trigger Description中
-		JSONObject json = new JSONObject();
-		json.put( "name", name );
-		json.put( "description", description );
-		json.put( "group", group );
-
-		//按新的cronExpression表达式构建一个新的trigger
-		TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
-		triggerBuilder = triggerBuilder.withIdentity( taskId );
-		triggerBuilder = triggerBuilder.withDescription( json.toString() );
-		CronTrigger trigger = triggerBuilder.withSchedule( scheduleBuilder ).build();
-
-		//创建任务
-		Date result = scheduler.scheduleJob( jobDetail, trigger );
-		return model.setRow( result );
-	}
-
-	/**
 	 * 暂停任务
 	 * */
 	@RequestMapping(value = "/pause", method = RequestMethod.POST)
@@ -204,35 +262,6 @@ public class JobController {
 		String taskId = task.getTaskId();
 		if( Stringz.isEmpty( taskId ) ) new Model().addError( "param is empty" );
 		scheduler.resumeJob( JobKey.jobKey( taskId ) );
-		return new Model();
-	}
-
-	/**
-	 * 修改任务
-	 * */
-	@RequestMapping(value = "/reschedule", method = RequestMethod.POST)
-	public Model reschedule( @RequestBody TaskEntity task ) throws Exception {
-		String name = task.getName();
-		String taskId = task.getTaskId();
-		String group = task.getGroup();
-		String cron = task.getCron();
-		String description = task.getDescription();
-		if( Stringz.isEmpty( name, taskId, cron ) ) throw new Exception( "param is empty" );
-
-		JSONObject descJson = new JSONObject();
-		descJson.put( "name", name );
-		descJson.put( "description", description );
-		descJson.put( "group", group );
-
-		TriggerKey triggerKey = TriggerKey.triggerKey( taskId );
-		// 表达式调度构建器
-		CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule( cron );
-		CronTrigger trigger = (CronTrigger) scheduler.getTrigger( triggerKey );
-
-		// 按新的cronExpression表达式重新构建trigger
-		trigger = trigger.getTriggerBuilder().withIdentity( triggerKey ).withDescription( descJson.toString() ).withSchedule( scheduleBuilder ).build();
-		// 按新的trigger重新设置job执行
-		scheduler.rescheduleJob( triggerKey, trigger );
 		return new Model();
 	}
 
