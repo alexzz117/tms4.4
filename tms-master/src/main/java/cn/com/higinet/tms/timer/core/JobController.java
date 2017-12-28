@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
@@ -67,6 +68,7 @@ public class JobController {
 			String group = json.getString( "group" );
 			String description = json.getString( "description" );
 			String status = scheduler.getTriggerState( trigger.getKey() ).name();
+			String className = scheduler.getJobDetail( trigger.getJobKey() ).getJobClass().getName();
 			String cron = "";
 			Date createTime = null;
 			Date previousFireTime = null;
@@ -84,6 +86,7 @@ public class JobController {
 			task.setName( name ); //执行名称
 			task.setTaskId( taskId ); //任务名称
 			task.setGroup( group ); //任务分组名
+			task.setClassName( className ); //任务Class名
 			task.setDescription( description ); //任务说明
 			task.setCron( cron ); //执行表达式
 			task.setStatus( status ); //任务状态
@@ -106,7 +109,7 @@ public class JobController {
 				String description = trigger.getDescription();
 				if( Stringz.isEmpty( description ) ) continue;
 				JSONObject json = JSON.parseObject( description );
-				if( task.equals( json.getString( "name" ) ) ) {
+				if( task.getName().equals( json.getString( "name" ) ) ) {
 					return new Model().setRow( false );
 				}
 			}
@@ -115,6 +118,12 @@ public class JobController {
 			}
 		}
 		return new Model().setRow( true );
+	}
+
+	@RequestMapping(value = "/check-cron", method = RequestMethod.POST)
+	public Model checkCron( @RequestBody TaskEntity task ) throws Exception {
+		if( Stringz.isEmpty( task.getCron() ) ) return new Model().addError( "cron为空" );
+		return new Model().setRow( CronExpression.isValidExpression( task.getCron() ) );
 	}
 
 	@RequestMapping(value = "/groups", method = RequestMethod.GET)
@@ -132,17 +141,20 @@ public class JobController {
 	 * */
 	@PostMapping("/add")
 	public Model add( @RequestBody TaskEntity task ) throws Exception {
+		Model model = new Model();
 		String name = task.getName();
 		String taskId = Stringz.isNotEmpty( task.getTaskId() ) ? task.getTaskId() : Stringz.randomUUID();
 		String className = task.getClassName();
 		String group = task.getGroup();
 		String cron = task.getCron();
 		String description = task.getDescription();
-		if( Stringz.isEmpty( name, className, cron ) ) return new Model().addError( "param is empty" );
 
-		if( checkExists( taskId ) ) {
-			return new Model().addError( "任务已存在" );
-		}
+		if( Stringz.isEmpty( name ) ) model.addError( "name为空" );
+		if( Stringz.isEmpty( className ) ) model.addError( "className为空" );
+		if( Stringz.isEmpty( cron ) ) model.addError( "cron为空" );
+		if( Stringz.isEmpty( CronExpression.isValidExpression( cron ) ) ) model.addError( "cron表达式错误" );
+		if( checkExists( taskId ) ) model.addError( "任务已存在" );
+		if( model.hasError() ) return model;
 
 		// 启动调度器  
 		if( !scheduler.isStarted() ) scheduler.start();
@@ -169,7 +181,7 @@ public class JobController {
 
 		//创建任务
 		Date result = scheduler.scheduleJob( jobDetail, trigger );
-		return new Model().setRow( result );
+		return model.setRow( result );
 	}
 
 	/**
