@@ -5,10 +5,10 @@
       <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
                :inline="true" style="text-align: left" v-show="queryFormShow" >
         <el-form-item label="统计名称:" prop="stat_name">
-          <el-input v-model="queryShowForm.stat_name" class="query-form-item" auto-complete="off"></el-input>
+          <el-input v-model="queryShowForm.stat_name" class="stat-query-form-item" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="统计描述:" prop="stat_desc">
-          <el-input v-model="queryShowForm.stat_desc" class="query-form-item" auto-complete="off"></el-input>
+          <el-input v-model="queryShowForm.stat_desc" class="stat-query-form-item" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="统计引用对象:" prop="stat_param">
 
@@ -17,7 +17,7 @@
         </el-form-item>
         <el-form-item label="统计目标:" prop="stat_datafd">
 
-          <el-select v-model="queryShowForm.stat_datafd" class="query-form-item" placeholder="请选择"
+          <el-select v-model="queryShowForm.stat_datafd" class="stat-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
               v-for="item in statDataFdList"
@@ -30,7 +30,7 @@
 
         </el-form-item>
         <el-form-item label="统计函数:" prop="stat_fn">
-          <el-select v-model="queryShowForm.stat_fn" class="query-form-item" placeholder="请选择"
+          <el-select v-model="queryShowForm.stat_fn" class="stat-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
               v-for="item in statFnList"
@@ -42,7 +42,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="有效性:" prop="stat_valid">
-          <el-select v-model="queryShowForm.stat_valid" class="query-form-item" placeholder="请选择"
+          <el-select v-model="queryShowForm.stat_valid" class="stat-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
               v-for="item in statValidList"
@@ -58,7 +58,7 @@
     </transition>
 
     <div style="margin-bottom: 10px;text-align: left ">
-      <el-button class="el-icon-view" type="primary" @click="queryFormShow = !queryFormShow">查询</el-button>
+
       <!--<el-button plain class="el-icon-view" :disabled="notSelectOne" @click="openDialog('view')">查看</el-button>-->
       <el-button plain class="el-icon-plus" :disabled="isExpand" @click="openDialog('add')">新建</el-button>
       <!--<el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand" @click="openDialog('edit')">编辑</el-button>-->
@@ -66,6 +66,10 @@
       <!--<el-button plain class="el-icon-circle-check" :disabled="notSelectOne || isExpand">启用</el-button>-->
       <!--<el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>-->
       <!--<el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>-->
+      <div class="stat-query-box">
+        <el-input v-model="queryShowForm.stat_desc" placeholder="统计描述" class="stat-query-form-item" auto-complete="off"></el-input>
+        <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+      </div>
     </div>
 
     <div class="stat-expand-table-box">
@@ -1367,8 +1371,11 @@
 </script>
 
 <style>
-  .query-form-item{
+  .stat-query-form-item{
     width: 200px;
+  }
+  .stat-query-box{
+    float: right
   }
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s

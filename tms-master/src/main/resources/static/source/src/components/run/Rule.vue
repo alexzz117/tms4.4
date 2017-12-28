@@ -4,11 +4,11 @@
           <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
                    :inline="true" style="text-align: left" v-show="queryFormShow" >
             <el-form-item label="规则名称:" prop="stat_name">
-              <el-input v-model="queryShowForm.rule_shortdesc" class="query-form-item" auto-complete="off"></el-input>
+              <el-input v-model="queryShowForm.rule_shortdesc" class="rule-query-form-item" auto-complete="off"></el-input>
             </el-form-item>
 
             <el-form-item label="评估类型:" prop="eval_type">
-              <el-select v-model="queryShowForm.eval_type" class="query-form-item" placeholder="请选择"
+              <el-select v-model="queryShowForm.eval_type" class="rule-query-form-item" placeholder="请选择"
                          clearable>
                 <el-option
                   v-for="item in evalTypeList"
@@ -21,7 +21,7 @@
 
             </el-form-item>
             <el-form-item label="处置方式:" prop="disposal">
-              <el-select v-model="queryShowForm.disposal" class="query-form-item" placeholder="请选择"
+              <el-select v-model="queryShowForm.disposal" class="rule-query-form-item" placeholder="请选择"
                          clearable>
                 <el-option
                   v-for="item in disposalList"
@@ -33,7 +33,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="有效性:" prop="rule_enable">
-              <el-select v-model="queryShowForm.rule_enable" class="query-form-item" placeholder="请选择"
+              <el-select v-model="queryShowForm.rule_enable" class="rule-query-form-item" placeholder="请选择"
                          clearable>
                 <el-option
                   v-for="item in ruleEnableList"
@@ -49,8 +49,12 @@
         </transition>
 
         <div style="margin-bottom: 10px;text-align: left ">
-          <el-button class="el-icon-view" type="primary" @click="queryFormShow = !queryFormShow">查询</el-button>
+
           <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
+          <div style="float:right">
+            <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off"></el-input>
+            <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+          </div>
         </div>
         <el-table
           ref="dataTable"
@@ -1057,5 +1061,7 @@
 </script>
 
 <style>
-
+  .rule-query-form-item{
+    width: 200px;
+  }
 </style>
