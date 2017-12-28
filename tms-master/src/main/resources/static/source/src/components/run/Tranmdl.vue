@@ -111,7 +111,7 @@
           <el-input v-model="tmForm.params2" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitTmForm">立即创建</el-button>
+          <el-button type="primary" @click="submitTmForm">保存</el-button>
           <el-button @click="tmDialogVisible = false">取消</el-button>
         </el-form-item>
       </el-form>
@@ -407,7 +407,7 @@
                 let params1 = Number(self.tmForm.params1)
                 let params2 = Number(value)
                 if (params2 < params1) {
-                  return  callback(new Error('处理函数参数2必须大于参数1')) // 后面的值小于等于前面的值
+                  return callback(new Error('处理函数参数2必须大于参数1')) // 后面的值小于等于前面的值
                 }
               }
             } else if (dt.recap === 'string') {
@@ -747,13 +747,23 @@
           src_default: row.src_default,
           genesisrul: genesisrul
         }
+        let timer = window.setInterval(function () {
+          if (self.tmForm.params1 === params1 && self.tmForm.params2 === params2) {
+            window.clearInterval(timer)
+          } else {
+            if (self.tmForm.params1 !== params1) {
+              self.tmForm.params1 = params1
+            } else {
+              self.tmForm.params2 = params2
+            }
+          }
+        }, 100)
         self.selectTmRows = [row]
       },
       submitTmForm () {
         let self = this
         this.$refs['tmForm'].validate((valid) => {
           if (valid) {
-            // self.tmDialogVisible = false
             let op = self.op
             let rowData = self.selectTmRows[0]
             let formData = self.tmForm
@@ -792,7 +802,6 @@
             row.genesisrul = genesisrul + ')'
             let jsonData = {}
             jsonData[op] = [row]
-            console.info(jsonData)
             ajax.post({
               url: '/tranmdl/saveModel',
               param: {
@@ -800,7 +809,8 @@
               },
               success: function (data) {
                 self.$message('操作成功。')
-                // self.selUser()
+                self.initForm()
+                self.tmDialogVisible = false
               }
             })
           } else {
@@ -811,7 +821,6 @@
       },
       tmDelFunc (index, row) { // 删除交易模型定义事件处理
         let self = this
-        console.info('删除交易模型')
         this.$confirm('确定删除？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -825,7 +834,8 @@
             },
             success: function (data) {
               self.$message('删除成功。')
-              // self.selUser()
+              self.initForm()
+              self.tmDialogVisible = false
             }
           })
         }).catch(() => {
