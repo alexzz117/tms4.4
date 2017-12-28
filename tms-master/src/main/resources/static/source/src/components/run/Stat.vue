@@ -913,8 +913,6 @@
         })
       },
       statCondInValueCallBack (value) {
-        console.log('statCondInValueCallBack')
-        console.log(value)
         this.dialogForm.stat_cond = value.stat_cond_value
         this.dialogForm.stat_cond_in = value.stat_cond_in
       },

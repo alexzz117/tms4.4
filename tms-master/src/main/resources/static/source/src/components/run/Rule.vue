@@ -193,10 +193,9 @@
                   width="150">
                   <template slot-scope="scope">
 
-                    <el-button type="text" size="small" icon="el-icon-edit" title="编辑"  @click="openDialog('edit', scope.row)"></el-button>
-                    <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copy(scope.row)"></el-button>
-                    <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)"></el-button>
-                    <el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>
+                    <el-button type="text" size="small" icon="el-icon-edit" title="编辑"  @click="openActionDialog('edit', scope.row)"></el-button>
+                    <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copyAction(scope.row)"></el-button>
+                    <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delActionData(scope.row)"></el-button>
 
                   </template>
                 </el-table-column>
@@ -210,7 +209,7 @@
                       :active-value=1
                       :inactive-value=0
                       :disabled="acEnableBtnDisabled"
-                      @change="ruleEnableChange(scope.row)">
+                      @change="acEnableChange(scope.row)">
                     </el-switch>
                   </template>
                 </el-table-column>
@@ -219,9 +218,9 @@
           </el-tabs>
 
           <el-dialog :title="actionDialogTitle" :visible.sync="actionDialogVisible" width="450px" :modal="false">
-            <el-form :model="actionDialogForm" ref="actionDialogForm" style="text-align: left" :inline="true">
+            <el-form :model="actionDialogForm" ref="actionDialogForm" style="text-align: left" :rules="actionRules" :inline="true">
               <el-form-item label="动作名称:" :label-width="formLabelWidth" prop="ac_desc" :style="formItemStyle">
-                <el-input v-model="actionDialogForm.ac_desc" auto-complete="off" :style="formItemContentStyle"></el-input>
+                <el-input v-model="actionDialogForm.ac_desc" auto-complete="off" :style="formItemContentStyle" :maxlength="128"></el-input>
               </el-form-item>
               <el-form-item label="动作条件:" :label-width="formLabelWidth" prop="ac_cond_in" :style="formItemStyle">
                 <div @dblclick="acCondInPopup">
@@ -229,9 +228,11 @@
                   <el-input v-model="actionDialogForm.ac_cond_in" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
                 </div>
               </el-form-item>
-              <el-form-item label="处理函数:" :label-width="formLabelWidth" prop="ac_expr_in" :style="formItemStyle">
+              <el-form-item class="is-required" label="处理函数:" :label-width="formLabelWidth" prop="ac_expr_in" :style="formItemStyle">
+                <div @dblclick="acExprInPopup">
                 <el-input v-show="false" v-model="actionDialogForm.ac_expr" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
                 <el-input v-model="actionDialogForm.ac_expr_in" auto-complete="off" :style="formItemContentStyle" readonly></el-input>
+                </div>
               </el-form-item>
               <el-form-item label="有效性:" :label-width="formLabelWidth" prop="ac_enable" :style="formItemStyle">
                 <el-switch
@@ -242,16 +243,23 @@
                 </el-switch>
               </el-form-item>
 
+              <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+                <el-button type="primary" @click="submitActionForm('actionDialogForm')" :disabled="actionFormSureBtnDisabled">保 存</el-button>
+                <el-button @click="actionDialogVisible = false">取 消</el-button>
+              </el-form-item>
             </el-form>
             <StatCondPicker ref="acCondDialog" @valueCallback="acCondInValueCallBack"
                             :statCond="actionDialogForm.ac_cond" :statCondIn="actionDialogForm.ac_cond_in" :txnId="txnIdParent"
+                            :hideItems="['rule_func', 'ac_func']" >
+
+            </StatCondPicker>
+
+            <StatCondPicker ref="acExprDialog" @valueCallback="acExprValueCallBack"
+                            :statCond="actionDialogForm.ac_expr" :statCondIn="actionDialogForm.ac_expr_in" :txnId="txnIdParent"
                             :hideItems="['rule_func']" >
 
             </StatCondPicker>
           </el-dialog>
-
-
-
 
         </el-dialog>
 
@@ -380,7 +388,25 @@
         acEnableBtnDisabled: false,
         selectedRule: {},
         actionDialogVisible: false,
-        actionDialogTitle: ''
+        actionDialogTitle: '',
+        actionFormSureBtnDisabled: false,
+        actionDialogType: '',
+        actionRules: {
+          ac_desc: [
+            { required: true, message: '请输入动作名称', trigger: 'blur' },
+            { max: 128, message: '长度在128个字符以内', trigger: 'blur' },
+            { validator: check.checkFormZhSpecialCharacter, trigger: 'blur' }
+          ],
+          ac_cond_in: [
+            { validator: this.checkAcCond, trigger: 'blur' }
+          ],
+          ac_expr_in: [
+            { validator: this.checkAcRxpr, trigger: 'blur' }
+          ],
+          ac_enable: [
+            { required: true, message: '请输入有效性', trigger: 'change' }
+          ]
+        }
       }
     },
     computed: {
@@ -505,7 +531,8 @@
           ac_cond_in: '',
           ac_cond: '',
           ac_expr_in: '',
-          ac_expr: ''
+          ac_expr: '',
+          ac_enable: '0'
         }
       },
       getData () {
@@ -618,6 +645,53 @@
           })
         })
       },
+      copyAction (row) {
+        this.$confirm('确定复制?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let jsonData = {}
+          let rowTemp = {}
+          Object.assign(rowTemp, row)
+          rowTemp.ac_desc = row.ac_desc + '_复制'
+          if (rowTemp.ac_desc.length > 128) {
+            this.$message({
+              type: 'error',
+              message: '动作复制后动作名称超过128个字符，复制失败！'
+            })
+            return
+          }
+          rowTemp.rule_txn = this.txnIdParent
+          rowTemp.rule_shortdesc = this.selectedRule.rule_shortdesc
+          jsonData.copy = [rowTemp]
+          let finalJsonData = {}
+          finalJsonData.postData = jsonData
+          finalJsonData.txnId = this.txnIdParent
+          let self = this
+
+          ajax.post({
+            url: '/action/save',
+            param: finalJsonData,
+            success: function (data) {
+              self.getActionData()
+              self.$message.success('复制成功')
+            },
+            error: function (data) {
+              if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+                self.$message.error(data.error.join('|'))
+              } else {
+                self.$message.error(data.error)
+              }
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消复制'
+          })
+        })
+      },
       delData (row) {
         this.$confirm('确定删除?', '提示', {
           confirmButtonText: '确定',
@@ -646,6 +720,38 @@
           })
         })
       },
+      delActionData (row) {
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let jsonData = {}
+          let delObj = {}
+          Object.assign(delObj, row)
+          delObj.rule_txn = this.txnIdParent
+          delObj.rule_shortdesc = this.selectedRule.rule_shortdesc
+          jsonData.del = [delObj]
+          let finalJsonData = {}
+          finalJsonData.postData = jsonData
+          finalJsonData.txnId = this.txnIdParent
+          let self = this
+
+          ajax.post({
+            url: '/action/save',
+            param: finalJsonData,
+            success: function (data) {
+              self.getActionData()
+              self.$message.success('删除成功')
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      },
       openRefsDialog (row) {
         let self = this
         ajax.post({
@@ -662,23 +768,22 @@
       ruleEnableChange (row) {
         let jsonData = {}
         this.ruleEnableBtnDisabled = true
-        jsonData['valid-y'] = [row]
+        let message = '编辑成功'
+        if (row.rule_enable === 1) {
+          message = '已启用'
+          jsonData['valid-y'] = [row]
+        } else {
+          message = '已停用'
+          jsonData['valid-n'] = [row]
+        }
         let finalJsonData = {}
         finalJsonData.postData = jsonData
         finalJsonData.txnId = this.txnIdParent
         let self = this
-        let message = '编辑成功'
-        if (row.stat_valid === 1) {
-          message = '已启用'
-        } else {
-          message = '已停用'
-        }
-
         ajax.post({
           url: '/rule/save',
           param: finalJsonData,
           success: function (data) {
-            // self.getData()
             self.ruleEnableBtnDisabled = false
             self.$message.success(message)
           },
@@ -689,9 +794,53 @@
               self.$message.error(data.error)
             }
             self.ruleEnableBtnDisabled = false
+            self.getData()
           },
           fail: function () {
             self.ruleEnableBtnDisabled = false
+          }
+        })
+      },
+      acEnableChange (row) {
+        let jsonData = {}
+        this.acEnableBtnDisabled = true
+        let dataObj = {}
+        Object.assign(dataObj, row)
+        dataObj.rule_txn = this.txnIdParent
+        dataObj.rule_shortdesc = this.selectedRule.rule_shortdesc
+        let message = '编辑成功'
+        if (row.ac_enable === 1) {
+          message = '已启用'
+          jsonData['valid-y'] = [dataObj]
+        } else {
+          message = '已停用'
+          jsonData['valid-n'] = [dataObj]
+        }
+
+        let finalJsonData = {}
+        finalJsonData.postData = jsonData
+        finalJsonData.txnId = this.txnIdParent
+        let self = this
+
+        ajax.post({
+          url: '/action/save',
+          param: finalJsonData,
+          success: function (data) {
+            // self.getData()
+            self.acEnableBtnDisabled = false
+            self.$message.success(message)
+          },
+          error: function (data) {
+            if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+              self.$message.error(data.error.join('|'))
+            } else {
+              self.$message.error(data.error)
+            }
+            self.acEnableBtnDisabled = false
+            self.getActionData()
+          },
+          fail: function () {
+            self.acEnableBtnDisabled = false
           }
         })
       },
@@ -755,6 +904,13 @@
           stat_cond_in: this.actionDialogForm.ac_cond_in
         })
       },
+      acExprInPopup () {
+        this.$refs.acExprDialog.open()
+        this.$refs.acExprDialog.setValue({
+          stat_cond_value: this.actionDialogForm.ac_expr,
+          stat_cond_in: this.actionDialogForm.ac_expr_in
+        })
+      },
       // 下拉获取的码值时字符串，真实数据是数字，要转一下才好用
       selectRowNum2Str (row) {
         let tempObj = {}
@@ -774,6 +930,12 @@
         this.actionDialogForm.ac_cond = value.stat_cond_value
         this.actionDialogForm.ac_cond_in = value.stat_cond_in
       },
+      acExprValueCallBack (value) {
+        this.actionDialogForm.ac_expr = value.stat_cond_value
+        this.actionDialogForm.ac_expr_in = value.stat_cond_in
+        this.$refs.actionDialogForm.validateField('ac_expr_in', (valid) => {
+        })
+      },
       checkRuleScore (rule, value, callback) {
         if (!util.isNumber(value, null, '0') || parseInt(value) < -100 || parseInt(value) > 100) {
           return callback(new Error(`周期只能输入-100-100的整数`))
@@ -789,11 +951,10 @@
           this.actionDialogTitle = '新建动作'
           this.actionDialogForm = this.initActionDialogForm()
         }
-
+        this.actionDialogType = dialogType
         this.actionDialogVisible = true
       },
       getActionData () {
-        console.log('getActionData')
         let ruleId = this.selectedRule.rule_id
         let self = this
         ajax.post({
@@ -803,7 +964,7 @@
           },
           success: function (data) {
             if (data.row) {
-              self.actionTableData = this.row
+              self.actionTableData = data.row.map((x) => { x.ac_enable = parseInt(x.ac_enable); return x })
             }
           },
           error: function (data) {
@@ -818,6 +979,75 @@
             self.dialogFormSureBtnDisabled = false
           }
         })
+      },
+      submitActionForm (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.actionFormSureBtnDisabled = true
+            let self = this
+            let submitParam = {}
+            submitParam.rule_id = this.selectedRule.rule_id;
+            submitParam.rule_shortdesc = this.selectedRule.rule_shortdesc;
+            submitParam.rule_txn = this.txnIdParent;
+            Object.assign(submitParam, this.actionDialogForm)
+            submitParam.rule_txn = this.txnIdParent
+            let jsonData = {}
+            let message = '提交成功'
+            if (this.actionDialogType === 'add') {
+              jsonData.add = [submitParam]
+              message = '新建成功'
+            } else {
+              jsonData.mod = [submitParam]
+              message = '编辑成功'
+            }
+            let finalJsonData = {}
+            finalJsonData.postData = jsonData
+            finalJsonData.txnId = this.txnIdParent
+
+            ajax.post({
+              url: '/action/save',
+              param: finalJsonData,
+              success: function (data) {
+                self.getActionData()
+                self.$message.success(message)
+                self.actionDialogVisible = false
+                self.actionFormSureBtnDisabled = false
+              },
+              error: function (data) {
+                if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+                  self.$message.error(data.error.join('|'))
+                } else {
+                  self.$message.error(data.error)
+                }
+                self.actionFormSureBtnDisabled = false
+              },
+              fail: function () {
+                self.actionFormSureBtnDisabled = false
+              }
+            })
+          }
+        })
+      },
+      checkAcCond (rule, value, callback) {
+        let acCond = this.actionDialogForm.ac_cond
+        if (acCond !== undefined && acCond !== '') {
+          if (acCond.length > 512) {
+            callback(new Error('长度在512个字符以内'))
+          }
+        }
+        callback()
+      },
+      checkAcRxpr (rule, value, callback) {
+        let self = this
+        let acExpr = self.actionDialogForm.ac_expr
+        if (acExpr !== undefined && acExpr !== '') {
+          if (acExpr.length > 512) {
+            callback(new Error('长度在512个字符以内'))
+          }
+        } else {
+          callback(new Error('处理函数不能为空'))
+        }
+        callback()
       }
     },
     components: {
@@ -827,26 +1057,5 @@
 </script>
 
 <style>
-  /*.rule-c-enter-active {*/
-    /*transition: all .3s ease;*/
-  /*}*/
-  /*.rule-c-leave-active {*/
-    /*transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);*/
-  /*}*/
-  /*.rule-c-enter, .rulec-leave-to*/
-    /*!* .slide-fade-leave-active for below version 2.1.8 *! {*/
-    /*transform: translateX(10px);*/
-    /*opacity: 0;*/
-  /*}*/
-  /*.rule-enter-active {*/
-    /*transition: all .3s ease;*/
-  /*}*/
-  /*.rule-leave-active {*/
-    /*transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);*/
-  /*}*/
-  /*.rule-enter, .rulec-leave-to*/
-    /*!* .slide-fade-leave-active for below version 2.1.8 *! {*/
-    /*transform: translateX(10px);*/
-    /*opacity: 0;*/
-  /*}*/
+
 </style>
