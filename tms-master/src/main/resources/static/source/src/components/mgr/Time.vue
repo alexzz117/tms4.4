@@ -127,7 +127,6 @@
       var vm = this
       var getOptions = function(url) {
         var promise = new Promise(function(resolve, reject){
-          let promiseSelf = this
           ajax.get({
             url: url,
             model: ajax.model.timer,
