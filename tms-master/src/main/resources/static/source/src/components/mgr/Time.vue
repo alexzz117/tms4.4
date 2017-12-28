@@ -168,7 +168,7 @@
     },
     data () {
       var self = this
-      var nameExist = function (rule, value, callback) {
+      var checkName = function (rule, value, callback) {
         if (this.flag === 'add') {
           return self.checkName(self.timerDialogForm.name, callback)
         } else if (this.flag === 'edit') {
@@ -177,6 +177,22 @@
           }
         }
         return callback()
+      }
+      var checkCron = function (rule, value, callback) {
+        ajax.post({
+          url: '/timer/check-cron',
+          model: ajax.model.timer,
+          param: {
+            cron: value
+          },
+          success: function (data) {
+            if('false' === data.row){
+              callback(new Error('请输入合法的时间表达式'));
+            }else{
+              callback();
+            }
+          }
+        })
       }
       return {
         timeData: [],
@@ -201,10 +217,11 @@
           name: [
             { required: true, message: '请输入任务名称', trigger: 'blur' },
             { max: 50, message: '长度在50个字符以内', trigger: 'blur' },
-            { validator: nameExist, trigger: 'blur' }
+            { validator: checkName, trigger: 'blur' }
           ],
           cron: [
-            { required: true, message: '请输入cron', trigger: 'blur' }
+            { required: true, message: '请输入cron', trigger: 'blur' },
+            { validator: checkCron, trigger: 'blur' }
           ],
           className: [
             { required: true, message: '请选择所属类', trigger: 'blur' }
@@ -340,7 +357,7 @@
             name: name
           },
           success: function (data) {
-            if('false' === data){
+            if('false' === data.row){
               callback(new Error('任务名称已被占用'));
             }else{
               callback();
