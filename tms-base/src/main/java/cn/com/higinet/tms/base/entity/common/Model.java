@@ -101,6 +101,10 @@ public class Model extends ModelMap {
 		return this;
 	}
 
+	public boolean hasError() {
+		return this.containsKey( ERROR );
+	}
+
 	/**
 	 * 模型中是否有某属性值
 	 * @param attributeName
