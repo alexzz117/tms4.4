@@ -278,7 +278,6 @@
             })
           }
         }
-        this.tmForm.genesisrul = ''
         return list
       }
     },
@@ -701,6 +700,19 @@
         self.tmDialogVisible = true
         self.tmFormReadOnly = false
         self.op = 'add'
+        self.tmForm = {
+          params1: '',
+          params2: '',
+          tab_name: self.txnId,
+          name: '',
+          ref_name: '',
+          src_id: '',
+          type: '',
+          fd_name: '',
+          code: '',
+          src_default: '',
+          genesisrul: ''
+        }
       },
       tmEditFunc (index, row) { // 编辑交易模型定义事件处理
         let self = this
@@ -714,7 +726,7 @@
         let genesisrulStr = row.genesisrul
         if (util.trim(genesisrulStr) !== '') {
           genesisrul = genesisrulStr.substring(0, genesisrulStr.indexOf('('))
-          let params = genesisrulStr.substring(genesisrulStr.indexOf('(') + 1, genesisrulStr.indexOf(')'))
+          let params = genesisrulStr.substring(genesisrulStr.indexOf('(') + 1, genesisrulStr.indexOf(')')).split(',')
           if (params.length > 1) {
             params1 = params[1]
           }
@@ -746,20 +758,22 @@
             let rowData = self.selectTmRows[0]
             let formData = self.tmForm
             let row = {}
-            if (op === 'mod' && rowData.type !== formData.type && rowData.link.length > 0) {
-              this.$confirm('该字段已在自定义查询中引用，确认修改？', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-              }).then(() => {
-                rowData.link = ''
-              }).catch(() => {
-                this.$message({
-                  type: 'info',
-                  message: '已取消操作'
+            if (op === 'mod') {
+              if (rowData.type !== formData.type && rowData.link.length > 0) {
+                this.$confirm('该字段已在自定义查询中引用，确认修改？', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(() => {
+                  rowData.link = ''
+                }).catch(() => {
+                  this.$message({
+                    type: 'info',
+                    message: '已取消操作'
+                  })
+                  return false
                 })
-                return false
-              })
+              }
               row = Object.assign({}, rowData, formData)
               row = Object.assign(row, {old: rowData})
             } else {
@@ -777,16 +791,13 @@
             }
             row.genesisrul = genesisrul + ')'
             let jsonData = {}
-            let finalJsonData = {}
-            if (op === 'add') {
-              jsonData.add = [row]
-            } else {
-              jsonData.mod = [row]
-            }
-            finalJsonData.postData = jsonData
+            jsonData[op] = [row]
+            console.info(jsonData)
             ajax.post({
               url: '/tranmdl/saveModel',
-              param: finalJsonData,
+              param: {
+                postData: jsonData
+              },
               success: function (data) {
                 self.$message('操作成功。')
                 // self.selUser()
@@ -798,9 +809,32 @@
           }
         })
       },
-      tmDelFunc () { // 删除交易模型定义事件处理
-        // let self = this
+      tmDelFunc (index, row) { // 删除交易模型定义事件处理
+        let self = this
         console.info('删除交易模型')
+        this.$confirm('确定删除？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let jsonData = {'del': [row]}
+          ajax.post({
+            url: '/tranmdl/saveModel',
+            param: {
+              postData: jsonData
+            },
+            success: function (data) {
+              self.$message('删除成功。')
+              // self.selUser()
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+          return false
+        })
       },
       tmInfoFunc (index, row) { // 查看交易模型定义事件处理
         let self = this
