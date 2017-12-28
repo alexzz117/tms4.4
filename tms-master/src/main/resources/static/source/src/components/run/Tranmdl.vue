@@ -40,7 +40,7 @@
       </el-main>
     </el-container>
     <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible" @open="openTmDialog">
-      <el-form :model="tmForm"  :label-width="formLabelWidth" :rules="tmRules" ref="tmForm" style="text-align: left;" >
+      <el-form :model="tmForm"  :label-width="formLabelWidth" :rules="tmRules" ref="tmForm">
         <el-form-item label="交易名称" prop="tab_name" class="hidden">
           <el-input v-model="tmForm.tab_name" auto-complete="off"></el-input>
         </el-form-item>
@@ -111,8 +111,8 @@
           <el-input v-model="tmForm.params2" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitTmForm">保存</el-button>
-          <el-button @click="tmDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitTmForm" size="large">保存</el-button>
+          <el-button @click="tmDialogVisible = false" size="large">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
