@@ -67,7 +67,9 @@
       <!--<el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>-->
       <!--<el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>-->
       <div class="stat-query-box">
-        <el-input v-model="queryShowForm.stat_desc" placeholder="统计描述" class="stat-query-form-item" auto-complete="off"></el-input>
+        <el-input v-model="queryShowForm.stat_desc" placeholder="统计描述" class="stat-query-form-item" auto-complete="off">
+          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+        </el-input>
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
       </div>
     </div>
@@ -597,7 +599,7 @@
     },
     methods: {
       // 重建一个新的表单对象
-      initDialogForm () {
+      initDialogForm() {
         return {
           stat_desc: '',
           stat_param: '',
@@ -618,11 +620,11 @@
         }
       },
       // 选中列 现在没用了
-      handleSelectionChange (rows) {
+      handleSelectionChange(rows) {
         this.selectedRows = rows
       },
       // 重新加载数据
-      reloadData () {
+      reloadData() {
         this.getStatParamSelectData()
         this.statValidList = dictCode.getCodeItems('tms.mgr.rulestatus')
         this.resultCondList = dictCode.getCodeItems('tms.stat.txnstatus')
@@ -630,7 +632,7 @@
         this.coununitList = dictCode.getCodeItems('tms.stat.condunit')
       },
       // 加载列表数据
-      getData () {
+      getData() {
         let self = this
         let paramsObj = {
           txnId: this.txnIdParent
@@ -648,7 +650,7 @@
         })
       },
       // 获取统计引用对象，统计目标 统计函数 的下拉值
-      getStatParamSelectData () {
+      getStatParamSelectData() {
         let self = this
         ajax.post({
           url: '/stat/txnFeature',
@@ -683,7 +685,7 @@
         })
       },
       // 表单弹窗弹出时的处理
-      dialogOpenHandle () {
+      dialogOpenHandle() {
         this.formDatatypeShow = false
 
         this.fnChangeEventCommon()
@@ -691,7 +693,7 @@
         this.countroundChangeEvent()
       },
       // 删除数据
-      delData (row) {
+      delData(row) {
         this.$confirm('确定删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -720,7 +722,7 @@
         })
       },
       // 表格中的可用性按钮点击
-      statValidChange (row) {
+      statValidChange(row) {
         let jsonData = {}
         this.statValidBtnDisabled = true
         jsonData['valid-y'] = [row]
@@ -757,7 +759,7 @@
         })
       },
       // 打开表单弹窗 其中view暂时去掉了
-      openDialog (dialogType, row) {
+      openDialog(dialogType, row) {
         this.dialogType = dialogType
         let self = this
         if (dialogType === 'edit') {
@@ -811,12 +813,12 @@
           }
         }, 100)
       },
-      openRefsDialog (row) {
+      openRefsDialog(row) {
         this.selTree(row)
         this.refsDialogVisible = true
       },
       // 下拉获取的码值时字符串，真实数据是数字，要转一下才好用
-      selectRowNum2Str (row) {
+      selectRowNum2Str(row) {
         let tempObj = {}
         Object.assign(tempObj, row)
         for (let field in tempObj) {
@@ -827,7 +829,7 @@
         return tempObj
       },
       // 提交表单，新增，编辑都在这
-      submitForm (formName) {
+      submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.dialogFormSureBtnDisabled = true
@@ -878,7 +880,7 @@
         })
       },
       // 函数参数弹窗
-      fnParamPopup () {
+      fnParamPopup() {
         if (!this.viewDisabled) {
           var objectValue = this.dialogForm.stat_fn
           var statDatafd = this.dialogForm.stat_datafd
@@ -896,7 +898,7 @@
         }
       },
       // 统计条件弹窗
-      statCondInPopup () {
+      statCondInPopup() {
         if (!this.viewDisabled) {
           this.$refs.StatCondDialog.open()
           this.$refs.StatCondDialog.setValue({
@@ -906,23 +908,23 @@
         }
       },
       //  下面是子组件的回调
-      statParamDataChange (value) {
+      statParamDataChange(value) {
         this.queryShowForm.stat_param = value
       },
-      addStatParamDataChange (value) {
+      addStatParamDataChange(value) {
         this.dialogForm.stat_param = value
         this.$refs.dialogForm.validateField('stat_param', (valid) => {
         })
       },
-      statCondInValueCallBack (value) {
+      statCondInValueCallBack(value) {
         this.dialogForm.stat_cond = value.stat_cond_value
         this.dialogForm.stat_cond_in = value.stat_cond_in
       },
-      funcParamValueCallBack (value) {
+      funcParamValueCallBack(value) {
         this.dialogForm.fn_param = value
       },
       // 下面是工具函数（基本控制表单各项的显示隐藏 逻辑按照之前的代码写的）
-      queryTxnFeature (fd) {
+      queryTxnFeature(fd) {
         for (let loopObj of this.statDataFdList) {
           if (loopObj.code_key === fd) {
             return loopObj
@@ -930,7 +932,7 @@
         }
         return null
       },
-      changeFeatureTypeToDataType (type) {
+      changeFeatureTypeToDataType(type) {
         var _type = type
         for (let loop of _dataTypeClassify) {
           if (loop.type.includes(type)) {
@@ -940,7 +942,7 @@
         }
         return _type
       },
-      getStorageFdByfdName (storeFds, storeFdName) {
+      getStorageFdByfdName(storeFds, storeFdName) {
         var _storeFd = null
         if (storeFds && storeFdName) {
           for (let loop of storeFds) {
@@ -952,7 +954,7 @@
         }
         return _storeFd
       },
-      getCanUseStorageFdByDataType (datatype, effect) {
+      getCanUseStorageFdByDataType(datatype, effect) {
         var sfdItems = []
         var enableStoreFds = this.enableStoreFd
         if (!effect) {
@@ -972,7 +974,7 @@
         return sfdItems
       },
       // 根据数据类型获取可用存储字段
-      getEnableStorageFdByDataType (datatype, enableStoreFds) {
+      getEnableStorageFdByDataType(datatype, enableStoreFds) {
         // debugger
         var sfdItems = []
         if (datatype && enableStoreFds) {
@@ -1005,7 +1007,7 @@
         return sfdItems
       },
       // 统计函数变化触发
-      changeDialogForm (type) {
+      changeDialogForm(type) {
         switch (type) {
           case 'calculat_expressions':// 计算表达式
             this.dialogForm.stat_param = ''
@@ -1038,7 +1040,7 @@
         }
       },
       // 统计函数修改与弹出窗口共用的调整表单样式的方法
-      fnChangeEventCommon () {
+      fnChangeEventCommon() {
         let val = this.dialogForm
         if (val.stat_fn === 'calculat_expressions') { // 计数表达式函数
           this.changeDialogForm('calculat_expressions')
@@ -1080,7 +1082,7 @@
           }
         }
       },
-      fnChangeEvent () {
+      fnChangeEvent() {
         let val = this.dialogForm
         val.storecolumn = ''// 存储字段清空
 
@@ -1118,7 +1120,7 @@
         }
       },
       // 周期修改触发
-      countroundChangeEvent () {
+      countroundChangeEvent() {
         let val = this.dialogForm
         if (val.coununit === '7' || val.coununit === '9' || val.stat_fn === 'calculat_expressions') { // 会话，永久不需要周期
           // 隐藏表单的函数参数
@@ -1130,7 +1132,7 @@
         }
       },
       // 统计目标变化响应
-      datafdChangeEvent () {
+      datafdChangeEvent() {
         let val = this.dialogForm
         val.storecolumn = ''// 存储字段清空
 
@@ -1169,7 +1171,7 @@
         }
       },
       // 下面是校验函数
-      checkStatCond (rule, value, callback) {
+      checkStatCond(rule, value, callback) {
         let statCond = this.dialogForm.stat_cond
         let name = this.formStatCondInName.replace(':', '')
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
@@ -1190,7 +1192,7 @@
         }
         callback()
       },
-      checkStatDataFd (rule, value, callback) {
+      checkStatDataFd(rule, value, callback) {
         let statFn = this.dialogForm.stat_fn
         // let fnParam = this.dialogForm.fn_param
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
@@ -1199,7 +1201,7 @@
         }
         callback()
       },
-      checkStatParam (rule, value, callback) {
+      checkStatParam(rule, value, callback) {
         let statParam = this.dialogForm.stat_param
         let counUnit = this.dialogForm.coununit
         // let fnParam = this.dialogForm.fn_param
@@ -1227,7 +1229,7 @@
 
         callback()
       },
-      checkFnParam (rule, value, callback) {
+      checkFnParam(rule, value, callback) {
         let statFn = this.dialogForm.stat_fn
         let fnParam = this.dialogForm.fn_param
         if (statFn === 'rang_bin_dist') {
@@ -1241,7 +1243,7 @@
         }
         callback()
       },
-      checkCoununit (rule, value, callback) {
+      checkCoununit(rule, value, callback) {
         let coununit = this.dialogForm.coununit
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc) {
@@ -1251,7 +1253,7 @@
         }
         callback()
       },
-      checkCountround (rule, value, callback) {
+      checkCountround(rule, value, callback) {
         let coununit = this.dialogForm.coununit
         let countround = this.dialogForm.countround
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
@@ -1268,7 +1270,7 @@
         }
         callback()
       },
-      checkResultCond (rule, value, callback) {
+      checkResultCond(rule, value, callback) {
         let resultCond = this.dialogForm.result_cond
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc) {
@@ -1278,7 +1280,7 @@
         }
         callback()
       },
-      checkDatatype (rule, value, callback) {
+      checkDatatype(rule, value, callback) {
         let datatype = this.dialogForm.datatype
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (isCaExFunc) {
@@ -1288,7 +1290,7 @@
         }
         callback()
       },
-      checkStatValid (rule, value, callback) {
+      checkStatValid(rule, value, callback) {
         let statValid = this.dialogForm.stat_valid
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc) {
@@ -1300,7 +1302,7 @@
       },
       // 下面是引用点的树形方法
       // 查询树结构
-      selTree (selectRow) {
+      selTree(selectRow) {
         var self = this
         let params = {
           txnId: this.txnIdParent,
@@ -1313,51 +1315,12 @@
             if (data.list && data.list.length > 0) {
               data.row = data.list
               self.treeList = (data.row)
-              self.refsTreeData = self.formatTreeData(data.row)
+              self.refsTreeData = util.formatTreeData(data.row)
               // self.expendNodesByLevel(1)
             }
           }
         }
         ajax.post(option)
-      },
-      // 把功能节点列表格式化为树形Json结构
-      formatTreeData (list, rootNodes) {
-        var tree = []
-        // 如果根节点数组不存在，则取fid不存在或为空字符的节点为父节点
-        if (rootNodes === undefined || rootNodes.length === 0) {
-          rootNodes = []
-          for (let i in list) {
-            if (list[i].fid === undefined || list[i].fid === null || list[i].fid === '' || list[i].fid === '-1') {
-              rootNodes.push(list[i])
-            }
-          }
-        }
-        // 根节点不存在判断
-        if (rootNodes.length === 0) {
-          console.error('根节点不存在，请确认树结构是否正确')
-          console.info('树结构的根节点是fid不存在（或为空）的节点，否则需手动添加指定得根节点（参数）')
-        }
-        // 根据根节点遍历组装数据
-        for (var r in rootNodes) {
-          var node = rootNodes[r]
-          node.children = getChildren(list, node.id)
-          tree.push(node)
-        }
-
-        // 递归查询节点的子节点
-        function getChildren (list, id) {
-          var childs = []
-          for (var i in list) {
-            var node = list[i]
-            if (node.fid === id) {
-              node.children = getChildren(list, node.id)
-              // node.icon = 'el-icon-message'
-              childs.push(node)
-            }
-          }
-          return childs
-        }
-        return tree  // 返回树结构Json
       }
     },
     components: {

@@ -11,7 +11,9 @@
             <el-col :span="8">
                 <div style="margin-right: 10px">
                   <el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50
-                            @keyup.enter.native="searchData('queryShowForm')"  placeholder="请输入搜索内容"></el-input>
+                            @keyup.enter.native="searchData('queryShowForm')"   placeholder="请输入搜索内容">
+                    <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                  </el-input>
 
                 </div>
             </el-col>

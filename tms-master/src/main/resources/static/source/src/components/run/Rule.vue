@@ -52,7 +52,9 @@
 
           <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
           <div style="float:right">
-            <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off"></el-input>
+            <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off">
+              <i slot="prefix" class="el-input__icon el-icon-search"></i>
+            </el-input>
             <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
           </div>
         </div>
