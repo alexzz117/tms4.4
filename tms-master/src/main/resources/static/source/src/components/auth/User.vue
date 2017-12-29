@@ -279,7 +279,7 @@
           url: '/operator/add',
           param: this.userDialogForm,
           success: function (data) {
-            self.$message('创建成功。')
+            self.$message.success('创建成功。')
             self.roleDialogVisible = false
             self.selUser()
           }
@@ -292,7 +292,7 @@
           url: '/operator/mod',
           param: this.userDialogForm,
           success: function (data) {
-            self.$message('更新成功。')
+            self.$message.success('更新成功。')
             self.roleDialogVisible = false
             self.selUser()
           }
@@ -312,7 +312,7 @@
               operatorId: row.operator_id
             },
             success: function (data) {
-              self.$message('删除成功。')
+              self.$message.success('删除成功。')
               self.selUser()
             }
           }
@@ -340,7 +340,7 @@
               passWord: pwd
             },
             success: function (data) {
-              self.$message('密码重置成功。')
+              self.$message.success('密码重置成功。')
               self.selUser()
             }
           }
@@ -365,7 +365,7 @@
               operatorId: row.operator_id
             },
             success: function (data) {
-              self.$message('用户解锁成功。')
+              self.$message.success('用户解锁成功。')
               self.selUser()
             }
           }

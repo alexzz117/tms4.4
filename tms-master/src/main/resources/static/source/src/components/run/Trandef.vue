@@ -172,9 +172,12 @@
             param: param,
             success: function (data) {
               if (data.success) {
-                self.$message('删除交易成功')
+                self.$message.success('删除交易成功')
                 self.reloadPage()
               }
+            },
+            fail: function (e) {
+              self.$message.error(e.response.data.message)
             }
           }
           ajax.post(option)

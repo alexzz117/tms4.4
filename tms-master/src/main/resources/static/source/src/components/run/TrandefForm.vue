@@ -205,10 +205,10 @@
           success: function (data) {
             if (data.success) {
               if (op === 'add') {
-                self.$message('添加成功')
+                self.$message.success('添加成功')
                 self.closeAddDialog()
               } else {
-                self.$message('修改成功')
+                self.$message.success('修改成功')
               }
               self.reloadPage()
             }

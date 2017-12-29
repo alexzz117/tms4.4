@@ -501,7 +501,7 @@
             success: function (data) {
               selectNode.visible = false
               self.resetPage()
-              self.$message('删除功能成功')
+              self.$message.success('删除功能成功')
             }
           }
           ajax.post(option)
@@ -550,7 +550,7 @@
             //   info: self.funcForm.info
             // }
             // self.$refs.tree.updateKeyChildren(selectNode.id, nodeData)
-            self.$message('操作成功。')
+            self.$message.success('操作成功。')
             self.selTree()
             self.resetPage()
           }
