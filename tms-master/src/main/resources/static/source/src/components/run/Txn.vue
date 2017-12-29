@@ -92,9 +92,8 @@
               let treeJson = self.formatTreeData(data.list)
               self.treeData = treeJson
               self.txnId = treeJson[0].id
-              self.breadcrumbData = ['交易模型：' + treeJson[0].text]
+              self.breadcrumbData = [{text: '交易模型：' + treeJson[0].text}]
               // self.expendNodesByLevel(1)
-              console.info( self.txnId, self.breadcrumbData)
             }
           }
         }
