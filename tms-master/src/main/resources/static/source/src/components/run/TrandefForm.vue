@@ -64,6 +64,10 @@
         <el-radio v-model="tranDefForm.is_enable" label="1" :disabled="formReadonly">启用</el-radio>
         <el-radio v-model="tranDefForm.is_enable" label="0" :disabled="formReadonly">停用</el-radio>
       </el-form-item>
+      <el-form-item>
+        <el-button v-if="addFlag" @click="closeAddDialog" size="large">取消</el-button>
+        <el-button type="primary" @click="submitForm" size="large" :disabled="saveVisible">保存</el-button>
+      </el-form-item>
     </el-form>
   </div>
 </template>
@@ -71,6 +75,7 @@
 <script>
   import AllPickSelect from '@/components/common/AllPickSelect'
   import check from '@/common/check'
+  import ajax from '@/common/ajax'
 
   export default {
     create () {
@@ -83,6 +88,12 @@
         } else {
           return tabDisposal.split(',')
         }
+      },
+      saveVisible () {
+        return this.editVisible
+      },
+      addFlag () {
+        return this.tranDefForm.op === 'add'
       },
       txnIdVisible: function () { // 交易识别标识是否可见（组：不可见；交易：可见）
         return this.tranDefForm.txn_type !== '1'
@@ -162,6 +173,7 @@
         }
       }
     },
+    props: ['editVisible'],
     watch: {
       tranDefForm: {
         handler (curVal) {
@@ -176,6 +188,33 @@
     methods: {
       addStatParamDataChange (value) {
         this.tranDefForm.tab_disposal = value.join(',')
+      },
+      closeAddDialog () {
+        this.$emit('listenToCloseDialog', false)
+      },
+      reloadPage () {
+        this.$emit('listenToReloadPage')
+      },
+      submitForm () { // 提交表单；op：操作方式；
+        var self = this
+        var params = self.tranDefForm
+        var op = params.op
+        var option = {
+          url: '/trandef/save',
+          param: params,
+          success: function (data) {
+            if (data.success) {
+              if (op === 'add') {
+                self.$message('添加成功')
+                self.closeAddDialog()
+              } else {
+                self.$message('修改成功')
+              }
+              self.reloadPage()
+            }
+          }
+        }
+        ajax.post(option)
       }
     },
     components: {

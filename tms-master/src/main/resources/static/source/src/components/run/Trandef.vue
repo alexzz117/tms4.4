@@ -1,16 +1,12 @@
 <template>
   <div>
-    <trandefForm ref="infoForm"></trandefForm>
-    <div>
-      <el-button type="primary" @click="submitForm('edit')" :disabled="editVisible">保存</el-button>
-    </div>
+    <trandefForm ref="infoForm" :editVisible="editVisible"
+                 v-on:listenToReloadPage="reloadPage"></trandefForm>
     <!-- Form -->
     <el-dialog title="新建交易" :visible.sync="addFormVisible" @open="resetForm" @close="resetValidate">
-      <trandefForm ref="addForm"></trandefForm>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="addFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('add')">确 定</el-button>
-      </div>
+      <trandefForm ref="addForm" :editVisible="false"
+                   v-on:listenToCloseDialog="syncDialogVisible"
+                   v-on:listenToReloadPage="reloadPage"></trandefForm>
     </el-dialog>
   </div>
 </template>
@@ -110,6 +106,9 @@
       resetValidate () {
         this.$refs['addForm'].$refs['tranDefForm'].clearValidate()
       },
+      syncDialogVisible (data) {
+        this.addFormVisible = data
+      },
       resetForm () {
         var self = this
         var nodeInfo = self.$refs['infoForm'].tranDefForm
@@ -157,31 +156,6 @@
               disposalList.push(item)
             }
             self.$refs[formId].tabDisposalList = disposalList
-          }
-        }
-        ajax.post(option)
-      },
-      submitForm (op) { // 提交表单；op：操作方式；
-        var self = this
-        var params = {}
-        if (op === 'add') {
-          params = self.$refs['addForm'].tranDefForm
-        } else {
-          params = self.$refs['infoForm'].tranDefForm
-        }
-        var option = {
-          url: '/trandef/save',
-          param: params,
-          success: function (data) {
-            if (data.success) {
-              if (op === 'add') {
-                self.$message('添加成功')
-                self.addFormVisible = false // 关闭弹窗
-              } else {
-                self.$message('修改成功')
-              }
-              self.reloadPage()
-            }
           }
         }
         ajax.post(option)
