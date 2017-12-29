@@ -54,7 +54,7 @@
           addBtn: true, // 添加按钮
           delBtn: true // 删除按钮
         },
-        txnId: 'T',
+        txnId: '',
         tabVisibility: {
           trandefVisibility: true,
           tranmdlVisibility: false,
@@ -68,7 +68,7 @@
           children: 'children',
           label: 'text'
         },
-        breadcrumbData: [], // 地址路径数组
+        breadcrumbData: [''], // 地址路径数组
         activeName: 'trandef'
       }
     },
@@ -89,8 +89,12 @@
           success: function (data) {
             if (data.list) {
               self.treeList = (data.list)
-              self.treeData = self.formatTreeData(data.list)
+              let treeJson = self.formatTreeData(data.list)
+              self.treeData = treeJson
+              self.txnId = treeJson[0].id
+              self.breadcrumbData = ['交易模型：' + treeJson[0].text]
               // self.expendNodesByLevel(1)
+              console.info( self.txnId, self.breadcrumbData)
             }
           }
         }
@@ -150,7 +154,7 @@
       },
       handleNodeClick (data, node) {
         var self = this
-        if (self.txnId === data.id) {
+        if (self.txnId === data.id && data.id !== 'T') {
           return
         }
         self.showToolBtn()
