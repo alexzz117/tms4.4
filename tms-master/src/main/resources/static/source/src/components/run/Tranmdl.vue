@@ -13,7 +13,7 @@
         <el-table :data="tmTableData" ref="tmTable"
                   :span-method="groupHandle"
                   :row-class-name="groupClassName"
-                  @row-dblclick="toggleListHandle"
+                  @row-click="toggleListHandle"
                   max-height="430"
                   style="width: 100%">
           <el-table-column label="操作">
@@ -26,7 +26,7 @@
           <el-table-column label="属性名称" prop="name">
             <template slot-scope="scope">
               <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row)></i>
-              <span style="margin-left: 10px">{{scope.row.name}}</span>
+              <span>{{scope.row.name}}</span>
             </template>
           </el-table-column>
           <el-table-column label="属性代码" prop="ref_name"></el-table-column>
@@ -453,7 +453,7 @@
       }
       return {
         op: '',
-        toggleIcon: ['el-icon-arrow-down', 'el-icon-arrow-right'], // 交易模型Table中分类[分组]中：展开与收起的Icon
+        toggleIcon: ['el-icon-caret-bottom', 'el-icon-caret-right'], // 交易模型Table中分类[分组]中：展开与收起的Icon
         tranModelList: [],      // 交易模型列表
         expendNodeKey: [],      // 展开的交易模型分类节点
         tmTitle: '',            // 交易模型弹窗标题
