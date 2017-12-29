@@ -5,7 +5,7 @@
              label-suffix="："
              :label-width="formLabelWidth"
              ref="tranDefForm"
-             style="text-align: left;padding-right: 5em;">
+             style="text-align: left;">
       <el-form-item label="" prop="parent_tab" class="hidden">
         <el-input v-model="tranDefForm.parent_tab" auto-complete="off"></el-input>
       </el-form-item>
@@ -21,53 +21,79 @@
       <el-form-item label="" prop="op" class="hidden">
         <el-input v-model="tranDefForm.op" auto-complete="off"></el-input>
       </el-form-item>
-      <el-form-item label="名称" prop="tab_desc">
-        <el-input v-model="tranDefForm.tab_desc" auto-complete="off" :readonly="formReadonly"></el-input>
-      </el-form-item>
-      <el-form-item label="顺序" prop="show_order">
-        <el-input v-model.number="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly"></el-input>
-      </el-form-item>
-      <el-form-item label="交易类型">
-        <el-radio v-model="tranDefForm.txn_type" label="0" :disabled="formReadonly">交易组</el-radio>
-        <el-radio v-model="tranDefForm.txn_type" label="1" :disabled="formReadonly">交易</el-radio>
-      </el-form-item>
-      <el-form-item label="交易识别标识" prop="txnid" v-bind:class="{hidden:txnIdVisible}">
-        <el-input v-model="tranDefForm.txnid" auto-complete="off" :readonly="formReadonly"></el-input>
-      </el-form-item>
-      <el-form-item label="处置策略:" :label-width="formLabelWidth" prop="tab_disposal">
-        <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly"></AllPickSelect>
-      </el-form-item>
-      <el-form-item label="渠道名称" prop="chann">
-        <el-select v-model="tranDefForm.chann" placeholder="请选择" :disabled="formReadonly||channVisible">
-          <el-option
-            v-for="item in channelList"
-            :key="item.channelid"
-            :label="item.channelname"
-            :value="item.channelid">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="上级交易" prop="txnffname">
-        <el-input v-model="tranDefForm.txnffname" auto-complete="off" readonly="readonly"></el-input>
-      </el-form-item>
-      <el-form-item label="模型状态" prop="modelused" v-bind:class="{hidden:modelusedVisible}">
-        <el-select v-model="tranDefForm.modelused" placeholder="请选择" :disabled="formReadonly">
-          <el-option
-            v-for="item in modelUsedList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="有效性">
-        <el-radio v-model="tranDefForm.is_enable" label="1" :disabled="formReadonly">启用</el-radio>
-        <el-radio v-model="tranDefForm.is_enable" label="0" :disabled="formReadonly">停用</el-radio>
-      </el-form-item>
-      <el-form-item>
-        <el-button v-if="addFlag" @click="closeAddDialog" size="large">取消</el-button>
-        <el-button type="primary" @click="submitForm" size="large" :disabled="saveVisible">保存</el-button>
-      </el-form-item>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="名称" prop="tab_desc">
+            <el-input v-model="tranDefForm.tab_desc" auto-complete="off" :readonly="formReadonly"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="顺序" prop="show_order">
+            <el-input v-model.number="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="交易类型">
+            <el-radio v-model="tranDefForm.txn_type" label="0" :disabled="formReadonly">交易组</el-radio>
+            <el-radio v-model="tranDefForm.txn_type" label="1" :disabled="formReadonly">交易</el-radio>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="交易识别标识" prop="txnid" v-bind:class="{hidden:txnIdVisible}">
+            <el-input v-model="tranDefForm.txnid" auto-complete="off" :readonly="formReadonly"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="处置策略:" :label-width="formLabelWidth" prop="tab_disposal">
+            <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly"></AllPickSelect>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="渠道名称" prop="chann">
+            <el-select v-model="tranDefForm.chann" placeholder="请选择" :disabled="formReadonly||channVisible">
+              <el-option
+                v-for="item in channelList"
+                :key="item.channelid"
+                :label="item.channelname"
+                :value="item.channelid">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="上级交易" prop="txnffname">
+            <el-input v-model="tranDefForm.txnffname" auto-complete="off" readonly="readonly"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="模型状态" prop="modelused" v-bind:class="{hidden:modelusedVisible}">
+            <el-select v-model="tranDefForm.modelused" placeholder="请选择" :disabled="formReadonly">
+              <el-option
+                v-for="item in modelUsedList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="有效性">
+            <el-radio v-model="tranDefForm.is_enable" label="1" :disabled="formReadonly">启用</el-radio>
+            <el-radio v-model="tranDefForm.is_enable" label="0" :disabled="formReadonly">停用</el-radio>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item>
+            <el-button v-if="addFlag" @click="closeAddDialog" size="large">取消</el-button>
+            <el-button type="primary" @click="submitForm" size="large" :disabled="saveVisible">保存</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
   </div>
 </template>
