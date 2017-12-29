@@ -91,8 +91,10 @@
               self.treeList = (data.list)
               let treeJson = self.formatTreeData(data.list)
               self.treeData = treeJson
+              // 模拟选中第一个节点（根节点）
               self.txnId = treeJson[0].id
               self.breadcrumbData = [{text: '交易模型：' + treeJson[0].text}]
+              self.toolBtn.addBtn = false
               // self.expendNodesByLevel(1)
             }
           }
@@ -153,7 +155,7 @@
       },
       handleNodeClick (data, node) {
         var self = this
-        if (self.txnId === data.id && data.id !== 'T') {
+        if (self.txnId === data.id) {
           return
         }
         self.showToolBtn()
@@ -223,7 +225,6 @@
           default: {
           }
         }
-        // console.log(tab, event);
         this.showToolBtn(tab.name)
       },
       addFunc () {
