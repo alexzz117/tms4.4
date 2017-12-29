@@ -32,8 +32,6 @@
             <el-input v-model.number="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly"></el-input>
           </el-form-item>
         </el-col>
-      </el-row>
-      <el-row>
         <el-col :span="12">
           <el-form-item label="交易类型">
             <el-radio v-model="tranDefForm.txn_type" label="0" :disabled="formReadonly">交易组</el-radio>
@@ -45,8 +43,6 @@
             <el-input v-model="tranDefForm.txnid" auto-complete="off" :readonly="formReadonly"></el-input>
           </el-form-item>
         </el-col>
-      </el-row>
-      <el-row>
         <el-col :span="12">
           <el-form-item label="处置策略:" :label-width="formLabelWidth" prop="tab_disposal">
             <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly"></AllPickSelect>
