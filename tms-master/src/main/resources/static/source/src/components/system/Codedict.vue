@@ -407,11 +407,6 @@
               self.getData()
             }
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
         })
       },
       delInfoData (data) {
@@ -430,11 +425,6 @@
               self.$message.success('删除成功')
               self.handleSelectionChange(self.showDictInfoRow)
             }
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
           })
         })
       },

@@ -650,11 +650,6 @@
               self.ruleEnableBtnDisabled = false
             }
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消复制'
-          })
         })
       },
       copyAction (row) {
@@ -697,11 +692,6 @@
               }
             }
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消复制'
-          })
         })
       },
       delData (row) {
@@ -724,11 +714,6 @@
               self.getData()
               self.$message.success('删除成功')
             }
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
           })
         })
       },
@@ -756,11 +741,6 @@
               self.getActionData()
               self.$message.success('删除成功')
             }
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
           })
         })
       },

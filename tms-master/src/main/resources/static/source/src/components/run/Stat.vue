@@ -714,11 +714,6 @@
               self.$message.success('删除成功')
             }
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
         })
       },
       // 表格中的可用性按钮点击
