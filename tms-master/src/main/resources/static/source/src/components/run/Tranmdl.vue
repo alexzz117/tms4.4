@@ -44,76 +44,108 @@
         <el-form-item label="交易名称" prop="tab_name" class="hidden">
           <el-input v-model="tmForm.tab_name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="属性名称" prop="name">
-          <el-input v-model="tmForm.name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="属性代码" prop="ref_name">
-          <el-input v-model="tmForm.ref_name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="数据来源" prop="src_id">
-          <el-input v-model="tmForm.src_id" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="类型" prop="type">
-          <el-select v-model="tmForm.type" :disabled="tmFormReadOnly" placeholder="请选择" @change="tmTypeChange">
-            <el-option
-              v-for="item in tmTypeList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="存储字段" prop="fd_name">
-          <el-select v-model="tmForm.fd_name" :disabled="tmFormReadOnly" placeholder="请选择">
-            <el-option
-              v-for="item in tmFdNameList"
-              :key="item.fd_name"
-              :label="item.fd_name"
-              :value="item.fd_name">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="关联代码集" prop="code" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmCodeVisible}">
-          <el-select v-model="tmForm.code" placeholder="请选择">
-            <el-option
-              v-for="item in tmCodeList"
-              :key="item.category_id"
-              :label="item.category_name"
-              :value="item.category_id">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="默认值"  prop="src_default" :disabled="tmFormReadOnly">
-          <el-select v-if="tmForm.type.toUpperCase() === 'CODE'" v-model="tmForm.src_default" placeholder="请选择">
-            <el-option
-              v-for="item in codeDefaultList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-          <el-input v-else v-model="tmForm.src_default" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="处理函数" prop="genesisrul" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmFuncVisible}">
-          <el-select v-model="tmForm.genesisrul" placeholder="请选择">
-            <el-option
-              v-for="item in tmFuncList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="处理函数参数1" prop="params1" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(1)}">
-          <el-input v-model="tmForm.params1" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="处理函数参数2" prop="params2" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(2)}">
-          <el-input v-model="tmForm.params2" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitTmForm" size="large">保存</el-button>
-          <el-button @click="tmDialogVisible = false" size="large">取消</el-button>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="属性名称" prop="name">
+              <el-input v-model="tmForm.name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="属性代码" prop="ref_name">
+              <el-input v-model="tmForm.ref_name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="数据来源" prop="src_id">
+              <el-input v-model="tmForm.src_id" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="类型" prop="type">
+              <el-select v-model="tmForm.type" :disabled="tmFormReadOnly" placeholder="请选择" @change="tmTypeChange">
+                <el-option
+                  v-for="item in tmTypeList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="存储字段" prop="fd_name">
+              <el-select v-model="tmForm.fd_name" :disabled="tmFormReadOnly" placeholder="请选择">
+                <el-option
+                  v-for="item in tmFdNameList"
+                  :key="item.fd_name"
+                  :label="item.fd_name"
+                  :value="item.fd_name">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="关联代码集" prop="code" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmCodeVisible}">
+              <el-select v-model="tmForm.code" placeholder="请选择">
+                <el-option
+                  v-for="item in tmCodeList"
+                  :key="item.category_id"
+                  :label="item.category_name"
+                  :value="item.category_id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="处理函数" prop="genesisrul" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmFuncVisible}">
+              <el-select v-model="tmForm.genesisrul" placeholder="请选择">
+                <el-option
+                  v-for="item in tmFuncList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="处理函数参数1" prop="params1" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(1)}">
+              <el-input v-model="tmForm.params1" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="处理函数参数2" prop="params2" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(2)}">
+              <el-input v-model="tmForm.params2" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="默认值"  prop="src_default" :disabled="tmFormReadOnly">
+              <el-select v-if="tmForm.type.toUpperCase() === 'CODE'" v-model="tmForm.src_default" placeholder="请选择">
+                <el-option
+                  v-for="item in codeDefaultList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+              <el-input v-else v-model="tmForm.src_default" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item>
+              <el-button type="primary" @click="submitTmForm" size="large">保存</el-button>
+              <el-button @click="tmDialogVisible = false" size="large">取消</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
     </el-dialog>
     <el-container style="border: 1px solid #eee;">
