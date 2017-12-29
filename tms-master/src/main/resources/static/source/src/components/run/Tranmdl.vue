@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="12">
             <span>交易模型</span>
-            <el-button type="text" icon="el-icon-plus" @click="tmAddFunc">新建交易模型</el-button>
+            <el-button type="text" icon="el-icon-circle-plus" @click="tmAddFunc" size="medium" title="新建交易模型"></el-button>
           </el-col>
         </el-row>
       </el-header>
