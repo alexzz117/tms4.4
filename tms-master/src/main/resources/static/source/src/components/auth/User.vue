@@ -317,12 +317,7 @@
             }
           }
           ajax.post(option)
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+        }).catch(() => {})
       },
       resetPwd (index, row) {
         var self = this
@@ -345,12 +340,7 @@
             }
           }
           ajax.post(option)
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消密码重置'
-          })
-        })
+        }).catch(() => {})
       },
       resetFlag (index, row) {
         var self = this
@@ -370,12 +360,7 @@
             }
           }
           ajax.post(option)
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消用户解锁'
-          })
-        })
+        }).catch(() => {})
       }
     },
     data () {
