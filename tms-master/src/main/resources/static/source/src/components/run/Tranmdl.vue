@@ -808,7 +808,7 @@
                 postData: jsonData
               },
               success: function (data) {
-                self.$message('操作成功。')
+                self.$message.success('操作成功。')
                 self.initForm()
                 self.tmDialogVisible = false
               }
@@ -833,7 +833,7 @@
               postData: jsonData
             },
             success: function (data) {
-              self.$message('删除成功。')
+              self.$message.success('删除成功。')
               self.initForm()
               self.tmDialogVisible = false
             }
