@@ -2,10 +2,10 @@
   <div>
     <el-form label-position="right" label-width="100px" :model="listForm" class="demo-form-inline" label="left"
              :inline="inline" style="text-align: left">
-      <el-form-item label="名单名称:" prop="listFormFosterdesc">
+      <el-form-item label="名单名称" prop="listFormFosterdesc">
         <el-input v-model="listForm.rosterdesc"></el-input>
       </el-form-item>
-      <el-form-item label="名单数据类型:">
+      <el-form-item label="名单数据类型">
         <el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择" :clearable="clearable">
           <el-option
             v-for="item in datatypeOptions"
@@ -15,7 +15,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="名单类型:">
+      <el-form-item label="名单类型">
         <el-select v-model="listForm.rostertype" @focus="selectFocus('rostertype')" placeholder="请选择" :clearable="clearable">
           <el-option
             v-for="item in rostertypeOptions"
@@ -47,7 +47,7 @@
       <el-table-column prop="rosterdesc" label="名单名称" align="left" width="160"></el-table-column>
       <el-table-column prop="datatype" label="名单数据类型" align="left" width="160" :formatter="formatter"></el-table-column>
       <el-table-column prop="rostertype" label="名单类型" align="left" width="160" :formatter="formatter"></el-table-column>
-      <el-table-column prop="valuecount" label="值数量" align="left" width="100"></el-table-column>
+      <el-table-column prop="valuecount" label="值数量" align="left" width="100" ></el-table-column>
       <el-table-column prop="createtime" label="创建时间" align="left" width="160" :formatter="formatter"></el-table-column>
       <el-table-column prop="iscache" label="是否缓存" align="left" width="120" :formatter="formatter"></el-table-column>
     </el-table>
@@ -65,14 +65,14 @@
   <!-- 名单查看弹出窗 -->
     <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible">
       <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
-               style="text-align: left">
-        <el-form-item label="名单英文名:" prop="rostername" data="rostername">
+               style="text-align: left" >
+        <el-form-item label="名单英文名" prop="rostername" data="rostername">
           <el-input v-model="listDialogform.rostername" auto-complete="off" :disabled="true"></el-input>
         </el-form-item>
-        <el-form-item label="名单名称:" prop="rosterdesc" data="rosterdesc">
+        <el-form-item label="名单名称" prop="rosterdesc" data="rosterdesc">
           <el-input v-model="listDialogform.rosterdesc" auto-complete="off" :disabled="true"></el-input>
         </el-form-item>
-        <el-form-item label="名单数据类型:" prop="datatype" data="datatype">
+        <el-form-item label="名单数据类型" prop="datatype" data="datatype">
           <el-select v-model="listDialogform.datatype" disabled :clearable="clearable">
             <el-option
               v-for="item in datatypeOptions"
@@ -82,7 +82,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="名单类型:" prop="rostertype" data="rostertype">
+        <el-form-item label="名单类型" prop="rostertype" data="rostertype">
           <el-select v-model="listDialogform.rostertype" disabled :clearable="clearable">
             <el-option
               v-for="item in rostertypeOptions"
@@ -92,16 +92,16 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="是否缓存:" prop="iscache" data="iscache" disabled>
+        <el-form-item label="是否缓存" prop="iscache" data="iscache" disabled>
           <el-radio v-model="listDialogform.iscache" label="1" disabled>是</el-radio>
           <el-radio v-model="listDialogform.iscache" label="0" disabled>否</el-radio>
         </el-form-item>
-        <el-form-item label="备注:" prop="remark" data="remark">
+        <el-form-item label="备注" prop="remark" data="remark">
           <el-input type="textarea" v-model="listDialogform.remark" :disabled="true"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-      <el-button @click="listDialogVisible = false" data="cancelBtn" icon="el-icon-arrow-left" type="primary">返 回</el-button>
+      <el-button @click="listDialogVisible = false" data="cancelBtn" icon="el-icon-arrow-left" type="primary" >返 回</el-button>
     </div>
     </el-dialog>
   </div>
