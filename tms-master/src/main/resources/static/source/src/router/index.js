@@ -11,6 +11,7 @@ import Func from '@/components/auth/Func'
 
 import List from '@/components/run/List'
 import NameList from '@/components/mgr/NameList'
+import AlarmEventSend from '@/components/riskmanage/AlarmEventSend'
 import ValueList from '@/components/run/ValueList'
 import Txn from '@/components/run/Txn'
 import Rule from '@/components/run/Rule'
@@ -86,6 +87,11 @@ export default new Router({
           path: 'namelist_vue',
           name: 'namelist',
           component: NameList
+        },
+        {
+          path: 'alarmEventSend_vue',
+          name: 'alarmEventSend',
+          component: AlarmEventSend
         },
         {
           path: 'txn_vue',
