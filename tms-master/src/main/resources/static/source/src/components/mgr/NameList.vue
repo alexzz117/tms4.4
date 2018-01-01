@@ -63,7 +63,7 @@
 
 
   <!-- 名单查看弹出窗 -->
-    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible" append-to-body  >
       <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
                style="text-align: left" >
         <el-form-item label="名单英文名" prop="rostername" data="rostername">
@@ -100,7 +100,7 @@
           <el-input type="textarea" v-model="listDialogform.remark" :disabled="true"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer" >
       <el-button @click="listDialogVisible = false" data="cancelBtn" icon="el-icon-arrow-left" type="primary" >返 回</el-button>
     </div>
     </el-dialog>
