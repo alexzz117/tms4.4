@@ -63,7 +63,7 @@
 
 
   <!-- 名单查看弹出窗 -->
-    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible" append-to-body  >
+    <el-dialog title="查看名单" :visible.sync="listDialogVisible" append-to-body  >
       <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
                style="text-align: left" >
         <el-form-item label="名单英文名" prop="rostername" data="rostername">
@@ -130,7 +130,6 @@
         })
       },
       openDialog(index, row) {
-          this.dialogTitle = '查看名单'
         this.listDialogVisible=true
         Object.assign(this.listDialogform, this.selectRowNum2Str(row))
 
@@ -186,7 +185,7 @@
       showValueList(index, row) {
         var rosterid = row.rosterid.toString()
         var datatype = 'view'
-        this.$router.push({ name: 'valuelist', params: { rosterid: rosterid, datatype: datatype}})
+        this.$router.push({ name: 'showValueList', params: { rosterid: rosterid, datatype: datatype}})
       },
       selectFocus (name) {
         if (name === 'datatype' &&　this.datatypeOptions.length === 0) {
