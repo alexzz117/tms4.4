@@ -13,6 +13,7 @@ import List from '@/components/run/List'
 import NameList from '@/components/mgr/NameList'
 import ShowValueList from '@/components/mgr/ShowValueList'
 import AlarmEventSend from '@/components/alarm/AlarmEventSend'
+import AlarmeventOperator from '@/components/alarm/AlarmeventOperator'
 import ValueList from '@/components/run/ValueList'
 import Txn from '@/components/run/Txn'
 import Rule from '@/components/run/Rule'
@@ -98,6 +99,11 @@ export default new Router({
           path: 'alarmEventSend_vue',
           name: 'alarmEventSend',
           component: AlarmEventSend
+        },
+        {
+          path: 'alarmeventOperator_vue',
+          name: 'alarmeventOperator',
+          component: AlarmeventOperator
         },
         {
           path: 'txn_vue',
