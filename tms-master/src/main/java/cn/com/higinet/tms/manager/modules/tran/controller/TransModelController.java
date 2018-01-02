@@ -13,10 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -75,21 +72,28 @@ public class TransModelController {
 	 * 初始化交易模型正式库
 	 */
 	@RequestMapping(value = "/queryOf", method = RequestMethod.POST)
-	public Model initTranModeOf( @RequestBody Map<String, String> reqs ) {
+	@ResponseBody
+	public Map<String, Object> initTranModeOf( @RequestBody Map<String, String> reqs ) {
 
 		Model model = new Model();
 		String txnid = reqs.get( "tab_name" );
 
 		List<Map<String, Object>> refTblFd = transModelService.getCanRefTable();
 		List<Map<String, Object>> sourceType = tmsCodeDictService.listCodeCateGorp( null );
+//
+//		model.set( "sourceType", sourceType );
+//		model.set( "refTblFd", refTblFd );
+//		model.set( "canRefTable", getCanRefTable( refTblFd ) );
+//		model.set( "func", getFunc() );
+//		model.set( "funcParam", getFuncParam() );
 
-		model.set( "sourceType", sourceType );
-		model.set( "refTblFd", refTblFd );
-		model.set( "canRefTable", getCanRefTable( refTblFd ) );
-		model.set( "func", getFunc() );
-		model.set( "funcParam", getFuncParam() );
-
-		return model;
+		Map<String, Object> resMap = new HashMap<>();
+		resMap.put( "sourceType", sourceType );
+		resMap.put( "refTblFd", refTblFd );
+		resMap.put( "canRefTable", getCanRefTable( refTblFd ) );
+		resMap.put( "func", getFunc() );
+		resMap.put( "funcParam", getFuncParam() );
+		return resMap;
 	}
 
 	/**
