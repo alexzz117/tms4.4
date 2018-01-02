@@ -911,6 +911,24 @@ public class AlarmEventService {
 		}
 		return time;
 	}
+	
+	/**
+	 * 通过查询交易流水, 获取其中报警处理相关信息
+	 * 
+	 * @param cond
+	 *            查询条件参数值
+	 * @return
+	 */
+	public List<Map<String, Object>> getTrafficDataForAlarmProcessList(Map<String, List<Map<String, String>>> modelMap) {
+		String sql = "select TXNCODE, CHANCODE, TXNID, TXNTYPE, USERID, COUNTRYCODE, REGIONCODE, CITYCODE, TXNTIME, "
+				+ "DISPOSAL, MODELID, STRATEGY, PSSTATUS, ASSIGNID, ASSIGNTIME, OPERID, OPERTIME, AUDITID, AUDITTIME, "
+				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN("+ modelMap +")";
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql);
+		if (list == null || list.isEmpty())
+			return null;
+		return list;
+	}
+	
 	////////////////////////////////////////////////////// lemon20180101增加查询预警事件列表结束/////////////////////////////////////////////////
 
 }
