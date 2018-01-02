@@ -553,7 +553,7 @@
         if (this.$refs['dictInfoDialogForm']) {
           this.$refs['dictInfoDialogForm'].clearValidate()
         }
-      },
+      }
     }
   }
 </script>
