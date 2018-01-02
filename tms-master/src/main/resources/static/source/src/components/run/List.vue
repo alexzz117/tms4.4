@@ -1,66 +1,98 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="100px" :model="listForm"
-             :inline="inline" style="text-align: left">
-      <el-form-item label="名单名称" prop="listFormFosterdesc">
-        <el-input v-model="listForm.rosterdesc"></el-input>
-      </el-form-item>
-      <el-form-item label="名单数据类型">
-        <el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择" :clearable="clearable">
-          <el-option
-            v-for="item in datatypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="名单类型">
-        <el-select v-model="listForm.rostertype" @focus="selectFocus('rostertype')" placeholder="请选择" :clearable="clearable">
-          <el-option
-            v-for="item in rostertypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-    </el-form>
-
-    <div style="margin-bottom: 10px;text-align: left ">
-      <el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button>
+    <div class="toolbar">
       <el-button plain class="el-icon-plus" @click="openDialog('add')" id="addBtn">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="del" :disabled="delBtnStatus">删除</el-button>
-      <el-button plain class="el-icon-edit" @click="showValueList" :disabled="btnStatus">名单值</el-button>
-      <el-button plain class="el-icon-upload" @click="importList" :disabled="btnStatus">导入</el-button>
-      <el-button plain class="el-icon-download" @click="exportList" :disabled="btnStatus">导出</el-button>
+      <!--<el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>-->
+      <!--<el-button plain class="el-icon-delete" @click="del" :disabled="delBtnStatus">删除</el-button>-->
+      <!--<el-button plain class="el-icon-edit" @click="showValueList" :disabled="btnStatus">名单值</el-button>-->
+      <!--<el-button plain class="el-icon-upload" @click="importList" :disabled="btnStatus">导入</el-button>-->
+      <!--<el-button plain class="el-icon-download" @click="exportList" :disabled="btnStatus">导出</el-button>-->
+
+      <el-form label-position="right" label-width="100px" :model="listForm"
+               :inline="inline" class="toolbar-form">
+        <el-form-item label="名单名称" prop="listFormFosterdesc">
+          <el-input v-model="listForm.rosterdesc"></el-input>
+        </el-form-item>
+        <!--<el-form-item label="名单数据类型">-->
+        <!--<el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择" :clearable="clearable">-->
+        <!--<el-option-->
+        <!--v-for="item in datatypeOptions"-->
+        <!--:key="item.value"-->
+        <!--:label="item.label"-->
+        <!--:value="item.value">-->
+        <!--</el-option>-->
+        <!--</el-select>-->
+        <!--</el-form-item>-->
+        <el-form-item label="名单类型">
+          <el-select v-model="listForm.rostertype" @focus="selectFocus('rostertype')" placeholder="请选择" :clearable="clearable">
+            <el-option
+              v-for="item in rostertypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button>
+        </el-form-item>
+      </el-form>
     </div>
-    <el-table
-      :data="gridData"
-      stripe
-      border
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
-      <el-table-column prop="rostername" label="名单英文名" align="left" width="120"></el-table-column>
-      <el-table-column prop="rosterdesc" label="名单名称" align="left" width="120"></el-table-column>
-      <el-table-column prop="datatype" label="名单数据类型" align="left" width="120" :formatter="formatter"></el-table-column>
-      <el-table-column prop="rostertype" label="名单类型" align="left" width="120" :formatter="formatter"></el-table-column>
-      <el-table-column prop="valuecount" label="值数量" align="left" width="120"></el-table-column>
-      <el-table-column prop="createtime" label="创建时间" align="left" width="150" :formatter="formatter"></el-table-column>
-      <el-table-column prop="iscache" label="是否缓存" align="left" width="120" :formatter="formatter"></el-table-column>
-      <el-table-column prop="remark" label="备注" align="left" width="120"></el-table-column>
-    </el-table>
-    <el-pagination style="margin-top: 10px; text-align: right;"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :current-page="pageindex"
-                   :page-sizes="[10, 25, 50, 100]"
-                   :page-size="pagesize"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="total">
-    </el-pagination>
+    <section class="table">
+      <el-table
+        :data="gridData"
+        @selection-change="handleSelectionChange"
+        class="scroll">
+        <el-table-column label="操作" width="160">
+          <template slot-scope="scope">
+            <el-button
+              icon="el-icon-edit"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'edit')"
+              title="编辑"></el-button>
+            <el-button
+              icon="el-icon-delete"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'del')"
+              title="删除"></el-button>
+            <el-button
+              icon="el-icon-tickets"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'valueList')"
+              title="名单值"></el-button>
+            <el-button
+              icon="el-icon-upload"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'upload')"
+              title="导入"></el-button>
+            <el-button
+              icon="el-icon-download"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'download')"
+              title="导出"></el-button>
+          </template>
+        </el-table-column>
+        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
+        <el-table-column prop="rostername" label="名单英文名" align="left" width="120"></el-table-column>
+        <el-table-column prop="rosterdesc" label="名单名称" align="left" width="120"></el-table-column>
+        <el-table-column prop="datatype" label="名单数据类型" align="left" width="120" :formatter="formatter"></el-table-column>
+        <el-table-column prop="rostertype" label="名单类型" align="left" width="120" :formatter="formatter"></el-table-column>
+        <el-table-column prop="valuecount" label="值数量" align="left" ></el-table-column>
+        <el-table-column prop="createtime" label="创建时间" align="left" width="150" :formatter="formatter"></el-table-column>
+        <el-table-column prop="iscache" label="是否缓存" align="left" :formatter="formatter"></el-table-column>
+        <el-table-column prop="remark" label="备注" align="left"></el-table-column>
+      </el-table>
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :current-page="pageindex"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pagesize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total">
+      </el-pagination>
+    </section>
+
     <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible">
       <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
                style="text-align: left">
@@ -71,7 +103,7 @@
           <el-input v-model="listDialogform.rosterdesc" auto-complete="off" :disabled="status"></el-input>
         </el-form-item>
         <el-form-item label="名单数据类型" prop="datatype" data="datatype">
-          <el-select v-model="listDialogform.datatype" :disabled="status" :clearable="clearable">
+          <el-select v-model="listDialogform.datatype" :disabled="status" :clearable="clearable" @focus="selectFocus('datatype')">
             <el-option
               v-for="item in datatypeOptions"
               :key="item.value"
@@ -81,7 +113,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="名单类型" prop="rostertype" data="rostertype">
-          <el-select v-model="listDialogform.rostertype" :disabled="status" :clearable="clearable">
+          <el-select v-model="listDialogform.rostertype" :disabled="status" :clearable="clearable" @focus="selectFocus('rostertype')">
             <el-option
               v-for="item in rostertypeOptions"
               :key="item.value"
@@ -91,17 +123,18 @@
           </el-select>
         </el-form-item>
         <el-form-item label="是否缓存" prop="iscache" data="iscache">
-          <el-radio v-model="listDialogform.iscache" label="1">是</el-radio>
-          <el-radio v-model="listDialogform.iscache" label="0">否</el-radio>
+          <!--<el-radio v-model="listDialogform.iscache" label="1">是</el-radio>-->
+          <!--<el-radio v-model="listDialogform.iscache" label="0">否</el-radio>-->
+          <el-switch v-model="listDialogform.iscache" active-value= "1"  inactive-value= "0"></el-switch>
         </el-form-item>
         <el-form-item label="备注" prop="remark" data="remark">
           <el-input type="textarea" v-model="listDialogform.remark"></el-input>
         </el-form-item>
+        <el-form-item label="" size="large">
+          <el-button type="primary" @click="submitForm('listDialogform')" data="saveBtn">保 存</el-button>
+          <el-button @click="listDialogVisible = false" data="cancelBtn">取 消</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="listDialogVisible = false" data="cancelBtn">取 消</el-button>
-        <el-button type="primary" @click="submitForm('listDialogform')" data="saveBtn">保 存</el-button>
-      </div>
     </el-dialog>
 
     <el-dialog title="名单管理导入" :visible.sync="importDialogVisible">
@@ -111,7 +144,9 @@
         action="/context/manager/mgr/import"
         :on-preview="handlePreview"
         :on-remove="handleRemove"
+        :on-change="handleChange"
         :file-list="fileList"
+        :multiple = 'multiple'
         :auto-upload="false">
         <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
         <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
@@ -124,10 +159,6 @@
       <el-button type="text" @click="exportAction('csv')">CSV</el-button>
       <el-button type="text" @click="exportAction('xls')">Excel2003及以下版本</el-button>
       <el-button type="text" @click="exportAction('xlsx')">Excel2007及以上版本</el-button>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="listDialogVisible = false" data="cancelBtn">取 消</el-button>
-        <el-button type="primary" @click="submitForm('listDialogform')" data="saveBtn">保 存</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -160,12 +191,13 @@
         if (flag === 'edit') {
           this.dialogTitle = '编辑名单'
           this.status = true
-          var length = this.multipleSelection.length
-          if (length !== 1) {
-            this.$message('请选择一行名单信息。')
-            return
-          }
-          this.listDialogform = util.extend({}, this.multipleSelection[0])
+//          var length = this.multipleSelection.length
+//          if (length !== 1) {
+//            this.$message('请选择一行名单信息。')
+//            return
+//          }
+//          this.listDialogform = util.extend({}, this.multipleSelection[0])
+          this.listDialogform =  Object.assign({}, this.selectedRow)
         } else if (flag === 'add') {
           this.dialogTitle = '新建名单'
           this.status = false
@@ -225,7 +257,10 @@
           url: '/mgr/add',
           param: this.listDialogform,
           success: function (data) {
-            self.$message('创建成功。')
+            self.$message({
+              type: 'success',
+              message: '创建成功!'
+            })
             self.listDialogVisible = false
             self.sel()
           }
@@ -241,7 +276,8 @@
           ajax.post({
             url: '/mgr/del',
             param: {
-              del: this.multipleSelection
+//              del: this.multipleSelection
+              del: [this.selectedRow]
             },
             success: function (data) {
               self.$message({
@@ -252,22 +288,18 @@
             }
           })
         }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
         })
       },
       sel(pageinfo) {
         var self = this;
         var param;
         if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
-          param = util.extend({
+          param = Object.assign({
             pageindex:this.pageindex,
             pagesize:this.pagesize
           }, this.listForm, pageinfo)
         } else {
-          param = util.extend({
+          param = Object.assign({
             pageindex:this.pageindex,
             pagesize:this.pagesize
           }, this.listForm)
@@ -289,23 +321,28 @@
           url: '/mgr/mod',
           param: this.listDialogform,
           success: function (data) {
-            self.$message('更新成功。')
+            self.$message({
+              type: 'success',
+              message: '更新成功!'
+            })
             self.listDialogVisible = false
             self.sel()
           }
         })
       },
       showValueList() {
-        var rosterid = this.multipleSelection[0].rosterid
-        var datatype = this.multipleSelection[0].datatype
+//        var rosterid = this.multipleSelection[0].rosterid
+//        var datatype = this.multipleSelection[0].datatype
+        var rosterid = this.selectedRow.rosterid
+        var datatype = this.selectedRow.datatype
         this.$router.push({ name: 'valuelist', params: { rosterid: rosterid, datatype: datatype}})
       },
       importList() {
         this.importDialogVisible = true
       },
       exportList() {
-        var row = this.multipleSelection[0]
-        if(row.valuecount === 0){
+//        var row = this.multipleSelection[0]
+        if(this.selectedRow.valuecount === 0){
           this.$message('名单中没有名单值。');
           return;
         }
@@ -341,7 +378,27 @@
         }
       },
       submitUpload() {
-        this.$refs.upload.submit();
+        var self = this
+//        this.$refs.upload.submit();
+        var format = this.file.name.split('.').pop()
+        this.uploadForm = new FormData()
+        this.uploadForm.append('importFile', this.file)
+        this.uploadForm.append('rosterid',  this.multipleSelection[0].rosterid)
+        this.uploadForm.append('rosterdesc',  this.multipleSelection[0].rosterdesc)
+        this.uploadForm.append('format',  format)
+        ajax.post({
+          url: '/mgr/import',
+          param: self.uploadForm,
+          success: function (data) {
+            console.log(data)
+          }
+        })
+      },
+      handleChange(file, fileList) {
+        this.file = file
+        debugger
+        console.log(file);
+        console.log(fileList)
       },
       handleRemove(file, fileList) {
         console.log(file, fileList);
@@ -350,18 +407,37 @@
         console.log(file);
       },
       exportAction(flag) {
-        let row = this.multipleSelection[0]
+//        let row = this.multipleSelection[0]
+        let row = this.selectedRow
         let rosterId = `&rosterid=${row.rosterid}&rosterdesc=${row.rosterdesc}`
         let params = util.serializeObj(this.listForm) + rosterId + "&flag="+flag;
         let url = '/context/manager/mgr/export?' + params;
         window.open(url);
-//        var rowData = g.table.selectedOneRow();
-//
-//        export_form.set({rosterId:rowData.ROSTERID,rosterdesc:rowData.ROSTERDESC});
-//        var export_params = export_form.serialize();
-//        jcl.postJSON('/tms/mgr/exportLog', export_params, function(data){
-//        });
         this.exportDialogVisible = false
+      },
+      handleRow(index, row, oper) {
+        this.selectedRow = row
+        switch(oper)
+        {
+          case 'edit':
+            return this.openDialog('edit')
+            break;
+          case 'del':
+            return this.del()
+            break;
+          case 'valueList':
+            return this.showValueList()
+            break;
+          case 'upload':
+            return this.importList()
+            break;
+          case 'download':
+            return this.exportList()
+            break;
+          default:
+            return
+            break;
+        }
       }
     },
     data() {
@@ -422,8 +498,38 @@
         multipleSelection: [],
         flag: '',
         importDialogVisible: false,
-        exportDialogVisible: false
+        exportDialogVisible: false,
+        fileList: [],
+        multiple: false,
+        selectedRow: {}
       }
     }
   }
 </script>
+
+<style>
+  .toolbar {
+    margin-bottom: 20px;
+    text-align: left;
+    background-color: #F0F1F4;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 20px;
+  }
+
+  .toolbar .toolbar-form {
+    text-align: left;
+    float: right;
+    display: inline-block;
+  }
+
+  .toolbar .toolbar-form .el-form-item__content {
+    line-height: 60px;
+  }
+
+  .table {
+    padding: 20px;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(112, 112, 112, 0.12);
+  }
+</style>

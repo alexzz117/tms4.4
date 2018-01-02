@@ -8,34 +8,11 @@ var config = {
   // prefix: '/api' // local mock
 }
 
-// function post (url, param, cb, errorCb) {
-//   var sendUrl = config.prefix + url + config.suffix
-//   axios.post(sendUrl, param)
-//     .then(function (response) {
-//       // console.log(response)
-//       if (response.status === 200) {
-//         if (response.data && response.data.success === true) {
-//           var data = util.toggleObjKey(response.data)
-//           cb(data)
-//         } else {
-//           if (typeof errorCb === 'function') {
-//             errorCb(response.data)
-//           } else {
-//             alert(response.data.error)
-//           }
-//           // this.$message(response.data.error)
-//         }
-//       }
-//     })
-//     .catch(function (error) {
-//       alert(error)
-//     })
-// }
-
 let modelDef = {
   manager: '/manager',
   timer: '',
-  plus: '/plus'
+  plus: '/plus',
+  login: ''
 }
 
 let defaultOption = {

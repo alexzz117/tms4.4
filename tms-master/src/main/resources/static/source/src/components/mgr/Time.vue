@@ -11,14 +11,14 @@
           <template slot-scope="scope">
             <el-button
               icon="el-icon-edit"
-              size="mini"
               type="text"
-              @click="handleEdit(scope.$index, scope.row)"></el-button>
+              @click="handleEdit(scope.$index, scope.row)"
+              title="编辑"></el-button>
             <el-button
               icon="el-icon-delete"
-              size="mini"
               type="text"
-              @click="handleDelete(scope.$index, scope.row)"></el-button>
+              @click="handleDelete(scope.$index, scope.row)"
+              title="删除"></el-button>
           </template>
         </el-table-column>
         <el-table-column label="任务启停" width="80">

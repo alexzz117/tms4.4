@@ -7,9 +7,32 @@
 </template>
 
 <script>
+  import util from '@/common/util'
 
   export default {
-    name: 'app'
+    name: 'app',
+    //监听路由检查登录
+    watch:{
+      "$route" : 'checkLogin'
+    },
+    created() {
+      this.checkLogin();
+    },
+    methods: {
+      checkLogin(){
+        //检查是否存在session
+        //cookie操作方法在源码里有或者参考网上的即可
+//        debugger
+//        if(!util.getCookie('SESSION')){
+//          console.log(util.getCookie('SESSION'))
+//          //如果没有登录状态则跳转到登录页
+//          this.$router.push({ name: 'login'})
+//        }else {
+//          //否则跳转到登录后的页面
+//          this.$router.push({name: 'user'})
+//        }
+      }
+    }
   }
 </script>
 
@@ -30,8 +53,8 @@
     color: #2c3e50;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
+    /*display: flex;*/
+    /*align-items: center;*/
   }
 
   /*************element 样式调整 start************/
@@ -61,8 +84,42 @@
   .el-select{
     width: 100%;
   }
+  .el-date-editor.el-input, .el-date-editor.el-input__inner {
+    width: 100%;
+  }
+  /*.el-table {*/
+    /*border: 1px solid rgb(238, 241, 246)*/
+  /*}*/
 
-  .el-table {
-    border: 1px solid rgb(238, 241, 246)
+  /********定制webkit内核滚动条**********/
+  .scroll::-webkit-scrollbar {
+    width: 12px;
+    height: 10px;
+  }
+  .scroll::-webkit-scrollbar-button       {
+    display:none
+  }
+  .scroll::-webkit-scrollbar-button    {
+    background-color:#FF7677;
+  }
+  .scroll::-webkit-scrollbar-track        {
+    display:none
+  }
+  .scroll::-webkit-scrollbar-track-piece  {
+    display:none
+  }
+  .scroll::-webkit-scrollbar-thumb {
+    /*background: rgb(158, 165, 171);*/
+    background: #e9ecf2;
+    display: none;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+  }
+  .scroll::-webkit-scrollbar-corner       { /* 6 */ }
+  .scroll::-webkit-resizer                { /* 7 */ }
+  .scroll:hover::-webkit-scrollbar-thumb{
+    display: block;
+    opacity: 0.4;
   }
 </style>

@@ -1,42 +1,65 @@
 <template>
   <div>
     <h1>名单值管理 -> {{ title }}</h1>
-    <el-form label-position="right" label-width="100px" :model="valueListForm"
-             :inline="inline" style="text-align: left">
-      <el-form-item label="名单值">
-        <el-input v-model="valueListForm.rostervalue"></el-input>
-      </el-form-item>
-    </el-form>
-    <div style="margin-bottom: 10px;text-align: left ">
-      <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
+    <div class="toolbar">
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="del" :disabled="delBtnStatus">删除</el-button>
-      <el-button plain class="el-icon-edit" @click="changeValue" :disabled="btnStatus">值转换</el-button>
+      <!--<el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>-->
+      <!--<el-button plain class="el-icon-delete" @click="del" :disabled="delBtnStatus">删除</el-button>-->
+      <!--<el-button plain class="el-icon-edit" @click="changeValue" :disabled="btnStatus">值转换</el-button>-->
       <el-button plain class="el-icon-back" @click="backList">返回</el-button>
+
+      <el-form label-position="right" label-width="100px" :model="valueListForm"
+               :inline="inline" class="toolbar-form">
+        <el-form-item label="名单值">
+          <el-input v-model="valueListForm.rostervalue"></el-input>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
+        </el-form-item>
+      </el-form>
     </div>
-    <el-table
-      :data="gridData"
-      stripe
-      border
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
-      <el-table-column prop="rostervalue" label="名单值" align="left" width="200"></el-table-column>
-      <el-table-column prop="enabletime" label="开始时间" align="left" width="200"></el-table-column>
-      <el-table-column prop="disabletime" label="结束时间" align="left" width="200"></el-table-column>
-      <el-table-column prop="createtime" label="创建时间" align="left" width="200"></el-table-column>
-      <el-table-column prop="remark" label="备注" align="left" width="300"></el-table-column>
-    </el-table>
-    <el-pagination style="margin-top: 10px; text-align: right;"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :current-page="pageindex"
-                   :page-sizes="[10, 25, 50, 100]"
-                   :page-size="pagesize"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="total">
-    </el-pagination>
+
+    <section class="table">
+      <el-table
+        :data="gridData"
+        @selection-change="handleSelectionChange">
+        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
+        <el-table-column label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button
+              icon="el-icon-edit"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'edit')"
+              title="编辑"></el-button>
+            <el-button
+              icon="el-icon-delete"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'del')"
+              title="删除"></el-button>
+            <el-button
+              icon="el-icon-tickets"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'changeValue')"
+              title="值转换"></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="rostervalue" label="名单值" align="left"></el-table-column>
+        <el-table-column prop="enabletime" label="开始时间" align="left"></el-table-column>
+        <el-table-column prop="disabletime" label="结束时间" align="left"></el-table-column>
+        <el-table-column prop="createtime" label="创建时间" align="left"></el-table-column>
+        <el-table-column prop="remark" label="备注" align="left"></el-table-column>
+      </el-table>
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :current-page="pageindex"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pagesize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total">
+      </el-pagination>
+    </section>
+
     <el-dialog :title="dialogTitle" :visible.sync="valueListDialogVisible">
       <el-form :model="valueListDialogform" :rules="rules" ref="valueListDialogform" :label-width="formLabelWidth"
                style="text-align: left">
@@ -107,12 +130,13 @@
         this.flag = flag
         this.dialogTitle = `名单值管理->${this.title}`
         if (flag === 'edit') {
-          var length = this.multipleSelection.length
-          if (length !== 1) {
-            this.$message('请选择一行名单值信息。')
-            return
-          }
-          this.valueListDialogform = util.extend({}, this.multipleSelection[0])
+//          var length = this.multipleSelection.length
+//          if (length !== 1) {
+//            this.$message('请选择一行名单值信息。')
+//            return
+//          }
+//          this.valueListDialogform = Object.assign({}, this.multipleSelection[0])
+          this.valueListDialogform = Object.assign({}, this.selectedRow)
         } else if (flag === 'add') {
           if (this.$refs['valueListDialogform']) {
             this.$refs['valueListDialogform'].resetFields();
@@ -185,7 +209,7 @@
       },
       add() {
         var self = this
-        var param = util.extend({
+        var param = Object.assign({
           rosterid: this.listData.rosterid,
           datatype: this.listData.datatype,
           rosterdesc: this.listData.rosterdesc,
@@ -195,7 +219,10 @@
           url: '/mgr/valueadd',
           param: param,
           success: function (data) {
-            self.$message('创建成功。')
+            self.$message({
+              type: 'success',
+              message: '创建成功!'
+            })
             self.valueListDialogVisible = false
             self.sel()
           }
@@ -212,7 +239,8 @@
             url: '/mgr/valuedel',
             param: {
               postData: {
-                del: this.multipleSelection
+//                del: this.multipleSelection
+                del: [this.selectedRow]
               }
             },
             success: function (data) {
@@ -224,10 +252,6 @@
             }
           })
         }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
         })
       },
       sel(pageinfo) {
@@ -240,9 +264,9 @@
           datatype: this.listData.datatype
         }
         if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
-          param = util.extend(comParam, this.valueListForm, pageinfo)
+          param = Object.assign(comParam, this.valueListForm, pageinfo)
         } else {
-          param = util.extend(comParam, this.valueListForm)
+          param = Object.assign(comParam, this.valueListForm)
         }
         ajax.post({
           url: '/mgr/valuelist',
@@ -256,7 +280,7 @@
       },
       update() {
         var self = this;
-        var param = util.extend({
+        var param = Object.assign({
           rosterid: this.listData.rosterid,
           datatype: this.listData.datatype,
           rosterdesc: this.listData.rosterdesc,
@@ -266,7 +290,10 @@
           url: '/mgr/valuemod',
           param: param,
           success: function (data) {
-            self.$message('更新成功。')
+            self.$message({
+              type: 'success',
+              message: '更新成功!'
+            })
             self.valueListDialogVisible = false
             self.sel()
           }
@@ -289,7 +316,8 @@
       },
       // 单击值转换确定按钮时
       constrast() {
-        var rosterValue = this.multipleSelection[0]
+//        var rosterValue = this.multipleSelection[0]
+        var rosterValue = this.selectedRow
         ajax.post({
           url: '/mgr/changevalue',
           param: {
@@ -300,7 +328,10 @@
             rosterdescout: this.listData.rosterdesc
           },
           success: function (data) {
-            self.$message('值转换成功。')
+            self.$message({
+              type: 'success',
+              message: '值转换成功!'
+            })
             self.changeValueDialogVisible= false
             self.sel()
           }
@@ -311,7 +342,24 @@
       },
       backList() {
         this.$router.push({ name: 'list' })
-//        this.$router.push('list');
+      },
+      handleRow(index, row, oper) {
+        this.selectedRow = row
+        switch(oper)
+        {
+          case 'edit':
+            return this.openDialog('edit')
+            break;
+          case 'del':
+            return this.del()
+            break;
+          case 'changeValue':
+            return this.changeValue()
+            break;
+          default:
+            return
+            break;
+        }
       }
     },
     data() {
@@ -363,7 +411,8 @@
         changeValueTableData: [],
         valuecurrentRow: {},
         btnStatus: true,
-        delBtnStatus: true
+        delBtnStatus: true,
+        selectedRow: {}
       }
     }
   }

@@ -1,31 +1,41 @@
 <template>
-  <div class="login">
-    <el-form ref="loginForm" :model="loginForm" label-width="80px" :rules="rules">
-      <el-form-item label="用户名" prop="username">
-        <el-input v-model="loginForm.username"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">登录</el-button>
-        <el-button @click="resetForm('loginForm')">重置</el-button>
-      </el-form-item>
-    </el-form>
+  <div class="login-bg">
+    <header class="sso-header">
+      <a href="http://www.lagou.com" class="logo ">
+      </a>
+    </header>
+    <section class="content-box">
+      <div class="form-head">登录</div>
+      <el-form ref="loginForm" :model="loginForm" :rules="rules" size="large">
+        <el-form-item label="" prop="username">
+          <el-input v-model="loginForm.username" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="" prop="password">
+          <el-input type="password" v-model="loginForm.password" auto-complete="off"
+                    placeholder="请输入密码" @keyup.enter.native="pressKey"></el-input>
+        </el-form-item>
+        <el-form-item label="">
+          <el-checkbox v-model="checked">记住密码</el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('loginForm')" style="width: 100%">登录</el-button>
+        </el-form-item>
+      </el-form>
+    </section>
   </div>
-
 </template>
 
 <script>
   import ajax from '@/common/ajax'
   import util from '@/common/util'
+//  import '../assets/css/login.css';
 
   export default {
     data() {
       return {
         loginForm: {
-          username: '',
-          password: ''
+          username: 'admin',
+          password: '123456'
         },
         rules: {
           username: [
@@ -34,38 +44,84 @@
           password: [
             { required: true, message: '请输入密码', trigger: 'blur' }
           ]
-        }
+        },
+        checked: true
       }
     },
     methods: {
-      onSubmit() {
-        var param = {
-          username: this.loginForm.username,
-          password: util.crypt.md5(this.loginForm.password)
-        }
-
-        ajax.post({
-          url: '/cmc/login',
-          param: param,
-          success: function (data) {
-//            this.$message('登录成功。')
-//            console.log(data)
-            sessionStorage.setItem("userToken",'1111')
-            sessionStorage.setItem("loginUser",'bbb')
-            this.$router.push({ name: '/'})
+      submitForm(formName) {
+        var self = this
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            self.login()
+          } else {
+            return false;
           }
         })
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
+      },
+      login () {
+        var self = this
+        var param = {
+          username: this.loginForm.username,
+          password: util.crypt.md5(this.loginForm.password)
+        }
+        ajax.post({
+          url: '/login',
+          model: ajax.model.login,
+          param: param,
+          success: function (data) {
+//            sessionStorage.setItem("loginStatus", true)
+//            sessionStorage.setItem("userToken",'1111')
+            self.$router.push({ name: 'list'})
+          }
+        })
+      },
+      pressKey (e) {
+        if (e.keyCode === 13) {
+          this.submitForm('loginForm')
+        }
       }
     }
   }
 </script>
 
 <style>
-.login{
-  margin: 0 auto;
-  width: 30%;
-}
+  .sso-header {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    background-color: #67a8e4;
+  }
+
+  .content-box {
+    width: 290px;
+    height: 274px;
+    margin: -205px auto 60px;
+    padding: 62px 70px 38px 78px;
+    background-color: #fff;
+    /*background-color: silver;*/
+    display: table;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    border: 1px solid #dce1e6;
+    position: relative;
+    z-index: 1;
+    color: #67a8e4;
+  }
+
+  .form-head{
+    height: 33px;
+  }
+
+  .login-bg{
+    width: 100%;
+    height: 100%;
+    /*background-repeat: no-repeat;*/
+    /*background-image: url("../assets/images/login_bg.jpg");*/
+    /*background-position: center;*/
+  }
 </style>

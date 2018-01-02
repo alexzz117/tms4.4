@@ -171,7 +171,10 @@
           url: '/role/add',
           param: this.roleDialogform,
           success: function (data) {
-            self.$message('创建成功。')
+            self.$message({
+              type: 'success',
+              message: '创建成功!'
+            })
             this.savebtnStatus = false
             self.roleDialogVisible = false
             self.sel()
@@ -187,24 +190,19 @@
           type: 'warning'
         }).then(() => {
           ajax.post({
-            url: '/role/del',
-            param: {
-              roleid: data.role_id
-            },
-            success: function (data) {
-              self.$message({
-                type: 'success',
-                message: '删除成功!'
-              })
-              self.sel()
-            }
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
+          url: '/role/del',
+          param: {
+            roleid: data.role_id
+          },
+          success: function (data) {
+            self.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            self.sel()
+          }
         })
+      }).catch(() => {})
       },
       sel(pageinfo) {
         var self = this;
@@ -238,7 +236,10 @@
           url: '/role/mod',
           param: this.roleDialogform,
           success: function (data) {
-            self.$message('更新成功。')
+            self.$message({
+              type: 'success',
+              message: '更新成功!'
+            })
             this.savebtnStatus = false
             self.roleDialogVisible = false
             self.sel()
@@ -286,7 +287,10 @@
             funcs: this.$refs.grantTree.getCheckedNodes()
           },
           success: function (data) {
-            self.$message('更新成功。')
+            self.$message({
+              type: 'success',
+              message: '更新成功!'
+            })
             self.savebtnStatus = false
             self.grantDialogVisible = false
             self.sel()
