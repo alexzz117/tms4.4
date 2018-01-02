@@ -47,6 +47,19 @@ public class AlarmEventController {
 		return model;
 	}
 
+	
+	/**
+	 * 预警事件处理交易
+	 * 
+	 * @param reqs
+	 * @return
+	 */
+	@RequestMapping(value = "/executeList", method = RequestMethod.POST)
+	public Model executeList(@RequestBody Map<String, String> modelMap) {
+		Model model = new Model();
+		model.setPage(alarmEventService.QueryListByPage(modelMap));
+		return model;
+	}
 	/**
 	 * 报警事件处理页面
 	 * 
