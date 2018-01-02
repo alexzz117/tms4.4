@@ -171,13 +171,12 @@ public class AlarmEventService {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String fraud_type = MapUtil.getString(cond, "FRAUD_TYPE");
 		String short_action = MapUtil.getString(cond, "SHORT_ACTION");
-		cond.put("FRAUD_TYPE", fraud_type);
-		cond.put("SHORT_ACTION", short_action);
+		cond.put("FRAUD_TYPE", fraud_type);//欺诈类型编码
+		cond.put("SHORT_ACTION", short_action);//处置动作
 		map.putAll(cond);
 		map.put("PS_ID", psId);
-		//map.put("PS_OPERID", operator.get("OPERATOR_ID"));
-		map.put("PS_OPERID", "1");
-		map.put("PS_TIME", System.currentTimeMillis());
+		map.put("PS_OPERID", cond.get("PS_OPERID"));//处理人
+		map.put("PS_TIME", System.currentTimeMillis());//处理时间
 //		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME,FRAUD_TYPE,SHORT_ACTION)"
 //				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME, :FRAUD_TYPE, :SHORT_ACTION)";
 		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME)"
@@ -607,7 +606,7 @@ public class AlarmEventService {
 			tms_mgr_alarm_process.put("PS_RESULT", "1");
 			tms_mgr_alarm_process.put("PS_INFO", "报警事件分派");
 			tms_mgr_alarm_process.put("TXN_CODE", String.valueOf(tms_run_trafficdata.get("TXNCODE"))); // 交易流水号
-			tms_mgr_alarm_process.put("PS_OPERID", String.valueOf(operaterInfo.get("OPERATOR_ID"))); // 报警处理操作员
+			tms_mgr_alarm_process.put("PS_OPERID", String.valueOf(operaterInfo.get("operator_id"))); // 报警处理操作员
 			Map<String, Object> infoMap = addAlarmProcessInfo(tms_mgr_alarm_process, request);
 
 			// 报警事件分派，更新工作量统计数据-----TMS_MGR_ALARM_OPERATOR_STAT;
@@ -615,7 +614,7 @@ public class AlarmEventService {
 			//tms_mgr_alarm_operator_stat.put("ASSIGNID", operator.get("OPERATOR_ID"));// ASSIGNID分派人员
 			tms_mgr_alarm_operator_stat.put("ASSIGNID", "1");// ASSIGNID分派人员
 			tms_mgr_alarm_operator_stat.put("ASSIGNTIME", infoMap.get("PS_TIME")); // ASSIGNTIME分派时间
-			tms_mgr_alarm_operator_stat.put("OPERID", String.valueOf(operaterInfo.get("OPERATOR_ID"))); // OPERID报警处理操作员
+			tms_mgr_alarm_operator_stat.put("OPERID", String.valueOf(operaterInfo.get("operator_id"))); // OPERID报警处理操作员
 			boolean status = "00".equals(psStatus) ? false : true;
 			monitorStatService.updateAlarmAssignOperatorStat(MapUtil.getString(tms_run_trafficdata, "OPERID"),
 					MapUtil.getLong(tms_run_trafficdata, "ASSIGNTIME"), status, MapUtil.getString(tms_mgr_alarm_operator_stat, "OPERID"), currTime);
@@ -625,7 +624,7 @@ public class AlarmEventService {
 			tms_run_trafficdata.put("ASSIGNID","1");//分派人员
 			//tms_run_trafficdata.put("ASSIGNID", operator.get("OPERATOR_ID"));//分派人员
 			tms_run_trafficdata.put("ASSIGNTIME", infoMap.get("PS_TIME"));//分派时间
-			tms_run_trafficdata.put("OPERID",  String.valueOf(operaterInfo.get("OPERATOR_ID")));//报警处理操作员
+			tms_run_trafficdata.put("OPERID",  String.valueOf(operaterInfo.get("operator_id")));//报警处理操作员
 			updateTransProcessInfo(tms_run_trafficdata);
 
 		}
@@ -888,16 +887,16 @@ public class AlarmEventService {
 		if (!StringUtil.isEmpty(conds.get("txncode"))) {
 			sb.append("TRAFFIC.TXNCODE =:txncode  AND ");
 		}
-		if (!StringUtil.isEmpty(conds.get("starttime"))) {
-			long time1 = getMillisTime(conds.get("starttime"));
-			sb.append("TRAFFIC.TXNTIME >=:time1  AND ");
+		if (!StringUtil.isEmpty(conds.get("operate_time"))) {
+			long operate_time = getMillisTime(conds.get("operate_time"));
+			sb.append("TRAFFIC.TXNTIME >=:operate_time  AND ");
 		}
-		if (!StringUtil.isEmpty(conds.get("endtime"))) {
-			long time2 = getMillisTime(conds.get("endtime"));
-			sb.append("TRAFFIC.TXNTIME <=:time2  AND ");
+		if (!StringUtil.isEmpty(conds.get("end_time"))) {
+			long end_time = getMillisTime(conds.get("end_time"));
+			sb.append("TRAFFIC.TXNTIME <=:end_time  AND ");
 		}
-		if (!StringUtil.isEmpty(conds.get("psstatus"))) {
-			sb.append("TRAFFIC.PSSTATUS =:psstatus  AND ");
+		if (!StringUtil.isEmpty(conds.get("passtatus"))) {
+			sb.append("TRAFFIC.PSSTATUS =:passtatus  AND ");
 		}
 		// sb.append("(TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02' ||
 		// TRAFFIC.PSSTATUS = '04') ");
