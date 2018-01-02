@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,8 +96,9 @@ public class TransModelController {
 	 * 取ref中可引用字段
 	 */
 	@RequestMapping(value = "/queryCanRefFd", method = RequestMethod.POST)
-	public Model getCanRefFd( @RequestBody String tab_name ) {
-
+	public Model getCanRefFd( @RequestBody String param ) {
+		JSONObject params = JSON.parseObject(param);
+		String tab_name = params.getString("tab_name");
 		Model model = new Model();
 		model.set( "canRefFd", transModelService.getCanRefFd( tab_name ) );
 		return model;
@@ -127,7 +130,9 @@ public class TransModelController {
 			if( !has ) {
 				//cols.remove("FD_NAME");
 				//cols.remove("NAME");
-				list.add( cols );
+				Map<String,Object> item = new HashMap<>();
+				item.putAll(cols);
+				list.add( item );
 			}
 		}
 
