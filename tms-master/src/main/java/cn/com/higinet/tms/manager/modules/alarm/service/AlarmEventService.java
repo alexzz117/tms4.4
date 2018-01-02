@@ -920,9 +920,18 @@ public class AlarmEventService {
 	 * @return
 	 */
 	public List<Map<String, Object>> getTrafficDataForAlarmProcessList(Map<String, List<Map<String, String>>> modelMap) {
+		List<Map<String, String>> condList = modelMap.get( "TXNCODES" );
+		String rosterIds = "";
+		for( Map<String, String> delMap : condList ) {
+			String rosterId = MapUtil.getString( delMap, "txncode" );
+			rosterIds += ",'" + rosterId + "'";
+		}
+		rosterIds = rosterIds.substring( 1 );
+		
 		String sql = "select TXNCODE, CHANCODE, TXNID, TXNTYPE, USERID, COUNTRYCODE, REGIONCODE, CITYCODE, TXNTIME, "
 				+ "DISPOSAL, MODELID, STRATEGY, PSSTATUS, ASSIGNID, ASSIGNTIME, OPERID, OPERTIME, AUDITID, AUDITTIME, "
-				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN("+ modelMap +")";
+				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN("+ rosterIds +")";
+		
 		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql);
 		if (list == null || list.isEmpty())
 			return null;
