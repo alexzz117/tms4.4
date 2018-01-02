@@ -216,17 +216,27 @@ public class AlarmEventController {
 	public Model alarmAssignAction(@RequestBody Map<String, List<Map<String, String>>> modelMap) {
 		Model model = new Model();
 		Map<String, Object> cond = new HashMap<String, Object>();
+		//报警事件处理人员工作量
 		List<Map<String, Object>> operCapacityList = alarmEventService.getAlarmAssignOperCapacity(cond);
-
+		//有报警事件处理权限的操作员
 		List<Map<String, Object>> list = alarmEventService.getAlarmProcessAuthorityOperators();
 		if (list == null || list.isEmpty()) {
 			throw new TmsMgrServiceException("没有拥有[报警事件处理]权限的人员, 请设置.");
 		}
 		// 20180101-lemon 修改 由单个改成批量
-		List<Map<String, Object>> txnMapList = alarmEventService.getTrafficDataForAlarmProcessList(modelMap);
+		//通过查询交易流水, 获取其中报警处理相关信息
+		List<Map<String, String>> condList = modelMap.get("TXNCODES");
+		String rosterIds = "";
+		for (Map<String, String> delMap : condList) {
+			String rosterId = MapUtil.getString(delMap, "txncode");
+			rosterIds += ",'" + rosterId + "'";
+		}
+		rosterIds = rosterIds.substring(1);
+		List<Map<String, Object>> txnMapList = alarmEventService.getTrafficDataForAlarmProcessList(rosterIds);
 		model.set("txnMap", txnMapList);
 		model.set("operList", list);
 		model.setList(operCapacityList);
+		
 		return model;
 	}
 
@@ -237,19 +247,44 @@ public class AlarmEventController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/saveAssign", method = RequestMethod.POST)
-	public Model saveAlarmAssignAction(@RequestBody Map<String, String> reqs, HttpServletRequest request) {
-		String txnCodes = MapUtil.getString(reqs, "TXNCODES");
-		if (null != txnCodes && txnCodes.trim().length() > 0) {
-			String[] codes = txnCodes.split(",");
-			for (String cd : codes) {
-				reqs.put("TXN_CODE", cd);
-				alarmEventService.alarmAssign(reqs, request);
-			}
+	@RequestMapping(value = "/onsaveAssign", method = RequestMethod.POST)
+	public Model onsaveAlarmAssignAction(@RequestBody List<Map<String, List<Map<String, String>>>>reqs, HttpServletRequest request) {
+		List<Map<String, String>> txncodeList = reqs.get(0).get( "TXNCODES" );//流水信息
+		List<Map<String, String>> operater = reqs.get(0).get("OPERATER"); //选择的分派操作员信息
+		String rosterIds = "";
+		for( Map<String, String> map : txncodeList) {
+			String rosterId = MapUtil.getString( map, "txncode" );
+			rosterIds += ",'" + rosterId + "'";
 		}
-
+		rosterIds = rosterIds.substring( 1 );
+		if(null != txncodeList && txncodeList.size()>0 && null!= operater) {
+			alarmEventService.alarmAssign(rosterIds,operater, request);
+		}
 		return  new Model();
 	}
+	
+//	
+//	
+//	/**
+//	 * 提交报警事件分派信息
+//	 * 多个流水信息批量
+//	 * @param reqs
+//	 * @param request
+//	 * @return
+//	 */
+//	@RequestMapping(value = "/saveAssign", method = RequestMethod.POST)
+//	public Model saveAlarmAssignAction(@RequestBody Map<String, String> reqs, HttpServletRequest request) {
+//		String txnCodes = MapUtil.getString(reqs, "TXNCODES");
+//		if (null != txnCodes && txnCodes.trim().length() > 0) {
+//			String[] codes = txnCodes.split(",");
+//			for (String cd : codes) {
+//				reqs.put("TXN_CODE", cd);
+//				alarmEventService.alarmAssign(reqs, request);
+//			}
+//		}
+//
+//		return  new Model();
+//	}
 
 	/*
 	 * @RequestMapping(value = "/alarmStrategy", method = RequestMethod.GET) public

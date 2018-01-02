@@ -1,23 +1,19 @@
 package cn.com.higinet.tms.manager.modules.alarm.service;
 
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Order;
@@ -179,7 +175,8 @@ public class AlarmEventService {
 		cond.put("SHORT_ACTION", short_action);
 		map.putAll(cond);
 		map.put("PS_ID", psId);
-		map.put("PS_OPERID", operator.get("OPERATOR_ID"));
+		//map.put("PS_OPERID", operator.get("OPERATOR_ID"));
+		map.put("PS_OPERID", "");
 		map.put("PS_TIME", System.currentTimeMillis());
 		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME,FRAUD_TYPE,SHORT_ACTION)"
 				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME, :FRAUD_TYPE, :SHORT_ACTION)";
@@ -586,27 +583,47 @@ public class AlarmEventService {
 	 */
 	@SuppressWarnings("unchecked")
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void alarmAssign(Map<String, String> cond, HttpServletRequest request) {
+	public void alarmAssign(String rosterIds, List<Map<String, String>> operater, HttpServletRequest request) {
 		long currTime = System.currentTimeMillis();
-		Map<String, Object> transMap = getTrafficDataForAlarmProcessInfo(cond);
-		Map<String, Object> sysParamMap = getSystemParam(ALARM_PS_TIMEOUT);
-		// long assignTime = MapUtil.getLong(transMap, "ASSIGNTIME");
-		// long timeout = MapUtil.getLong(sysParamMap, "STARTVALUE");
-		String psStatus = MapUtil.getString(transMap, "PSSTATUS");
-		if (!("00".equals(psStatus) || "02".equals(psStatus) || "04".equals(psStatus))) {
-			// && (currTime - assignTime > timeout)))) {
-			throw new TmsMgrServiceException("当前交易处理状态不符合分派条件, 请刷新页面数据.");
+		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute("OPERATOR"); // 获取当前登录操作员
+		// 通过查询交易流水, 获取其中报警处理相关信息
+		List<Map<String, Object>> transMap = getTrafficDataForAlarmProcessList(rosterIds);
+		// 查询系统参数
+		//Map<String, Object> sysParamMap = getSystemParam(ALARM_PS_TIMEOUT);
+		Map<String, String> operaterInfo = operater.get(0);
+		
+		for (Map<String, Object> tms_run_trafficdata : transMap) {
+			String psStatus = MapUtil.getString(tms_run_trafficdata, "PSSTATUS");
+			if (!("00".equals(psStatus) || "02".equals(psStatus) || "04".equals(psStatus))) {
+				throw new TmsMgrServiceException("当前交易处理状态不符合分派条件, 请刷新页面数据.");
+			}
+			// 添加报警处理信息----TMS_MGR_ALARM_PROCESS
+			Map<String, String> tms_mgr_alarm_process = new HashMap<String, String>();
+			tms_mgr_alarm_process.put("PSSTATUS", "02"); // 处理状态改成待处理
+			tms_mgr_alarm_process.put("PS_TYPE", "0");
+			tms_mgr_alarm_process.put("PS_RESULT", "1");
+			tms_mgr_alarm_process.put("PS_INFO", "报警事件分派");
+			tms_mgr_alarm_process.put("TXNCODE", String.valueOf(tms_run_trafficdata.get("TXN_CODE"))); // 交易流水号
+			tms_mgr_alarm_process.put("PS_OPERID", String.valueOf(operaterInfo.get("OPERATOR_ID"))); // 报警处理操作员
+			Map<String, Object> infoMap = addAlarmProcessInfo(tms_mgr_alarm_process, request);
+
+			// 报警事件分派，更新工作量统计数据-----TMS_MGR_ALARM_OPERATOR_STAT;
+			Map<String, Object> tms_mgr_alarm_operator_stat = new HashMap<String, Object>();
+			tms_mgr_alarm_operator_stat.put("ASSIGNID", operator.get("OPERATOR_ID"));// ASSIGNID分派人员
+			tms_mgr_alarm_operator_stat.put("ASSIGNTIME", infoMap.get("PS_TIME")); // ASSIGNTIME分派时间
+			tms_mgr_alarm_operator_stat.put("OPERID", String.valueOf(operaterInfo.get("OPERATOR_ID"))); // OPERID报警处理操作员
+			boolean status = "00".equals(psStatus) ? false : true;
+			monitorStatService.updateAlarmAssignOperatorStat(MapUtil.getString(tms_run_trafficdata, "OPERID"),
+					MapUtil.getLong(tms_run_trafficdata, "ASSIGNTIME"), status, MapUtil.getString(tms_mgr_alarm_operator_stat, "OPERID"), currTime);
+
+			// 更新交易流水中报警处理状态----TMS_RUN_TRAFFICDATA
+			tms_run_trafficdata.put("PSSTATUS", "02"); // 处理状态改成待处理
+			tms_run_trafficdata.put("ASSIGNID", operator.get("OPERATOR_ID"));//分派人员
+			tms_run_trafficdata.put("ASSIGNTIME", infoMap.get("PS_TIME"));//分派时间
+			tms_run_trafficdata.put("OPERID",  String.valueOf(operaterInfo.get("OPERATOR_ID")));//报警处理操作员
+			updateTransProcessInfo(tms_run_trafficdata);
+
 		}
-		Map<String, Object> infoMap = addAlarmProcessInfo(cond, request);
-		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute("OPERATOR");
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.putAll(cond);
-		map.put("ASSIGNID", operator.get("OPERATOR_ID"));
-		map.put("ASSIGNTIME", infoMap.get("PS_TIME"));
-		boolean status = "00".equals(psStatus) ? false : true;
-		monitorStatService.updateAlarmAssignOperatorStat(MapUtil.getString(transMap, "OPERID"),
-				MapUtil.getLong(transMap, "ASSIGNTIME"), status, MapUtil.getString(map, "OPERID"), currTime);
-		updateTransProcessInfo(map);
 	}
 
 	/**
@@ -911,7 +928,8 @@ public class AlarmEventService {
 		}
 		return time;
 	}
-	
+
+
 	/**
 	 * 通过查询交易流水, 获取其中报警处理相关信息
 	 * 
@@ -919,25 +937,17 @@ public class AlarmEventService {
 	 *            查询条件参数值
 	 * @return
 	 */
-	public List<Map<String, Object>> getTrafficDataForAlarmProcessList(Map<String, List<Map<String, String>>> modelMap) {
-		List<Map<String, String>> condList = modelMap.get( "TXNCODES" );
-		String rosterIds = "";
-		for( Map<String, String> delMap : condList ) {
-			String rosterId = MapUtil.getString( delMap, "txncode" );
-			rosterIds += ",'" + rosterId + "'";
-		}
-		rosterIds = rosterIds.substring( 1 );
-		
+	public List<Map<String, Object>> getTrafficDataForAlarmProcessList(String rosterIds) {
 		String sql = "select TXNCODE, CHANCODE, TXNID, TXNTYPE, USERID, COUNTRYCODE, REGIONCODE, CITYCODE, TXNTIME, "
 				+ "DISPOSAL, MODELID, STRATEGY, PSSTATUS, ASSIGNID, ASSIGNTIME, OPERID, OPERTIME, AUDITID, AUDITTIME, "
-				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN("+ rosterIds +")";
-		
+				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN(" + rosterIds + ")";
+
 		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql);
 		if (list == null || list.isEmpty())
 			return null;
 		return list;
 	}
-	
+
 	////////////////////////////////////////////////////// lemon20180101增加查询预警事件列表结束/////////////////////////////////////////////////
 
 }
