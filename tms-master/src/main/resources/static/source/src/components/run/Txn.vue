@@ -28,7 +28,7 @@
         <!--<router-view/>-->
         <el-tabs v-model="activeName" @tab-click="handleClick" ref="tab">
           <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;"><trandef :txnId='txnId' :isVisibility="tabVisibility.trandefVisibility" ref="trandef"></trandef></el-tab-pane>
-          <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl :txnId='txnId' :isVisibility="tabVisibility.tranmdlVisibility"></tranmdl></el-tab-pane>
+          <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl :txnId='txnId' :isVisibility="tabVisibility.tranmdlVisibility" :txnName="txnName"></tranmdl></el-tab-pane>
           <el-tab-pane label="交易统计" name="stat"><stat :txnId='txnId' :isVisibility="tabVisibility.statVisibility"></stat></el-tab-pane>
           <el-tab-pane label="交易规则" name="rule"><rule :txnId='txnId' :isVisibility="tabVisibility.ruleVisibility"></rule></el-tab-pane>
         </el-tabs>
@@ -56,6 +56,7 @@
           delBtn: true // 删除按钮
         },
         txnId: '',
+        txnName: '',
         tabVisibility: {
           trandefVisibility: true,
           tranmdlVisibility: false,
@@ -94,6 +95,7 @@
               self.treeData = treeJson
               // 模拟选中第一个节点（根节点）
               self.txnId = treeJson[0].id
+              self.txnName = treeJson[0].text
               self.breadcrumbData = [{text: '交易模型：' + treeJson[0].text}]
               self.toolBtn.addBtn = false
               // self.expendNodesByLevel(1)
@@ -121,6 +123,7 @@
         }
         self.showToolBtn()
         self.txnId = data.id
+        self.txnName = data.text
         self.activeName = 'trandef' // tab跳转到首位,交易定义
         self.tabVisibility = { // 同时更新显隐状态
           trandefVisibility: true,
