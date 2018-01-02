@@ -56,6 +56,15 @@
                 <el-menu-item index="5-2">报警事件查询</el-menu-item>
               </router-link>
             </el-submenu>
+            <el-submenu index="6">
+              <template slot="title"><i class="el-icon-setting"></i>风险处置</template>
+              <router-link :to="{ name:'alarmEventSend'}" tag="li" replace>
+                <el-menu-item index="6-1">报警事件分派</el-menu-item>
+              </router-link>
+              <router-link :to="{ name:'alarmeventExecute'}" tag="li" replace>
+                <el-menu-item index="6-2">报警事件处理</el-menu-item>
+              </router-link>
+            </el-submenu>
           </el-menu>
         </div>
       </el-aside>
