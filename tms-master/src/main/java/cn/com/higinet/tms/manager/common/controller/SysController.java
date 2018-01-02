@@ -40,7 +40,7 @@ import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
  */
 
 @RestController("cmcSysController")
-@RequestMapping(ManagerConstants.URI_PREFIX)
+@RequestMapping(ManagerConstants.URI_PREFIX + "/")
 public class SysController {
 	
 	private static final Logger logger = LoggerFactory.getLogger( SysController.class );
