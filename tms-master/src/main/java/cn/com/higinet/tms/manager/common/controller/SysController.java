@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
-import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.DBConstant;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.common.service.OperatorService;
 import cn.com.higinet.tms.manager.common.service.SysService;
 import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
@@ -40,6 +40,7 @@ import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
  */
 
 @RestController("cmcSysController")
+@RequestMapping(ManagerConstants.URI_PREFIX)
 public class SysController {
 	
 	private static final Logger logger = LoggerFactory.getLogger( SysController.class );
