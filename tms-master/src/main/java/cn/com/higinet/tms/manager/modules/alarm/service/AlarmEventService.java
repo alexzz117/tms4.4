@@ -152,7 +152,7 @@ public class AlarmEventService {
 				sb.append(", ");
 			sb.append("ISCORRECT = :ISCORRECT");
 		}
-		sb.append(" where TXNCODE = :TXN_CODE");
+		sb.append(" where TXNCODE = :TXNCODE");
 		sql += sb.toString();
 		offlineSimpleDao.executeUpdate(sql, cond);
 	}
@@ -176,10 +176,13 @@ public class AlarmEventService {
 		map.putAll(cond);
 		map.put("PS_ID", psId);
 		//map.put("PS_OPERID", operator.get("OPERATOR_ID"));
-		map.put("PS_OPERID", "");
+		map.put("PS_OPERID", "1");
 		map.put("PS_TIME", System.currentTimeMillis());
-		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME,FRAUD_TYPE,SHORT_ACTION)"
-				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME, :FRAUD_TYPE, :SHORT_ACTION)";
+//		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME,FRAUD_TYPE,SHORT_ACTION)"
+//				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME, :FRAUD_TYPE, :SHORT_ACTION)";
+		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME)"
+				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME)";
+		System.out.println(sql);
 		offlineSimpleDao.executeUpdate(sql, map);
 		return map;
 	}
@@ -603,13 +606,14 @@ public class AlarmEventService {
 			tms_mgr_alarm_process.put("PS_TYPE", "0");
 			tms_mgr_alarm_process.put("PS_RESULT", "1");
 			tms_mgr_alarm_process.put("PS_INFO", "报警事件分派");
-			tms_mgr_alarm_process.put("TXNCODE", String.valueOf(tms_run_trafficdata.get("TXN_CODE"))); // 交易流水号
+			tms_mgr_alarm_process.put("TXN_CODE", String.valueOf(tms_run_trafficdata.get("TXNCODE"))); // 交易流水号
 			tms_mgr_alarm_process.put("PS_OPERID", String.valueOf(operaterInfo.get("OPERATOR_ID"))); // 报警处理操作员
 			Map<String, Object> infoMap = addAlarmProcessInfo(tms_mgr_alarm_process, request);
 
 			// 报警事件分派，更新工作量统计数据-----TMS_MGR_ALARM_OPERATOR_STAT;
 			Map<String, Object> tms_mgr_alarm_operator_stat = new HashMap<String, Object>();
-			tms_mgr_alarm_operator_stat.put("ASSIGNID", operator.get("OPERATOR_ID"));// ASSIGNID分派人员
+			//tms_mgr_alarm_operator_stat.put("ASSIGNID", operator.get("OPERATOR_ID"));// ASSIGNID分派人员
+			tms_mgr_alarm_operator_stat.put("ASSIGNID", "1");// ASSIGNID分派人员
 			tms_mgr_alarm_operator_stat.put("ASSIGNTIME", infoMap.get("PS_TIME")); // ASSIGNTIME分派时间
 			tms_mgr_alarm_operator_stat.put("OPERID", String.valueOf(operaterInfo.get("OPERATOR_ID"))); // OPERID报警处理操作员
 			boolean status = "00".equals(psStatus) ? false : true;
@@ -618,7 +622,8 @@ public class AlarmEventService {
 
 			// 更新交易流水中报警处理状态----TMS_RUN_TRAFFICDATA
 			tms_run_trafficdata.put("PSSTATUS", "02"); // 处理状态改成待处理
-			tms_run_trafficdata.put("ASSIGNID", operator.get("OPERATOR_ID"));//分派人员
+			tms_run_trafficdata.put("ASSIGNID","1");//分派人员
+			//tms_run_trafficdata.put("ASSIGNID", operator.get("OPERATOR_ID"));//分派人员
 			tms_run_trafficdata.put("ASSIGNTIME", infoMap.get("PS_TIME"));//分派时间
 			tms_run_trafficdata.put("OPERID",  String.valueOf(operaterInfo.get("OPERATOR_ID")));//报警处理操作员
 			updateTransProcessInfo(tms_run_trafficdata);
