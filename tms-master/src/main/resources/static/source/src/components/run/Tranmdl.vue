@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-container style="border: 1px solid #eee;">
+    <el-container>
       <el-header height="30px" class="table-header">
         <el-row>
           <el-col :span="12">
@@ -16,26 +16,26 @@
                   @row-click="toggleListHandle"
                   max-height="430"
                   style="width: 100%">
-          <el-table-column label="操作">
+          <el-table-column align="left" width="100px" label="操作">
             <template slot-scope="scope">
               <el-button type="text" icon="el-icon-edit" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="编辑" @click="tmEditFunc(scope.$index, scope.row)"></el-button>
               <el-button type="text" icon="el-icon-delete" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="删除" @click="tmDelFunc(scope.$index, scope.row)"></el-button>
               <el-button type="text" icon="el-icon-search" title="查看" @click="tmInfoFunc(scope.$index, scope.row)"></el-button>
             </template>
           </el-table-column>
-          <el-table-column label="属性名称" prop="name">
+          <el-table-column align="left"  label="属性名称" prop="name">
             <template slot-scope="scope">
-              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row)></i>
+              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row,expendNodeKey)></i>
               <span>{{scope.row.name}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="属性代码" prop="ref_name"></el-table-column>
-          <el-table-column label="数据来源" prop="src_id"></el-table-column>
-          <el-table-column label="类型" prop="type"></el-table-column>
-          <el-table-column label="存储字段" prop="fd_name"></el-table-column>
-          <el-table-column label="关联代码集" prop="code" :formatter="formatterCode"></el-table-column>
-          <el-table-column label="默认值" prop="src_default"></el-table-column>
-          <el-table-column label="处理函数" prop="genesisrul"></el-table-column>
+          <el-table-column align="left" label="属性代码" prop="ref_name"></el-table-column>
+          <el-table-column align="left" label="数据来源" prop="src_id"></el-table-column>
+          <el-table-column align="left" label="类型" prop="type"></el-table-column>
+          <el-table-column align="left" label="存储字段" prop="fd_name"></el-table-column>
+          <el-table-column align="left" label="关联代码集" prop="code" :formatter="formatterCode"></el-table-column>
+          <el-table-column align="left" label="默认值" prop="src_default"></el-table-column>
+          <el-table-column align="left" label="处理函数" prop="genesisrul"></el-table-column>
         </el-table>
       </el-main>
     </el-container>
@@ -154,36 +154,97 @@
       </el-header>
       <el-main style="padding: 0px;">
         <div style="padding-left: 10px;text-align: left;border-bottom: 1px solid #eee;">
-          <el-button type="text" class="el-icon-plus" @click="">新建引用表</el-button>
-          <el-button type="text" class="el-icon-edit" @click="">编辑引用表</el-button>
-          <el-button type="text" class="el-icon-delete" @click="">删除引用表</el-button>
-          <el-button type="text" class="el-icon-plus" @click="">新建行字段</el-button>
-          <el-button type="text" class="el-icon-edit" @click="">编辑行字段</el-button>
-          <el-button type="text" class="el-icon-delete" @click="">删除行字段</el-button>
-          <el-button type="text" class="el-icon-search" @click="">查询引用表</el-button>
+          <el-button type="text" class="el-icon-plus" @click="tableAddFunc">新建引用表</el-button>
         </div>
-        <el-table :data="refTableData" ref="refTable"
-                  :span-method="groupHandle"
+        <el-table :data="tableData" ref="refTable"
+                  :span-method="tableGroupHandle"
                   :row-class-name="groupClassName"
-                  @row-dblclick="toggleListHandle"
+                  @row-click="toggleTableHandle"
                   max-height="430"
                   style="width: 100%">
-          <el-table-column type="selection" width="35" align="left"></el-table-column>
-          <el-table-column label="属性名称" prop="ref_desc">
+          <el-table-column align="left" width="125px" label="操作">
             <template slot-scope="scope">
-              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row)></i>
-              <span style="margin-left: 10px">{{scope.row.ref_desc}}</span>
+              <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)"></el-button>
+              <el-button type="text" icon="el-icon-delete" title="删除" @click="tableDelFunc(scope.row)"></el-button>
+              <el-button type="text" icon="el-icon-search" title="查看" @click="tableInfoFunc(scope.row)"></el-button>
+              <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click=""></el-button>
             </template>
           </el-table-column>
-          <el-table-column label="属性代码" prop="ref_name"></el-table-column>
-          <el-table-column label="数据来源" prop="ref_fd_name"></el-table-column>
-          <el-table-column label="条件" prop="src_cond_in"></el-table-column>
-          <el-table-column label="表达式" prop="src_expr_in"></el-table-column>
-          <el-table-column label="存储字段" prop="storecolumn"></el-table-column>
-          <el-table-column label="所属节点" prop="tab_desc"></el-table-column>
+          <el-table-column align="left" label="属性名称" prop="ref_desc">
+            <template slot-scope="scope">
+              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row,expendTableKey)></i>
+              <span v-if="scope.row.group_type==='group'">{{scope.row.group_name}}</span>
+              <span v-else>{{scope.row.ref_desc}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="属性代码" prop="ref_name" align="left"></el-table-column>
+          <el-table-column label="数据来源" prop="ref_fd_name" align="left"></el-table-column>
+          <el-table-column label="条件" prop="src_cond_in" align="left"></el-table-column>
+          <el-table-column label="表达式" prop="src_expr_in" align="left"></el-table-column>
+          <el-table-column label="存储字段" prop="storecolumn" align="left"></el-table-column>
+          <el-table-column label="所属节点" prop="tab_desc" align="left"></el-table-column>
         </el-table>
       </el-main>
     </el-container>
+    <el-dialog :title="tableTitle" :visible.sync="tableDialogVisible" @open="tableOpenFunc">
+      <el-form :model="tableForm"  :label-width="formLabelWidth" :rules="tableRules" ref="tableForm">
+        <el-form-item label="引用ID" prop="ref_id" class="hidden">
+          <el-input v-model="tableForm.ref_id" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="所属交易" prop="tab_name" class="hidden">
+          <el-input v-model="tableForm.tab_name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="排序" prop="txn_order" class="hidden">
+          <el-input v-model="tableForm.txn_order" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="引用表" prop="ref_tab_name">
+              <el-select v-model="tableForm.ref_tab_name" :disabled="tableFormReadOnly" @change="refTableNameChange" placeholder="请选择">
+                <el-option
+                  v-for="item in canRefTab"
+                  :key="item.tab_name"
+                  :label="item.tab_desc"
+                  :value="item.tab_name">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="引用描述" prop="ref_desc">
+              <el-input v-model="tableForm.ref_desc" :readonly="tableFormReadOnly" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="引用字段" prop="src_expr">
+              <el-select v-model="tableForm.src_expr" :disabled="tableFormReadOnly" placeholder="请选择">
+                <el-option
+                  v-for="item in canRefFd"
+                  :key="item.fd_name"
+                  :label="item.name"
+                  :value="item.fd_name">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属节点" prop="tab_desc">
+              <el-input v-model="tableForm.tab_desc" :disabled="true" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :class="{hidden:tableFormReadOnly}">
+          <el-col :span="24">
+            <el-form-item>
+              <el-button type="primary" @click="submitTableForm" size="large">保存</el-button>
+              <el-button @click="tableDialogVisible = false" size="large">取消</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -214,9 +275,10 @@
                 tableData.push({                    // 添加分类节点数据
                   tab_name: keys[0],
                   name: keys[1],
+                  group_id: keys[0],
                   group_type: 'group'               // 把当前的数据类型设置为组[group]
                 })
-                if (expendNodeKey.indexOf(key) === -1) {  // 节点名称是否在展开节点列表中
+                if (expendNodeKey.indexOf(keys[0]) === -1) {  // 节点名称是否在展开节点列表中
                   break                                   // 不在列表中则跳出当前循环
                 }
                 for (var j in tranModelList[i][key]) {    // 添加分类节点下的全部数据到数据列表
@@ -282,7 +344,7 @@
         }
         return sfdItems
       },
-      codeDefaultList () {
+      codeDefaultList () { // 默认值
         let type = this.tmForm.type
         if (type !== 'code') {
           return []
@@ -311,9 +373,37 @@
           }
         }
         return list
+      },
+      tableData () { // 交易模型引用表数据
+        var expendTableKey = this.expendTableKey
+        var list = this.tableList
+        var tableData = []
+        for (var i in list) {
+          var group = list[i]
+          tableData.push(group)
+          if (expendTableKey.indexOf(group.group_id) > -1 && group.children) {
+            tableData = tableData.concat(group.children)
+          }
+        }
+        return tableData
+      },
+      canRefTabFdList () {
+        let refTabName = this.tableForm.ref_tab_name
+        let canRefTabFd = this.canRefTabFd
+        let list = []
+        for (let i in canRefTabFd) {
+          let item = canRefTabFd[i]
+          if (item.tab_name === refTabName) {
+            list.push({
+              fd_name: item.fd_name,
+              name: item.name
+            })
+          }
+        }
+        return list
       }
     },
-    props: ['txnId', 'isVisibility'], // 父组件传递的参数【交易定义编号，功能显示标识】
+    props: ['txnId', 'isVisibility', 'txnName'], // 父组件传递的参数【交易定义编号，功能显示标识,功能名称】
     data () {
       // 关联代码集合法校验
       let codeCheck = (rule, value, callback) => {
@@ -477,18 +567,30 @@
         allStoreFd: [],         // 全部存储字段
         enableStoreFd: [],      // 可用存储字段
         tmCodeList: [],         // 关联代码集
-        refTab: [],             // 引用表
-        refFd: [],              // 引用字段
-        canRefTab: [],          // 可引用表
-        canRefTabFd: [],        // 可引用表中的字段
         func: [],               // 函数
         funcParam: [],          // 函数参数
-        refTableData: [],       // 交易模型引用表数据
         dataTypeClassify: [     // 数据类型归类
           {recap: 'long', type: ['long', 'time', 'datetime']},
           {recap: 'decimal', type: ['double', 'money']},
           {recap: 'string', type: ['string', 'devid', 'ip', 'userid', 'acc', 'code']}
         ],
+        tableDialogVisible: false,
+        tableTitle: '',
+        canRefTab: [],          // 可引用表
+        canRefFd: [],           // 可引用表中的字段
+        canRefTabFd: [],        // 可引用表中的属性
+        tableList: [],          // 交易模型引用数据
+        expendTableKey: [],     // 展开的节点
+        tableForm: {
+          ref_id: '',
+          tab_name: '',
+          txn_order: '',
+          ref_tab_name: '',
+          ref_desc: '',
+          src_expr: '',
+          tab_desc: ''
+        },
+        tableFormReadOnly: false,
         formLabelWidth: '120px',
         tmRules: {
           name: [
@@ -537,6 +639,18 @@
             {max: 20, message: '处理函数参数不能超过20个字符', trigger: 'blur'},
             {validator: paramsCheck2, trigger: 'blur'}
           ]
+        },
+        tableRules: {
+          ref_tab_name: [
+            {required: true, message: '请选择引用表', trigger: 'blur'}
+          ],
+          ref_desc: [
+            {required: true, message: '请输入引用描述', trigger: 'blur'},
+            {max: 64, message: '引用描述不能超过64个字符', trigger: 'blur'}
+          ],
+          src_expr: [
+            {required: true, message: '请选择引用字段', trigger: 'blur'}
+          ]
         }
       }
     },
@@ -576,12 +690,13 @@
               let expendNodeKey = []
               for (let i in tranModelList) {
                 for (let key in tranModelList[i]) {
-                  expendNodeKey.push(key)         // 添加所有的【交易模型定义分类名称】到【展开列表中】
+                  expendNodeKey.push(key.split('____')[0])         // 添加所有的【交易模型定义分类名称】到【展开列表中】
                 }
               }
               self.expendNodeKey = expendNodeKey      // 展开列表中（展开的模型分类节点名称）；默认展开全部
-              self.refTab = data.txn_ref_tab          // 引用表
-              self.refFd = data.txn_ref_fds           // 引用字段
+              var tableObj = self.tableDataFormat(data.txn_ref_tab, data.txn_ref_fds)
+              self.tableList = tableObj.tableList
+              self.expendTableKey = tableObj.expendKey
               self.enableStoreFd = data.enablestorefd // 可用存储字段
               self.allStoreFd = data.allstorefd       // 所有的存储字段
             }
@@ -593,7 +708,7 @@
               success: function (data) {
                 self.tmCodeList = data.sourcetype // 关联代码集
                 self.canRefTab = data.canreftable // 可引用表
-                self.canRefTabFd = data.reftblfd  // 可引用表中的字段
+                self.canRefTabFd = data.reftblfd  // 可引用表中的属性
                 self.func = data.func             // 函数
                 self.funcParam = data.funcparam   // 函数参数
               }
@@ -618,19 +733,18 @@
           return ''
         }
       },
-      groupIcon (row) {  // 计算组的Icon
+      groupIcon (row, expendKey) {  // 计算组的Icon
         if (row.group_type !== 'group') { // 不是分组行数据
           return ''                       // 空
         }
-        let expendNodeKey = this.expendNodeKey      // 展开的组节点
-        let key = row.tab_name + '____' + row.name  // 行名称
-        if (expendNodeKey.indexOf(key) > -1) {      // 是展开的节点
+        let key = row.group_id // 组ID
+        if (expendKey.indexOf(key) > -1) {      // 是展开的节点
           return this.toggleIcon[0]
         } else {                                    // 不是展开的节点
           return this.toggleIcon[1]
         }
       },
-      toggleListHandle (row, e) {   // 行展开（双击）事件处理
+      toggleListHandle (row, e) {   // 行展开事件处理
         let self = this
         if (row.group_type !== 'group') { // 不是分类[组]
           return
@@ -642,7 +756,10 @@
             cellItem = path[i]
           }
         }
-        let key = row.tab_name + '____' + row.name // 分类[组]节点名称
+        if (cellItem === null) {
+          return
+        }
+        let key = row.group_id// 分类[组]节点名称
         let expendNodeKey = self.expendNodeKey     // 展开的分类[组]名称
         let toggleIcon = self.toggleIcon     // 展开的分类[组]名称
         let iconItem = cellItem.getElementsByTagName('i') // 获取I标签
@@ -710,7 +827,7 @@
         ajax.post({
           url: '/tranmdl/queryAvailableStoreFd',
           param: {
-            tab_name: (tabName?tabName:self.txnId)
+            tab_name: (tabName ? tabName : self.txnId)
           },
           success: function (data) {
             self.enableStoreFd = data.enableStoreFd // 存储字段
@@ -863,7 +980,6 @@
             success: function (data) {
               self.$message.success('删除成功。')
               self.initForm()
-              self.tmDialogVisible = false
             }
           })
         }).catch(() => {
@@ -903,6 +1019,212 @@
           src_default: row.src_default,
           genesisrul: genesisrul
         }
+      },
+      /**
+       *
+       * @param tab 交易模型引用的引用表数据
+       * @param data 交易模型引用的引用行数据
+       * @returns {{tableList: Array, expendKey: Array}}
+       * 交易模型引用Table数据和展开的引用表（全部展开）
+       */
+      tableDataFormat (tab, data) {
+        var tableList = []
+        var groupList = []
+        for (var i in tab) {
+          for (var key in tab[i]) {
+            let keys = key.split('____')          // 按格式获取名称
+            if (keys && keys.length === 2) {      // 分类节点名称格式正确
+              for (var j in tab[i][key]) {
+                var tabItem = tab[i][key][j]
+                var groupObj = {                  // 添加分类节点数据
+                  tab_name: keys[0],
+                  tab_desc: keys[1],
+                  group_id: tabItem.ref_id,
+                  group_name: keys[1] + ':[' + tabItem.ref_desc + ']', // 交易定义（树节点）：【交易模型引用】
+                  group_type: 'group',            // 把当前的数据类型设置为组[group]
+                  info: tabItem
+                }
+                var children = []
+                for (var k in data) {
+                  if (data[k].ref_id === tabItem.ref_id) {
+                    children.push(data[k])
+                  }
+                }
+                if (children.length > 0) {
+                  groupObj.children = children
+                }
+                tableList.push(groupObj)
+                groupList.push(tabItem.ref_id)
+              }
+            }
+          }
+        }
+        return {tableList: tableList, expendKey: groupList}
+      },
+      tableGroupHandle ({ row, column, rowIndex, columnIndex }) {
+        if (row.group_type === 'group') { // 行的属性[group_type]值为组[group]的
+          switch (columnIndex) {          // 列索引
+            case 0 :
+              return [1, 1]
+            case 1 :        // 当前行合并全部列到第一列
+              return [1, 7] // 以当前的单元格位置开始【合并行数，合并的列数】；
+            default :       // 其他列
+              return [0, 0] // 不显示
+          }
+        }
+      },
+      toggleTableHandle (row, e) {
+        let self = this
+        if (row.group_type !== 'group') { // 不是分类[组]
+          return
+        }
+        let path = e.path
+        let cellItem = null   // 单元格
+        for (let i in path) { // 根据路径找到td[cell]
+          if (path[i].className === 'cell') {
+            cellItem = path[i]
+          }
+        }
+        if (cellItem === null) {
+          return
+        }
+        let key = row.group_id // 分类[组]节点名称
+        let expendTableKey = self.expendTableKey     // 展开的分类[组]名称
+        let toggleIcon = self.toggleIcon     // 展开的分类[组]名称
+        let iconItem = cellItem.getElementsByTagName('i') // 获取I标签
+        if (iconItem[0].getAttribute('class') === toggleIcon[0]) { // 是展开的分类[组]
+          if (expendTableKey.indexOf(key) > -1) {
+            expendTableKey.splice(expendTableKey.indexOf(key), 1)
+          }
+        } else if (iconItem[0].getAttribute('class') === toggleIcon[1]) { // 需要展开的行
+          expendTableKey.push(key)
+        }
+        self.expendTableKey = expendTableKey
+      },
+      tableOpenFunc () {
+        let self = this
+        if (self.$refs['tableForm']) { // 如果Form存在，则初始化；第一次打开为undefined
+          self.$refs['tableForm'].resetFields()
+        }
+        self.tableForm.tab_desc = self.txnName
+        self.tableForm.tab_name = self.txnId
+        ajax.post({
+          url: '/tranmdl/queryCanRefFd',
+          param: {
+            tab_name: this.txnId
+          },
+          success: function (data) {
+            self.canRefFd = data.canreffd
+          }
+        })
+      },
+      refTableNameChange (value) {
+        let self = this
+        let canRefTab = self.canRefTab
+        let refDesc = ''
+        for (let i in canRefTab) {
+          let item = canRefTab[i]
+          if (item.tab_name === value) {
+            refDesc = item.tab_desc
+            break
+          }
+        }
+        self.tableForm.ref_desc = refDesc
+      },
+      tableAddFunc () {
+        this.tableDialogVisible = true
+        this.tableFormReadOnly = false
+        this.tableTitle = '新建引用表'
+      },
+      tableEditFunc (row) {
+        if (row.group_type && row.group_type === 'group') {
+          this.tableDialogVisible = true
+          this.tableFormReadOnly = false
+          this.tableTitle = '编辑引用表'
+          this.tableForm = {
+            ref_id: row.info.ref_id,
+            tab_name: row.info.tab_name,
+            txn_order: row.info.txn_order,
+            ref_tab_name: row.info.ref_tab_name,
+            ref_desc: row.info.ref_desc,
+            src_expr: row.info.src_expr,
+            tab_desc: row.info.tab_desc
+          }
+        } else {
+          console.info('待处理')
+        }
+      },
+      tableInfoFunc (row) {
+        if (row.group_type && row.group_type === 'group') {
+          this.tableDialogVisible = true
+          this.tableFormReadOnly = true
+          this.tableTitle = '查看引用表'
+          this.tableForm = {
+            ref_id: row.info.ref_id,
+            tab_name: row.info.tab_name,
+            txn_order: row.info.txn_order,
+            ref_tab_name: row.info.ref_tab_name,
+            ref_desc: row.info.ref_desc,
+            src_expr: row.info.src_expr,
+            tab_desc: row.info.tab_desc
+          }
+        } else {
+          console.info('待处理')
+        }
+      },
+      submitTableForm () {
+        let self = this
+        this.$refs['tableForm'].validate((valid) => {
+          if (valid) {
+            let op = ''
+            let refId = self.tableForm.ref_id
+            if (util.trim(refId) === '') {
+              op = 'add'
+            } else {
+              op = 'mod'
+            }
+            let jsonData = {}
+            let row = self.tableForm
+            jsonData[op] = [row]
+            ajax.post({
+              url: '/tranmdl/saveModelRefTab',
+              param: {
+                postData: jsonData
+              },
+              success: function (data) {
+                self.$message.success('操作成功。')
+                self.initForm()
+                self.tableDialogVisible = false
+              }
+            })
+          } else {
+            this.$message('请正确填写引用表信息')
+            return false
+          }
+        })
+      },
+      tableDelFunc (row) {
+        let self = this
+        self.$confirm('确定删除？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          ajax.post({
+            url: '/tranmdl/saveModelRefTab',
+            param: {
+              postData: {
+                del: [row.info]
+              }
+            },
+            success: function (data) {
+              self.$message.success('删除成功')
+              self.initForm()
+            }
+          })
+        }).catch(() => {
+          return false
+        })
       }
     }
   }
@@ -914,12 +1236,7 @@
   }
   tbody .groupStyle {
     background-color: #f5f7fa !important;
-    text-align: left;
   }
-  tbody .groupStyle .cell {
-    padding-left: 15px;
-  }
-
   .table-header {
     text-align: left;
     line-height: 2em;
