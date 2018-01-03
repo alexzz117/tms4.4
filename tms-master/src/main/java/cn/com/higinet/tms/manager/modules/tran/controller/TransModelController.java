@@ -80,20 +80,13 @@ public class TransModelController {
 
 		List<Map<String, Object>> refTblFd = transModelService.getCanRefTable();
 		List<Map<String, Object>> sourceType = tmsCodeDictService.listCodeCateGorp( null );
-//
-//		model.set( "sourceType", sourceType );
-//		model.set( "refTblFd", refTblFd );
-//		model.set( "canRefTable", getCanRefTable( refTblFd ) );
-//		model.set( "func", getFunc() );
-//		model.set( "funcParam", getFuncParam() );
+		model.set( "sourceType", sourceType );
+		model.set( "refTblFd", refTblFd );
+		model.set( "canRefTable", getCanRefTable( refTblFd ) );
+		model.set( "func", getFunc() );
+		model.set( "funcParam", getFuncParam() );
 
-		Map<String, Object> resMap = new HashMap<>();
-		resMap.put( "sourceType", sourceType );
-		resMap.put( "refTblFd", refTblFd );
-		resMap.put( "canRefTable", getCanRefTable( refTblFd ) );
-		resMap.put( "func", getFunc() );
-		resMap.put( "funcParam", getFuncParam() );
-		return resMap;
+		return model;
 	}
 
 	/**
