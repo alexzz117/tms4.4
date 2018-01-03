@@ -610,6 +610,14 @@
         }
         callback()
       }
+      // 判断表达式是否合法
+      let tableSrcExprCheck = (rule, value, callback) => {
+        let info = this.tableInfoForm
+        if (info.src_expr === '' && info.src_cond !== '') {
+          return callback(new Error('填写条件后，表达式不能为空'))
+        }
+        return callback()
+      }
       return {
         op: '',
         toggleIcon: ['el-icon-caret-bottom', 'el-icon-caret-right'], // 交易模型Table中分类[分组]中：展开与收起的Icon
@@ -663,7 +671,9 @@
         tableInfoDialogVisible: false,
         tableInfoTitle: '',
         tableInfoFormReadOnly: false,
+        selectTableInfoRows: [],
         tableInfoForm: {
+          op: '',
           ref_id: '',
           tab_name: '',
           ref_tab_name: '',
@@ -740,7 +750,20 @@
           ]
         },
         tableInfoRules: {
-
+          ref_fd_name: [
+            {required: true, message: '请选择数据来源', trigger: 'blur'}
+          ],
+          ref_desc: [
+            {required: true, message: '请输入属性名称', trigger: 'blur'},
+            {max: 64, message: '属性名称不能超过64个字符', trigger: 'blur'}
+          ],
+          ref_name: [
+            {required: true, message: '请输入属性代码', trigger: 'blur'},
+            {max: 50, message: '属性代码不能超过50个字符', trigger: 'blur'}
+          ],
+          src_expr_in: [
+            {validator: tableSrcExprCheck, trigger: 'blur'} // 空校验
+          ]
         }
       }
     },
@@ -1241,12 +1264,12 @@
             tab_desc: row.info.tab_desc
           }
         } else {
-          console.info('待处理', row)
           this.tableInfoTitle = '编辑行字段'
           this.tableInfoDialogVisible = true
           this.tableInfoFormReadOnly = false
           let info = row
           this.tableInfoForm = {
+            op: 'mod',
             ref_id: info.ref_id,
             tab_name: info.tab_name,
             ref_tab_name: info.ref_tab_name,
@@ -1261,6 +1284,7 @@
             storecolumn: info.storecolumn,
             tab_desc: info.tab_desc
           }
+          this.selectTableInfoRows = [info]
         }
       },
       tableInfoFunc (row) {
@@ -1278,7 +1302,6 @@
             tab_desc: row.info.tab_desc
           }
         } else {
-          console.info('待处理')
           this.tableInfoTitle = '查看行字段'
           this.tableInfoDialogVisible = true
           this.tableInfoFormReadOnly = true
@@ -1321,8 +1344,8 @@
               },
               success: function (data) {
                 self.$message.success('操作成功。')
-                self.initForm()
                 self.tableDialogVisible = false
+                self.initForm()
               }
             })
           } else {
@@ -1333,28 +1356,39 @@
       },
       tableDelFunc (row) {
         let self = this
-        if (row.group_type && row.group_type === 'group') {
-          self.$confirm('确定删除？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            ajax.post({
-              url: '/tranmdl/saveModelRefTab',
-              param: {
-                postData: {
-                  del: [row.info]
-                }
-              },
-              success: function (data) {
-                self.$message.success('删除成功')
-                self.initForm()
+        self.$confirm('确定删除？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let url = ''
+          let param = {}
+          if (row.group_type && row.group_type === 'group') {
+            url = '/tranmdl/saveModelRefTab'
+            param = {
+              postData: {
+                del: [row.info]
               }
-            })
-          }).catch(() => {
-            return false
+            }
+          } else {
+            url = '/tranmdl/saveModelRefFd'
+            param = {
+              postData: {
+                del: [row]
+              }
+            }
+          }
+          ajax.post({
+            url: url,
+            param: param,
+            success: function (data) {
+              self.$message.success('删除成功')
+              self.initForm()
+            }
           })
-        }
+        }).catch(() => {
+          return false
+        })
       },
       canRefTabFdChange (value) {
         this.tableInfoForm.ref_name = value
@@ -1381,6 +1415,7 @@
         this.tableInfoFormReadOnly = false
         let info = row.info
         this.tableInfoForm = {
+          op: 'add',
           ref_id: info.ref_id,
           tab_name: info.tab_name,
           ref_tab_name: info.ref_tab_name,
@@ -1397,7 +1432,35 @@
         }
       },
       submitTableInfoForm () {
-
+        let self = this
+        this.$refs['tableInfoForm'].validate((valid) => {
+          if (valid) {
+            let op = this.tableInfoForm.op
+            let jsonData = {}
+            let row = self.tableInfoForm
+            let rowData = self.selectTableInfoRows[0]
+            row = Object.assign(row, {old: rowData})
+            jsonData[op] = [row]
+            console.info(jsonData,self.selectTableInfoRows)
+            ajax.post({
+              url: '/tranmdl/saveModelRefFd',
+              param: {
+                postData: jsonData
+              },
+              success: function (data) {
+                self.$message.success('操作成功。')
+                self.initForm()
+                self.tableDialogVisible = false
+              },
+              fail: function (e) {
+                self.$message.error(e.response.data.message)
+              }
+            })
+          } else {
+            this.$message('请正确填写行字段信息')
+            return false
+          }
+        })
       },
       getFdNameList (dataType, enableStoreFd, fdName) {
         let self = this
