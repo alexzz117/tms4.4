@@ -167,7 +167,7 @@
               <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)"></el-button>
               <el-button type="text" icon="el-icon-delete" title="删除" @click="tableDelFunc(scope.row)"></el-button>
               <el-button type="text" icon="el-icon-search" title="查看" @click="tableInfoFunc(scope.row)"></el-button>
-              <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click=""></el-button>
+              <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click="tableSetFunc(scope.row)"></el-button>
             </template>
           </el-table-column>
           <el-table-column align="left" label="属性名称" prop="ref_desc">
@@ -245,6 +245,98 @@
         </el-row>
       </el-form>
     </el-dialog>
+    <el-dialog :title="tableInfoTitle" :visible.sync="tableInfoDialogVisible" @open="tableOpenFunc">
+      <el-form :model="tableInfoForm"  :label-width="formLabelWidth" :rules="tableInfoRules" ref="tableInfoForm">
+        <el-form-item label="引用ID" prop="ref_id" class="hidden">
+          <el-input v-model="tableInfoForm.ref_id" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="所属交易" prop="tab_name" class="hidden">
+          <el-input v-model="tableInfoForm.tab_name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="引用表描述" prop="ref_tab_desc" class="hidden">
+          <el-input v-model="tableInfoForm.ref_tab_desc" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="数据来源" prop="ref_fd_name">
+              <el-select v-model="tableInfoForm.ref_fd_name" :disabled="tableInfoFormReadOnly" @change="canRefTabFdChange" placeholder="请选择">
+                <el-option
+                  v-for="item in canRefTabFdList"
+                  :key="item.fd_name"
+                  :label="item.name"
+                  :value="item.fd_name">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="属性名称" prop="ref_desc">
+              <el-input v-model="tableInfoForm.ref_desc" :readonly="tableInfoFormReadOnly" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="属性代码" prop="ref_name">
+              <el-input v-model="tableInfoForm.ref_name" :readonly="tableInfoFormReadOnly" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="条件" prop="src_cond_in">
+              <div @dblclick="showStatCondDialog">
+                <el-input v-model="tableInfoForm.src_cond_in" :readonly="true" auto-complete="off"></el-input>
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="表达式" prop="src_expr_in">
+              <div @dblclick="showSrcExprDialog">
+                <el-input v-model="tableInfoForm.src_expr_in" :readonly="true" auto-complete="off"></el-input>
+              </div>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="存储字段" prop="storecolumn">
+              <el-select v-model="tableInfoForm.storecolumn" :disabled="tableInfoFormReadOnly" placeholder="请选择">
+                <el-option
+                  v-for="item in storeColumnList"
+                  :key="item.fd_name"
+                  :label="item.fd_name"
+                  :value="item.fd_name">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="所属节点" prop="tab_desc">
+              <el-input v-model="tableInfoForm.tab_desc" :disabled="true" auto-complete="off"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :class="{hidden:tableInfoFormReadOnly}">
+          <el-col :span="24">
+            <el-form-item>
+              <el-button type="primary" @click="submitTableInfoForm" size="large">保存</el-button>
+              <el-button @click="tableInfoDialogVisible = false" size="large">取消</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </el-dialog>
+    <StatCondPicker ref="StatCondDialog" @valueCallback="statCondInValueCallBack"
+                    :statCond="tableInfoForm.src_cond" :statCondIn="tableInfoForm.src_cond_in" :txnId="txnId"
+                    :hideItems="['rule_func', 'ac_func', 'stat_fn', 'roster_func' , 'diy_func']" >
+
+    </StatCondPicker>
+    <StatCondPicker ref="SrcExprDialog" @valueCallback="SrcExprInValueCallBack"
+                    :statCond="tableInfoForm.src_expr" :statCondIn="tableInfoForm.src_expr_in" :txnId="txnId"
+                    :hideItems="['rule_func', 'ac_func', 'stat_fn', 'roster_func' , 'diy_func']" >
+
+    </StatCondPicker>
   </div>
 </template>
 
@@ -253,6 +345,8 @@
   import check from '@/common/check'
   import util from '@/common/util'
   import dictCode from '@/common/dictCode'
+  import StatCondPicker from '@/components/common/StatCondPicker'
+  import FuncParamPicker from '@/components/common/FuncParamPicker'
 
   let vm = null
   export default {
@@ -296,53 +390,8 @@
         let self = this
         let dataType = self.tmForm.type
         let enableStoreFd = self.enableStoreFd
-        let dataTypeClassify = self.dataTypeClassify
         let fdName = self.tmForm.fd_name
-        let hasFdName = false
-        var sfdItems = []
-        if (dataType && enableStoreFd) {
-          for (let i in enableStoreFd) {
-            let fd = enableStoreFd[i]
-            for (let d in dataTypeClassify) {
-              let dt = dataTypeClassify[d]
-              if (dt.type.indexOf(dataType) !== -1) {
-                if (dt.recap === 'long' || dt.recap === 'decimal') {
-                  if (dataType !== 'double' && dataType !== 'long') {
-                    if (fd['type'] === dataType) {
-                      sfdItems.push(fd)
-                      hasFdName = hasFdName || fd.fd_name === fdName
-                    }
-                  }
-                  if (fd['type'] === 'double' || fd['type'] === 'long') {
-                    sfdItems.push(fd)
-                    hasFdName = hasFdName || fd.fd_name === fdName
-                  }
-                } else if (dt.recap === 'string') {
-                  if (dataType !== 'string') {
-                    if (fd['type'] === dataType) {
-                      sfdItems.push(fd)
-                      hasFdName = hasFdName || fd.fd_name === fdName
-                    }
-                  }
-                }
-                if (fd['type'] === 'string') {
-                  sfdItems.push(fd)
-                  hasFdName = hasFdName || fd.fd_name === fdName
-                }
-              }
-            }
-          }
-        }
-        // 编辑的时候，如果下拉列表中不存在编辑值，那么插入这条记录
-        if (!hasFdName && fdName !== '') {
-          let allStoreFd = self.allStoreFd
-          for (let i in allStoreFd) {
-            if (allStoreFd[i].fd_name === fdName) {
-              sfdItems.splice(0, 0, allStoreFd[i])
-            }
-          }
-        }
-        return sfdItems
+        return self.getFdNameList(dataType, enableStoreFd, fdName)
       },
       codeDefaultList () { // 默认值
         let type = this.tmForm.type
@@ -388,12 +437,12 @@
         return tableData
       },
       canRefTabFdList () {
-        let refTabName = this.tableForm.ref_tab_name
+        let tabName = this.tableInfoForm.ref_tab_name
         let canRefTabFd = this.canRefTabFd
         let list = []
         for (let i in canRefTabFd) {
           let item = canRefTabFd[i]
-          if (item.tab_name === refTabName) {
+          if (item.tab_name === tabName) {
             list.push({
               fd_name: item.fd_name,
               name: item.name
@@ -401,6 +450,26 @@
           }
         }
         return list
+      },
+      storeColumnList () { // 计算存储字段下拉列表；根据类型计算
+        let self = this
+        let dataType = ''
+        let canRefTabFd = this.canRefTabFd
+        let refFdName = self.tableInfoForm.ref_fd_name // 数据来源名称
+        for (let i in canRefTabFd) {
+          let item = canRefTabFd[i]
+          if (item.fd_name === refFdName) {
+            dataType = canRefTabFd[i].type
+            break
+          }
+        }
+        let enableStoreFd = self.enableStoreFd
+        let fdName = self.tableInfoForm.storecolumn
+        if (dataType !== '' && enableStoreFd.length > 0) {
+          return self.getFdNameList(dataType, enableStoreFd, fdName)
+        } else {
+          return []
+        }
       }
     },
     props: ['txnId', 'isVisibility', 'txnName'], // 父组件传递的参数【交易定义编号，功能显示标识,功能名称】
@@ -574,13 +643,14 @@
           {recap: 'decimal', type: ['double', 'money']},
           {recap: 'string', type: ['string', 'devid', 'ip', 'userid', 'acc', 'code']}
         ],
-        tableDialogVisible: false,
-        tableTitle: '',
         canRefTab: [],          // 可引用表
         canRefFd: [],           // 可引用表中的字段
         canRefTabFd: [],        // 可引用表中的属性
         tableList: [],          // 交易模型引用数据
         expendTableKey: [],     // 展开的节点
+        tableTitle: '',
+        tableDialogVisible: false,
+        tableFormReadOnly: false,
         tableForm: {
           ref_id: '',
           tab_name: '',
@@ -590,7 +660,24 @@
           src_expr: '',
           tab_desc: ''
         },
-        tableFormReadOnly: false,
+        tableInfoDialogVisible: false,
+        tableInfoTitle: '',
+        tableInfoFormReadOnly: false,
+        tableInfoForm: {
+          ref_id: '',
+          tab_name: '',
+          ref_tab_name: '',
+          ref_tab_desc: '',
+          ref_fd_name: '',
+          ref_desc: '',
+          ref_name: '',
+          src_cond: '',
+          src_cond_in: '',
+          src_expr: '',
+          src_expr_in: '',
+          storecolumn: '',
+          tab_desc: ''
+        },
         formLabelWidth: '120px',
         tmRules: {
           name: [
@@ -651,6 +738,9 @@
           src_expr: [
             {required: true, message: '请选择引用字段', trigger: 'blur'}
           ]
+        },
+        tableInfoRules: {
+
         }
       }
     },
@@ -1151,7 +1241,26 @@
             tab_desc: row.info.tab_desc
           }
         } else {
-          console.info('待处理')
+          console.info('待处理', row)
+          this.tableInfoTitle = '编辑行字段'
+          this.tableInfoDialogVisible = true
+          this.tableInfoFormReadOnly = false
+          let info = row
+          this.tableInfoForm = {
+            ref_id: info.ref_id,
+            tab_name: info.tab_name,
+            ref_tab_name: info.ref_tab_name,
+            ref_tab_desc: info.ref_tab_desc,
+            ref_fd_name: info.ref_fd_name,
+            ref_desc: info.ref_desc,
+            ref_name: info.ref_name,
+            src_cond: info.src_cond,
+            src_cond_in: info.src_cond_in,
+            src_expr: info.src_expr,
+            src_expr_in: info.src_expr_in,
+            storecolumn: info.storecolumn,
+            tab_desc: info.tab_desc
+          }
         }
       },
       tableInfoFunc (row) {
@@ -1170,6 +1279,25 @@
           }
         } else {
           console.info('待处理')
+          this.tableInfoTitle = '查看行字段'
+          this.tableInfoDialogVisible = true
+          this.tableInfoFormReadOnly = true
+          let info = row
+          this.tableInfoForm = {
+            ref_id: info.ref_id,
+            tab_name: info.tab_name,
+            ref_tab_name: info.ref_tab_name,
+            ref_tab_desc: info.ref_tab_desc,
+            ref_fd_name: info.ref_fd_name,
+            ref_desc: info.ref_desc,
+            ref_name: info.ref_name,
+            src_cond: info.src_cond,
+            src_cond_in: info.src_cond_in,
+            src_expr: info.src_expr,
+            src_expr_in: info.src_expr_in,
+            storecolumn: info.storecolumn,
+            tab_desc: info.tab_desc
+          }
         }
       },
       submitTableForm () {
@@ -1205,27 +1333,145 @@
       },
       tableDelFunc (row) {
         let self = this
-        self.$confirm('确定删除？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          ajax.post({
-            url: '/tranmdl/saveModelRefTab',
-            param: {
-              postData: {
-                del: [row.info]
+        if (row.group_type && row.group_type === 'group') {
+          self.$confirm('确定删除？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            ajax.post({
+              url: '/tranmdl/saveModelRefTab',
+              param: {
+                postData: {
+                  del: [row.info]
+                }
+              },
+              success: function (data) {
+                self.$message.success('删除成功')
+                self.initForm()
               }
-            },
-            success: function (data) {
-              self.$message.success('删除成功')
-              self.initForm()
-            }
+            })
+          }).catch(() => {
+            return false
           })
-        }).catch(() => {
-          return false
+        }
+      },
+      canRefTabFdChange (value) {
+        this.tableInfoForm.ref_name = value
+        let list = this.canRefTabFd
+        let refDesc = ''
+        for (let i in list) {
+          if (list[i].fd_name === value) {
+            refDesc = list[i].name
+          }
+        }
+        this.tableInfoForm.ref_desc = refDesc
+      },
+      statCondInValueCallBack (value) {
+        this.tableInfoForm.src_cond = value.stat_cond_value
+        this.tableInfoForm.src_cond_in = value.stat_cond_in
+      },
+      SrcExprInValueCallBack (value) {
+        this.tableInfoForm.src_expr = value.stat_cond_value
+        this.tableInfoForm.src_expr_in = value.stat_cond_in
+      },
+      tableSetFunc (row) {
+        this.tableInfoTitle = '新建行字段'
+        this.tableInfoDialogVisible = true
+        this.tableInfoFormReadOnly = false
+        let info = row.info
+        this.tableInfoForm = {
+          ref_id: info.ref_id,
+          tab_name: info.tab_name,
+          ref_tab_name: info.ref_tab_name,
+          ref_tab_desc: info.ref_desc,
+          ref_fd_name: '',
+          ref_desc: '',
+          ref_name: '',
+          src_cond: '',
+          src_expr: '',
+          src_cond_in: '',
+          src_expr_in: '',
+          storecolumn: '',
+          tab_desc: info.tab_desc
+        }
+      },
+      submitTableInfoForm () {
+
+      },
+      getFdNameList (dataType, enableStoreFd, fdName) {
+        let self = this
+        let dataTypeClassify = self.dataTypeClassify
+        let hasFdName = false
+        var sfdItems = []
+        if (dataType && enableStoreFd) {
+          for (let i in enableStoreFd) {
+            let fd = enableStoreFd[i]
+            for (let d in dataTypeClassify) {
+              let dt = dataTypeClassify[d]
+              if (dt.type.indexOf(dataType) !== -1) {
+                if (dt.recap === 'long' || dt.recap === 'decimal') {
+                  if (dataType !== 'double' && dataType !== 'long') {
+                    if (fd['type'] === dataType) {
+                      sfdItems.push(fd)
+                      hasFdName = hasFdName || fd.fd_name === fdName
+                    }
+                  }
+                  if (fd['type'] === 'double' || fd['type'] === 'long') {
+                    sfdItems.push(fd)
+                    hasFdName = hasFdName || fd.fd_name === fdName
+                  }
+                } else if (dt.recap === 'string') {
+                  if (dataType !== 'string') {
+                    if (fd['type'] === dataType) {
+                      sfdItems.push(fd)
+                      hasFdName = hasFdName || fd.fd_name === fdName
+                    }
+                  }
+                }
+                if (fd['type'] === 'string') {
+                  sfdItems.push(fd)
+                  hasFdName = hasFdName || fd.fd_name === fdName
+                }
+              }
+            }
+          }
+        }
+        // 编辑的时候，如果下拉列表中不存在编辑值，那么插入这条记录
+        if (!hasFdName && fdName !== '') {
+          let allStoreFd = self.allStoreFd
+          for (let i in allStoreFd) {
+            if (allStoreFd[i].fd_name === fdName) {
+              sfdItems.splice(0, 0, allStoreFd[i])
+            }
+          }
+        }
+        return sfdItems
+      },
+      showStatCondDialog () {
+        if (this.tableInfoFormReadOnly) {
+          return
+        }
+        this.$refs['StatCondDialog'].open()
+        this.$refs['StatCondDialog'].setValue({
+          stat_cond_value: this.tableInfoForm.src_cond,
+          stat_cond_in: this.tableInfoForm.src_cond_in
+        })
+      },
+      showSrcExprDialog () {
+        if (this.tableInfoFormReadOnly) {
+          return
+        }
+        this.$refs['SrcExprDialog'].open()
+        this.$refs['SrcExprDialog'].setValue({
+          stat_cond_value: this.tableInfoForm.src_expr,
+          stat_cond_in: this.tableInfoForm.src_expr_in
         })
       }
+    },
+    components: {
+      StatCondPicker,
+      FuncParamPicker
     }
   }
 </script>
