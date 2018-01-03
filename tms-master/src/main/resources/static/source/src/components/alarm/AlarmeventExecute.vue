@@ -65,11 +65,11 @@
       <el-table-column  prop="username" label="客户名称" width="100" align="left" />
       <el-table-column  prop="txntime" label="操作时间" width="100" align="left" :formatter="formatter"/>
       <el-table-column  prop="txnname" label="监控操作" width="100" align="left" />
-      <el-table-column  prop="disposal" label="处置结果" width="100" align="left" />
+      <el-table-column  prop="disposal" label="处置结果" width="80" align="left" />
       <el-table-column  prop="assign_name" label="分派人" width="80"/>
-      <el-table-column  prop="assign_name" label="分派时间" width="80"/>
+      <el-table-column  prop="assigntime" label="分派时间" width="80" :formatter="formatter"/>
       <el-table-column  prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
-      <el-table-column  prop="operid" label="处理人" width="80"/>
+      <el-table-column  prop="oper_name" label="处理人" width="80"/>
 
     </el-table>
     <el-pagination background class="block" label="left" label-width="100px"
@@ -159,6 +159,9 @@
             return dictCode.rendCode('tms.alarm.process.status', cellValue)
             break;
           case 'txntime':
+            return dictCode.rendDatetime(cellValue)
+            break;
+          case 'assigntime':
             return dictCode.rendDatetime(cellValue)
             break;
           default:
