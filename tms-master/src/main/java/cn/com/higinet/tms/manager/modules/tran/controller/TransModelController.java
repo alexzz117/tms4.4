@@ -73,7 +73,7 @@ public class TransModelController {
 	 */
 	@RequestMapping(value = "/queryOf", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> initTranModeOf( @RequestBody Map<String, String> reqs ) {
+	public Model initTranModeOf( @RequestBody Map<String, String> reqs ) {
 
 		Model model = new Model();
 		String txnid = reqs.get( "tab_name" );
