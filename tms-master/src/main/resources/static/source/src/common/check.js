@@ -42,6 +42,15 @@ var check = {
     }
     callback()
   },
+  checkFormIp: function (rule, value, callback) {
+    if(value == null || value === '') {
+      callback()
+    }
+    if (!/((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)/.test(value)){
+      return callback(new Error('请输入正确的IP地址'));
+    }
+    callback()
+  },
   /*
    * 校验特殊字符
    * type 1

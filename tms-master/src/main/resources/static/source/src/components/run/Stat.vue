@@ -505,38 +505,28 @@
       })
     },
     watch: {
-      txnId: {
-        handler: (val, oldVal) => {
-          if (vm.isVisibilityParent === true) {
-            vm.reloadData()
-          }
+      txnId: function (val) {
+        if (this.isVisibilityParent === true) {
+          this.reloadData()
         }
       },
-      isVisibility: {
-        handler: (val, oldVal) => {
-          if (vm.isVisibilityParent === true) {
-            vm.reloadData()
-          }
+      isVisibility: function (val) {
+        if (this.isVisibilityParent === true) {
+          this.reloadData()
         }
       },
-      'dialogForm.stat_fn': {
-        handler: (val, oldVal) => {
-          vm.fnChangeEvent()
-          // 周期修改触发
-          vm.countroundChangeEvent()
-        }
+      'dialogForm.stat_fn': function (val) {
+        this.fnChangeEvent()
+        // 周期修改触发
+        this.countroundChangeEvent()
       },
-      'dialogForm.coununit': {
-        handler: (val, oldVal) => {
-          // 周期修改触发
-          vm.countroundChangeEvent()
-        }
+      'dialogForm.coununit': function (val) {
+        // 周期修改触发
+        this.countroundChangeEvent()
       },
-      'dialogForm.stat_datafd': {
-        handler: (val, oldVal) => {
-          // 周期修改触发
-          vm.datafdChangeEvent()
-        }
+      'dialogForm.stat_datafd': function (val) {
+        // 周期修改触发
+        this.datafdChangeEvent()
       }
     },
     filters: {

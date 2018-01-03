@@ -44,7 +44,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="字符函数:" :label-width="formLabelWidth" prop="oper_func" :style="formItemStyle"  v-show="itemShow.oper_func" >
+      <el-form-item label="关系函数:" :label-width="formLabelWidth" prop="oper_func" :style="formItemStyle"  v-show="itemShow.oper_func" >
         <el-select v-model="statCondInDictDialogForm.oper_func" placeholder="请选择" :style="formItemContentStyle"
                    clearable @change="selectChange">
           <el-option
@@ -139,7 +139,7 @@
       </el-tree>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="statFnDialogVisible = false">取 消</el-button>
+        <el-button @click="statFnDialogVisible = false" size="large">取 消</el-button>
       </div>
     </el-dialog>
   </el-dialog>

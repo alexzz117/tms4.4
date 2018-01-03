@@ -503,31 +503,25 @@
       })
     },
     watch: {
-      txnId: {
-        handler: (val, oldVal) => {
-          if (vm.isVisibilityParent === true) {
-            vm.reloadData()
-          }
+      txnId: function (val) {
+        if (this.isVisibilityParent === true) {
+          this.reloadData()
         }
       },
-      isVisibility: {
-        handler: (val, oldVal) => {
-          if (vm.isVisibilityParent === true) {
-            vm.reloadData()
-          }
+      isVisibility: function (val) {
+        if (this.isVisibilityParent === true) {
+          this.reloadData()
         }
       },
-      'dialogForm.disposal': {
-        handler: (val, oldVal) => {
-          for (let loop of vm.disposalList) {
-            if (val === '') {
-              vm.dialogForm.rule_score = ''
-              break
-            }
-            if (val === loop.dp_code) {
-              vm.dialogForm.rule_score = loop.default_score
-              break
-            }
+      'dialogForm.disposal': function (val) {
+        for (let loop of this.disposalList) {
+          if (val === '') {
+            this.dialogForm.rule_score = ''
+            break
+          }
+          if (val === loop.dp_code) {
+            this.dialogForm.rule_score = loop.default_score
+            break
           }
         }
       }
