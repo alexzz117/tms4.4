@@ -898,19 +898,17 @@ public class AlarmEventService {
 			sb.append("TRAFFIC.TXNCODE =:txncode  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("operate_time"))) {
-			long operate_time = getMillisTime(conds.get("operate_time"));
+			conds.put("operate_time", String.valueOf(getMillisTime(conds.get("operate_time"))));
 			sb.append("TRAFFIC.TXNTIME >=:operate_time  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("end_time"))) {
-			long end_time = getMillisTime(conds.get("end_time"));
+			conds.put("end_time", String.valueOf(getMillisTime(conds.get("end_time"))));
 			sb.append("TRAFFIC.TXNTIME <=:end_time  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("passtatus"))) {
 			sb.append("TRAFFIC.PSSTATUS =:passtatus  AND ");
 		}
-		// sb.append("(TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02' ||
-		// TRAFFIC.PSSTATUS = '04') ");
-		sb.append("TRAFFIC.HITRULENUM !=0 AND  TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02'");
+		sb.append("TRAFFIC.HITRULENUM !=0 AND  TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02' OR TRAFFIC.PSSTATUS = '04')");
 
 		Order order = new Order().desc("TXNTIME");
 		System.out.println(sb.toString());
@@ -951,11 +949,11 @@ public class AlarmEventService {
 			sb.append("TRAFFIC.TXNCODE =:txncode  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("operate_time"))) {
-			long operate_time = getMillisTime(conds.get("operate_time"));
+			conds.put("operate_time", String.valueOf(getMillisTime(conds.get("operate_time"))));
 			sb.append("TRAFFIC.TXNTIME >=:operate_time  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("end_time"))) {
-			long end_time = getMillisTime(conds.get("end_time"));
+			conds.put("end_time", String.valueOf(getMillisTime(conds.get("end_time"))));
 			sb.append("TRAFFIC.TXNTIME <=:end_time  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("passtatus"))) {
@@ -969,6 +967,55 @@ public class AlarmEventService {
 		System.out.println(listPage.getList().get(0));
 		return listPage;
 	}
+	
+	
+
+	/**
+	 * 查询报警事件处理信息
+	 * 
+	 * @param conds
+	 *            查询条件
+	 * @return
+	 */
+	public Page<Map<String, Object>> QueryAuditListByPage(Map<String, String> conds) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT ");
+		sb.append("TRAFFIC.TXNCODE, TRAFFIC.USERID, U.USERNAME, TRAFFIC.TXNTYPE, ");
+		sb.append(
+				"(SELECT CONCAT(CHANNEL.CHANNELNAME, '--', TAB.TAB_DESC) FROM TMS_DP_CHANNEL CHANNEL, TMS_COM_TAB TAB ");
+		sb.append("WHERE TRAFFIC.TXNTYPE = TAB.TAB_NAME AND TAB.CHANN = CHANNEL.CHANNELID) TXNNAME, ");
+		sb.append("TRAFFIC.TXNTIME,IFNULL(TRAFFIC.ISCORRECT, '2') ISCORRECT, ");
+		sb.append("(SELECT DP_NAME FROM TMS_COM_DISPOSAL DP WHERE TRAFFIC.DISPOSAL=DP.DP_CODE)  DISPOSAL,  ");
+		sb.append("TRAFFIC.TXNSTATUS,TRAFFIC.ASSIGNTIME,TRAFFIC.ASSIGNTIME M_ASSIGNTIME,  ");
+		sb.append("(SELECT O.LOGIN_NAME FROM CMC_OPERATOR O WHERE TRAFFIC.ASSIGNID = O.OPERATOR_ID) ASSIGN_NAME, ");
+		sb.append(
+				"(SELECT O.LOGIN_NAME FROM CMC_OPERATOR O WHERE TRAFFIC.OPERID = O.OPERATOR_ID) OPER_NAME, TRAFFIC.OPERTIME, ");
+		sb.append("(SELECT O.LOGIN_NAME FROM CMC_OPERATOR O WHERE TRAFFIC.AUDITID = O.OPERATOR_ID) AUDIT_NAME,  ");
+		sb.append("TRAFFIC.AUDITTIME,TRAFFIC.AUDITTIME M_AUDITTIME,TRAFFIC.PSSTATUS, TRAFFIC.STRATEGY  ");
+		sb.append("FROM TMS_RUN_TRAFFICDATA TRAFFIC LEFT JOIN TMS_RUN_USER U ");
+		sb.append("ON TRAFFIC.USERID = U.USERID  WHERE  ");
+		if (!StringUtil.isEmpty(conds.get("userid"))) {
+			sb.append("TRAFFIC.USERID =:userid  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("txncode"))) {
+			sb.append("TRAFFIC.TXNCODE =:txncode  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("operate_time"))) {
+			conds.put("operate_time", String.valueOf(getMillisTime(conds.get("operate_time"))));
+			sb.append("TRAFFIC.TXNTIME >=:operate_time  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("end_time"))) {
+			conds.put("end_time", String.valueOf(getMillisTime(conds.get("end_time"))));
+			sb.append("TRAFFIC.TXNTIME <=:end_time  AND ");
+		}
+		sb.append("TRAFFIC.PSSTATUS = '03' ");
+		Order order = new Order().desc("TXNTIME");
+		System.out.println(sb.toString());
+		Page<Map<String, Object>> listPage = offlineSimpleDao.pageQuery(sb.toString(), conds, order);
+		return listPage;
+	}
+	
+	
 	
 	/**
 	 * 将2018-01-01 09:50:39转成时间戳

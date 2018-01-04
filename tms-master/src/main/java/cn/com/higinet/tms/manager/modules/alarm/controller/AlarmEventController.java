@@ -61,15 +61,19 @@ public class AlarmEventController {
 		model.setPage(alarmEventService.QueryExecuteListByPage(modelMap));
 		return model;
 	}
+	
 	/**
-	 * 报警事件处理页面
+	 * 预警事件处理审核
 	 * 
+	 * @param reqs
 	 * @return
 	 */
-	/*
-	 * @RequestMapping(value = "/process", method = RequestMethod.GET) public String
-	 * alarmProcessView() { return "tms/alarm/alarmevent_process"; }
-	 */
+	@RequestMapping(value = "/auditList", method = RequestMethod.POST)
+	public Model auditList(@RequestBody Map<String, String> modelMap) {
+		Model model = new Model();	
+		model.setPage(alarmEventService.QueryAuditListByPage(modelMap));
+		return model;
+	}
 
 	/**
 	 * 获取报警事件处理信息
