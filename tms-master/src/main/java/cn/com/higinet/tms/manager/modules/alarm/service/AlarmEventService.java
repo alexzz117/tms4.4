@@ -177,10 +177,8 @@ public class AlarmEventService {
 		map.put("PS_ID", psId);
 		map.put("PS_OPERID", cond.get("PS_OPERID"));//处理人
 		map.put("PS_TIME", System.currentTimeMillis());//处理时间
-//		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME,FRAUD_TYPE,SHORT_ACTION)"
-//				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME, :FRAUD_TYPE, :SHORT_ACTION)";
-		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME)"
-				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME)";
+		String sql = "insert into TMS_MGR_ALARM_PROCESS(PS_ID, TXN_CODE, PS_OPERID, PS_TYPE, PS_RESULT, PS_INFO, PS_TIME,FRAUD_TYPE,SHORT_ACTION)"
+				+ "values(:PS_ID, :TXN_CODE, :PS_OPERID, :PS_TYPE, :PS_RESULT, :PS_INFO, :PS_TIME, :FRAUD_TYPE, :SHORT_ACTION)";
 		System.out.println(sql);
 		offlineSimpleDao.executeUpdate(sql, map);
 		return map;
@@ -912,7 +910,7 @@ public class AlarmEventService {
 		}
 		// sb.append("(TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02' ||
 		// TRAFFIC.PSSTATUS = '04') ");
-		sb.append("TRAFFIC.HITRULENUM !=0 ");
+		sb.append("TRAFFIC.HITRULENUM !=0 AND  TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02'");
 
 		Order order = new Order().desc("TXNTIME");
 		System.out.println(sb.toString());
