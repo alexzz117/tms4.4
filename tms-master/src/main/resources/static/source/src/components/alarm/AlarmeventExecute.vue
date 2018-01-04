@@ -60,7 +60,7 @@
       <div>
         <el-form  label-position="right" :model="executeForm"  :rules="executeFormRules" ref="executeForm" label-width="100px"  :inline="inline"  >
           <el-row>
-            <el-col :span="4"> <div ><el-form-item label="欺诈类型"  prop="fraud_type"  data="fraud_type"/></div> </el-col>
+            <el-col :span="4"> <div ><el-form-item label="欺诈类型"  prop="FRAUD_TYPE"  data="fraud_type"/></div> </el-col>
             <el-col :span="20"><div >
               <el-select v-model="executeForm.FRAUD_TYPE" placeholder="请选择" @focus="selectFocus('fraud_type')" :clearable="clearable">
                 <el-option
