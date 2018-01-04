@@ -14,6 +14,7 @@ import NameList from '@/components/mgr/NameList'
 import ShowValueList from '@/components/mgr/ShowValueList'
 import AlarmEventSend from '@/components/alarm/AlarmEventSend'
 import AlarmeventExecute from '@/components/alarm/AlarmeventExecute'
+import AlarmeventAudit from '@/components/alarm/AlarmeventAudit'
 import ValueList from '@/components/run/ValueList'
 import Txn from '@/components/run/Txn'
 import Rule from '@/components/run/Rule'
@@ -104,6 +105,11 @@ export default new Router({
           path: 'alarmeventExecute_vue',
           name: 'alarmeventExecute',
           component: AlarmeventExecute
+        },
+        {
+          path: 'alarmeventAudit_vue',
+          name: 'alarmeventAudit',
+          component: AlarmeventAudit
         },
         {
           path: 'txn_vue',
