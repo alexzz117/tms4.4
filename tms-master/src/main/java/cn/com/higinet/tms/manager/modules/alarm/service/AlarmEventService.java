@@ -853,7 +853,7 @@ public class AlarmEventService {
 	 * @param reqs
 	 */
 	public List<Map<String, Object>> shortActionList(Map<String, String> reqs) {
-		String sql = "select func_name text,func_code value from tms_com_func where func_catalog = '8' order by func_orderby";
+		String sql = "select func_name text,func_code value from tms_com_func where func_catalog = '1' order by func_orderby";
 		return offlineSimpleDao.queryForList(sql);
 	}
 
@@ -927,6 +927,7 @@ public class AlarmEventService {
 		sb.append("TRAFFIC.TXNTIME,IFNULL(TRAFFIC.ISCORRECT, '2') ISCORRECT, ");
 		sb.append("(SELECT DP_NAME FROM TMS_COM_DISPOSAL DP WHERE TRAFFIC.DISPOSAL=DP.DP_CODE)  DISPOSAL,  ");
 		sb.append("TRAFFIC.TXNSTATUS,TRAFFIC.ASSIGNTIME,TRAFFIC.ASSIGNTIME M_ASSIGNTIME,  ");
+		sb.append("(SELECT O.LOGIN_NAME FROM CMC_OPERATOR O WHERE TRAFFIC.ASSIGNID = O.OPERATOR_ID) ASSIGN_NAME, ");
 		sb.append(
 				"(SELECT O.LOGIN_NAME FROM CMC_OPERATOR O WHERE TRAFFIC.OPERID = O.OPERATOR_ID) OPER_NAME, TRAFFIC.OPERTIME, ");
 		sb.append("(SELECT O.LOGIN_NAME FROM CMC_OPERATOR O WHERE TRAFFIC.AUDITID = O.OPERATOR_ID) AUDIT_NAME,  ");
@@ -950,9 +951,7 @@ public class AlarmEventService {
 		if (!StringUtil.isEmpty(conds.get("passtatus"))) {
 			sb.append("TRAFFIC.PSSTATUS =:passtatus  AND ");
 		}
-		// sb.append("(TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02' ||
-		// TRAFFIC.PSSTATUS = '04') ");
-		sb.append("TRAFFIC.HITRULENUM !=0 AND TRAFFIC.PSSTATUS = '02' OR  TRAFFIC.PSSTATUS = '04'");
+		sb.append("TRAFFIC.PSSTATUS = '02' OR  TRAFFIC.PSSTATUS = '04' ");
 
 		Order order = new Order().desc("TXNTIME");
 		System.out.println(sb.toString());

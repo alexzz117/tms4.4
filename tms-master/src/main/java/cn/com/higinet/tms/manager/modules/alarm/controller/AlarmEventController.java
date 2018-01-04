@@ -57,7 +57,7 @@ public class AlarmEventController {
 	@RequestMapping(value = "/executeList", method = RequestMethod.POST)
 	public Model executeList(@RequestBody Map<String, String> modelMap) {
 		Model model = new Model();
-		model.setPage(alarmEventService.QueryListByPage(modelMap));
+		model.setPage(alarmEventService.QueryExecuteListByPage(modelMap));
 		return model;
 	}
 	/**
@@ -83,7 +83,8 @@ public class AlarmEventController {
 		reqs.put("AC_TYPE", "1");// 普通动作
 		List<Map<String, Object>> actList = alarmEventService.getAlarmProcessActions(reqs);
 		model.set("txnMap", txnMap);
-		model.set("actList", actList);
+		model.setList(actList);
+		//model.set("actList", actList);
 		return model;
 	}
 
