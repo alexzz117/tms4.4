@@ -3,47 +3,36 @@
   <el-form  label-position="right" :model="listForm" ref="listForm"  label-width="100px" :inline="inline"  >
   <el-row>
     <el-col :span="2"><div><el-form-item label="流水号"/></div> </el-col>
-    <el-col :span="5"><div>
+    <el-col :span="3"><div>
       <el-form-item prop="listFormFosterdesc">
         <el-input v-model="listForm.txncode" ></el-input>
       </el-form-item></div>
     </el-col>
-    <el-col :span="2"><div ><el-form-item label="交易时间起"/></div></el-col>
-    <el-col :span="5"><div>
+    <el-col :span="2"> <div ><el-form-item label="处理状态"  prop="PSSTATUS"/></div> </el-col>
+    <el-col :span="3"><div >
+      <el-select v-model="listForm.passtatus" placeholder="请选择" @focus="selectFocus('passtatus')" :clearable="clearable">
+        <el-option
+          v-for="item in datatypeOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select></div>
+    </el-col>
+    <el-col :span="2"><div ><el-form-item label="交易时间"/></div></el-col>
+    <el-col :span="3"><div>
           <el-form-item >
             <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.operate_time" ></el-date-picker>
           </el-form-item></div>
     </el-col>
-    <el-col :span="2"><div ><el-form-item label="交易时间止"/></div></el-col>
-    <el-col :span="5"><div>
+    <el-col :span="2"><div ><el-form-item label="-"/></div></el-col>
+    <el-col :span="3"><div>
         <el-form-item >
           <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.end_time" ></el-date-picker>
         </el-form-item>
     </div>
     </el-col>
-    <el-col :span="3"><div > <el-button class="el-icon-more" type="primary" @click="showMore"/></div></el-col>
-  </el-row>
-
-    <el-row>
-      <el-col :span="2"><div ><el-form-item label="客户号"/></div></el-col>
-      <el-col :span="5"><div ><el-form-item prop="listFormFosterdesc" >
-        <el-input v-model="listForm.userid" /></el-form-item>
-      </div>
-      </el-col>
-
-      <el-col :span="2"> <div ><el-form-item label="处理状态"  prop="PSSTATUS"/></div> </el-col>
-      <el-col :span="5"><div >
-        <el-select v-model="listForm.passtatus" placeholder="请选择" @focus="selectFocus('passtatus')" :clearable="clearable">
-          <el-option
-            v-for="item in datatypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select></div>
-      </el-col>
-
-      <el-col :span="9"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></div></el-col>
+      <el-col :span="4"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></div></el-col>
     </el-row>
   <el-row>
     <el-col :span="1"><div >  <el-button type="primary" :align="left"  icon="el-icon-success" @click="openDialog" :disabled="sendBtnStatus">分派</el-button></div></el-col>
@@ -54,8 +43,8 @@
   <el-table
     :data="gridData"
     style="width: 100%" tooltip-effect="dark" @selection-change="handleSelectionChange">
-    <el-table-column type="selection" width="50" align="left" />
-    <el-table-column fixed="left" label="操 作" width="60" alert="center" >
+    <el-table-column type="selection" width="40" align="left" />
+    <el-table-column fixed="left" label="操 作" width="55" alert="center" >
       <template slot-scope="scope"  >
         <el-button type="text"  @click="" size="mini"  icon="el-icon-search" />
       </template>
@@ -63,7 +52,7 @@
     <el-table-column  prop="txncode" label="流水号" width="210" align="left" />
     <el-table-column  prop="userid" label="客户号" width="150" align="left" />
     <el-table-column  prop="username" label="客户名称" width="120" align="left" />
-    <el-table-column  prop="txntime" label="操作时间" width="150" align="left" :formatter="formatter"/>
+    <el-table-column  prop="txntime" label="交易时间" width="150" align="left" :formatter="formatter"/>
     <el-table-column  prop="txnname" label="监控操作" width="100" align="left" />
     <el-table-column  prop="disposal" label="处置结果" width="140" align="left" />
     <el-table-column  prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>

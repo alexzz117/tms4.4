@@ -45,7 +45,7 @@
       <el-table-column  prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
       <el-table-column  prop="assign_name" label="分派人" width="60"/>
       <el-table-column  prop="oper_name" label="处理人" width="60"/>
-      <el-table-column  prop="oper_name" label="处理时间" width="135"/>
+      <el-table-column  prop="opertime" label="处理时间" width="135" :formatter="formatter"/>
     </el-table>
     <el-pagination background class="block" label="left" label-width="100px"
                    @size-change="handleSizeChange"
@@ -108,7 +108,7 @@
             <el-col :span="9"><div >
               <el-form-item  >
                 <el-radio v-model="auditForm.PS_RESULT" label="1">通过</el-radio>
-               <el-radio v-model="auditForm.PS_RESULT" label="2">不通过</el-radio>
+               <el-radio v-model="auditForm.PS_RESULT" label="0">不通过</el-radio>
               </el-form-item>
             </div>
             </el-col>
@@ -123,7 +123,7 @@
           </el-row>
         </el-form>
         <div class="dialog-footer"  align="center"  slot="footer">
-          <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="onSaveAudit('auditForm')" >确 定</el-button>
+          <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="onSaveAudit('auditForm')" >提 交</el-button>
           <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false" >返 回</el-button>
         </div>
       </div>
@@ -188,7 +188,7 @@
           case 'txntime':
             return dictCode.rendDatetime(cellValue)
             break;
-          case 'assigntime':
+          case 'opertime':
             return dictCode.rendDatetime(cellValue)
             break;
           default:
@@ -232,6 +232,7 @@
         var self = this
         this.listDialogVisible = true
         var TXN_CODE = row.txncode
+        this.vTxncode = TXN_CODE
         ajax.post({
           url: '/alarmevent/audit',
           param: {TXN_CODE: TXN_CODE},
@@ -252,11 +253,20 @@
           if (valid) {
             var param = util.extend({
               TXN_CODE: this.vTxncode,
-              TXNCODE: this.vTxncode,
-              PS_TYPE: '1',
-              PSSTATUS: '03',
-              PS_RESULT: '1'
+              PS_TYPE: '2'
             }, this.auditForm)
+            ajax.post({
+              url: '/alarmevent/saveAudit',
+              param: param,
+              success: function (data) {
+                self.$message({
+                  message: '审核成功。',
+                  type: 'success'
+                })
+                self.listDialogVisible = false
+                self.sel()
+              }
+            })
           } else {
             return false
           }
@@ -290,6 +300,7 @@
         gridData: [],
         ActionData: [],
         ExecuteData: [],
+        vTxncode: '',
         pageindex: 1,
         pagesize: 10,
         total: 100,
