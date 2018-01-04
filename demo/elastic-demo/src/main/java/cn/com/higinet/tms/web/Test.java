@@ -1,7 +1,9 @@
 package cn.com.higinet.tms.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -20,9 +22,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 
-import cn.com.higinet.tms.ElasticsearchConfig;
 import cn.com.higinet.tms.ElasticsearchServiceImpl;
 import cn.com.higinet.tms.Trafficdata;
+import cn.com.higinet.tms.adapter.ElasticsearchAdapter;
+import cn.com.higinet.tms.provider.ElasticsearchConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -37,6 +40,9 @@ public class Test {
 	private ElasticsearchServiceImpl elasticsearchServiceImpl;
 	
 	@Autowired
+	private ElasticsearchAdapter elasticsearchAdapter;
+	
+	@Autowired
 	private ElasticsearchConfig elasticsearchConfig;
 	
 	@ApiOperation(value = "创建index", notes = "说明:创建index")
@@ -46,7 +52,7 @@ public class Test {
         boolean isOk = true;
         String msg = "成功";
         try {
-        	elasticsearchServiceImpl.addIndex("tms", 1,1);
+        	elasticsearchServiceImpl.addIndex("trafficdata", 3,2);
         } catch (Exception e) {
             isOk = false;
             msg = "失败";
@@ -67,7 +73,7 @@ public class Test {
         String msg = "成功";
         try {
 //        	elasticsearchServiceImpl.addIndex("tms",3,2);//创建索引
-        	elasticsearchServiceImpl.createMapping("tms", "trafficdata");
+        	elasticsearchServiceImpl.createMapping("trafficdata", "trafficdata");
         } catch (Exception e) {
             isOk = false;
             msg = "失败";
@@ -75,32 +81,34 @@ public class Test {
         return "aaa";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "根据条件进行查询", notes = "说明:根据条件查询")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "txncode", value = "交易流水", required = false, paramType = "query",allowEmptyValue = true, dataType = "String"),
-            @ApiImplicitParam(name = "startTime", value = "交易起始时间", required = false, paramType = "query",allowEmptyValue = true, dataType = "Long"),
-            @ApiImplicitParam(name = "endTime", value = "交易结束时间", required = false, paramType = "query",allowEmptyValue = true, dataType = "Long"),
+    		@ApiImplicitParam(name = "pageNo", value = "当前页码", required = true, paramType = "query",allowEmptyValue = true, dataType = "Integer"),
+    		@ApiImplicitParam(name = "pageSize", value = "每页数量", required = true, paramType = "query",allowEmptyValue = true, dataType = "Integer"),
+    		@ApiImplicitParam(name = "txncode", value = "交易流水", required = false, paramType = "query",allowEmptyValue = true, dataType = "String"),
             @ApiImplicitParam(name = "ipAddr", value = "IP地址", required = false, paramType = "query", allowEmptyValue = true,dataType = "String"),
             @ApiImplicitParam(name = "disposal", value = "处置方式", required = false, paramType = "query",allowEmptyValue = true, dataType = "String"),
             @ApiImplicitParam(name = "iseval", value = "是否评估", required = false, paramType = "query",allowEmptyValue = true, dataType = "String")
     })
     @RequestMapping(value = "search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String search(@RequestParam(value = "txncode", required = false) String txncode,
-                           @RequestParam(value = "startTime", required = false) Long startTime,
-                           @RequestParam(value = "endTime", required = false) Long endTime,
+    public String search(@RequestParam(value = "pageNo", required = false) Integer pageNo,
+    					   @RequestParam(value = "pageSize", required = false) Integer pageSize,		
+    					   @RequestParam(value = "txncode", required = false) String txncode,
                            @RequestParam(value = "ipAddr", required = false) String ipAddr,
                            @RequestParam(value = "disposal", required = false) String disposal,
                            @RequestParam(value = "iseval", required = false) String iseval) {
         boolean isOk = true;
         String msg = "查询成功";
         try {
-        	Trafficdata data = new Trafficdata();
-        	data.setTxncode(txncode);
-        	data.setIpaddr(ipAddr);
-        	data.setDisposal(disposal);
-        	data.setIseval(iseval);
-        	elasticsearchServiceImpl.searchTrafficdata("tms", "trafficdata", data, startTime, endTime);
+        	Map<String,Object> data = new HashMap<String,Object>();
+        	data.put("txncode",txncode);
+        	data.put("ipAddr",ipAddr);
+        	data.put("disposal",disposal);
+        	data.put("iseval",iseval);
+        	List<Trafficdata> dataList = (List<Trafficdata>) elasticsearchAdapter.search("trafficdata", pageSize,pageNo,data,Trafficdata.class);
+        	System.out.println("dataList的size为:"+dataList.size()+"---------");
         } catch (Exception e) {
             e.printStackTrace();
             msg = "查询失败";
@@ -119,12 +127,10 @@ public class Test {
         boolean isOk = true;
         String msg = "成功";
         try {
-        	List<Trafficdata> list = new ArrayList<Trafficdata>();
     		Trafficdata data = new Trafficdata();
     		data.setTxncode(txncode);
     		data.setTxnstatus(txnstatus);
-    		list.add(data);
-        	elasticsearchServiceImpl.upsertTrafficdata("tms", "trafficdata", list);
+    		elasticsearchAdapter.upsertData("trafficdata", data);
         } catch (Exception e) {
             isOk = false;
             msg = "失败";
@@ -132,6 +138,7 @@ public class Test {
         return "aaa";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "更新", notes = "说明:存在更新不存在不更新")
     @ApiImplicitParams({
     	@ApiImplicitParam(name = "txncode", value = "交易流水", paramType = "query", dataType = "String"),
@@ -146,7 +153,7 @@ public class Test {
     		Trafficdata data = new Trafficdata();
     		data.setTxncode(txncode);
     		data.setTxnstatus(txnstatus);
-        	elasticsearchServiceImpl.updateTrafficdata("tms", "trafficdata", data);
+    		elasticsearchAdapter.updateData("trafficdata", data);
         } catch (Exception e) {
             isOk = false;
             msg = "失败";
@@ -158,16 +165,13 @@ public class Test {
 //  @ApiImplicitParams({
 //          @ApiImplicitParam(name = "name", value = "优化索引名", paramType = "query", dataType = "String")
 //  })
-  @RequestMapping(value = "bulkAdd", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "batchUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
-  public String bulkAdd() {
+  public String batchUpdate() {
       boolean isOk = true;
       String msg = "成功";
       try {
       	List<Trafficdata> list = new ArrayList<Trafficdata>();
-//      	String txncode = "874f53a3d10b42f4aa34eaa56398bff3";
-//      	String txncode = "974f53a3d10b42f4aa34ebb";
-      	
       	String txncode = "111111111112-";//"111111111111-";
       	Trafficdata data = null;
       	for(int i=170000;i<180000;i++){
@@ -200,7 +204,7 @@ public class Test {
       		}
       		list.add(data);
       	}
-      	elasticsearchServiceImpl.bulkProcessorTrafficdata("tms", "trafficdata", list);
+      	elasticsearchAdapter.batchUpdate("trafficdata", list,Trafficdata.class);
       } catch (Exception e) {
     	  e.printStackTrace();
 //          isOk = false;
@@ -261,13 +265,13 @@ public class Test {
   @ApiImplicitParams({
     @ApiImplicitParam(name = "txncode", value = "交易流水", paramType = "query",required = true,  dataType = "String")
   })
-  @RequestMapping(value = "delete by txncode", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "deleteById", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public String deleteById(@RequestParam("txncode") String txncode) {
       boolean isOk = true;
       String msg = "成功";
       try {
-    	  elasticsearchServiceImpl.deleteById("tms", "trafficdata", txncode);
+    	  elasticsearchAdapter.deleteById("trafficdata", txncode);
       } catch (Exception e) {
           isOk = false;
           msg = "失败";
@@ -279,13 +283,14 @@ public class Test {
   @ApiImplicitParams({
     @ApiImplicitParam(name = "txncode", value = "交易流水", paramType = "query",required = true,  dataType = "String")
   })
-  @RequestMapping(value = "query by txncode", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value = "getById", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public String getById(@RequestParam("txncode") String txncode) {
       boolean isOk = true;
       String msg = "成功";
       try {
-    	  elasticsearchServiceImpl.getById("tms", "trafficdata", txncode);
+    	  Trafficdata data = (Trafficdata) elasticsearchAdapter.getById("trafficdata", txncode,Trafficdata.class);
+    	  System.out.println(data.getTxncode()+"-----"+data.getTxnstatus()+"------"+data.getTxntime());
       } catch (Exception e) {
           isOk = false;
           msg = "失败";

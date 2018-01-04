@@ -1,6 +1,9 @@
 package cn.com.higinet.tms;
 
+import javax.persistence.Id;
+
 public class Trafficdata {
+	@Id
 	private String txncode;
 	private String chancode;
 	private String sessionid;

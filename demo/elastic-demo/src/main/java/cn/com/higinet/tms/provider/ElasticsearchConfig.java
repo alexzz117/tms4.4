@@ -1,4 +1,4 @@
-package cn.com.higinet.tms;
+package cn.com.higinet.tms.provider;
 
 import java.net.InetAddress;
 
