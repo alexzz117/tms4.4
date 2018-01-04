@@ -10,22 +10,26 @@ import java.util.List;
 public class Classz {
 	/**
 	 * @Description: 根据一个接口返回该接口的所有类 
-	 * @param c 接口 
+	 * @param c 接口类
+	 * @param packageName 搜索包
+	 * @param exception 排除包
 	 * @return List<Class> 实现接口的所有类 
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	*/
-	@SuppressWarnings("rawtypes")
-	public static List<Class<?>> getAllClassByInterface( Class<?> c, String packageName, String... exception ) throws Exception {
-		List<Class<?>> returnClassList = new ArrayList<Class<?>>();
+	@SuppressWarnings({
+			"rawtypes", "unchecked"
+	})
+	public static <T> List<Class<T>> getAllClassByInterface( Class<T> c, String packageName, String... exception ) throws Exception {
+		List<Class<T>> returnClassList = new ArrayList<Class<T>>();
 		//判断是不是接口,不是接口不作处理  
 		if( c.isInterface() ) {
-			List<Class> allClass = getClasses( packageName, exception );//获得当前包以及子包下的所有类  
+			List<Class> allClass = getClasses( packageName, exception );//获得当前包以及子包下的所有类
 			//判断是否是一个接口  
 			for( int i = 0; i < allClass.size(); i++ ) {
 				if( c.isAssignableFrom( allClass.get( i ) ) ) {
 					if( !c.equals( allClass.get( i ) ) ) {
-						returnClassList.add( allClass.get( i ) );
+						returnClassList.add( (Class<T>) allClass.get( i ) );
 					}
 				}
 			}
@@ -60,7 +64,6 @@ public class Classz {
 	@SuppressWarnings("rawtypes")
 	private static List<Class> findClass( File directory, String packageName, String... exception ) throws ClassNotFoundException {
 		List<Class> classes = new ArrayList<Class>();
-		
 
 		if( exception != null ) {
 			for( String ex : exception ) {
