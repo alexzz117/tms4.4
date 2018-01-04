@@ -21,7 +21,7 @@
           </el-form-item>
         </div>
         </el-col>
-          <el-col :span="6"><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></el-col>
+          <el-col :span="5"><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></el-col>
       </el-row>
       </el-row>
     </el-form>
