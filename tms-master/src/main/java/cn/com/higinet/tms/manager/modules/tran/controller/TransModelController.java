@@ -263,7 +263,8 @@ public class TransModelController {
 		}
 
 		Model model = new Model();
-		model.setRow( transModelService.saveModelRefFd( formMap ) );
+		Map<String, List<Map<String, ?>>> formListUpperCase = saveParams2UpperCase(formMap);
+		model.setRow( transModelService.saveModelRefFd( formListUpperCase ) );
 
 		return model;
 	}
