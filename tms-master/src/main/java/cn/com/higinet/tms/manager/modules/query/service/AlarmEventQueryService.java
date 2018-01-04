@@ -130,6 +130,8 @@ public class AlarmEventQueryService {
 
         String txncode = requestModel.getString("txncode");
 
+        sql += " and traffic.txncode = :txncode";
+
         List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
         return list;
     }
