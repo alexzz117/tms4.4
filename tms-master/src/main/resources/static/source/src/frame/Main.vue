@@ -62,25 +62,22 @@
                 <el-menu-item index="6-1">报警事件分派</el-menu-item>
               </router-link>
               <router-link :to="{ name:'alarmeventExecute'}" tag="li" replace>
-                <el-menu-item index="6-2">报警事件处理</el-menu-item>
+              <el-menu-item index="6-2">报警事件处理</el-menu-item>
+            </router-link>
+              <router-link :to="{ name:'alarmeventAudit'}" tag="li" replace>
+                <el-menu-item index="6-3">报警事件审核</el-menu-item>
               </router-link>
             </el-submenu>
           </el-menu>
         </div>
       </el-aside>
       <el-main class="scroll">
-        <header class="el-header">
-          <span class="page-title">名单管理</span>
-          <el-dropdown>
-        <span class="el-dropdown-link">
-        admin<i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
+
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item><i class="el-icon-setting" style="margin-right: 5px"></i>修改密码</el-dropdown-item>
               <el-dropdown-item><i class="el-icon-circle-close" style="margin-right: 5px"></i>退出</el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown>
-        </header>
+
         <!--用router-view渲染视图-->
         <router-view/>
       </el-main>
