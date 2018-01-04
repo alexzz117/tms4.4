@@ -4,7 +4,7 @@
       <el-row>
         <el-row>
           <el-col :span="2"><div ><el-form-item label="客户号"/></div></el-col>
-          <el-col :span="4"><div ><el-form-item prop="listFormFosterdesc" >
+          <el-col :span="4"><div ><el-form-item prop="userid" >
             <el-input v-model="listForm.userid" /></el-form-item>
           </div>
           </el-col>
@@ -30,23 +30,22 @@
     <el-table
       :data="gridData"
       style="width: 100%" tooltip-effect="dark" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="35" align="left" />
       <el-table-column fixed="left" label="操作" width="65" alert="center" >
         <template slot-scope="scope"  >
-          <el-button type="text"  @click="" size="mini"  icon="el-icon-edit-outline" />
+          <el-button type="text"  @click="openDialog(scope.$index, scope.row)" size="mini"  icon="el-icon-edit-outline" />
           <el-button type="text"  @click="" size="mini"  icon="el-icon-search" />
         </template>
       </el-table-column>
-      <el-table-column  prop="txncode" label="流水号" width="230" align="left" />
+      <el-table-column  prop="txncode" label="流水号" width="235" align="left" />
       <el-table-column  prop="userid" label="客户号" width="110" align="left" />
       <el-table-column  prop="username" label="客户名称" width="100" align="left" />
-      <el-table-column  prop="txntime" label="交易时间" width="120" align="left" :formatter="formatter"/>
+      <el-table-column  prop="txntime" label="交易时间" width="135" align="left" :formatter="formatter"/>
       <el-table-column  prop="txnname" label="监控操作" width="80" align="left" />
       <el-table-column  prop="disposal" label="处置结果" width="80" align="left" />
       <el-table-column  prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
       <el-table-column  prop="assign_name" label="分派人" width="60"/>
       <el-table-column  prop="oper_name" label="处理人" width="60"/>
-      <el-table-column  prop="oper_name" label="处理时间" width="120"/>
+      <el-table-column  prop="oper_name" label="处理时间" width="135"/>
     </el-table>
     <el-pagination background class="block" label="left" label-width="100px"
                    @size-change="handleSizeChange"
@@ -58,20 +57,73 @@
                    :total="total">
     </el-pagination>
 
-    <!-- 选择人员弹窗 -->
-    <el-dialog title="报警事件分派" :visible.sync="listDialogVisible" append-to-body  >
+    <!--报警事件审核ExecuteData -->
+    <el-dialog title="报警事件审核" :visible.sync="listDialogVisible" append-to-body  >
       <div>
-        <el-table
-          :data="userData" highlight-current-row height="280"
-          tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
-          <el-table-column type="selection" width="55" align="left"></el-table-column>
-          <el-table-column  prop="login_name" label="登录名" width="180" align="left" />
-          <el-table-column  prop="assign_number" label="总量" width="70" align="left" />
-          <el-table-column  prop="process_number" label="已处理" width="70" align="left" />
-          <el-table-column  prop="unprocess_number" label="未处理" width="70" align="left" />
-        </el-table>
+        <el-form label-position="right"  :model="actionForm" :inline="inline" >
+          <el-row>
+            <el-col :span="3"><div ><el-form-item label="欺诈类型"/></div></el-col>
+            <el-col :span="9"><div ><el-form-item prop="ac_name" clearable>
+              <el-select v-model="actionForm.FRAUD_TYPE" placeholder="请选择" @focus="selectFocus('fraud_type')" disabled>
+                <el-option
+                  v-for="item in datatypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            </div>
+            </el-col>
+          </el-row>
+        </el-form>
+
+        <el-collapse v-model="activeNames" @change="handleChange">
+          <el-collapse-item title="处理动作信息" name="1">
+            <el-table
+              :data="actionData" highlight-current-row height="100"
+              tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
+              <el-table-column  prop="ac_name" label="动作名称" width="180"  />
+              <el-table-column  prop="ac_cond_in" label="条件" width="180"  />
+              <el-table-column  prop="ac_expr_in" label="表达式" width="180"  />
+            </el-table>
+          </el-collapse-item>
+          <el-collapse-item title="报警处理信息" name="2">
+            <el-table
+              :data="ExecuteData" highlight-current-row height="100"
+              tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
+              <el-table-column  prop="ac_name" label="处理时间" width="140"  />
+              <el-table-column  prop="ac_cond_in" label="处理类型" width="80"  />
+              <el-table-column  prop="ac_expr_in" label="处理人员" width="80"  />
+              <el-table-column  prop="ac_expr_in" label="处理结果" width="80"  />
+              <el-table-column  prop="ac_expr_in" label="处理信息" width="140"  />
+            </el-table>
+          </el-collapse-item>
+        </el-collapse>
+
+        <!--审核信息 -->
+        <el-form  label-position="right" :model="auditForm"  ref="auditForm" :rules="rules"   :inline="inline"  >
+          <el-row>
+            <el-col :span="3.5"><div ><el-form-item label="审核结果" prop="PS_RESULT"/></div></el-col>
+            <el-col :span="9"><div >
+              <el-form-item  >
+                <el-radio v-model="auditForm.PS_RESULT" label="1">通过</el-radio>
+               <el-radio v-model="auditForm.PS_RESULT" label="2">不通过</el-radio>
+              </el-form-item>
+            </div>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="3.5" :rows="3"><div><el-form-item label="处理信息"  prop="PS_INFO"  /></div></el-col>
+            <el-col :span="20"><div><el-input
+              type="textarea"resize="none" v-model="auditForm.PS_INFO"
+              :rows="3"  auto-complete="off"
+              placeholder="请输入内容">
+            </el-input></div></el-col>
+          </el-row>
+        </el-form>
         <div class="dialog-footer"  align="center"  slot="footer">
-          <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="onSaveAssign" :disabled="btnStatus">确 定</el-button>
+          <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="onSaveAudit('auditForm')" >确 定</el-button>
           <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false" >返 回</el-button>
         </div>
       </div>
@@ -175,45 +227,38 @@
         this.pagesize = data.page.size
         this.total = data.page.total
       },
-      //分派按钮弹出报警事件人员窗体
-      openDialog(){
+      //报警事件审核弹窗
+      openDialog(index, row){
         var self = this
         this.listDialogVisible = true
-        this.txncodeData = this.multipleSelection
-        var param = {
-          TXNCODES: this.multipleSelection
-        }
-        debugger
+        var TXN_CODE = row.txncode
         ajax.post({
-          url: '/alarmevent/assign',
-          param: param,
+          url: '/alarmevent/audit',
+          param: {TXN_CODE: TXN_CODE},
           success: function (data) {
             if (data.list) {
-              self.userData =  data.list
+              self.actionData = data.row
             }
-            if(data.rosterIds) {
-              self.rosterIds  = data.rosterIds
+            if (data.list) {
+              self.ExecuteData = data.list
             }
           }
         })
       },
-      onSaveAssign(){
+      //报警事件审核提交
+      onSaveAudit(formName){
         var self = this
-        var param = [{
-          TXNCODES: this.txncodeData, //需要分派的流水交易
-          OPERATER: this.multipleSelection //选中操作员
-        }]
-        debugger
-        ajax.post({
-          url: '/alarmevent/onsaveAssign',
-          param: param,
-          success: function (data) {
-            self.$message({
-              message: '分派成功。',
-              type: 'success'
-            })
-            self.listDialogVisible = false
-            self.sel()
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            var param = util.extend({
+              TXN_CODE: this.vTxncode,
+              TXNCODE: this.vTxncode,
+              PS_TYPE: '1',
+              PSSTATUS: '03',
+              PS_RESULT: '1'
+            }, this.auditForm)
+          } else {
+            return false
           }
         })
       }
@@ -222,9 +267,7 @@
       return {
         inline: true,
         clearable: true,
-        sendBtnStatus: true,
         listDialogVisible: false,
-        btnStatus: true,
         listForm: {
           txncode: '',
           passtatus: '',
@@ -232,9 +275,21 @@
           endtime: '',
           userid: ''
         },
+        actionForm: {
+          FRAUD_TYPE: ''
+        },
+        auditForm: {
+          PS_RESULT: '',
+          PS_INFO: ''
+        },
+        rules: {
+          PS_RESULT: [{ required: true, message: '审核结果不能为空', trigger: 'blur' }],
+          PS_INFO: [{ required: true, message: '处理信息不能为空', trigger: 'blur' },
+            { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
+        },
         gridData: [],
-        userData: [],
-        txncodeData: [],
+        ActionData: [],
+        ExecuteData: [],
         pageindex: 1,
         pagesize: 10,
         total: 100,
