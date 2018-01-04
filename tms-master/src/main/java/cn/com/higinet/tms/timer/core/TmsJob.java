@@ -10,6 +10,10 @@ import org.quartz.Job;
 
 public interface TmsJob extends Job {
 	
+	/**
+	 * 返回任务名称
+	 * 只将任务动作简单描述，切勿带入执行时间
+	 * */
 	public String getJobName();
 	
 }
