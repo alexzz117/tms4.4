@@ -3,46 +3,25 @@
     <el-form  label-position="right" :model="listForm" ref="listForm" label-width="100px"  class="demo-form-inline"  :inline="inline"  >
       <el-row>
         <el-col :span="2"><div><el-form-item label="流水号"/></div> </el-col>
-        <el-col :span="5"><div>
+        <el-col :span="4"><div>
           <el-form-item  prop="txncode" data="txncode">
             <el-input v-model="listForm.txncode" clearable></el-input>
           </el-form-item></div>
         </el-col>
-        <el-col :span="2"><div ><el-form-item label="交易时间起"/></div></el-col>
-        <el-col :span="5"><div>
+        <el-col :span="2"><div ><el-form-item label="交易时间"/></div></el-col>
+        <el-col :span="3"><div>
           <el-form-item >
             <el-date-picker  type="datetime" placeholder="选择时间" v-model="listForm.operate_time" ></el-date-picker>
           </el-form-item></div>
         </el-col>
-        <el-col :span="2"><div ><el-form-item label="交易时间止"/></div></el-col>
-        <el-col :span="5"><div>
+        <el-col :span="2"><div ><el-form-item label="-"/></div></el-col>
+        <el-col :span="3"><div>
           <el-form-item >
             <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.end_time" ></el-date-picker>
           </el-form-item>
         </div>
         </el-col>
-        <el-col :span="3"><div > <el-button class="el-icon-more" type="primary" @click=""/></div></el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :span="2"><div ><el-form-item label="客户号"/></div></el-col>
-        <el-col :span="5"><div ><el-form-item prop="listFormFosterdesc" clearable>
-          <el-input v-model="listForm.userid" /></el-form-item>
-        </div>
-        </el-col>
-
-        <el-col :span="2"> <div ><el-form-item label="处理状态"  prop="PSSTATUS"/></div> </el-col>
-        <el-col :span="4"><div >
-          <el-select v-model="listForm.passtatus" placeholder="请选择" @focus="selectFocus('passtatus')" :clearable="clearable">
-            <el-option
-              v-for="item in datatypeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select></div>
-        </el-col>
-        <el-col :span="10"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></div></el-col>
+        <el-col :span="6"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></div></el-col>
       </el-row>
     </el-form>
     <!--   数据列表  -->

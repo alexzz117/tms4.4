@@ -2,15 +2,9 @@
   <div>
     <el-form  label-position="right" :model="listForm" ref="listForm"  label-width="100px" :inline="inline"  >
       <el-row>
-        <el-col :span="2"><div><el-form-item label="流水号"/></div> </el-col>
-        <el-col :span="3"><div>
-          <el-form-item prop="listFormFosterdesc">
-            <el-input v-model="listForm.txncode" ></el-input>
-          </el-form-item></div>
-        </el-col>
         <el-row>
           <el-col :span="2"><div ><el-form-item label="客户号"/></div></el-col>
-          <el-col :span="3"><div ><el-form-item prop="listFormFosterdesc" >
+          <el-col :span="4"><div ><el-form-item prop="listFormFosterdesc" >
             <el-input v-model="listForm.userid" /></el-form-item>
           </div>
           </el-col>
@@ -27,7 +21,7 @@
           </el-form-item>
         </div>
         </el-col>
-          <el-col :span="4"><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></el-col>
+          <el-col :span="6"><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></el-col>
       </el-row>
       </el-row>
     </el-form>
