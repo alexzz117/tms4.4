@@ -152,10 +152,10 @@
 </template>
 
 <script>
-  import ajax from '../../common/ajax'
-  import util from '../../common/util'
-  import dictCode from '../../common/dictCode'
-  import check from '../../common/check'
+  import ajax from '@/common/ajax'
+  import util from '@/common/util'
+  import dictCode from '@/common/dictCode'
+  import check from '@/common/check'
   /**
    * 认证状态下拉列表数据
    */
