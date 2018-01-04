@@ -153,7 +153,11 @@
       :data="tableData"
       style="width: 100%">
 
-      <el-table-column prop="txncode" label="流水号" align="left" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column label="流水号" align="left" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <a href="javascript:void(0)" @click="showAlarmEventInfo(scope.row)">{{scope.row.txncode}}</a>
+        </template>
+      </el-table-column>
       <el-table-column prop="userid" label="客户号" align="left"></el-table-column>
       <el-table-column prop="username" label="客户名称" align="left"></el-table-column>
       <el-table-column prop="txnname" label="监控交易" align="left"></el-table-column>
@@ -224,6 +228,21 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="报警事件详细信息" :visible.sync="infoDialogVisible" width="900px">
+
+      <el-tabs v-model="tabActiveName" @tab-click="handleTabClick">
+        <el-tab-pane label="操作信息" name="operate">
+         <AlarmEventQueryOperateDetail :showItem="selectedRow"></AlarmEventQueryOperateDetail>
+        </el-tab-pane>
+        <el-tab-pane label="策略信息" name="strategy">策略信息</el-tab-pane>
+        <el-tab-pane label="处理信息" name="handle">处理信息</el-tab-pane>
+      </el-tabs>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="infoDialogVisible = false" size="large">取 消</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -233,12 +252,15 @@
   import dictCode from "../../common/dictCode";
   import check from "../../common/check";
 
+  import AlarmEventQueryOperateDetail from '@/components/synquery/AlarmEventQueryOperateDetail'
+
   let iscorrectList = [{'label': '未认证', 'value': '2'}, {'label': '认证通过', 'value': '1'}, {'label': '认证未通过', 'value': '0'}]
 
   export default {
     data () {
       return {
         txntypeDialogVisible: false,
+        infoDialogVisible: false,
         defaultTreeProps: {
           children: 'children',
           label: 'tab_desc'
@@ -292,7 +314,8 @@
         currentPage: 1,
         pageSize: 10,
         total: 0,
-        selectRow: {},
+        selectedRow: {},
+        tabActiveName: 'operate',
         tableData: [],
         // 下拉框
         txntypeList: [],
@@ -503,7 +526,17 @@
 
       openTxnTypedialog () {
         this.txntypeDialogVisible = true
+      },
+      showAlarmEventInfo (row) {
+        this.selectedRow = row
+        this.infoDialogVisible = true
+      },
+      handleTabClick (tab, event) {
+        console.log(tab, event)
       }
+    },
+    components: {
+      AlarmEventQueryOperateDetail
     }
   }
 </script>
