@@ -29,16 +29,16 @@
       :data="gridData"
       style="width: 100%" tooltip-effect="dark" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="40" />
-      <el-table-column fixed="left" label="操 作" width="90" alert="center" >
+      <el-table-column fixed="left" label="操作" width="65" alert="center" >
         <template slot-scope="scope"  >
-          <el-button type="text" @click="openDialog(scope.$index, scope.row)"   icon=" el-icon-edit-outline" />
+          <el-button type="text" @click="openDialog(scope.$index, scope.row)"   icon="el-icon-edit-outline" />
           <el-button type="text"  @click=""  icon="el-icon-search" />
         </template>
       </el-table-column>
       <el-table-column  prop="txncode" label="流水号" width="220" />
       <el-table-column  prop="userid" label="客户号" width="120"/>
       <el-table-column  prop="username" label="客户名称" width="80" />
-      <el-table-column  prop="txntime" label="操作时间" width="100" :formatter="formatter"/>
+      <el-table-column  prop="txntime" label="交易时间" width="100" :formatter="formatter"/>
       <el-table-column  prop="txnname" label="监控操作" width="100" />
       <el-table-column  prop="disposal" label="处置结果" width="80"  />
       <el-table-column  prop="assign_name" label="分派人" width="80"/>

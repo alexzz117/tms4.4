@@ -30,23 +30,23 @@
     <el-table
       :data="gridData"
       style="width: 100%" tooltip-effect="dark" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="40" align="left" />
-      <el-table-column fixed="left" label="操 作" width="60" alert="center" >
+      <el-table-column type="selection" width="35" align="left" />
+      <el-table-column fixed="left" label="操作" width="65" alert="center" >
         <template slot-scope="scope"  >
+          <el-button type="text"  @click="" size="mini"  icon="el-icon-edit-outline" />
           <el-button type="text"  @click="" size="mini"  icon="el-icon-search" />
         </template>
       </el-table-column>
-      <el-table-column  prop="txncode" label="流水号" width="210" align="left" />
-      <el-table-column  prop="userid" label="客户号" width="100" align="left" />
+      <el-table-column  prop="txncode" label="流水号" width="230" align="left" />
+      <el-table-column  prop="userid" label="客户号" width="110" align="left" />
       <el-table-column  prop="username" label="客户名称" width="100" align="left" />
-      <el-table-column  prop="txntime" label="操作时间" width="120" align="left" :formatter="formatter"/>
+      <el-table-column  prop="txntime" label="交易时间" width="120" align="left" :formatter="formatter"/>
       <el-table-column  prop="txnname" label="监控操作" width="80" align="left" />
       <el-table-column  prop="disposal" label="处置结果" width="80" align="left" />
       <el-table-column  prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
       <el-table-column  prop="assign_name" label="分派人" width="60"/>
-      <el-table-column  prop="assigntime" label="分派时间" width="80"/>
       <el-table-column  prop="oper_name" label="处理人" width="60"/>
-      <el-table-column  prop="oper_name" label="处理时间" width="80"/>
+      <el-table-column  prop="oper_name" label="处理时间" width="120"/>
     </el-table>
     <el-pagination background class="block" label="left" label-width="100px"
                    @size-change="handleSizeChange"
