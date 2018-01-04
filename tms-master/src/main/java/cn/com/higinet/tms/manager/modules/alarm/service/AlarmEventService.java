@@ -908,7 +908,7 @@ public class AlarmEventService {
 		if (!StringUtil.isEmpty(conds.get("passtatus"))) {
 			sb.append("TRAFFIC.PSSTATUS =:passtatus  AND ");
 		}
-		sb.append("TRAFFIC.HITRULENUM !=0 AND  TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02' OR TRAFFIC.PSSTATUS = '04')");
+		sb.append("TRAFFIC.HITRULENUM !=0 AND  (TRAFFIC.PSSTATUS = '00' OR TRAFFIC.PSSTATUS = '02' OR TRAFFIC.PSSTATUS = '04' )");
 
 		Order order = new Order().desc("TXNTIME");
 		System.out.println(sb.toString());
@@ -964,7 +964,6 @@ public class AlarmEventService {
 		Order order = new Order().desc("TXNTIME");
 		System.out.println(sb.toString());
 		Page<Map<String, Object>> listPage = offlineSimpleDao.pageQuery(sb.toString(), conds, order);
-		System.out.println(listPage.getList().get(0));
 		return listPage;
 	}
 	
