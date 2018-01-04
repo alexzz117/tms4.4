@@ -28,7 +28,6 @@
     <el-table
       :data="gridData"
       style="width: 100%" tooltip-effect="dark" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="40" />
       <el-table-column fixed="left" label="操作" width="65" alert="center" >
         <template slot-scope="scope"  >
           <el-button type="text" @click="openDialog(scope.$index, scope.row)"   icon="el-icon-edit-outline" />
