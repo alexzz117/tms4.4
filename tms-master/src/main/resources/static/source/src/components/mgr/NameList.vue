@@ -1,70 +1,70 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="100px" :model="listForm" class="demo-form-inline" label="left"
-             :inline="inline" style="text-align: left">
-      <el-form-item label="名单名称" prop="listFormFosterdesc">
-        <el-input v-model="listForm.rosterdesc"></el-input>
-      </el-form-item>
-      <el-form-item label="名单数据类型">
-        <el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择" :clearable="clearable">
-          <el-option
-            v-for="item in datatypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="名单类型">
-        <el-select v-model="listForm.rostertype" @focus="selectFocus('rostertype')" placeholder="请选择" :clearable="clearable">
-          <el-option
-            v-for="item in rostertypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-table
-      :data="gridData"
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
-      <el-table-column
-        fixed="left"
-        label="操 作"
-        width="100">
-        <template slot-scope="scope" >
-          <el-button type="text"  @click="openDialog(scope.$index, scope.row)" size="mini"  icon="el-icon-search"  v-show="typeof(scope.row.rosterid)=='number'"></el-button>
-          <el-button type="text"  @click="showValueList(scope.$index, scope.row)" size="mini" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'"></el-button>
-        </template>
-      </el-table-column>
-      <el-table-column prop="rostername" label="名单英文名" align="left" width="160"></el-table-column>
-      <el-table-column prop="rosterdesc" label="名单名称" align="left" width="160"></el-table-column>
-      <el-table-column prop="datatype" label="名单数据类型" align="left" width="160" :formatter="formatter"></el-table-column>
-      <el-table-column prop="rostertype" label="名单类型" align="left" width="160" :formatter="formatter"></el-table-column>
-      <el-table-column prop="valuecount" label="值数量" align="left" width="100" ></el-table-column>
-      <el-table-column prop="createtime" label="创建时间" align="left" width="160" :formatter="formatter"></el-table-column>
-      <el-table-column prop="iscache" label="是否缓存" align="left" width="120" :formatter="formatter"></el-table-column>
-    </el-table>
-    <el-pagination background class="block" label="left" label-width="100px"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :current-page="pageindex"
-                   :page-sizes="[10, 25, 50, 100]"
-                   :page-size="pagesize"
-                   layout="total, prev, pager, next"
-                   :total="total">
-    </el-pagination>
-
-
+    <div class="toolbar">
+      <el-form label-position="right" label-width="100px" :model="listForm"
+               :inline="inline" class="toolbar-form">
+        <el-form-item label="名单名称" prop="listFormFosterdesc">
+          <el-input v-model="listForm.rosterdesc"></el-input>
+        </el-form-item>
+        <!--<el-form-item label="名单数据类型">-->
+          <!--<el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择" :clearable="clearable">-->
+            <!--<el-option-->
+              <!--v-for="item in datatypeOptions"-->
+              <!--:key="item.value"-->
+              <!--:label="item.label"-->
+              <!--:value="item.value">-->
+            <!--</el-option>-->
+          <!--</el-select>-->
+        <!--</el-form-item>-->
+        <el-form-item label="名单类型">
+          <el-select v-model="listForm.rostertype" @focus="selectFocus('rostertype')" placeholder="请选择" :clearable="clearable">
+            <el-option
+              v-for="item in rostertypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <section class="table">
+      <el-table
+        :data="gridData"
+        @selection-change="handleSelectionChange">
+        <el-table-column
+          label="操作"
+          width="160">
+          <template slot-scope="scope" >
+            <el-button type="text"  @click="openDialog(scope.$index, scope.row)"  icon="el-icon-view"  v-show="typeof(scope.row.rosterid)=='number'">查看</el-button>
+            <el-button type="text"  @click="showValueList(scope.$index, scope.row)" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'">名单值</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="rostername" label="名单英文名" align="left" width="160"></el-table-column>
+        <el-table-column prop="rosterdesc" label="名单名称" align="left" width="120"></el-table-column>
+        <el-table-column prop="datatype" label="名单数据类型" align="left" width="120" :formatter="formatter"></el-table-column>
+        <el-table-column prop="rostertype" label="名单类型" align="left" width="120" :formatter="formatter"></el-table-column>
+        <el-table-column prop="valuecount" label="值数量" align="left" width="90"></el-table-column>
+        <el-table-column prop="createtime" label="创建时间" align="left" width="160" :formatter="formatter"></el-table-column>
+        <el-table-column prop="iscache" label="是否缓存" align="left" :formatter="formatter"></el-table-column>
+      </el-table>
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :current-page="pageindex"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pagesize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total">
+      </el-pagination>
+    </section>
+    
   <!-- 名单查看弹出窗 -->
     <el-dialog title="查看名单" :visible.sync="listDialogVisible" append-to-body  >
-      <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
+      <el-form :model="listDialogform" ref="listDialogform" :label-width="formLabelWidth"
                style="text-align: left" >
         <el-form-item label="名单英文名" prop="rostername" data="rostername">
           <el-input v-model="listDialogform.rostername" auto-complete="off" :disabled="true"></el-input>
