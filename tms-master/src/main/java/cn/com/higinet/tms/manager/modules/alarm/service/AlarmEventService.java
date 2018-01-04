@@ -209,7 +209,7 @@ public class AlarmEventService {
 		_map_.put("AC_ID", acId);
 		_map_.put("CREATE_TIME", System.currentTimeMillis());
 		String sql = "insert into TMS_MGR_ALARM_ACTION(AC_ID, TXN_CODE, AC_NAME, AC_COND, AC_COND_IN, AC_EXPR, AC_EXPR_IN, CREATE_TIME, AC_TYPE)"
-				+ "values(:AC_ID, :TXN_CODE, :AC_NAME, :AC_COND, :AC_COND_IN, :AC_EXPR, :AC_EXPR_IN, :CREATE_TIME, :AC_TYPE)";
+				+ "values(:AC_ID, :TXN_CODE, :ac_name, :ac_cond, :ac_cond_in, :ac_expr, :ac_expr_in, :CREATE_TIME, :AC_TYPE)";
 		offlineSimpleDao.executeUpdate(sql, _map_);
 		return _map_;
 	}
