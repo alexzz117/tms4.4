@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Service("alarmEventQueryService")
 @Transactional
@@ -48,6 +46,53 @@ public class AlarmEventQueryService {
         if(StringUtils.isNotEmpty(txncode)) {
             sql += " and traffic.txncode = :txncode";
         }
+        if(StringUtils.isNotEmpty(userid)) {
+            sql += " and traffic.userid = :userid";
+        }
+        if(StringUtils.isNotEmpty(username)) {
+            sql += " and u.username = :username";
+        }
+        if(StringUtils.isNotEmpty(deviceid)) {
+            sql += " and traffic.deviceid = :deviceid";
+        }
+        if(StringUtils.isNotEmpty(ipaddr)) {
+            sql += " and traffic.ipaddr = :ipaddr";
+        }
+        if(StringUtils.isNotEmpty(txntype)) {
+            String[] txnTypes = txntype.split(",");
+            List<String> txnTypeList = new ArrayList<>(Arrays.asList(txnTypes));
+            requestModel.put("txnTypeList", txnTypeList);
+            sql += " and traffic.txntype in (:txnTypeList)";
+        }
+        if(StringUtils.isNotEmpty(disposal)) {
+            sql += " and traffic.disposal = :disposal";
+        }
+        if(StringUtils.isNotEmpty(iscorrect)) {
+            sql += " and ifnull(traffic.iscorrect,2) = :iscorrect";
+        }
+        if(StringUtils.isNotEmpty(txnstatus)) {
+            sql += " and traffic.txnstatus = :txnstatus";
+        }
+        if(StringUtils.isNotEmpty(psstatus)) {
+            sql += " and traffic.psstatus = :psstatus";
+        }
+        if(StringUtils.isNotEmpty(startDateStr) && StringUtils.isNotEmpty(endDateStr)) {
+            long startDate = Long.parseLong(startDateStr);
+            long endDate = Long.parseLong(endDateStr);
+
+            requestModel.put("startTimeStamp", startDate);
+            requestModel.put("endTimeStamp", endDate);
+            sql += " and traffic.txntime between :startTimeStamp and :endTimeStamp";
+        }
+        if(StringUtils.isNotEmpty(countrycode)) {
+            sql += " and traffic.countrycode = :countrycode";
+        }
+        if(StringUtils.isNotEmpty(regioncode)) {
+            sql += " and traffic.regioncode = :regioncode";
+        }
+        if(StringUtils.isNotEmpty(citycode)) {
+            sql += " and traffic.citycode = :citycode";
+        }
 
 
         //获取country真实表名
@@ -67,6 +112,26 @@ public class AlarmEventQueryService {
         Page<Map<String, Object>> page = offlineSimpleDao.pageQuery(sql, requestModel, order);
 
         return page;
+    }
+
+    public List<Map<String, Object>> queryAlarmEventOperateDetail(RequestModel requestModel) {
+        String sql = "select traffic.*, concat(ifnull((select country.countryname from TMS_COUNTRY country where traffic.countrycode = country.countrycode), '未知'), '-', ifnull((select region.regionname from TMS_REGION region where traffic.regioncode = region.regioncode), '未知'), '-', ifnull((select city.cityname from TMS_CITY city where traffic.citycode = city.citycode), '未知')) LOCATION from TMS_RUN_TRAFFICDATA traffic where 1=1";
+        //获取country真实表名
+        String tableNameSql = "select concat('', case t.SUCC_COUNT when 0 then '_N' else (select case c.IS_SUFFIX when 0 then '' when 1 then '_N' else '_N' end TAB_NAME from (select a.IS_SUFFIX from TMS_MGR_IPLOG a where a.IPLOG_ID=(select max(b.IPLOG_ID) from TMS_MGR_IPLOG b where b.OPERATE_RESULT=1)) c) end) TAB_NAME from (select count(*) SUCC_COUNT from TMS_MGR_IPLOG where OPERATE_RESULT=1) t";
+        List<Map<String, Object>> tableNameList = offlineSimpleDao.queryForList(tableNameSql, new HashMap());
+        String tableName = Objects.toString(tableNameList.get(0).get("TAB_NAME"), "_N");
+        String countryTableName = "TMS_MGR_COUNTRY" + tableName;
+        String regionTableName = "TMS_MGR_REGION" + tableName;
+        String cityTableName = "TMS_MGR_CITY" + tableName;
+
+        sql = sql.replaceAll("TMS_COUNTRY", countryTableName);
+        sql = sql.replaceAll("TMS_REGION", regionTableName);
+        sql = sql.replaceAll("TMS_CITY", cityTableName);
+
+        String txncode = requestModel.getString("txncode");
+
+        List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
+        return list;
     }
 
 }

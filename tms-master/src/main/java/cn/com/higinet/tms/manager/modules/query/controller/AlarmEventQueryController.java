@@ -34,4 +34,15 @@ public class AlarmEventQueryController {
         return model;
     }
 
+    @RequestMapping(value = "/operateDetail", method = RequestMethod.POST)
+    public Model showQueryOperateDetailAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
+        Model model = new Model();
+
+        model.setRow(alarmEventQueryService.queryAlarmEventOperateDetail(reqs));
+
+        return model;
+    }
+
+
+
 }
