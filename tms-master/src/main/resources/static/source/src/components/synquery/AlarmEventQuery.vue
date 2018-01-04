@@ -196,7 +196,10 @@
           <span>{{scope.row.audittime | renderDateTime}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="psstatus" label="处理状态" align="left">
+      <el-table-column label="处理状态" align="left">
+        <template slot-scope="scope">
+          <span>{{scope.row.psstatus | renderPsStatus}}</span>
+        </template>
 
       </el-table-column>
     </el-table>
@@ -228,13 +231,15 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="报警事件详细信息" :visible.sync="infoDialogVisible" width="900px">
+    <el-dialog title="报警事件详细信息" :visible.sync="infoDialogVisible" width="900px" @open="handleInfoOpen">
 
       <el-tabs v-model="tabActiveName" @tab-click="handleTabClick">
         <el-tab-pane label="操作信息" name="operate">
-         <AlarmEventQueryOperateDetail :showItem="selectedRow"></AlarmEventQueryOperateDetail>
+         <AlarmEventQueryOperateDetail ref="operateDetail" :showItem="selectedRow"></AlarmEventQueryOperateDetail>
         </el-tab-pane>
-        <el-tab-pane label="策略信息" name="strategy">策略信息</el-tab-pane>
+        <el-tab-pane label="策略信息" name="strategy">
+          <AlarmEventQueryStrategyDetail ref="strategyDetail" :showItem="selectedRow" :disposalList="disposalList"></AlarmEventQueryStrategyDetail>
+        </el-tab-pane>
         <el-tab-pane label="处理信息" name="handle">处理信息</el-tab-pane>
       </el-tabs>
 
@@ -253,6 +258,7 @@
   import check from "../../common/check";
 
   import AlarmEventQueryOperateDetail from '@/components/synquery/AlarmEventQueryOperateDetail'
+  import AlarmEventQueryStrategyDetail from '@/components/synquery/AlarmEventQueryStrategyDetail'
 
   let iscorrectList = [{'label': '未认证', 'value': '2'}, {'label': '认证通过', 'value': '1'}, {'label': '认证未通过', 'value': '0'}]
 
@@ -370,6 +376,9 @@
         return util.renderDateTime(value)
       },
       renderTxnstatus (value) {
+        if (!value || value === '') {
+          return ''
+        }
         return dictCode.rendCode('tms.common.txnstatus', value)
       },
       renderIscorrect (value) {
@@ -379,6 +388,12 @@
           }
         }
         return ''
+      },
+      renderPsStatus (value) {
+        if (!value || value === '') {
+          return ''
+        }
+        return dictCode.rendCode('tms.alarm.process.status', value)
       }
     },
     methods: {
@@ -389,8 +404,14 @@
         return [start, end]
       },
       initSelectData () {
-        this.txnstatusList = dictCode.getCodeItems('tms.common.txnstatus')
-        this.psstatusList = dictCode.getCodeItems('tms.alarm.process.status')
+        dictCode.getCodeItemsCb('tms.common.txnstatus', (items) => {
+          this.txnstatusList = items
+        })
+        dictCode.getCodeItemsCb('tms.alarm.process.status', (items) => {
+          this.psstatusList = items
+        })
+        // this.txnstatusList = dictCode.getCodeItems('tms.common.txnstatus')
+        // this.psstatusList = dictCode.getCodeItems('tms.alarm.process.status')
         let self = this
         this.selTree()
         ajax.post({
@@ -530,13 +551,21 @@
       showAlarmEventInfo (row) {
         this.selectedRow = row
         this.infoDialogVisible = true
+        let self = this
+        setTimeout(function () {
+          self.$refs.operateDetail.loadData(row)
+          self.$refs.strategyDetail.loadData(row)
+        }, 200)
+      },
+      handleInfoOpen () {
+
       },
       handleTabClick (tab, event) {
-        console.log(tab, event)
       }
     },
     components: {
-      AlarmEventQueryOperateDetail
+      AlarmEventQueryOperateDetail,
+      AlarmEventQueryStrategyDetail
     }
   }
 </script>

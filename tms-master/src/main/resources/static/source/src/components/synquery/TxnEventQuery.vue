@@ -195,6 +195,7 @@
     mounted: function () {
       this.$nextTick(function () {
         let self = this
+        console.log(dictCode.getCodeItems('tms.common.txnstatus'), dictCode.getCodeItems('tms.confirmrisk.status'))
         self.txnStatusList = dictCode.getCodeItems('tms.common.txnstatus')
         self.confirmRiskList = dictCode.getCodeItems('tms.confirmrisk.status')
         ajax.post({

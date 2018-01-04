@@ -33,6 +33,22 @@ function getCodeItems(codeName) {
   return items
 }
 
+function getCodeItemsCb(codeName, cb) {
+  if (util.isEmptyObject(dictCode)){
+    ajax.get({
+      url: '/common/dict',
+      success: function (data) {
+        dictCode = data.codes ? data.codes : {}
+        var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
+        cb(items)
+      }
+    })
+  } else {
+    var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
+    cb(items)
+  }
+}
+
 function getCode(codeName) {
   return dictCode[codeName]
 }
@@ -65,6 +81,7 @@ export default {
   getCodeData: getCodeData,
   rendCode: rendCode,
   getCodeItems: getCodeItems,
+  getCodeItemsCb: getCodeItemsCb,
   getCode: getCode,
   rendDatetime: rendDatetime
 }
