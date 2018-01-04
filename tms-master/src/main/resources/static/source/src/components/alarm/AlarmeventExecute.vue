@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form  label-position="right" :model="listForm"  label-width="100px"  class="demo-form-inline"  :inline="inline"  >
+    <el-form  label-position="right" :model="listForm" ref="listForm" label-width="100px"  class="demo-form-inline"  :inline="inline"  >
       <el-row>
         <el-col :span="2"><div><el-form-item label="流水号"/></div> </el-col>
         <el-col :span="5"><div>
@@ -48,7 +48,6 @@
         <el-col :span="1"><div >  <el-button type="primary" :align="left"  icon="el-icon-success" @click="" >批量处理</el-button></div></el-col>
       </el-row>
     </el-form>
-
     <!--   数据列表  -->
     <el-table
       :data="gridData"
@@ -70,7 +69,6 @@
       <el-table-column  prop="assigntime" label="分派时间" width="80" :formatter="formatter"/>
       <el-table-column  prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
       <el-table-column  prop="oper_name" label="处理人" width="80"/>
-
     </el-table>
     <el-pagination background class="block"  label-width="100px"
                    @size-change="handleSizeChange"
@@ -85,7 +83,7 @@
     <!-- 报警事件处理弹窗 -->
     <el-dialog title="报警事件处理" :visible.sync="listDialogVisible" append-to-body  >
       <div>
-        <el-form  label-position="right" :model="executeForm" ref="executeForm" label-width="100px"  class="demo-form-inline"  :inline="inline"  >
+        <el-form  label-position="right" :model="executeForm"  :rules="executeFormRules" ref="executeForm" label-width="100px"  :inline="inline"  >
           <el-row>
             <el-col :span="4"> <div ><el-form-item label="欺诈类型"  prop="fraud_type"  data="fraud_type"/></div> </el-col>
             <el-col :span="20"><div >
@@ -147,15 +145,15 @@
         </el-collapse>
         <div>
           <el-button-group size="small">
-            <el-button type="primary" plain icon="el-icon-delete"></el-button>
+            <el-button type="primary" plain icon="el-icon-delete" @click="delPsAct()" :disabled="delBtnStatus"></el-button>
           </el-button-group>
         </div>
               <!-- GRID -->
               <el-table
                 :data="actionData" highlight-current-row height="200"
                 tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
-                <el-table-column  type="selection" width="40" />
-                <el-table-column fixed="left" label="操 作" width="60" alert="center" >
+                <el-table-column  type="selection" width="45" />
+                <el-table-column fixed="left" label="操 作" width="50" alert="center" >
                   <template slot-scope="scope"  >
                     <el-button type="text" @click="editPsAct(scope.$index, scope.row)"  icon="el-icon-edit" />
                   </template>
@@ -165,7 +163,7 @@
                 <el-table-column  prop="ac_expr_in" label="表达式" width="180"  />
               </el-table>
           <div class="dialog-footer"  align="center"  slot="footer">
-           <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="saveProcess()" >提交审核</el-button>
+           <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="saveProcess('executeForm')" >提交审核</el-button>
            <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false" >取消</el-button>
         </div>
       </div>
@@ -199,6 +197,11 @@
       },
       handleCurrentRow(val){
         this.multipleSelection = val;
+        if (val.length >= 1){
+          this.delBtnStatus = false
+        } else {
+          this.delBtnStatus = true
+        }
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
@@ -307,6 +310,60 @@
                   type: 'success',
                   message: '保存成功。'
                 })
+                //刷新动作列表
+                self.openDialog()
+              }
+            })
+          } else {
+            return false
+          }
+        })
+      },
+      //批量删除动作信息
+      delPsAct() {
+        var self = this
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var param = {
+            del: this.multipleSelection
+          }
+          ajax.post({
+            url: '/alarmevent/delPsAct',
+            param: param,
+            success: function (data) {
+              self.$message({
+                message: '删除成功。',
+                type: 'success'
+              })
+              self.sel()
+            }
+          })
+        }).catch(() => {
+        })
+      },
+      //提交审核按钮事件 PSSTATUS: '03', //处理状态改为待审核
+      saveProcess(formName) {
+        var self = this
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            var param = util.extend({
+              TXN_CODE: this.vTxncode,
+              TXNCODE: this.vTxncode,
+              PS_TYPE: '1',
+              PSSTATUS: '03',
+              PS_RESULT: '1'
+            }, this.executeForm)
+            ajax.post({
+              url: '/alarmevent/saveProcess',
+              param: param,
+              success: function (data) {
+                self.$message({
+                  message: '处理成功。',
+                  type: 'success'
+                })
                 self.listDialogVisible = false
                 self.sel()
               }
@@ -316,29 +373,6 @@
             return false
           }
         })
-      },
-      //提交审核按钮事件 PSSTATUS: '03', //处理状态改为待审核
-      saveProcess() {
-        var self = this
-        var param = util.extend({
-          TXN_CODE: this.vTxncode,
-          TXNCODE: this.vTxncode,
-          PS_TYPE: '1',
-          PSSTATUS: '03',
-          PS_RESULT: '1'
-        }, this.executeForm)
-        ajax.post({
-          url: '/alarmevent/saveProcess',
-          param: param,
-          success: function (data) {
-            self.$message({
-              message: '处理成功。',
-              type: 'success'
-            })
-            self.listDialogVisible = false
-            self.sel()
-          }
-        })
       }
     },
     data() {
@@ -346,6 +380,7 @@
         inline: true,
         clearable: true,
         listDialogVisible: false,
+        delBtnStatus: true,
         listForm: {
           txncode: '',
           passtatus: '',
@@ -372,6 +407,11 @@
           fraud_type: '',
           PS_INFO: ''
         },
+        executeFormRules: {
+          fraud_type: [{ required: true, message: '欺诈类型不能为空', trigger: 'blur' }],
+          PS_INFO: [{ required: true, message: '处理信息不能为空', trigger: 'blur' },
+            { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
+        },
         gridData: [],
         actionData: [],
         txnMap: [],
@@ -381,7 +421,7 @@
         total: 100,
         datatypeOptions: []
       }
-    }
+    },props: ['ac_id']
   }
 </script>
 

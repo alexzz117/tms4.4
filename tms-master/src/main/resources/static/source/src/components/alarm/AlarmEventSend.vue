@@ -1,6 +1,6 @@
 <template>
 <div>
-  <el-form  label-position="right" :model="listForm"  label-width="100px"  class="demo-form-inline"  :inline="inline"  >
+  <el-form  label-position="right" :model="listForm" ref="listForm"  label-width="100px" :inline="inline"  >
   <el-row>
     <el-col :span="2"><div><el-form-item label="流水号"/></div> </el-col>
     <el-col :span="5"><div>
