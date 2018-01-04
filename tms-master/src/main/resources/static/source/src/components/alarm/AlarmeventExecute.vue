@@ -45,13 +45,13 @@
       <el-table-column  prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
       <el-table-column  prop="oper_name" label="处理人" width="80"/>
     </el-table>
-    <el-pagination background class="block"  label-width="100px"
+    <el-pagination style="margin-top: 10px; text-align: right;" background
                    @size-change="handleSizeChange"
                    @current-change="handleCurrentChange"
                    :current-page="pageindex"
                    :page-sizes="[10, 25, 50, 100]"
                    :page-size="pagesize"
-                   layout="total, prev, pager, next"
+                   layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
 

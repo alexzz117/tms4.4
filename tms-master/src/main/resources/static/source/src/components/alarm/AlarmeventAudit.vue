@@ -47,13 +47,13 @@
       <el-table-column  prop="oper_name" label="处理人" width="60"/>
       <el-table-column  prop="opertime" label="处理时间" width="135" :formatter="formatter"/>
     </el-table>
-    <el-pagination background class="block" label="left" label-width="100px"
+    <el-pagination style="margin-top: 10px; text-align: right;" background
                    @size-change="handleSizeChange"
                    @current-change="handleCurrentChange"
                    :current-page="pageindex"
                    :page-sizes="[10, 25, 50, 100]"
                    :page-size="pagesize"
-                   layout="total, prev, pager, next"
+                   layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
 
