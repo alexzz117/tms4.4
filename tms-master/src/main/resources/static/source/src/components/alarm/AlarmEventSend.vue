@@ -194,11 +194,11 @@
         this.pagesize = data.page.size
         this.total = data.page.total
       },
+      //分派按钮弹出报警事件人员窗体
       openDialog(){
-        //分派按钮弹出报警事件人员窗体
-        var self=this
-        this.listDialogVisible=true
-        this.txncodeData = this.multipleSelection //保存选中的流水信息
+        var self = this
+        this.listDialogVisible = true
+        this.txncodeData = this.multipleSelection
         var param = {
           TXNCODES: this.multipleSelection
         }
@@ -210,7 +210,7 @@
             if (data.list) {
               self.userData =  data.list
             }
-            if(data.rosterIds){
+            if(data.rosterIds) {
               self.rosterIds  = data.rosterIds
             }
           }
