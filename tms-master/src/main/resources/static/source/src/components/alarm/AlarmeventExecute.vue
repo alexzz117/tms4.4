@@ -44,9 +44,6 @@
         </el-col>
         <el-col :span="10"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel">查询</el-button></div></el-col>
       </el-row>
-      <el-row>
-        <el-col :span="1"><div >  <el-button type="primary" :align="left"  icon="el-icon-success" @click="" >批量处理</el-button></div></el-col>
-      </el-row>
     </el-form>
     <!--   数据列表  -->
     <el-table
@@ -87,7 +84,7 @@
           <el-row>
             <el-col :span="4"> <div ><el-form-item label="欺诈类型"  prop="fraud_type"  data="fraud_type"/></div> </el-col>
             <el-col :span="20"><div >
-              <el-select v-model="executeForm.fraud_type" placeholder="请选择" @focus="selectFocus('fraud_type')" :clearable="clearable">
+              <el-select v-model="executeForm.FRAUD_TYPE" placeholder="请选择" @focus="selectFocus('fraud_type')" :clearable="clearable">
                 <el-option
                   v-for="item in datatypeOptions"
                   :key="item.value"
@@ -112,30 +109,30 @@
             <el-form  label-position="right" :model="actionForm"  ref="actionForm" :rules="rules" class="demo-form-inline"  :inline="inline"  >
               <el-row>
                 <el-col :span="3"><div ><el-form-item label="动作名称"/></div></el-col>
-                <el-col :span="9"><div ><el-form-item prop="AC_NAME" clearable>
-                  <el-input v-model="actionForm.AC_NAME" /></el-form-item>
+                <el-col :span="9"><div ><el-form-item prop="ac_name" clearable>
+                  <el-input v-model="actionForm.ac_name" /></el-form-item>
                 </div>
                 </el-col>
                 <el-col :span="2"><div ><el-form-item label="条件"/></div></el-col>
                 <el-col :span="10">
                   <div >
-                    <el-form-item prop="AC_COND" clearable>
+                    <el-form-item prop="ac_cond_in" clearable>
                      <div @dblclick="statCondInPopup">
-                       <el-input v-model="actionForm.AC_COND" auto-complete="off"
+                       <el-input v-model="actionForm.ac_cond" auto-complete="off"
                                  v-show="false"   />
-                       <el-input v-model="actionForm.AC_COND_IN" auto-complete="off"  />
+                       <el-input v-model="actionForm.ac_cond_in" auto-complete="off"  />
                      </div>
                     </el-form-item>
                   </div></el-col>
               </el-row>
               <el-row>
                 <el-col :span="3"><div ><el-form-item label="表达式"/></div></el-col>
-                <el-col :span="10"><div ><el-form-item prop="AC_EXPR" clearable>
-                  <el-input v-model="actionForm.AC_EXPR" /></el-form-item>
+                <el-col :span="10"><div ><el-form-item prop="ac_expr" clearable>
+                  <el-input v-model="actionForm.ac_expr" /></el-form-item>
                 </div>
                 </el-col>
                 <el-col :span="11"><div >
-                  <el-button type="primary" icon="el-icon-success" @click="addPsAct('actionForm')">保存</el-button>
+                  <el-button type="primary" icon="el-icon-success" @click="savePsAct('actionForm')">保存</el-button>
                   <el-button type="primary" icon="el-icon-back" @click="">取消</el-button>
                 </div>
                 </el-col>
@@ -155,7 +152,7 @@
                 <el-table-column  type="selection" width="45" />
                 <el-table-column fixed="left" label="操 作" width="50" alert="center" >
                   <template slot-scope="scope"  >
-                    <el-button type="text" @click="editPsAct(scope.$index, scope.row)"  icon="el-icon-edit" />
+                    <el-button type="text" @click="editPsAct(scope.$index, scope.row, 'edit')"  icon="el-icon-edit" />
                   </template>
                 </el-table-column>
                 <el-table-column  prop="ac_name" label="动作名称" width="140"  />
@@ -235,17 +232,17 @@
       },
       //界面初始化和查询按钮事件
       sel(pageinfo) {
-        var self = this;
-        var param;
+        var self = this
+        var param
         if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
           param = util.extend({
-            pageindex:this.pageindex,
-            pagesize:this.pagesize
+            pageindex: this.pageindex,
+            pagesize: this.pagesize
           }, this.listForm, pageinfo)
         } else {
           param = util.extend({
-            pageindex:this.pageindex,
-            pagesize:this.pagesize
+            pageindex: this.pageindex,
+            pagesize: this.pagesize
           }, this.listForm)
         }
         ajax.post({
@@ -285,17 +282,15 @@
         })
       },
       //编辑动作信息
-      editPsAct(index, row) {
-        var self = this
-        var param = util.extend({
-          TXN_CODE: this.vTxncode
-        }, this.actionForm)
+      editPsAct(index, row, flag) {
+        alert(flag)
+        this.actionForm = Object.assign({}, row, flag)
       },
       // 统计条件弹窗
       statCondInPopup () {
       },
       //增加修改保存动作信息
-      addPsAct(formName) {
+      savePsAct(formName) {
         var self = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -311,7 +306,7 @@
                   message: '保存成功。'
                 })
                 //刷新动作列表
-                self.openDialog()
+                self.sel()
               }
             })
           } else {
@@ -389,26 +384,26 @@
           userid: ''
         },
         actionForm: {
-          AC_NAME: '',
-          AC_COND: '',
-          AC_COND_IN: '',
-          AC_EXPR: '',
-          AC_EXPR_IN: ''
+          ac_name: '',
+          ac_cond: '',
+          ac_cond_in: '',
+          ac_expr: '',
+          ac_expr_in: ''
         },
         rules: {
-          AC_NAME: [{ required: true, message: '动作名称不能为空', trigger: 'blur' },
+          ac_name: [{ required: true, message: '动作名称不能为空', trigger: 'blur' },
                     { min: 3, max: 64, message: '长度在3到64个字符', trigger: 'blur' }],
-          AC_COND_IN: [{ required: true, message: '条件不能为空', trigger: 'blur' },
+          ac_cond_in: [{ required: true, message: '条件不能为空', trigger: 'blur' },
                     { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }],
-          AC_EXPR: [{ required: true, message: '表达式不能为空', trigger: 'blur' },
+          ac_expr: [{ required: true, message: '表达式不能为空', trigger: 'blur' },
                     { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
         },
         executeForm: {
-          fraud_type: '',
+          FRAUD_TYPE: '',
           PS_INFO: ''
         },
         executeFormRules: {
-          fraud_type: [{ required: true, message: '欺诈类型不能为空', trigger: 'blur' }],
+          FRAUD_TYPE: [{ required: true, message: '欺诈类型不能为空', trigger: 'blur' }],
           PS_INFO: [{ required: true, message: '处理信息不能为空', trigger: 'blur' },
             { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
         },
@@ -421,7 +416,7 @@
         total: 100,
         datatypeOptions: []
       }
-    },props: ['ac_id']
+    }
   }
 </script>
 

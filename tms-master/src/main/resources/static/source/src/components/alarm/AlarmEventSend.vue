@@ -86,7 +86,6 @@
         :data="userData" highlight-current-row height="280"
         tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
         <el-table-column type="selection" width="55" align="left"></el-table-column>
-
         <el-table-column  prop="login_name" label="登录名" width="180" align="left" />
         <el-table-column  prop="assign_number" label="总量" width="70" align="left" />
         <el-table-column  prop="process_number" label="已处理" width="70" align="left" />
@@ -165,17 +164,17 @@
       },
       sel(pageinfo) {
         //界面初始化和查询按钮事件
-        var self = this;
-        var param;
+        var self = this
+        var param
         if (pageinfo && (pageinfo.pageindex || pageinfo.pagesize)) {
           param = util.extend({
-            pageindex:this.pageindex,
-            pagesize:this.pagesize
+            pageindex: this.pageindex,
+            pagesize: this.pagesize
           }, this.listForm, pageinfo)
         } else {
           param = util.extend({
-            pageindex:this.pageindex,
-            pagesize:this.pagesize
+            pageindex: this.pageindex,
+            pagesize: this.pagesize
           }, this.listForm)
         }
         ajax.post({
