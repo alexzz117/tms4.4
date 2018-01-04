@@ -279,15 +279,14 @@ public class JobController {
 		return new Model();
 	}
 
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/classes", method = RequestMethod.GET)
 	public Model jobclasslist() throws Exception {
 		List<Map<String, String>> resultList = Lists.newArrayList();
-		List<Class<?>> list = Classz.getAllClassByInterface( TmsJob.class, "cn.com.higinet.tms", "cn.com.higinet.tms.engine", "cn.com.higinet.tms.base" );
+		List<Class<TmsJob>> list = Classz.getAllClassByInterface( TmsJob.class, "cn.com.higinet.tms", "cn.com.higinet.tms.engine", "cn.com.higinet.tms.base" );
 		if( list != null ) {
-			for( Class<?> _class : list ) {
+			for( Class<TmsJob> _class : list ) {
 				Map<String, String> map = Maps.newHashMap();
-				TmsJob tmsjob = ((Class<TmsJob>) _class).newInstance();
+				TmsJob tmsjob = _class.newInstance();
 				map.put( "label", tmsjob.getJobName() );
 				map.put( "value", tmsjob.getClass().getName() );
 				resultList.add( map );
