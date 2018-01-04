@@ -1,5 +1,6 @@
 package cn.com.higinet.tms.manager.modules.alarm.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,21 +171,19 @@ public class AlarmEventController {
 	 * @return
 	 */
 	@RequestMapping(value = "/delPsAct", method = RequestMethod.POST)
-	public Model delAlarmPsActAction(@RequestBody Map<String, String> reqs) {
+	public Model delAlarmPsActAction(@RequestBody Map<String, List<Map<String, Object>>> modelMap) {
 		Model model = new Model();
-		alarmEventService.delAlarmProcessAction(reqs);
+		List<Map<String, Object>> condList = modelMap.get("del");
+		List<Map<String, ?>> reqslist = new ArrayList<Map<String, ?>>();
+		for(Map<String, Object> map :condList) {
+			Map<String, Object> temp =new HashMap<String, Object>();
+			temp.put("AC_ID", map.get("ac_id"));
+			reqslist.add(temp);
+		}
+		alarmEventService.delsAlarmProcessAction(reqslist);
 		return model;
 	}
 
-	/**
-	 * 报警事件审核页面
-	 * 
-	 * @return
-	 */
-	/*
-	 * @RequestMapping(value = "/audit", method = RequestMethod.GET) public String
-	 * alarmAuditView() { return "tms/alarm/alarmevent_audit"; }
-	 */
 
 	/**
 	 * 获取报警事件审核信息

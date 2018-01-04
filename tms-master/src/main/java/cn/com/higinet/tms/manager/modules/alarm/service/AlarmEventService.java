@@ -218,7 +218,19 @@ public class AlarmEventService {
 		String sql = "delete from TMS_MGR_ALARM_ACTION where AC_ID = ?";
 		offlineSimpleDao.executeUpdate(sql, MapUtil.getString(cond, "AC_ID"));
 	}
-
+	
+	
+	/**
+	 * 删除报警处理动作
+	 * 
+	 * @param cond
+	 */
+	public void delsAlarmProcessAction(List<Map<String, ?>> reqslist) {
+		String sql = "delete from TMS_MGR_ALARM_ACTION where AC_ID = :AC_ID";
+		offlineSimpleDao.batchUpdate(sql, reqslist);
+	}
+	
+	
 	/**
 	 * 删除报警处理动作
 	 * 
