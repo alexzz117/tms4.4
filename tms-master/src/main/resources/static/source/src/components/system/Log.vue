@@ -57,7 +57,6 @@
 </template>
 
 <script>
-  import axios from 'axios'
   import util from '@/common/util'
   import ajax from '@/common/ajax'
 
@@ -84,13 +83,17 @@
       },
       selFunc () {
         var self = this
-        var option = {
+        ajax.post({
           url: '/func/getAll',
           success: function (data) {
             self.funcList = data.row
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       selLog () {
         var self = this
@@ -100,7 +103,7 @@
           operateTime = self.value6[0]
           endTime = self.value6[1]
         }
-        var option = {
+        ajax.post({
           url: '/log/list',
           param: {
             operator_name: self.logForm.operator_name,
@@ -114,9 +117,13 @@
             if (data.page) {
               self.bindGridData(data)
             }
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       formatterDate (row, column) {
         return util.renderDateTime(row.operate_time)

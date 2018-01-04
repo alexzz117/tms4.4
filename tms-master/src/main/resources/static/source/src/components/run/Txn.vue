@@ -86,7 +86,7 @@
       // 查询树结构
       selTree () {
         var self = this
-        var option = {
+        ajax.post({
           url: '/trandef/query',
           success: function (data) {
             if (data.list) {
@@ -100,9 +100,13 @@
               self.toolBtn.addBtn = false
               // self.expendNodesByLevel(1)
             }
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       // 展开前几层功能树
       expendNodesByLevel (deep) {

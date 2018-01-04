@@ -225,7 +225,7 @@
         var self = this
         var params = self.tranDefForm
         var op = params.op
-        var option = {
+        ajax.post({
           url: '/trandef/save',
           param: params,
           success: function (data) {
@@ -238,9 +238,13 @@
               }
               self.reloadPage()
             }
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       }
     },
     components: {

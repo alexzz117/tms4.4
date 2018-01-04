@@ -192,17 +192,21 @@
       },
       selRole () {
         var self = this
-        var option = {
+        ajax.post({
           url: '/role/listNormalRole',
           success: function (data) {
             self.roles = data.row
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       selUser () {
         var self = this
-        var option = {
+        ajax.post({
           url: '/operator/list',
           param: {
             login_name: this.userForm.login_name,
@@ -216,16 +220,20 @@
             if (data.page) {
               self.bindGridData(data)
             }
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       openDialog (flag, index, row) {
         let self = this
         this.flag = flag
         if (flag === 'edit') {
           this.dialogTitle = '编辑用户'
-          var option = {
+          ajax.post({
             url: '/operator/get',
             param: {operatorId: row.operator_id},
             success: function (data) {
@@ -246,9 +254,13 @@
                 repwd: info.password,
                 password: info.password
               }
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
-          }
-          ajax.post(option)
+          })
         } else if (flag === 'add') {
           this.dialogTitle = '新建用户'
           this.userDialogForm = {
@@ -275,29 +287,37 @@
       },
       addUser () {
         var self = this
-        var option = {
+        ajax.post({
           url: '/operator/add',
           param: this.userDialogForm,
           success: function (data) {
             self.$message.success('创建成功。')
             self.roleDialogVisible = false
             self.selUser()
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       updateUser () {
         var self = this
-        var option = {
+        ajax.post({
           url: '/operator/mod',
           param: this.userDialogForm,
           success: function (data) {
             self.$message.success('更新成功。')
             self.roleDialogVisible = false
             self.selUser()
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       delUser (index, row) {
         var self = this
@@ -306,7 +326,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          var option = {
+          ajax.post({
             url: '/operator/del',
             param: {
               operatorId: row.operator_id
@@ -314,9 +334,13 @@
             success: function (data) {
               self.$message.success('删除成功。')
               self.selUser()
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
-          }
-          ajax.post(option)
+          })
         }).catch(() => {})
       },
       resetPwd (index, row) {
@@ -327,7 +351,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          var option = {
+          ajax.post({
             url: '/operator/reset',
             param: {
               operatorId: row.operator_id,
@@ -337,9 +361,13 @@
             success: function (data) {
               self.$message.success('密码重置成功。')
               self.selUser()
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
-          }
-          ajax.post(option)
+          })
         }).catch(() => {})
       },
       resetFlag (index, row) {
@@ -349,7 +377,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          var option = {
+          ajax.post({
             url: '/operator/resetLoginFailedAttempts',
             param: {
               operatorId: row.operator_id
@@ -357,9 +385,13 @@
             success: function (data) {
               self.$message.success('用户解锁成功。')
               self.selUser()
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
-          }
-          ajax.post(option)
+          })
         }).catch(() => {})
       }
     },
@@ -375,10 +407,11 @@
       }
       // 用户名重复校验
       var UserNameExist = (rule, value, callback) => {
+        let self = this
         if (this.flag === 'edit' && this.multipleSelection[0].login_name === value) {
           callback()
         } else {
-          var option = {
+          ajax.post({
             url: '/operator/check/username',
             param: {'username': value}, // 用户名
             success: function (data) { // 请求校验用户名
@@ -388,9 +421,13 @@
               } else {
                 callback()
               }
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
-          }
-          ajax.post(option)
+          })
         }
       }
       // 证件号码格式校验 证件号码只能有数字和字母组成

@@ -739,26 +739,32 @@
         },
         tableRules: {
           ref_tab_name: [
-            {required: true, message: '请选择引用表', trigger: 'blur'}
+            {required: true, message: '请选择引用表', trigger: 'blur'},
+            {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'} // 输入格式校验：包含字母,数字和下划线
           ],
           ref_desc: [
             {required: true, message: '请输入引用描述', trigger: 'blur'},
+            {validator: check.checkFormZhSpecialCharacter, trigger: 'blur'}, // 中文校验
             {max: 64, message: '引用描述不能超过64个字符', trigger: 'blur'}
           ],
           src_expr: [
-            {required: true, message: '请选择引用字段', trigger: 'blur'}
+            {required: true, message: '请选择引用字段', trigger: 'blur'},
+            {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'} // 输入格式校验：包含字母,数字和下划线
           ]
         },
         tableInfoRules: {
           ref_fd_name: [
-            {required: true, message: '请选择数据来源', trigger: 'blur'}
+            {required: true, message: '请选择数据来源', trigger: 'blur'},
+            {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'} // 输入格式校验：包含字母,数字和下划线
           ],
           ref_desc: [
             {required: true, message: '请输入属性名称', trigger: 'blur'},
+            {validator: check.checkFormZhSpecialCharacter, trigger: 'blur'}, // 中文校验
             {max: 64, message: '属性名称不能超过64个字符', trigger: 'blur'}
           ],
           ref_name: [
             {required: true, message: '请输入属性代码', trigger: 'blur'},
+            {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'}, // 输入格式校验：包含字母,数字和下划线
             {max: 50, message: '属性代码不能超过50个字符', trigger: 'blur'}
           ],
           src_expr_in: [
@@ -824,8 +830,58 @@
                 self.canRefTabFd = data.reftblfd  // 可引用表中的属性
                 self.func = data.func             // 函数
                 self.funcParam = data.funcparam   // 函数参数
+              },
+              fail: function (e) {
+                if (e.response.data.message) {
+                  self.$message.error(e.response.data.message)
+                }
               }
             })
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
+          }
+        })
+      },
+      initTmForm () { // 初始化记忆模型表格
+        var self = this
+        ajax.post({
+          url: '/tranmdl/query', // 临时库
+          param: {
+            tab_name: self.txnId
+          },
+          success: function (data) {
+            var tranModelList = data.txnfds
+            if (tranModelList) {
+              self.tranModelList = tranModelList  // 交易模型列表
+            }
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
+          }
+        })
+      },
+      initTableForm () { // 初始化交易模型引用表格
+        var self = this
+        ajax.post({
+          url: '/tranmdl/query', // 临时库
+          param: {
+            tab_name: self.txnId
+          },
+          success: function (data) {
+            var tableObj = self.tableDataFormat(data.txn_ref_tab, data.txn_ref_fds)
+            self.tableList = tableObj.tableList
+            self.enableStoreFd = data.enablestorefd // 可用存储字段
+            self.allStoreFd = data.allstorefd       // 所有的存储字段
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
         })
       },
@@ -940,10 +996,15 @@
         ajax.post({
           url: '/tranmdl/queryAvailableStoreFd',
           param: {
-            tab_name: (tabName ? tabName : self.txnId)
+            tab_name: self.txnId
           },
           success: function (data) {
             self.enableStoreFd = data.enableStoreFd // 存储字段
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
         })
       },
@@ -953,6 +1014,11 @@
           url: '/tranmdl/queryFunWithParam',
           success: function (data) {
             self.func = data.funwithparam
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
         })
       },
@@ -1067,8 +1133,13 @@
               },
               success: function (data) {
                 self.$message.success('操作成功。')
-                self.initForm()
+                self.initTmForm()
                 self.tmDialogVisible = false
+              },
+              fail: function (e) {
+                if (e.response.data.message) {
+                  self.$message.error(e.response.data.message)
+                }
               }
             })
           } else {
@@ -1092,7 +1163,12 @@
             },
             success: function (data) {
               self.$message.success('删除成功。')
-              self.initForm()
+              self.initTmForm()
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
           })
         }).catch(() => {
@@ -1228,6 +1304,11 @@
           },
           success: function (data) {
             self.canRefFd = data.canreffd
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
         })
       },
@@ -1248,6 +1329,15 @@
         this.tableDialogVisible = true
         this.tableFormReadOnly = false
         this.tableTitle = '新建引用表'
+        this.tableForm = {
+          ref_id: '',
+          tab_name: '',
+          txn_order: '',
+          ref_tab_name: '',
+          ref_desc: '',
+          src_expr: '',
+          tab_desc: ''
+        }
       },
       tableEditFunc (row) {
         if (row.group_type && row.group_type === 'group') {
@@ -1345,7 +1435,12 @@
               success: function (data) {
                 self.$message.success('操作成功。')
                 self.tableDialogVisible = false
-                self.initForm()
+                self.initTableForm()
+              },
+              fail: function (e) {
+                if (e.response.data.message) {
+                  self.$message.error(e.response.data.message)
+                }
               }
             })
           } else {
@@ -1383,7 +1478,12 @@
             param: param,
             success: function (data) {
               self.$message.success('删除成功')
-              self.initForm()
+              self.initTableForm()
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
           })
         }).catch(() => {
@@ -1441,7 +1541,6 @@
             let rowData = self.selectTableInfoRows[0]
             row = Object.assign(row, {old: rowData})
             jsonData[op] = [row]
-            console.info(jsonData,self.selectTableInfoRows)
             ajax.post({
               url: '/tranmdl/saveModelRefFd',
               param: {
@@ -1449,11 +1548,13 @@
               },
               success: function (data) {
                 self.$message.success('操作成功。')
-                self.initForm()
-                self.tableDialogVisible = false
+                self.initTableForm()
+                self.tableInfoDialogVisible = false
               },
               fail: function (e) {
-                self.$message.error(e.response.data.message)
+                if (e.response.data.message) {
+                  self.$message.error(e.response.data.message)
+                }
               }
             })
           } else {

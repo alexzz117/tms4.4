@@ -64,7 +64,7 @@
         if (self.txnId === '') {
           return
         }
-        var option = {
+        ajax.post({
           url: '/trandef/edit_prepare',
           param: {
             tab_name: self.txnId
@@ -99,9 +99,13 @@
             }
             self.$refs['infoForm'].channelList = data.channs // 渠道列表
             self.getDisposal(data.infos.parent_tab, 'infoForm') // 获取处置策略列表 'infoForm' 编辑表单标识
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       resetValidate () {
         this.$refs['addForm'].$refs['tranDefForm'].clearValidate()
@@ -140,7 +144,7 @@
       },
       getDisposal (txnId, formId) {
         var self = this
-        var option = {
+        ajax.post({
           url: '/rule/disposal',
           param: {
             txn_id: txnId
@@ -156,9 +160,13 @@
               disposalList.push(item)
             }
             self.$refs[formId].tabDisposalList = disposalList
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       delInfo (param) {
         var self = this
@@ -167,7 +175,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          var option = {
+          ajax.post({
             url: '/trandef/save',
             param: param,
             success: function (data) {
@@ -179,8 +187,7 @@
             fail: function (e) {
               self.$message.error(e.response.data.message)
             }
-          }
-          ajax.post(option)
+          })
         }).catch(() => {})
       },
       reloadPage () {

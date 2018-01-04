@@ -242,7 +242,7 @@
       // 查询树结构
       selTree () {
         var self = this
-        var option = {
+        ajax.post({
           url: '/func/tree',
           success: function (data) {
             if (data.list) {
@@ -262,9 +262,13 @@
               self.treeData = util.formatTreeData(treeList)
               self.expendNodesByLevel(2)
             }
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       },
       // 展开前几层功能树
       expendNodesByLevel (deep) {
@@ -451,7 +455,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          var option = {
+          ajax.post({
             url: '/func/del',
             param: {
               funcId: selectNode.id,
@@ -461,9 +465,13 @@
               selectNode.visible = false
               self.resetPage()
               self.$message.success('删除功能成功')
+            },
+            fail: function (e) {
+              if (e.response.data.message) {
+                self.$message.error(e.response.data.message)
+              }
             }
-          }
-          ajax.post(option)
+          })
         }).catch(() => {})
       },
       closeFuncForm () {
@@ -483,7 +491,7 @@
         } else {
           url = '/func/mod'
         }
-        var option = {
+        ajax.post({
           url: url,
           param: self.funcForm,
           success: function (data) {
@@ -507,9 +515,13 @@
             self.$message.success('操作成功。')
             self.selTree()
             self.resetPage()
+          },
+          fail: function (e) {
+            if (e.response.data.message) {
+              self.$message.error(e.response.data.message)
+            }
           }
-        }
-        ajax.post(option)
+        })
       }
     }
   }
