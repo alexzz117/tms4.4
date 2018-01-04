@@ -37,10 +37,10 @@
       <el-table-column
         fixed="left"
         label="操 作"
-        width="140">
+        width="100">
         <template slot-scope="scope" >
-          <el-button type="text"  @click="openDialog(scope.$index, scope.row)" size="mini"  icon="el-icon-view"  v-show="typeof(scope.row.rosterid)=='number'">查看</el-button>
-          <el-button type="text"  @click="showValueList(scope.$index, scope.row)" size="mini" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'">名单值</el-button>
+          <el-button type="text"  @click="openDialog(scope.$index, scope.row)" size="mini"  icon="el-icon-search"  v-show="typeof(scope.row.rosterid)=='number'"></el-button>
+          <el-button type="text"  @click="showValueList(scope.$index, scope.row)" size="mini" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'"></el-button>
         </template>
       </el-table-column>
       <el-table-column prop="rostername" label="名单英文名" align="left" width="160"></el-table-column>
