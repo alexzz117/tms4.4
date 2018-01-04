@@ -73,12 +73,12 @@
           </template>
         </el-table-column>
         <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
-        <el-table-column prop="rostername" label="名单英文名" align="left" width="120"></el-table-column>
+        <el-table-column prop="rostername" label="名单英文名" align="left" width="160"></el-table-column>
         <el-table-column prop="rosterdesc" label="名单名称" align="left" width="120"></el-table-column>
         <el-table-column prop="datatype" label="名单数据类型" align="left" width="120" :formatter="formatter"></el-table-column>
         <el-table-column prop="rostertype" label="名单类型" align="left" width="120" :formatter="formatter"></el-table-column>
         <el-table-column prop="valuecount" label="值数量" align="left" ></el-table-column>
-        <el-table-column prop="createtime" label="创建时间" align="left" width="150" :formatter="formatter"></el-table-column>
+        <el-table-column prop="createtime" label="创建时间" align="left" width="160" :formatter="formatter"></el-table-column>
         <el-table-column prop="iscache" label="是否缓存" align="left" :formatter="formatter"></el-table-column>
         <el-table-column prop="remark" label="备注" align="left"></el-table-column>
       </el-table>
@@ -508,28 +508,5 @@
 </script>
 
 <style>
-  .toolbar {
-    margin-bottom: 20px;
-    text-align: left;
-    background-color: #F0F1F4;
-    height: 60px;
-    line-height: 60px;
-    padding-left: 20px;
-  }
 
-  .toolbar .toolbar-form {
-    text-align: left;
-    float: right;
-    display: inline-block;
-  }
-
-  .toolbar .toolbar-form .el-form-item__content {
-    line-height: 60px;
-  }
-
-  .table {
-    padding: 20px;
-    background-color: #FFFFFF;
-    border: 1px solid rgba(112, 112, 112, 0.12);
-  }
 </style>
