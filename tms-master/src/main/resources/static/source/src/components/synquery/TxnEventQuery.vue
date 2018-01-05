@@ -2,29 +2,29 @@
   <div>
     <transition name="fade">
       <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
-               :inline="true" style="text-align: left" v-show="queryFormShow" >
-        <el-form-item label="流水号:" prop="">
-          <el-input class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+               :inline="true" style="text-align: center" v-show="queryFormShow" >
+        <el-form-item label="流水号:" prop="txncode">
+          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="客户号:" prop="">
-          <el-input class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+        <el-form-item label="客户号:" prop="userid">
+          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="客户名称:" prop="">
-          <el-input class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+        <el-form-item label="客户名称:" prop="username">
+          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="IP地址:" prop="">
-          <el-input class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+        <el-form-item label="IP地址:" prop="ipaddr">
+          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="设备信息:" prop="">
-          <el-input class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+        <el-form-item label="设备信息:" prop="deviceid">
+          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="会话标识:" prop="">
-          <el-input class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+        <el-form-item label="会话标识:" prop="sessionid">
+          <el-input v-model="queryShowForm.sessionid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="监控操作:" prop="">
-          <el-input class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+        <el-form-item label="监控操作:" prop="txntype">
+          <el-input v-model="queryShowForm.txntype" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="处置方式:" prop="">
+        <el-form-item label="处置方式:" prop="disposal">
           <el-select v-model="queryShowForm.disposal" class="alarm-event-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
@@ -36,8 +36,8 @@
 
           </el-select>
         </el-form-item>
-        <el-form-item label="是否评估:" prop="">
-          <el-select v-model="queryShowForm.aaa" class="alarm-event-query-form-item" placeholder="请选择"
+        <el-form-item label="是否评估:" prop="iseval">
+          <el-select v-model="queryShowForm.iseval" class="alarm-event-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
               v-for="item in isAssessmentList"
@@ -48,8 +48,8 @@
 
           </el-select>
         </el-form-item>
-        <el-form-item label="认证状态:" prop="">
-          <el-select v-model="queryShowForm.aaa" class="alarm-event-query-form-item" placeholder="请选择"
+        <el-form-item label="认证状态:" prop="iscorrect">
+          <el-select v-model="queryShowForm.iscorrect" class="alarm-event-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
               v-for="item in isCorrectList"
@@ -59,8 +59,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="人工确认风险:" prop="">
-          <el-select v-model="queryShowForm.aaa" class="alarm-event-query-form-item" placeholder="请选择"
+        <el-form-item label="人工确认风险:" prop="confirmrisk">
+          <el-select v-model="queryShowForm.confirmrisk" class="alarm-event-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
               v-for="item in confirmRiskList"
@@ -70,8 +70,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="操作状态:" prop="">
-          <el-select v-model="queryShowForm.aaa" class="alarm-event-query-form-item" placeholder="请选择"
+        <el-form-item label="操作状态:" prop="txnstatus">
+          <el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
               v-for="item in txnStatusList"
@@ -81,9 +81,9 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间范围:" prop="queryDate">
+        <el-form-item label="时间范围:" prop="txntime">
           <el-date-picker
-            v-model="queryShowForm.queryDate"
+            v-model="queryShowForm.txntime"
             type="datetimerange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -118,25 +118,48 @@
         </el-form-item>
       </el-form>
     </transition>
+    <el-row>
+      <el-col :span="24">
+        <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
+                 :inline="true" style="text-align: right">
+          <el-form-item label="流水号:" prop="txncode" v-show="!queryFormShow">
+            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          </el-form-item>
+          <el-form-item label="时间范围:" prop="txntime" v-show="!queryFormShow">
+            <el-date-picker
+              v-model="queryShowForm.txntime"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+            <el-button type="primary" @click="searchData">搜索</el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
+    </el-row>
     <el-table
-      :data="tnxEventTable"
+      :data="tnxEventTableData"
       style="width: 100%">
-      <el-table-column prop="" label="流水号" align="left"></el-table-column>
+      <el-table-column prop="txncode" label="流水号" align="left"></el-table-column>
       <el-table-column prop="userid" label="客户号" align="left"></el-table-column>
-      <el-table-column prop="" label="会话标识" align="left"></el-table-column>
+      <el-table-column prop="sessionid" label="会话标识" align="left"></el-table-column>
       <el-table-column prop="txnname" label="监控操作" align="left"></el-table-column>
-      <el-table-column prop="txntime" label="操作时间" align="left"></el-table-column>
-      <el-table-column prop="" label="地理信息" align="left"></el-table-column>
-      <el-table-column prop="" label="设备信息" align="left"></el-table-column>
-      <el-table-column prop="" label="IP地址" align="left"></el-table-column>
-      <el-table-column prop="" label="是否评估" align="left"></el-table-column>
-      <el-table-column prop="" label="风险类型" align="left"></el-table-column>
-      <el-table-column prop="" label="规则命中数" align="left"></el-table-column>
-      <el-table-column prop="" label="风险分值" align="left"></el-table-column>
-      <el-table-column prop="" label="认证状态" align="left"></el-table-column>
-      <el-table-column prop="" label="处置方式" align="left"></el-table-column>
-      <el-table-column prop="" label="人工确认风险" align="left"></el-table-column>
-      <el-table-column prop="" label="操作状态" align="left"></el-table-column>
+      <el-table-column prop="txntime" label="操作时间" align="left" :formatter="renderDateTime"></el-table-column>
+      <el-table-column prop="location" label="地理信息" align="left"></el-table-column>
+      <el-table-column prop="deviceid" label="设备信息" align="left"></el-table-column>
+      <el-table-column prop="ipaddr" label="IP地址" align="left"></el-table-column>
+      <el-table-column prop="iseval" label="是否评估" align="left" :formatter="renderIsEval"></el-table-column>
+      <el-table-column prop="ismodelrisk" label="风险类型" align="left" :formatter="renderIsModelRisk"></el-table-column>
+      <el-table-column prop="hitrulenum" label="规则命中数" align="left"></el-table-column>
+      <el-table-column prop="score" label="风险分值" align="left"></el-table-column>
+      <el-table-column prop="iscorrect" label="认证状态" align="left" :formatter="renderIsCorrect"></el-table-column>
+      <el-table-column prop="disposal" label="处置方式" align="left"></el-table-column>
+      <el-table-column prop="confirmrisk" label="人工确认风险" align="left" :formatter="renderConfirmRisk"></el-table-column>
+      <el-table-column prop="txnstatus" label="操作状态" align="left" :formatter="renderTxnStatus"></el-table-column>
     </el-table>
 
     <el-pagination style="margin-top: 10px; text-align: right;"
@@ -169,13 +192,29 @@
   export default {
     data () {
       return {
-        tnxEventTable: [],    // 操作事件表数据
-        queryFormShow: true,  // 查询条件表单显示控制
+        tnxEventTableData: [],    // 操作事件表数据
+        queryFormShow: false,  // 查询条件表单显示控制
         queryShowForm: {      // 查询条件表单
-          disposal: '',
-          countrycode: '',
-          regioncode: '',
-          citycode: ''
+          ruleid: '',
+          txncode: '',        // 流水号
+          userid: '',         // 客户号
+          username: '',       // 客户名称
+          ipaddr: '',         // IP地址
+          deviceid: '',       // 设备信息
+          sessionid: '',      // 会话标识
+          txntype: '',        // 监控操作
+          disposal: '',       // 处置方式
+          iseval: '',         // 是否评估
+          iscorrect: '',      // 认证状态
+          confirmrisk: '',    // 人工确认风险
+          txnstatus: '',      // 操作状态
+          txntime: '',        // 时间范围
+          operate_time: '',   // 开始时间
+          end_time: '',       // 截止时间
+          location: '',       // 地理位置
+          countrycode: '',    // 国家
+          regioncode: '',     // 省份
+          citycode: ''        // 城市
         },
         isAssessmentList: isAssessmentList, // 是否评估下拉列表数据
         isCorrectList: isCorrectList, // 认证状态下拉列表数据
@@ -192,10 +231,16 @@
         queryRules: {}        // 查询条件表单校验
       }
     },
+    created () {
+      let self = this
+      this.getTxnEventTableData({
+        pageindex: 1,
+        pagesize: self.pageSize
+      })
+    },
     mounted: function () {
       this.$nextTick(function () {
         let self = this
-        console.log(dictCode.getCodeItems('tms.common.txnstatus'), dictCode.getCodeItems('tms.confirmrisk.status'))
         self.txnStatusList = dictCode.getCodeItems('tms.common.txnstatus')
         self.confirmRiskList = dictCode.getCodeItems('tms.confirmrisk.status')
         ajax.post({
@@ -208,6 +253,12 @@
       })
     },
     watch: {
+      'queryShowForm.txntime': function (val) {
+        let startTime = val[0].getTime()
+        let endTime = val[1].getTime()
+        this.queryShowForm.operate_time = startTime
+        this.queryShowForm.end_time = endTime
+      },
       'queryShowForm.countrycode': function (val) {
         let self = this
         ajax.post({
@@ -230,11 +281,92 @@
       }
     },
     methods: {
-      handleSizeChange () {
-
+      bindGridData (data) {
+        this.tnxEventTableData = data.page.list
+        this.currentPage = data.page.index
+        this.pageSize = data.page.size
+        this.total = data.page.total
       },
-      handleCurrentChange () {
-
+      handleSizeChange (val) {
+        // console.log(`每页 ${val} 条`)
+        this.currentPage = 1
+        this.pageSize = val
+        this.getTxnEventTableData()
+      },
+      handleCurrentChange (val) {
+        this.currentPage = val
+        this.getTxnEventTableData()
+      },
+      getTxnEventTableData (params) {
+        let self = this
+        let param = params || Object.assign({
+          pageindex: this.currentPage,
+          pagesize: this.pageSize
+        }, self.queryShowForm)
+        ajax.post({
+          url: '/query/tnxEvent/result',
+          param: param,
+          success: function (data) {
+            if (data.success === true) {
+              self.bindGridData(data)
+            }
+          },
+          fail: function (rep) {
+            console.error('请求操作时间列表失败', rep)
+          },
+          error: function (e) {
+            console.error('请求操作时间列表异常', e)
+          }
+        })
+      },
+      searchData () {
+        let params = Object.assign({
+          pageindex: 1,
+          pagesize: this.pageSize
+        }, this.queryShowForm)
+        console.info(params)
+        this.getTxnEventTableData(params)
+      },
+      renderDateTime (row, column, cellValue) {
+        return util.renderDateTime(cellValue)
+      },
+      renderIsEval (row, column, cellValue) {
+        switch (cellValue) {
+          case '0':
+            return '未评估'
+          case '1':
+            return '已评估'
+          default:
+            return ''
+        }
+      },
+      renderIsModelRisk (row, column, cellValue) {
+        switch (cellValue) {
+          case '0':
+            return '规则风险'
+          case '1':
+            return '模型风险'
+          default:
+            return ''
+        }
+      },
+      renderIsCorrect (row, column, cellValue) {
+        switch (cellValue) {
+          case '0':
+            return '认证未通过'
+          case '1':
+            return '认证通过'
+          case '2':
+            return '未认证'
+          default:
+            return ''
+        }
+      },
+      renderConfirmRisk (row, column, cellValue) {
+        return dictCode.rendCode('tms.confirmrisk.status',cellValue)
+      },
+      renderTxnStatus (row, column, cellValue) {
+        return dictCode.rendCode('tms.common.txnstatus',cellValue)
       }
     }
   }
