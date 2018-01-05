@@ -1,6 +1,6 @@
 <template>
   <div>
-
+    <section class="table">
     <el-table
       :data="tableData"
       style="width: 100%">
@@ -11,6 +11,7 @@
       </el-table-column>
       <el-table-column prop="count" label="待授权信息数" align="left"></el-table-column>
     </el-table>
+    </section>
   </div>
 </template>
 

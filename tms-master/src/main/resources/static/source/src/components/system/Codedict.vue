@@ -19,6 +19,8 @@
             </el-col>
           </el-row>
         </div>
+
+        <section class="table">
         <el-table
         :data="dictData"
         highlight-current-row
@@ -49,6 +51,8 @@
         layout="total, sizes, prev, next, jumper"
         :total="total">
         </el-pagination>
+
+        </section>
       </el-col>
 
       <el-col :span="12" style="border-right: 1px solid #eee">
@@ -57,6 +61,8 @@
             <el-button plain class="el-icon-plus" @click="openInfoDialog('add')">新建</el-button>
           </el-row>
         </div>
+
+        <section class="table">
         <el-table
           :data="dictInfoData"
           style="width: 100%"
@@ -76,6 +82,7 @@
           <el-table-column prop="code_key" label="代码key" align="left"></el-table-column>
           <el-table-column prop="code_value" label="代码value" align="left"></el-table-column>
         </el-table>
+        </section>
       </el-col>
     </el-row>
 

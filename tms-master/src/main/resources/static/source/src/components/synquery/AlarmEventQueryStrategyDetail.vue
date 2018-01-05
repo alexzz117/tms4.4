@@ -1,5 +1,7 @@
 <template>
   <div>
+    <!-- 策略信息 -->
+    <section class="table">
     <el-table
       :data="transHitRuleList"
       style="width: 100%">
@@ -19,7 +21,7 @@
       </el-table-column>
       <el-table-column prop="numtimes" label="执行耗时" align="left"></el-table-column>
     </el-table>
-
+    </section>
   </div>
 </template>
 <script>
@@ -30,6 +32,7 @@
   let alarmEventQueryStrategyDetailVm = null
 
   export default {
+    name: 'alarmEventQueryStrategyDetail',
     computed: {
       showItemParent () {
         return this.showItem
@@ -50,25 +53,25 @@
         return util.renderDateTime(value)
       },
       renderTxnstatus (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('tms.common.txnstatus', value)
       },
       renderIs (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('common.is', value)
       },
       renderEvalType (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('tms.rule.evaltype', value)
       },
       renderDisposal (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         for (let item of alarmEventQueryStrategyDetailVm.disposalListParent) {

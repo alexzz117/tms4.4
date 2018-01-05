@@ -149,6 +149,7 @@
 
     </div>
 
+    <section class="table">
     <el-table
       :data="tableData"
       style="width: 100%">
@@ -213,6 +214,7 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
+    </section>
 
     <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px">
       <el-tree :data="treeData" node-key="id" ref="tree"
@@ -241,7 +243,7 @@
           <AlarmEventQueryStrategyDetail ref="strategyDetail" :showItem="selectedRow" :disposalList="disposalList"></AlarmEventQueryStrategyDetail>
         </el-tab-pane>
         <el-tab-pane label="处理信息" name="handle">
-          <AlarmEventQueryHandleDetail ref="strategyDetail" :showItem="selectedRow"></AlarmEventQueryHandleDetail>
+          <AlarmEventQueryHandleDetail ref="handleDetail" :showItem="selectedRow"></AlarmEventQueryHandleDetail>
         </el-tab-pane>
       </el-tabs>
 
@@ -266,6 +268,7 @@
   let iscorrectList = [{'label': '未认证', 'value': '2'}, {'label': '认证通过', 'value': '1'}, {'label': '认证未通过', 'value': '0'}]
 
   export default {
+    name: 'alarmEventQuery',
     data () {
       return {
         txntypeDialogVisible: false,
@@ -379,7 +382,7 @@
         return util.renderDateTime(value)
       },
       renderTxnstatus (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('tms.common.txnstatus', value)
@@ -393,7 +396,7 @@
         return ''
       },
       renderPsStatus (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('tms.alarm.process.status', value)
@@ -552,12 +555,16 @@
         setTimeout(function () {
           self.$refs.operateDetail.loadData(row)
           self.$refs.strategyDetail.loadData(row)
+          self.$refs.handleDetail.loadData(row)
         }, 200)
       },
       handleInfoOpen () {
 
       },
       handleTabClick (tab, event) {
+      },
+      setQueryShowForm (queryShowForm) {
+        this.queryShowForm = queryShowForm
       }
     },
     components: {

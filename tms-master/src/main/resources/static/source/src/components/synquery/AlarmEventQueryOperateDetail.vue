@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- 操作信息 -->
     <el-row>
       <el-col :span="6">是否进行风险评估:</el-col>
       <el-col :span="6">{{detailData.iseval|renderIs}}&nbsp</el-col>
@@ -52,7 +53,7 @@
       <el-col :span="6">操作状态:</el-col>
       <el-col :span="6">{{detailData.txnstatus|renderTxnstatus}}&nbsp</el-col>
       <el-col :span="6">用户标识:</el-col>
-      <el-col :span="6">{{detailData.userid}}&nbsp</el-col>
+      <el-col :span="6"><a href="javascript:void(0)" @click="showUserDetail">{{detailData.userid}}</a></el-col>
     </el-row>
     <el-row>
       <el-col :span="6">操作标识:</el-col>
@@ -101,6 +102,15 @@
       <el-col :span="6">地理位置:</el-col>
       <el-col :span="6">{{detailData.location}}&nbsp</el-col>
     </el-row>
+
+    <el-dialog title="报警操作用户信息" :visible.sync="userDialogVisible" width="900px" :modal="false">
+
+      <AlarmEventQueryUserDetail ref="userDetail"></AlarmEventQueryUserDetail>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="userDialogVisible = false" size="large">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -108,7 +118,10 @@
   import util from "../../common/util";
   import dictCode from "../../common/dictCode";
 
+  import AlarmEventQueryUserDetail from './AlarmEventQueryUserDetail'
+
   export default {
+    name: 'alarmEventQueryOperateDetail',
     computed: {
       showItemParent () {
         return this.showItem
@@ -116,6 +129,8 @@
     },
     data () {
       return {
+        userDialogVisible: false,
+        selectedRow: {},
         detailData: {}
       }
     },
@@ -124,25 +139,25 @@
         return util.renderDateTime(value)
       },
       renderTxnstatus (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('tms.common.txnstatus', value)
       },
       renderIs (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('common.is', value)
       },
       renderConfirmrisk (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('tms.confirmrisk.status', value)
       },
       renderPsStatus (value) {
-        if (!value || value === '') {
+        if (value === undefined || value === '') {
           return ''
         }
         return dictCode.rendCode('tms.alarm.process.status', value)
@@ -155,6 +170,7 @@
     },
     methods: {
       loadData (row) {
+        this.selectedRow = row
         let self = this
         self.detailData = {}
         ajax.post({
@@ -164,7 +180,17 @@
             self.detailData = data.row[0]
           }
         })
+      },
+      showUserDetail () {
+        let self = this
+        this.userDialogVisible = true
+        setTimeout(function () {
+          self.$refs.userDetail.loadData(self.selectedRow)
+        }, 200)
       }
+    },
+    components: {
+      AlarmEventQueryUserDetail
     }
   }
 </script>

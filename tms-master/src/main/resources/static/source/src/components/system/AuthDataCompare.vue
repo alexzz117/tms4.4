@@ -5,6 +5,7 @@
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
     </div>
 
+    <section class="table">
     <el-table
       :data="tableData"
       style="width: 100%">
@@ -30,6 +31,7 @@
 
       </el-table-column>
     </el-table>
+    </section>
   </div>
 </template>
 

@@ -58,6 +58,7 @@
             <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
           </div>
         </div>
+    <section class="table">
         <el-table
           ref="dataTable"
           :data="tableDataShow"
@@ -109,7 +110,7 @@
             </template>
           </el-table-column>
         </el-table>
-
+    </section>
         <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
 
           <el-tabs ref="dialogTab" v-model="dialogTabActive" type="card">

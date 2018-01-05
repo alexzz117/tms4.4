@@ -73,8 +73,7 @@
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
       </div>
     </div>
-
-    <div class="stat-expand-table-box">
+    <section class="table">
       <el-table
 
         ref="dataTable"
@@ -128,8 +127,7 @@
           </template>
         </el-table-column>
       </el-table>
-
-    </div>
+    </section>
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
       <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true" :rules="dialogFormRules">

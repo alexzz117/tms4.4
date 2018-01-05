@@ -12,7 +12,11 @@ import axios from 'axios';
 Vue.prototype.$axios=axios;
 
 Vue.config.productionTip = false
-
+// import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
+//
+// console.log('111111')
+// console.log(AlarmEventQuery)
+// Vue.component('alarmEventQuery', AlarmEventQuery)
 import dictCode from '@/common/dictCode'
 
 let vue = null
@@ -25,6 +29,7 @@ dictCode.getCodeData(function () {
       template: '<App/>',
       components: { App }
     })
+
 })
 
 

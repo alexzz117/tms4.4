@@ -6,7 +6,7 @@
       <!--<el-button plain class="el-icon-view" @click="showSub" :disabled="notSelectOne">查看子操作</el-button>-->
       <!--<el-button plain class="el-icon-view" @click="showLog()" :disabled="notSelectOne">查看日志</el-button>-->
     </div>
-
+    <section class="table">
     <el-table
       :data="tableData"
       style="width: 100%"
@@ -47,6 +47,7 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
+    </section>
 
     <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible">
       <el-form :model="dialogForm" :rules="rules" ref="dialogForm" style="text-align: left;">
