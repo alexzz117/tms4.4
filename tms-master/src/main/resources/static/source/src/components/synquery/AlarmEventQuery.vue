@@ -240,7 +240,9 @@
         <el-tab-pane label="策略信息" name="strategy">
           <AlarmEventQueryStrategyDetail ref="strategyDetail" :showItem="selectedRow" :disposalList="disposalList"></AlarmEventQueryStrategyDetail>
         </el-tab-pane>
-        <el-tab-pane label="处理信息" name="handle">处理信息</el-tab-pane>
+        <el-tab-pane label="处理信息" name="handle">
+          <AlarmEventQueryHandleDetail ref="strategyDetail" :showItem="selectedRow"></AlarmEventQueryHandleDetail>
+        </el-tab-pane>
       </el-tabs>
 
       <div slot="footer" class="dialog-footer">
@@ -259,6 +261,7 @@
 
   import AlarmEventQueryOperateDetail from '@/components/synquery/AlarmEventQueryOperateDetail'
   import AlarmEventQueryStrategyDetail from '@/components/synquery/AlarmEventQueryStrategyDetail'
+  import AlarmEventQueryHandleDetail from '@/components/synquery/AlarmEventQueryHandleDetail'
 
   let iscorrectList = [{'label': '未认证', 'value': '2'}, {'label': '认证通过', 'value': '1'}, {'label': '认证未通过', 'value': '0'}]
 
@@ -404,14 +407,8 @@
         return [start, end]
       },
       initSelectData () {
-        dictCode.getCodeItemsCb('tms.common.txnstatus', (items) => {
-          this.txnstatusList = items
-        })
-        dictCode.getCodeItemsCb('tms.alarm.process.status', (items) => {
-          this.psstatusList = items
-        })
-        // this.txnstatusList = dictCode.getCodeItems('tms.common.txnstatus')
-        // this.psstatusList = dictCode.getCodeItems('tms.alarm.process.status')
+        this.txnstatusList = dictCode.getCodeItems('tms.common.txnstatus')
+        this.psstatusList = dictCode.getCodeItems('tms.alarm.process.status')
         let self = this
         this.selTree()
         ajax.post({
@@ -565,7 +562,8 @@
     },
     components: {
       AlarmEventQueryOperateDetail,
-      AlarmEventQueryStrategyDetail
+      AlarmEventQueryStrategyDetail,
+      AlarmEventQueryHandleDetail
     }
   }
 </script>

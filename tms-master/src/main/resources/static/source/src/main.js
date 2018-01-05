@@ -15,12 +15,16 @@ Vue.config.productionTip = false
 
 import dictCode from '@/common/dictCode'
 
-dictCode.getCodeData()
+let vue = null
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  template: '<App/>',
-  components: { App }
+dictCode.getCodeData(function () {
+  vue = /* eslint-disable no-new */
+    new Vue({
+      el: '#app',
+      router,
+      template: '<App/>',
+      components: { App }
+    })
 })
+
+

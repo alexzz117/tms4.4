@@ -6,12 +6,13 @@ import util from '@/common/util'
 
 var dictCode = {}
 
-function getCodeData() {
+function getCodeData(cb) {
   if (util.isEmptyObject(dictCode)){
     ajax.get({
       url: '/common/dict',
       success: function (data) {
         dictCode = data.codes ? data.codes : {}
+        cb()
       }
     })
   }
