@@ -195,10 +195,8 @@
       let txnTimeCheck = (rule, value, callback) => {
         let self = this
         let txncode = self.queryShowForm.txncode
-        if (txncode) {
-          callback()
-        } else {
-          if ( value && value.length === 2) {
+        if (!txncode) {
+          if (value && value.length === 2) {
             let startTime = value[0]
             let endTime = value[1]
             let range = (endTime - startTime) / 86400000
@@ -222,6 +220,7 @@
             return callback(new Error('流水号与时间范围不能同时为空'))
           }
         }
+        callback()
       }
       return {
         tnxEventTableData: [],    // 操作事件表数据
@@ -240,7 +239,7 @@
           iscorrect: '',      // 认证状态
           confirmrisk: '',    // 人工确认风险
           txnstatus: '',      // 操作状态
-          txntime: '',        // 时间范围
+          txntime: [],        // 时间范围
           operate_time: '',   // 开始时间
           end_time: '',       // 截止时间
           location: '',       // 地理位置
@@ -288,7 +287,11 @@
     },
     created () {
       let self = this
-      this.getTxnEventTableData({
+      let txntime = self.initDateRange()
+      self.queryShowForm.txntime = txntime
+      self.getTxnEventTableData({
+        operate_time: txntime[0].getTime(),
+        end_time: txntime[1].getTime(),
         pageindex: 1,
         pagesize: self.pageSize
       })
@@ -379,12 +382,24 @@
         })
       },
       searchData () {
-        let params = Object.assign({
-          pageindex: 1,
-          pagesize: this.pageSize
-        }, this.queryShowForm)
-        console.info(params)
-        this.getTxnEventTableData(params)
+        this.$refs['queryShowForm'].validate((valid) => {
+          if (valid) {
+            let params = Object.assign({
+              pageindex: 1,
+              pagesize: this.pageSize
+            }, this.queryShowForm)
+            this.getTxnEventTableData(params)
+          } else {
+            this.$message('查询条件不符合规则，请按提示重新输入')
+            return false
+          }
+        })
+      },
+      initDateRange () {
+        let start = new Date()
+        start.setHours(new Date().getHours() - 1)
+        let end = new Date()
+        return [start, end]
       },
       renderDateTime (row, column, cellValue) {
         return util.renderDateTime(cellValue)
