@@ -2,6 +2,9 @@ package cn.com.higinet.tms;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Pagination<T> {
 	
 private int pageSize; // 每页显示多少条记录

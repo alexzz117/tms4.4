@@ -27,8 +27,10 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,33 +66,21 @@ public class ElasticsearchAdapter {
 	
 	
 	/**
-	 * 存在2个问题，1：后面返回的实体怎么转换 2：查询中模糊查询和区间查询，非精确查询怎么区别
 	 * @param indexName
 	 * @param pageSize
 	 * @param pageNo
-	 * @param map
+	 * @param dataList
+	 * @param entityType
 	 * @return
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <T> Pagination search(String indexName,Integer pageSize,Integer pageNo
-			,Map<String,Object> map,Class<T> entityType){
-		Pagination page = new Pagination();
+	public <T> Pagination<T> search(String indexName,Integer pageSize,Integer pageNo
+			,List<QueryConditionEntity> dataList,Class<T> entityType){
+		Pagination<T> page = new Pagination<T>();
 		pageNo = null==pageNo?1:pageNo;
 		page.setPageNo(pageNo);
 		page.setPageSize(pageSize);
-		SearchRequestBuilder searchRequestBuilder = elasticsearchConfig.getTransportClient().prepareSearch(indexName)
-				.setTypes(indexName).setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-		searchRequestBuilder.setFrom((pageNo - 1) * pageSize).setSize(pageSize).setExplain(true);;
-		 for (Map.Entry<String,Object> entry : map.entrySet()) {
-			 searchRequestBuilder.setQuery(QueryBuilders.termQuery(entry.getKey(), entry.getValue())); 
-		 }
-//			searchRequestBuilder.setPostFilter(QueryBuilders.rangeQuery("txntime").gte(startTime));
-//			searchRequestBuilder.setPostFilter(QueryBuilders.rangeQuery("txntime").from(startTime).to(endTime));
-//			searchRequestBuilder.setPostFilter(QueryBuilders.rangeQuery("txntime").lt(endTime));
-//			searchRequestBuilder.setQuery(QueryBuilders.termQuery("ipaddr", data.getIpaddr()));
-//			searchRequestBuilder.setQuery(QueryBuilders.termQuery("iseval", data.getIseval()));
-//			searchRequestBuilder.setQuery(QueryBuilders.termQuery("disposal", data.getDisposal()));
-		SearchHits hits =  searchRequestBuilder.get().getHits();
+		SearchRequestBuilder searchRequestBuilder = queryCondition(indexName, page, dataList);
+		SearchHits hits =  searchRequestBuilder.execute().actionGet().getHits();
 		List<T> list = new ArrayList<T>();
 		for (SearchHit searchHit : hits) {
 			Map<String, Object> source = searchHit.getSourceAsMap();
@@ -110,6 +100,53 @@ public class ElasticsearchAdapter {
 		}
 		page.setDataList(list);
 		return page;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private SearchRequestBuilder queryCondition(String indexName,Pagination page,List<QueryConditionEntity> dataList){
+		SearchRequestBuilder searchRequestBuilder = elasticsearchConfig.getTransportClient().prepareSearch(indexName)
+				.setTypes(indexName).setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+		searchRequestBuilder.setFrom((page.getPageNo() - 1) * page.getPageSize()).setSize(page.getPageSize()).setExplain(true);
+		for (int i=0;i<dataList.size();i++) {
+			 QueryConditionEntity condition = dataList.get(i);
+			 if(ConditionMarkEnum.BETWEEN.equals(condition.getQueryType())){
+				 RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(condition.getName());
+				 if(ConditionMarkEnum.GT.equals(condition.getStartMark())){
+					 rangeQuery.gt(condition.getStartValue());
+				 }else if(ConditionMarkEnum.GTE.equals(condition.getStartMark())){
+					 rangeQuery.gte(condition.getStartValue());
+				 }
+				 if(ConditionMarkEnum.LT.equals(condition.getEndMark())){
+					 rangeQuery.lt(condition.getEndValue());
+				 }else if(ConditionMarkEnum.LTE.equals(condition.getEndMark())){
+					 rangeQuery.lte(condition.getEndValue());
+				 }
+				 searchRequestBuilder.setQuery(rangeQuery);
+			 }else if(ConditionMarkEnum.OTHER.equals(condition.getQueryType())){
+				 if(ConditionMarkEnum.EQ.equals(condition.getStartMark())){
+					 searchRequestBuilder.setQuery(QueryBuilders.termQuery(condition.getName(),condition.getStartValue()));
+				 }else if(ConditionMarkEnum.LIKE.equals(condition.getStartMark())){
+					 searchRequestBuilder.setQuery(QueryBuilders.fuzzyQuery(condition.getName(), condition.getStartValue()));
+				 }else if(ConditionMarkEnum.LIKE_.equals(condition.getStartMark())){
+					 searchRequestBuilder.setQuery(QueryBuilders.prefixQuery(condition.getName(), String.valueOf(condition.getStartValue())));
+				 }else if(ConditionMarkEnum.GT.equals(condition.getStartMark())){
+					 searchRequestBuilder.setQuery(QueryBuilders.rangeQuery(condition.getName()).gt(condition.getStartValue()));
+				 }else if(ConditionMarkEnum.GTE.equals(condition.getStartMark())){
+					 searchRequestBuilder.setQuery(QueryBuilders.rangeQuery(condition.getName()).gte(condition.getStartValue()));
+				 }else if(ConditionMarkEnum.LT.equals(condition.getStartMark())){
+					 searchRequestBuilder.setQuery(QueryBuilders.rangeQuery(condition.getName()).lt(condition.getStartValue()));
+				 }else if(ConditionMarkEnum.LTE.equals(condition.getStartMark())){
+					 searchRequestBuilder.setQuery(QueryBuilders.rangeQuery(condition.getName()).lte(condition.getStartValue()));
+				 }
+			 }else if(ConditionMarkEnum.ORDERBY.equals(condition.getQueryType())){
+				 if(String.valueOf(ConditionMarkEnum.ASC).equals(condition.getStartValue())){
+					 searchRequestBuilder.addSort(condition.getName(), SortOrder.ASC);
+				 }else if(String.valueOf(ConditionMarkEnum.DESC).equals(condition.getStartValue())){
+					 searchRequestBuilder.addSort(condition.getName(), SortOrder.DESC);
+				 }
+			 }
+		 }
+		return searchRequestBuilder;
 	}
 	
 	/**

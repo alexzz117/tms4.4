@@ -15,6 +15,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +24,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.com.higinet.tms.ElasticsearchServiceImpl;
+import cn.com.higinet.tms.Pagination;
 import cn.com.higinet.tms.Trafficdata;
+import cn.com.higinet.tms.adapter.ConditionMarkEnum;
 import cn.com.higinet.tms.adapter.ElasticsearchAdapter;
+import cn.com.higinet.tms.adapter.QueryConditionEntity;
 import cn.com.higinet.tms.provider.ElasticsearchConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -88,6 +92,10 @@ public class Test {
     		@ApiImplicitParam(name = "pageSize", value = "每页数量", required = true, paramType = "query",allowEmptyValue = true, dataType = "Integer"),
     		@ApiImplicitParam(name = "txncode", value = "交易流水", required = false, paramType = "query",allowEmptyValue = true, dataType = "String"),
             @ApiImplicitParam(name = "ipAddr", value = "IP地址", required = false, paramType = "query", allowEmptyValue = true,dataType = "String"),
+            @ApiImplicitParam(name = "text1", value = "text1模糊匹配", required = false, paramType = "query", allowEmptyValue = true,dataType = "String"),
+            @ApiImplicitParam(name = "text2", value = "text2前缀匹配", required = false, paramType = "query", allowEmptyValue = true,dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "交易时间起始时间", required = false, paramType = "query", allowEmptyValue = true,dataType = "Long"),
+            @ApiImplicitParam(name = "endTime", value = "交易时间结束时间", required = false, paramType = "query", allowEmptyValue = true,dataType = "Long"),
             @ApiImplicitParam(name = "disposal", value = "处置方式", required = false, paramType = "query",allowEmptyValue = true, dataType = "String"),
             @ApiImplicitParam(name = "iseval", value = "是否评估", required = false, paramType = "query",allowEmptyValue = true, dataType = "String")
     })
@@ -97,23 +105,71 @@ public class Test {
     					   @RequestParam(value = "pageSize", required = false) Integer pageSize,		
     					   @RequestParam(value = "txncode", required = false) String txncode,
                            @RequestParam(value = "ipAddr", required = false) String ipAddr,
+                           @RequestParam(value = "text1", required = false) String text1,
+                           @RequestParam(value = "text2", required = false) String text2,
+                           @RequestParam(value = "startTime", required = false) String startTime,
+                           @RequestParam(value = "endTime", required = false) String endTime,
                            @RequestParam(value = "disposal", required = false) String disposal,
                            @RequestParam(value = "iseval", required = false) String iseval) {
         boolean isOk = true;
         String msg = "查询成功";
         try {
-        	Map<String,Object> data = new HashMap<String,Object>();
-        	data.put("txncode",txncode);
-        	data.put("ipAddr",ipAddr);
-        	data.put("disposal",disposal);
-        	data.put("iseval",iseval);
-        	List<Trafficdata> dataList = (List<Trafficdata>) elasticsearchAdapter.search("trafficdata", pageSize,pageNo,data,Trafficdata.class);
-        	System.out.println("dataList的size为:"+dataList.size()+"---------");
+        	List<QueryConditionEntity> conditionList = new ArrayList<QueryConditionEntity>();
+        	if(!StringUtils.isEmpty(txncode)){
+        		conditionList.add(setValue("txncode", txncode, null, ConditionMarkEnum.EQ
+        			, null, ConditionMarkEnum.OTHER));
+        	}
+        	if(!StringUtils.isEmpty(ipAddr)){
+        		conditionList.add(setValue("ipAddr", ipAddr, null, ConditionMarkEnum.EQ
+        			, null, ConditionMarkEnum.OTHER));
+        	}
+        	if(!StringUtils.isEmpty(text1)){
+        		conditionList.add(setValue("text1", text1, null, ConditionMarkEnum.LIKE
+        			, null, ConditionMarkEnum.OTHER));
+        	}
+        	if(!StringUtils.isEmpty(text2)){
+        		conditionList.add(setValue("text2", text2, null, ConditionMarkEnum.LIKE_
+        			, null, ConditionMarkEnum.OTHER));
+        	}
+        	if(!StringUtils.isEmpty(startTime)&&!StringUtils.isEmpty(endTime)){
+        		conditionList.add(setValue("txntime", startTime, endTime, ConditionMarkEnum.GTE
+        			, ConditionMarkEnum.LTE, ConditionMarkEnum.BETWEEN));
+        	}else if(!StringUtils.isEmpty(startTime)&&StringUtils.isEmpty(endTime)){
+        		conditionList.add(setValue("txntime", startTime, null, ConditionMarkEnum.GTE
+            			, null, ConditionMarkEnum.OTHER));
+        	}else if(StringUtils.isEmpty(startTime)&&!StringUtils.isEmpty(endTime)){
+        		conditionList.add(setValue("txntime", endTime, null, ConditionMarkEnum.LTE
+            			, null, ConditionMarkEnum.OTHER));
+            }
+        	if(!StringUtils.isEmpty(disposal)){
+        		conditionList.add(setValue("disposal", disposal, null, ConditionMarkEnum.EQ
+        			, null, ConditionMarkEnum.OTHER));
+        	}
+        	if(!StringUtils.isEmpty(iseval)){
+        		conditionList.add(setValue("iseval", iseval, null, ConditionMarkEnum.EQ
+        			, null, ConditionMarkEnum.OTHER));
+        	}
+        	conditionList.add(setValue("txntime", "ASC", null, null
+        			, null, ConditionMarkEnum.ORDERBY));
+        	Pagination<Trafficdata> pagination = (Pagination<Trafficdata>) elasticsearchAdapter.search("trafficdata", pageSize,pageNo,conditionList,Trafficdata.class);
+        	System.out.println("dataList的size为:"+pagination.getDataList().size()+"---------");
         } catch (Exception e) {
             e.printStackTrace();
             msg = "查询失败";
         }
         return "aaa";
+	}
+	
+	private QueryConditionEntity setValue(String name,Object startValue,Object endValue
+			,ConditionMarkEnum startMark,ConditionMarkEnum endMark,ConditionMarkEnum queryType){
+		QueryConditionEntity entity = new QueryConditionEntity();
+		entity.setName(name);
+		entity.setStartValue(startValue);
+		entity.setEndValue(endValue);
+		entity.setStartValue(startValue);
+		entity.setStartMark(startMark);
+		entity.setQueryType(queryType);
+		return entity;
 	}
 	
 	@ApiOperation(value = "存在更新不存在插入", notes = "说明:存在更新不存在插入")
