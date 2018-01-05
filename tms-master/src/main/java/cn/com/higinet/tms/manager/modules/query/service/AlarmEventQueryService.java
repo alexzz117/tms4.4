@@ -128,9 +128,25 @@ public class AlarmEventQueryService {
         sql = sql.replaceAll("TMS_REGION", regionTableName);
         sql = sql.replaceAll("TMS_CITY", cityTableName);
 
-        String txncode = requestModel.getString("txncode");
-
         sql += " and traffic.txncode = :txncode";
+
+        List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
+        return list;
+    }
+
+    public List<Map<String, Object>> queryAlarmEventHandleDetail(RequestModel requestModel) {
+        String sql = "select ps.ps_id, co.login_name as ps_opername, ps.ps_type, ps.ps_result, ps.ps_info, ps.ps_time from TMS_MGR_ALARM_PROCESS ps inner join CMC_OPERATOR co on ps.ps_operid = co.operator_id where 1 = 1";
+
+        sql += " and ps.txn_code = :txncode";
+
+        List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
+        return list;
+    }
+
+    public List<Map<String, Object>> queryAlarmEventUserDetail(RequestModel requestModel) {
+        String sql = "select u.* from TMS_RUN_USER u where 1=1";
+
+        sql += " and u.userid = :userid";
 
         List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
         return list;
