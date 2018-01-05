@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common;
+package cn.com.higinet.tms.common.config;
 
 import cn.com.higinet.tms.common.filter.StaticResourcesFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

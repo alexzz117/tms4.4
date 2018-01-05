@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common;
+package cn.com.higinet.tms.common.config;
 
 import java.util.ArrayList;
 import java.util.List;
