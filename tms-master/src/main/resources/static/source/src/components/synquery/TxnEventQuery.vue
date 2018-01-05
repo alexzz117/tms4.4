@@ -191,6 +191,38 @@
 
   export default {
     data () {
+      // 时间范围输入校验
+      let txnTimeCheck = (rule, value, callback) => {
+        let self = this
+        let txncode = self.queryShowForm.txncode
+        if (txncode) {
+          callback()
+        } else {
+          if ( value && value.length === 2) {
+            let startTime = value[0]
+            let endTime = value[1]
+            let range = (endTime - startTime) / 86400000
+
+            let userid = self.queryShowForm.userid
+            let username = self.queryShowForm.username
+            let ipaddr = self.queryShowForm.ipaddr
+            let deviceid = self.queryShowForm.deviceid
+            let sessionid = self.queryShowForm.sessionid
+
+            if (userid || username || ipaddr || deviceid || sessionid) {
+              if (range > 30) {
+                return callback(new Error('时间范围不能超过1个月(30天)'))
+              }
+            } else {
+              if (range > 1) {
+                return callback(new Error('时间范围不能超过1天'))
+              }
+            }
+          } else {
+            return callback(new Error('流水号与时间范围不能同时为空'))
+          }
+        }
+      }
       return {
         tnxEventTableData: [],    // 操作事件表数据
         queryFormShow: false,  // 查询条件表单显示控制
@@ -228,7 +260,30 @@
         pageSize: 10,         // 分页显示条目
         total: 0,             // 表格记录总条数
         selectedRow: {},      // 表选中的行
-        queryRules: {}        // 查询条件表单校验
+        queryRules: {         // 查询条件表单校验
+          txncode: [
+            {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
+          ],
+          userid: [
+            {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
+          ],
+          username: [
+            {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
+          ],
+          ipaddr: [
+            {max: 16, message: '长度在16个字符以内', trigger: 'blur'}, // ip格式校验
+            {validator: check.checkFormIp, trigger: 'blur'}
+          ],
+          deviceid: [
+            {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
+          ],
+          sessionid: [
+            {max: 64, message: '长度在64个字符以内', trigger: 'blur'}
+          ],
+          txntime: [
+            {validator: txnTimeCheck, trigger: 'blur'} // 时间范围输入校验
+          ]
+        }
       }
     },
     created () {
@@ -254,8 +309,12 @@
     },
     watch: {
       'queryShowForm.txntime': function (val) {
-        let startTime = val[0].getTime()
-        let endTime = val[1].getTime()
+        let startTime = ''
+        let endTime = ''
+        if (val && val.length === 2) {
+          startTime = val[0].getTime()
+          endTime = val[1].getTime()
+        }
         this.queryShowForm.operate_time = startTime
         this.queryShowForm.end_time = endTime
       },
@@ -363,10 +422,10 @@
         }
       },
       renderConfirmRisk (row, column, cellValue) {
-        return dictCode.rendCode('tms.confirmrisk.status',cellValue)
+        return dictCode.rendCode('tms.confirmrisk.status', cellValue)
       },
       renderTxnStatus (row, column, cellValue) {
-        return dictCode.rendCode('tms.common.txnstatus',cellValue)
+        return dictCode.rendCode('tms.common.txnstatus', cellValue)
       }
     }
   }
