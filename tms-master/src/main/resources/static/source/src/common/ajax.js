@@ -18,6 +18,7 @@ let defaultOption = {
   url: '',
   param: {},
   model: modelDef.manager,
+  toLowerCase: true,
   success: function (data) {},
   error: function (data) { alert(data.error) },
   fail: function (error) { alert(error) }
@@ -31,7 +32,12 @@ function post (opt) {
     .then(function (response) {
       if (response.status === 200) {
         if (response.data && response.data.success === true) {
-          var data = util.toggleObjKey(response.data)
+          var data
+          if (option.toLowerCase) {
+            data = util.toggleObjKey(response.data)
+          } else {
+            data = response.data
+          }
           option.success(data)
         } else {
           option.error(response.data)
@@ -52,7 +58,12 @@ function get (opt) {
     .then(function (response) {
       if (response.status === 200) {
         if (response.data && response.data.success === true) {
-          var data = util.toggleObjKey(response.data)
+          var data
+          if (option.toLowerCase) {
+            data = util.toggleObjKey(response.data)
+          } else {
+            data = response.data
+          }
           option.success(data)
         } else {
           option.error(response.data)
