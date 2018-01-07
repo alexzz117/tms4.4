@@ -32,7 +32,26 @@
       <el-table
         :data="roleData"
         @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="left"></el-table-column>
+        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
+        <el-table-column label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button
+              icon="el-icon-edit"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'edit')"
+              title="编辑"></el-button>
+            <el-button
+              icon="el-icon-delete"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'del')"
+              title="删除"></el-button>
+            <el-button
+              icon="el-icon-setting"
+              type="text"
+              @click="handleRow(scope.$index, scope.row, 'grant')"
+              title="功能授权"></el-button>
+          </template>
+        </el-table-column>
         <el-table-column prop="role_name" label="角色名称" align="left" width="180"></el-table-column>
         <el-table-column prop="flag" label="状态" align="left" width="180" :formatter="formatter"></el-table-column>
         <el-table-column prop="info" label="描述信息" align="left"></el-table-column>
@@ -48,7 +67,7 @@
       </el-pagination>
     </section>
 
-    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="35%">
       <el-form :model="roleDialogform" :rules="rules" ref="roleDialogform">
         <el-form-item label="角色名称" :label-width="formLabelWidth" prop="role_name">
           <el-input v-model="roleDialogform.role_name" auto-complete="off"></el-input>
@@ -60,14 +79,14 @@
         <el-form-item label="描述信息" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="roleDialogform.info"></el-input>
         </el-form-item>
+        <el-form-item label="" :label-width="formLabelWidth">
+          <el-button type="primary" @click="submitForm('roleDialogform')" :disabled="savebtnStatus">保 存</el-button>
+          <el-button @click="roleDialogVisible = false">取 消</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="roleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('roleDialogform')" :disabled="savebtnStatus">保 存</el-button>
-      </div>
     </el-dialog>
 
-    <el-dialog title="功能授权" :visible.sync="grantDialogVisible">
+    <el-dialog title="功能授权" :visible.sync="grantDialogVisible" width="35%">
       <el-tree
         :data="grantData"
         :default-expanded-keys="expendKey"
@@ -78,9 +97,9 @@
         highlight-current
         :props="defaultProps">
       </el-tree>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="roleDialogVisible = false">取 消</el-button>
+      <div style="text-align: left; margin: 20px">
         <el-button type="primary" @click="saveGrant" :disabled="savebtnStatus">保 存</el-button>
+        <el-button @click="roleDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -114,12 +133,13 @@
         this.flag = flag
         if (flag === 'edit') {
           this.dialogTitle = '编辑角色'
-          var length = this.multipleSelection.length
-          if (length !== 1) {
-            this.$message('请选择一行角色信息。')
-            return
-          }
-          this.roleDialogform = util.extend({}, this.multipleSelection[0])
+//          var length = this.multipleSelection.length
+//          if (length !== 1) {
+//            this.$message('请选择一行角色信息。')
+//            return
+//          }
+//          this.roleDialogform = util.extend({}, this.multipleSelection[0])
+          this.roleDialogform =  Object.assign({}, this.selectedRow)
         } else if (flag === 'add') {
           this.dialogTitle = '新建角色'
           if (this.$refs['roleDialogform']) {
@@ -185,7 +205,8 @@
       },
       del() {
         var self = this
-        var data = this.multipleSelection[0]
+//        var data = this.multipleSelection[0]
+        var data = this.selectedRow
         this.$confirm('确定删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -250,7 +271,7 @@
       },
       grant() {
         var self = this
-        var data = this.multipleSelection[0]
+        var data = this.selectedRow
         ajax.post({
           url: '/role/grant/list',
           param: {
@@ -285,7 +306,7 @@
         ajax.post({
           url: '/role/grant/mod',
           param: {
-            roleid: this.multipleSelection[0].role_id,
+            roleid: this.selectedRow.role_id,
             funcs: this.$refs.grantTree.getCheckedNodes()
           },
           success: function (data) {
@@ -312,12 +333,30 @@
             return cellValue
             break;
         }
+      },
+      handleRow(index, row, oper) {
+        this.selectedRow = row
+        switch(oper)
+        {
+          case 'edit':
+            return this.openDialog('edit')
+            break;
+          case 'del':
+            return this.del()
+            break;
+          case 'grant':
+            return this.grant()
+            break;
+          default:
+            return
+            break;
+        }
       }
     },
     data() {
       var self = this
       var roleNameExist = function (rule, value, callback) {
-        if (value === self.multipleSelection[0].role_name) {
+        if (value === self.selectedRow.role_name) {
           return callback();
         }
         ajax.post({
@@ -376,7 +415,8 @@
         defaultProps: {
           children: 'children',
           label: 'text'
-        }
+        },
+        selectedRow: {}
       }
     }
   }

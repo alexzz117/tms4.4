@@ -92,7 +92,7 @@
         </section>
       </el-col>
     </el-row>
-    <el-dialog title="新建定时任务" :visible.sync="timerDialogVisible" width="30%">
+    <el-dialog title="新建定时任务" :visible.sync="timerDialogVisible" width="35%">
       <el-form :model="timerDialogForm" :rules="rules" ref="timerDialogForm">
         <el-form-item label="任务名称" :label-width="formLabelWidth" prop="name">
           <el-input v-model="timerDialogForm.name" auto-complete="off"></el-input>

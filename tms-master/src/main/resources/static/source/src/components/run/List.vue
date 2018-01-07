@@ -93,7 +93,7 @@
       </el-pagination>
     </section>
 
-    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible" width="40%">
       <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
                style="text-align: left">
         <el-form-item label="名单英文名" prop="rostername" data="rostername">
@@ -130,7 +130,7 @@
         <el-form-item label="备注" prop="remark" data="remark">
           <el-input type="textarea" v-model="listDialogform.remark"></el-input>
         </el-form-item>
-        <el-form-item label="" size="large">
+        <el-form-item label="">
           <el-button type="primary" @click="submitForm('listDialogform')" data="saveBtn">保 存</el-button>
           <el-button @click="listDialogVisible = false" data="cancelBtn">取 消</el-button>
         </el-form-item>
@@ -466,7 +466,7 @@
         btnStatus: true,
         delBtnStatus: true,
         dialogTitle: '',
-        formLabelWidth: '150px',
+        formLabelWidth: '120px',
         datatypeOptions: [],
         rostertypeOptions: [],
         rules: {
