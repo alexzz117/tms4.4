@@ -1,81 +1,98 @@
 <template>
-  <el-container style="height: 100%; border: 1px solid #eee">
-    <el-aside width="60%" >
-      <div style="margin: 10px;text-align: left ">
-        <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      </div>
-      <el-table
-        :data="timeData"
-        @selection-change="handleSelectionChange">
-        <el-table-column label="操作" width="80">
-          <template slot-scope="scope">
-            <el-button
-              icon="el-icon-edit"
-              type="text"
-              @click="handleEdit(scope.$index, scope.row)"
-              title="编辑"></el-button>
-            <el-button
-              icon="el-icon-delete"
-              type="text"
-              @click="handleDelete(scope.$index, scope.row)"
-              title="删除"></el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="任务启停" width="80">
-          <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.status"
-              active-value= "NORMAL"
-              inactive-value= "PAUSED"
-              @change="statusChange(scope.row)">
-            </el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column prop="name" label="任务名称" align="left"></el-table-column>
-        <el-table-column prop="cron" label="时间表达式" align="left"></el-table-column>
-        <el-table-column prop="group" label="任务组" align="left" :formatter="formatter"></el-table-column>
-        <el-table-column prop="className" label="类名" align="left" :formatter="formatter"></el-table-column>
-      </el-table>
-    </el-aside>
-    <el-main>
-      <el-form :model="timerForm" :rules="rules" ref="timerForm">
-        <el-form-item label="任务名称" :label-width="formLabelWidth" prop="name">
-          <el-input v-model="timerForm.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="时间表达式" :label-width="formLabelWidth" prop="cron">
-          <el-input v-model="timerForm.cron" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="类名" :label-width="formLabelWidth" prop="className">
-          <el-select v-model="timerForm.className" placeholder="请选择"
-                     :clearable="clearable">
-            <el-option
-              v-for="item in classOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="任务组" :label-width="formLabelWidth" prop="group">
-          <el-select v-model="timerForm.group" placeholder="请选择"
-                     :clearable="clearable">
-            <el-option
-              v-for="item in groupOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="描述信息" :label-width="formLabelWidth" prop="description">
-          <el-input type="textarea" v-model="timerForm.description"></el-input>
-        </el-form-item>
-        <el-form-item label=" " :label-width="formLabelWidth" size="large">
-          <el-button type="primary" @click="submitForm('timerDialogForm')">保 存</el-button>
-        </el-form-item>
-      </el-form>
-    </el-main>
-    <el-dialog title="新建定时任务" :visible.sync="timerDialogVisible">
+  <div style="min-height: 85%">
+    <div class="toolbar">
+      <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
+    </div>
+    <el-row :gutter="20">
+      <el-col :span="9" style="height: 400px;">
+        <section class="section">
+          <el-table
+            :data="timeData"
+            highlight-current-row
+            @current-change="handleCurrentChange"
+            ref="timeTable">
+            <!--@selection-change="handleSelectionChange"-->
+
+            <el-table-column label="操作" width="50">
+              <template slot-scope="scope">
+                <!--<el-button-->
+                <!--icon="el-icon-edit"-->
+                <!--type="text"-->
+                <!--@click="handleEdit(scope.$index, scope.row)"-->
+                <!--title="编辑"></el-button>-->
+                <el-button
+                  icon="el-icon-delete"
+                  type="text"
+                  @click="handleDelete(scope.$index, scope.row)"
+                  title="删除"></el-button>
+              </template>
+            </el-table-column>
+            <!--<el-table-column label="任务启停" width="80">-->
+            <!--<template slot-scope="scope">-->
+            <!--<el-switch-->
+            <!--v-model="scope.row.status"-->
+            <!--active-value= "NORMAL"-->
+            <!--inactive-value= "PAUSED"-->
+            <!--@change="statusChange(scope.row)">-->
+            <!--</el-switch>-->
+            <!--</template>-->
+            <!--</el-table-column>-->
+            <el-table-column prop="name" label="任务名称" align="left"></el-table-column>
+            <!--<el-table-column prop="cron" label="时间表达式" align="left"></el-table-column>-->
+            <el-table-column prop="group" label="任务组" align="left" :formatter="formatter"></el-table-column>
+            <!--<el-table-column prop="className" label="类名" align="left" :formatter="formatter"></el-table-column>-->
+          </el-table>
+        </section>
+      </el-col>
+      <el-col :span="15" style="height: 400px;">
+        <section class="section">
+          <el-form :model="timerForm" :rules="rules" ref="timerForm" style="margin: 20px 20px 0px 10px;">
+            <el-form-item label="任务名称" :label-width="formLabelWidth" prop="name">
+              <el-input v-model="timerForm.name" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="时间表达式" :label-width="formLabelWidth" prop="cron">
+              <el-input v-model="timerForm.cron" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="类名" :label-width="formLabelWidth" prop="className">
+              <el-select v-model="timerForm.className" placeholder="请选择"
+                         :clearable="clearable">
+                <el-option
+                  v-for="item in classOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="任务组" :label-width="formLabelWidth" prop="group">
+              <el-select v-model="timerForm.group" placeholder="请选择"
+                         :clearable="clearable">
+                <el-option
+                  v-for="item in groupOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="是否启动" :label-width="formLabelWidth" prop="status">
+              <el-switch v-model="timerForm.status"
+                         active-value= "NORMAL"
+                         inactive-value= "PAUSED"
+                         @change="statusChange()">
+              </el-switch>
+            </el-form-item>
+            <el-form-item label="描述信息" :label-width="formLabelWidth" prop="description">
+              <el-input type="textarea" v-model="timerForm.description"></el-input>
+            </el-form-item>
+            <el-form-item label=" " :label-width="formLabelWidth">
+              <el-button type="primary" @click="submitForm('timerForm')">保 存</el-button>
+            </el-form-item>
+          </el-form>
+        </section>
+      </el-col>
+    </el-row>
+    <el-dialog title="新建定时任务" :visible.sync="timerDialogVisible" width="30%">
       <el-form :model="timerDialogForm" :rules="rules" ref="timerDialogForm">
         <el-form-item label="任务名称" :label-width="formLabelWidth" prop="name">
           <el-input v-model="timerDialogForm.name" auto-complete="off"></el-input>
@@ -105,16 +122,23 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="是否启动" :label-width="formLabelWidth" prop="status">
+          <el-switch v-model="timerDialogForm.status"
+                     active-value= "NORMAL"
+                     inactive-value= "PAUSED">
+          </el-switch>
+        </el-form-item>
         <el-form-item label="描述信息" :label-width="formLabelWidth" prop="description">
           <el-input type="textarea" v-model="timerDialogForm.description"></el-input>
         </el-form-item>
-        <el-form-item label=" " :label-width="formLabelWidth" size="large">
+        <el-form-item label=" " :label-width="formLabelWidth">
           <el-button type="primary" @click="submitForm('timerDialogForm')">保 存</el-button>
           <el-button @click="timerDialogVisible = false">取 消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
-  </el-container>
+  </div>
+
 </template>
 
 <script>
@@ -169,11 +193,11 @@
     data () {
       var self = this
       var checkName = function (rule, value, callback) {
-        if (this.flag === 'add') {
+        if (self.flag === 'add') {
           return self.checkName(self.timerDialogForm.name, callback)
-        } else if (this.flag === 'edit') {
-          if (value !== self.selectionRow.name) {
-            return self.checkName(self.timerDialogForm.name, callback)
+        } else if (self.flag === 'edit') {
+          if (value !== self.selectedRow.name) {
+            return self.checkName(self.timerForm.name, callback)
           }
         }
         return callback()
@@ -186,7 +210,7 @@
             cron: value
           },
           success: function (data) {
-            if('false' === data.row){
+            if(false === data.row){
               callback(new Error('请输入合法的时间表达式'));
             }else{
               callback();
@@ -202,6 +226,7 @@
           "cron": "",
           "className": "",
           "group": "",
+          "status": "PAUSED",
           "description": ""
         },
         timerDialogForm: {
@@ -209,6 +234,7 @@
           "cron": "",
           "className": "",
           "group": "",
+          "status": "NORMAL",
           "description": ""
         },
         flag: '',
@@ -220,7 +246,7 @@
             { validator: checkName, trigger: 'blur' }
           ],
           cron: [
-            { required: true, message: '请输入cron', trigger: 'blur' },
+            { required: true, message: '请输入时间表达式', trigger: 'blur' },
             { validator: checkCron, trigger: 'blur' }
           ],
           className: [
@@ -233,7 +259,7 @@
             { max: 300, message: '长度在300个字符以内', trigger: 'blur' }
           ]
         },
-        selectionRow: {},
+        selectedRow: {},
         classOptions: [],
         groupOptions: [],
         clearable: true
@@ -245,9 +271,13 @@
         ajax.get({
           url: '/timer/list',
           model: ajax.model.timer,
+          toLowerCase: false,
           success: function (data) {
             if (data.list) {
               self.timeData = data.list
+              if (data.list.length > 0) {
+                self.setCurrent(self.timeData[0])
+              }
             }
           }
         })
@@ -283,10 +313,10 @@
           }
         })
       },
-      handleEdit(index, row) {
-        this.flag = 'edit'
-        this.timerForm = row
-      },
+//      handleEdit(index, row) {
+//        this.flag = 'edit'
+//        this.timerForm = row
+//      },
       handleDelete(index, row) {
         var self = this
         this.$confirm('确定删除?', '提示', {
@@ -324,6 +354,7 @@
               "cron": "",
               "className": "",
               "group": "",
+              "status": "NORMAL",
               "description": ""
             }
           }
@@ -346,9 +377,9 @@
           }
         })
       },
-      handleSelectionChange(val) {
-        this.selectionRow = val;
-      },
+//      handleSelectionChange(val) {
+//        this.selectedRow = val;
+//      },
       checkName(name, callback) {
         ajax.post({
           url: '/timer/check-name',
@@ -357,22 +388,22 @@
             name: name
           },
           success: function (data) {
-            if('false' === data.row){
+            if (false === data.row) {
               callback(new Error('任务名称已被占用'));
-            }else{
+            } else {
               callback();
             }
           }
         })
       },
-      statusChange(row) {
+      statusChange() {
         var self = this
-        if (row.status === 'NORMAL') {
+        if (this.timerForm.status === 'NORMAL') {
           ajax.post({
             url: '/timer/resume',
             model: ajax.model.timer,
             param: {
-              taskId: row.taskid
+              taskId: this.timerForm.taskid
             },
             success: function (data) {
               self.$message({
@@ -381,12 +412,12 @@
               })
             }
           })
-        } else if (row.status === 'PAUSED') {
+        } else if (this.timerForm.status === 'PAUSED') {
           ajax.post({
             url: '/timer/pause',
             model: ajax.model.timer,
             param: {
-              taskId: row.taskid
+              taskId: this.timerForm.taskid
             },
             success: function (data) {
               self.$message({
@@ -410,9 +441,25 @@
             return cellValue
             break;
         }
+      },
+      handleCurrentChange(val) {
+        this.flag = 'edit'
+        this.timerForm = Object.assign({}, val)
+        this.selectedRow = val
+      },
+      setCurrent(row) {
+        this.$refs.timeTable.setCurrentRow(row);
       }
     }
   }
 </script>
 <style>
+  .section {
+    padding: 20px;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(112, 112, 112, 0.12);
+    border-radius: 7px;
+    height:100%;
+  }
+
 </style>
