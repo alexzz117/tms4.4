@@ -12,7 +12,9 @@ function getCodeData(cb) {
       url: '/common/dict',
       success: function (data) {
         dictCode = data.codes ? data.codes : {}
-        cb()
+        if (cb) {
+          cb()
+        }
       }
     })
   }

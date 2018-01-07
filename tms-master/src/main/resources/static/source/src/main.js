@@ -7,9 +7,13 @@ import router from './router'
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(Element, { size: 'small' })
+// Vue.use(Element, { size: 'medium' })
 
 import axios from 'axios';
+import echarts from 'echarts'
+
 Vue.prototype.$axios=axios;
+Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 // import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
@@ -21,15 +25,17 @@ import dictCode from '@/common/dictCode'
 
 let vue = null
 
-dictCode.getCodeData(function () {
-  vue = /* eslint-disable no-new */
-    new Vue({
-      el: '#app',
-      router,
-      template: '<App/>',
-      components: { App }
-    })
+vue = /* eslint-disable no-new */
+  new Vue({
+    el: '#app',
+    router,
+    beforeCreate: function () {
+      dictCode.getCodeData()
+    },
+    template: '<App/>',
+    components: { App }
+  })
 
-})
+
 
 

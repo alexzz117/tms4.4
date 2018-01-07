@@ -61,7 +61,7 @@
                      :total="total">
       </el-pagination>
     </section>
-    
+
   <!-- 名单查看弹出窗 -->
     <el-dialog title="查看名单" :visible.sync="listDialogVisible" append-to-body  >
       <el-form :model="listDialogform" ref="listDialogform" :label-width="formLabelWidth"

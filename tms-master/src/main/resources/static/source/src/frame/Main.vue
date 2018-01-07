@@ -55,6 +55,9 @@
               <router-link :to="{ name:'alarmEventQuery'}" tag="li" replace>
                 <el-menu-item index="5-2">报警事件查询</el-menu-item>
               </router-link>
+              <router-link :to="{ name:'dashboard'}" tag="li" replace>
+                <el-menu-item index="5-3">交易监控</el-menu-item>
+              </router-link>
             </el-submenu>
             <el-submenu index="6">
               <template slot="title"><i class="el-icon-setting"></i>风险处置</template>
@@ -72,12 +75,13 @@
         </div>
       </el-aside>
       <el-main class="scroll">
-
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item><i class="el-icon-setting" style="margin-right: 5px"></i>修改密码</el-dropdown-item>
-              <el-dropdown-item><i class="el-icon-circle-close" style="margin-right: 5px"></i>退出</el-dropdown-item>
-            </el-dropdown-menu>
-
+        <div class="toolbar">
+          <div class="page-title">交易监控</div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item><i class="el-icon-setting" style="margin-right: 5px"></i>修改密码</el-dropdown-item>
+            <el-dropdown-item><i class="el-icon-circle-close" style="margin-right: 5px"></i>退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </div>
         <!--用router-view渲染视图-->
         <router-view/>
       </el-main>
@@ -136,5 +140,33 @@
     height: 60px;
     line-height: 60px;
     margin: 20px auto;
+  }
+
+  /*工具栏及表单样式设置*/
+  .toolbar {
+    margin-bottom: 20px;
+    text-align: left;
+    background-color: #F0F1F4;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 20px;
+    border-radius: 7px;
+  }
+
+  .toolbar .toolbar-form {
+    text-align: left;
+    float: right;
+    display: inline-block;
+  }
+
+  .toolbar .toolbar-form .el-form-item__content {
+    line-height: 60px;
+  }
+
+  .table {
+    padding: 20px;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(112, 112, 112, 0.12);
+    border-radius: 7px;
   }
 </style>

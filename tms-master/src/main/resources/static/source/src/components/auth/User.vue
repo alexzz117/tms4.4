@@ -2,74 +2,77 @@
   <div>
     <el-row>
       <el-col :span="24">
-        <div style="float: left ">
-          <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-        </div>
-        <div style="float: right;">
-          <el-form label-position="right" label-width="80px" :model="userForm"
-                   :inline="inline" style="text-align: left">
-            <el-form-item label="用户名" prop="login_name">
-              <el-input v-model="userForm.login_name"></el-input>
-            </el-form-item>
-            <!--<el-form-item label="姓名" prop="real_name">
-              <el-input v-model="userForm.real_name"></el-input>
-            </el-form-item>-->
-            <el-form-item label="状态">
-              <el-select v-model="userForm.flag" placeholder="状态">
-                <el-option label="全部" value=""></el-option>
-                <el-option label="停用" value="1"></el-option>
-                <el-option label="正常" value="2"></el-option>
-              </el-select>
-            </el-form-item>
-            <!--<el-form-item label="角色">
-              <el-select v-model="userForm.role" placeholder="角色">
-                <el-option label="全部" value=""></el-option>
-                <el-option
-                  v-for="item in roles"
-                  :key="item.role_id"
-                  :label="item.role_name"
-                  :value="item.role_id">
-                </el-option>
-              </el-select>
-            </el-form-item>-->
-            <el-form-item>
-              <el-button class="el-icon-search" type="primary" @click="selUser">查询</el-button>
-            </el-form-item>
-          </el-form>
+        <div class="toolbar">
+          <div style="float: left ">
+            <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
+          </div>
+          <div style="float: right;">
+            <el-form label-position="right" label-width="80px" :model="userForm"
+                     :inline="inline" class="toolbar-form">
+              <el-form-item label="用户名" prop="login_name">
+                <el-input v-model="userForm.login_name"></el-input>
+              </el-form-item>
+              <!--<el-form-item label="姓名" prop="real_name">
+                <el-input v-model="userForm.real_name"></el-input>
+              </el-form-item>-->
+              <el-form-item label="状态">
+                <el-select v-model="userForm.flag" placeholder="状态">
+                  <el-option label="全部" value=""></el-option>
+                  <el-option label="停用" value="1"></el-option>
+                  <el-option label="正常" value="2"></el-option>
+                </el-select>
+              </el-form-item>
+              <!--<el-form-item label="角色">
+                <el-select v-model="userForm.role" placeholder="角色">
+                  <el-option label="全部" value=""></el-option>
+                  <el-option
+                    v-for="item in roles"
+                    :key="item.role_id"
+                    :label="item.role_name"
+                    :value="item.role_id">
+                  </el-option>
+                </el-select>
+              </el-form-item>-->
+              <el-form-item>
+                <el-button class="el-icon-search" type="primary" @click="selUser">查询</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
         </div>
       </el-col>
     </el-row>
-    <el-table
-      :data="roleData"
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
-      <el-table-column label="操作" width="120px">
-        <template slot-scope="scope">
-          <el-button type="text" icon="el-icon-edit" title="编辑" @click="openDialog('edit',scope.$index, scope.row)"></el-button>
-          <el-button type="text" icon="el-icon-delete"  title="删除" @click="delUser(scope.$index, scope.row)"></el-button>
-          <el-button type="text" icon="el-icon-refresh" title="重置密码" @click="resetPwd(scope.$index, scope.row)"></el-button>
-          <el-button type="text" icon="el-icon-circle-check-outline" title="解锁" @click="resetFlag(scope.$index, scope.row)"></el-button>
-        </template>
-      </el-table-column>
-      <el-table-column prop="login_name" label="用户名" align="left"></el-table-column>
-      <el-table-column prop="real_name" label="姓名" align="left"></el-table-column>
-      <el-table-column prop="role_name" label="角色" align="left"></el-table-column>
-      <el-table-column prop="flag" label="状态" align="left"></el-table-column>
-      <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left"></el-table-column>
-      <el-table-column prop="lockout" label="锁定次数" align="left"></el-table-column>
-      <el-table-column prop="lockout_date" label="锁定时间" align="left"></el-table-column>
-      <el-table-column prop="email" label="电子邮件" align="left"></el-table-column>
-      <el-table-column prop="mobile" label="移动电话" align="left"></el-table-column>
-    </el-table>
-    <el-pagination style="margin-top: 10px; text-align: right;"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :current-page="currentPage"
-                   :page-sizes="[10, 25, 50, 100]"
-                   :page-size="pagesize"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="total">
-    </el-pagination>
+    <section class="table">
+      <el-table
+        :data="roleData"
+        @selection-change="handleSelectionChange">
+        <el-table-column label="操作" width="120px">
+          <template slot-scope="scope">
+            <el-button type="text" icon="el-icon-edit" title="编辑" @click="openDialog('edit',scope.$index, scope.row)"></el-button>
+            <el-button type="text" icon="el-icon-delete"  title="删除" @click="delUser(scope.$index, scope.row)"></el-button>
+            <el-button type="text" icon="el-icon-refresh" title="重置密码" @click="resetPwd(scope.$index, scope.row)"></el-button>
+            <el-button type="text" icon="el-icon-circle-check-outline" title="解锁" @click="resetFlag(scope.$index, scope.row)"></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="login_name" label="用户名" align="left"></el-table-column>
+        <el-table-column prop="real_name" label="姓名" align="left"></el-table-column>
+        <el-table-column prop="role_name" label="角色" align="left"></el-table-column>
+        <el-table-column prop="flag" label="状态" align="left"></el-table-column>
+        <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left"></el-table-column>
+        <el-table-column prop="lockout" label="锁定次数" align="left"></el-table-column>
+        <el-table-column prop="lockout_date" label="锁定时间" align="left"></el-table-column>
+        <el-table-column prop="email" label="电子邮件" align="left"></el-table-column>
+        <el-table-column prop="mobile" label="移动电话" align="left"></el-table-column>
+      </el-table>
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :current-page="currentPage"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pagesize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total">
+      </el-pagination>
+    </section>
     <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="900px">
       <el-form :model="userDialogForm" :rules="rules" ref="userDialogForm" :inline="true">
         <el-form-item label="用户名" :label-width="formLabelWidth" prop="login_name" :style="formItemStyle">

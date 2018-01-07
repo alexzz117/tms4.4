@@ -3,16 +3,15 @@ import util from '@/common/util'
 
 var config = {
   suffix: '?format=json',
-  prefix: util.getWebRootPath()  // 正式测试环境
-  // prefix: '/context' // 分离测试环境
+  // prefix: util.getWebRootPath()  // 正式测试环境
+  prefix: '/context' // 分离测试环境
   // prefix: '/api' // local mock
 }
 
 let modelDef = {
   manager: '/manager',
   timer: '',
-  plus: '/plus',
-  login: ''
+  plus: '/plus'
 }
 
 let defaultOption = {

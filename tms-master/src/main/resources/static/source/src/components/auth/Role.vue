@@ -1,50 +1,52 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="80px" :model="roleForm"
-             :inline="inline" style="text-align: left">
-      <el-form-item label="角色名称">
-        <el-input v-model="roleForm.role_name"></el-input>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-select v-model="roleForm.flag" @focus="selectFocus()" placeholder="请选择" :clearable="clearable">
-          <el-option
-            v-for="item in flagOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-    </el-form>
-
-    <div style="margin-bottom: 10px;text-align: left ">
-      <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
+    <div class="toolbar">
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-      <el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>
-      <el-button plain class="el-icon-delete" @click="del" :disabled="btnStatus">删除</el-button>
-      <el-button plain class="el-icon-setting" @click="grant" :disabled="btnStatus">功能授权</el-button>
+      <el-form label-position="right" label-width="80px" :model="roleForm"
+               :inline="inline" class="toolbar-form">
+        <el-form-item label="角色名称">
+          <el-input v-model="roleForm.role_name"></el-input>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="roleForm.flag" @focus="selectFocus()" placeholder="请选择" :clearable="clearable">
+            <el-option
+              v-for="item in flagOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
+        </el-form-item>
+      </el-form>
     </div>
 
-    <el-table
-      :data="roleData"
-      stripe
-      border
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="left"></el-table-column>
-      <el-table-column prop="role_name" label="角色名称" align="left" width="180"></el-table-column>
-      <el-table-column prop="flag" label="状态" align="left" width="180" :formatter="formatter"></el-table-column>
-      <el-table-column prop="info" label="描述信息" align="left"></el-table-column>
-    </el-table>
-    <el-pagination style="margin-top: 10px; text-align: right;"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :current-page="pageindex"
-                   :page-sizes="[10, 25, 50, 100]"
-                   :page-size="pagesize"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="total">
-    </el-pagination>
+    <!--<div style="margin-bottom: 10px;text-align: left ">-->
+      <!--<el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>-->
+      <!--<el-button plain class="el-icon-delete" @click="del" :disabled="btnStatus">删除</el-button>-->
+      <!--<el-button plain class="el-icon-setting" @click="grant" :disabled="btnStatus">功能授权</el-button>-->
+    <!--</div>-->
+    <section class="table">
+      <el-table
+        :data="roleData"
+        @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" align="left"></el-table-column>
+        <el-table-column prop="role_name" label="角色名称" align="left" width="180"></el-table-column>
+        <el-table-column prop="flag" label="状态" align="left" width="180" :formatter="formatter"></el-table-column>
+        <el-table-column prop="info" label="描述信息" align="left"></el-table-column>
+      </el-table>
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :current-page="pageindex"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pagesize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total">
+      </el-pagination>
+    </section>
 
     <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible">
       <el-form :model="roleDialogform" :rules="rules" ref="roleDialogform">
