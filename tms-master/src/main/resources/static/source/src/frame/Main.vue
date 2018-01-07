@@ -65,8 +65,8 @@
                 <el-menu-item index="6-1">报警事件分派</el-menu-item>
               </router-link>
               <router-link :to="{ name:'alarmeventExecute'}" tag="li" replace>
-              <el-menu-item index="6-2">报警事件处理</el-menu-item>
-            </router-link>
+                <el-menu-item index="6-2">报警事件处理</el-menu-item>
+              </router-link>
               <router-link :to="{ name:'alarmeventAudit'}" tag="li" replace>
                 <el-menu-item index="6-3">报警事件审核</el-menu-item>
               </router-link>
@@ -77,10 +77,10 @@
       <el-main class="scroll">
         <div class="toolbar">
           <div class="page-title">交易监控</div>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item><i class="el-icon-setting" style="margin-right: 5px"></i>修改密码</el-dropdown-item>
-            <el-dropdown-item><i class="el-icon-circle-close" style="margin-right: 5px"></i>退出</el-dropdown-item>
-          </el-dropdown-menu>
+          <!--<el-dropdown-menu slot="dropdown">-->
+            <!--<el-dropdown-item><i class="el-icon-setting" style="margin-right: 5px"></i>修改密码</el-dropdown-item>-->
+            <!--<el-dropdown-item><i class="el-icon-circle-close" style="margin-right: 5px"></i>退出</el-dropdown-item>-->
+          <!--</el-dropdown-menu>-->
         </div>
         <!--用router-view渲染视图-->
         <router-view/>
@@ -168,5 +168,9 @@
     background-color: #FFFFFF;
     border: 1px solid rgba(112, 112, 112, 0.12);
     border-radius: 7px;
+  }
+
+  .el-dialog__body {
+    padding: 30px 30px 30px 20px;
   }
 </style>

@@ -56,7 +56,7 @@
               @click="handleRow(scope.$index, scope.row, 'del')"
               title="删除"></el-button>
             <el-button
-              icon="el-icon-tickets"
+              icon="el-icon-document"
               type="text"
               @click="handleRow(scope.$index, scope.row, 'valueList')"
               title="名单值"></el-button>

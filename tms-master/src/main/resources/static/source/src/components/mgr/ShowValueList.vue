@@ -1,9 +1,21 @@
 <template>
   <div>
     <h1>名单值管理 -> {{ title }}</h1>
+    <div class="toolbar">
+      <el-button @click="backList" data="cancelBtn" icon="el-icon-arrow-left">返 回</el-button>
+
+      <el-form label-position="right" label-width="100px" :model="valueListForm"
+               :inline="inline" class="toolbar-form">
+        <el-form-item label="名单值">
+          <el-input v-model="valueListForm.rostervalue"></el-input>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button class="el-icon-search" type="primary" @click="sel">查询</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
     <el-table
-      :data="gridData"
-      style="width: 100%">
+      :data="gridData">
       <el-table-column prop="rostervalue" label="名单值" align="left" width="200"></el-table-column>
       <el-table-column prop="enabletime" label="开始时间" align="left" width="200"></el-table-column>
       <el-table-column prop="disabletime" label="结束时间" align="left" width="200"></el-table-column>
@@ -19,9 +31,6 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
-    <div slot="footer" class="dialog-footer" >
-      <el-button @click="backList" data="cancelBtn" icon="el-icon-arrow-left" type="primary" >返 回</el-button>
-    </div>
   </div>
 </template>
 

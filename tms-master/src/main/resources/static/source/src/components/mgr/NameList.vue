@@ -37,10 +37,10 @@
         @selection-change="handleSelectionChange">
         <el-table-column
           label="操作"
-          width="160">
+          width="80">
           <template slot-scope="scope" >
-            <el-button type="text"  @click="openDialog(scope.$index, scope.row)"  icon="el-icon-view"  v-show="typeof(scope.row.rosterid)=='number'">查看</el-button>
-            <el-button type="text"  @click="showValueList(scope.$index, scope.row)" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'">名单值</el-button>
+            <el-button type="text"  @click="openDialog(scope.$index, scope.row)"  icon="el-icon-view"  v-show="typeof(scope.row.rosterid)=='number'" title="查看"></el-button>
+            <el-button type="text"  @click="showValueList(scope.$index, scope.row)" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'" title="名单值"></el-button>
           </template>
         </el-table-column>
         <el-table-column prop="rostername" label="名单英文名" align="left" width="160"></el-table-column>
@@ -63,7 +63,7 @@
     </section>
 
   <!-- 名单查看弹出窗 -->
-    <el-dialog title="查看名单" :visible.sync="listDialogVisible" append-to-body  >
+    <el-dialog title="查看名单" :visible.sync="listDialogVisible" width="40%">
       <el-form :model="listDialogform" ref="listDialogform" :label-width="formLabelWidth"
                style="text-align: left" >
         <el-form-item label="名单英文名" prop="rostername" data="rostername">
@@ -99,10 +99,10 @@
         <el-form-item label="备注" prop="remark" data="remark">
           <el-input type="textarea" v-model="listDialogform.remark" :disabled="true"></el-input>
         </el-form-item>
+        <el-form-item label="">
+          <el-button @click="listDialogVisible = false" icon="el-icon-arrow-left" type="primary" >返 回</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer" >
-      <el-button @click="listDialogVisible = false" data="cancelBtn" icon="el-icon-arrow-left" type="primary" >返 回</el-button>
-    </div>
     </el-dialog>
   </div>
 </template>
@@ -240,7 +240,7 @@
           remark: "",
         },
         dialogTitle: '',
-        formLabelWidth: '150px',
+        formLabelWidth: '120px',
         datatypeOptions: [],
         rostertypeOptions: [],
         multipleSelection: []
