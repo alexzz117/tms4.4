@@ -233,24 +233,6 @@
       </div>
     </el-dialog>
 
-    <!--<el-dialog title="报警事件详细信息" :visible.sync="infoDialogVisible" width="900px" @open="handleInfoOpen">-->
-
-      <!--<el-tabs v-model="tabActiveName" @tab-click="handleTabClick">-->
-        <!--<el-tab-pane label="操作信息" name="operate">-->
-         <!--<AlarmEventQueryOperateDetail ref="operateDetail" :showItem="selectedRow"></AlarmEventQueryOperateDetail>-->
-        <!--</el-tab-pane>-->
-        <!--<el-tab-pane label="策略信息" name="strategy">-->
-          <!--<AlarmEventQueryStrategyDetail ref="strategyDetail" :showItem="selectedRow" :disposalList="disposalList"></AlarmEventQueryStrategyDetail>-->
-        <!--</el-tab-pane>-->
-        <!--<el-tab-pane label="处理信息" name="handle">-->
-          <!--<AlarmEventQueryHandleDetail ref="handleDetail" :showItem="selectedRow"></AlarmEventQueryHandleDetail>-->
-        <!--</el-tab-pane>-->
-      <!--</el-tabs>-->
-
-      <!--<div slot="footer" class="dialog-footer">-->
-        <!--<el-button @click="infoDialogVisible = false" size="large">取 消</el-button>-->
-      <!--</div>-->
-    <!--</el-dialog>-->
     <txn-detail ref="txnDetail" :txn="selectedRow"></txn-detail>
   </div>
 </template>
@@ -261,12 +243,12 @@
   import dictCode from "../../common/dictCode";
   import check from "../../common/check";
 
-
   import TxnDetail from '@/components/synquery/TxnDetail'
 
   let iscorrectList = [{'label': '未认证', 'value': '2'}, {'label': '认证通过', 'value': '1'}, {'label': '认证未通过', 'value': '0'}]
 
   export default {
+    name: 'alarmEventQuery',
     data () {
       return {
         txntypeDialogVisible: false,

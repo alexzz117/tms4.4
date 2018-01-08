@@ -111,7 +111,6 @@
                 if (data.rulelist) {
                   self.transHitRuleList = data.rulelist
                 }
-                console.log(self.transHitRuleList)
               }
             })
           }

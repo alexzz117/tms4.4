@@ -5,6 +5,7 @@
     </div>
     <div v-show="hasData">
       <el-row>
+
         <el-col :span="6">设备标识:</el-col>
         <el-col :span="6">{{detailData.device_id}}&nbsp</el-col>
         <el-col :span="6">渠道代码:</el-col>
@@ -23,11 +24,9 @@
   import ajax from "../../common/ajax";
   import util from "../../common/util";
   import dictCode from "../../common/dictCode";
-  import AlarmEventQuery from './AlarmEventQuery'
-
-  let alarmEventQueryStrategyDetailVm = null
 
   export default {
+    name: 'alarmEventDeviceDetail',
     computed: {
       showItemParent () {
         return this.showItem
@@ -60,29 +59,16 @@
           return ''
         }
         return dictCode.rendCode('common.sex', value)
-      },
-      renderDisposal (value) {
-        if (value === undefined || value === '') {
-          return ''
-        }
-        for (let item of alarmEventQueryStrategyDetailVm.disposalListParent) {
-          if (item.dp_code === value) {
-            return item.dp_name
-          }
-        }
-        return ''
       }
     },
     props: ['showItem'],
     mounted: function () {
       this.$nextTick(function () {
-        alarmEventQueryStrategyDetailVm = this
       })
     },
     methods: {
       loadData (row) {
         let self = this
-        console.log(row)
         ajax.post({
           url: '/query/alarmEvent/deviceDetail',
           param: {

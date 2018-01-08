@@ -59,7 +59,6 @@
   import ajax from "../../common/ajax";
   import util from "../../common/util";
   import dictCode from "../../common/dictCode";
-  import AlarmEventQuery from './AlarmEventQuery'
 
   let alarmEventQueryStrategyDetailVm = null
 

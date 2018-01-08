@@ -42,6 +42,7 @@
   import TxnStatQuery from '@/components/synquery/TxnStatQuery'
 
   export default {
+    name: 'txnDetail',
     computed: {
       selectedRow () {
         return this.txn

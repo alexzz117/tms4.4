@@ -118,8 +118,6 @@
   import util from "../../common/util";
   import dictCode from "../../common/dictCode";
 
-  import AlarmEventQueryUserDetail from './AlarmEventQueryUserDetail'
-
   export default {
     computed: {
       showItemParent () {
@@ -187,9 +185,6 @@
           self.$refs.userDetail.loadData(self.selectedRow)
         }, 200)
       }
-    },
-    components: {
-      AlarmEventQueryUserDetail
     }
   }
 </script>

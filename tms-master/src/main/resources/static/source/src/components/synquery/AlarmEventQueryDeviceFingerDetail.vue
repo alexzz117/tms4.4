@@ -31,8 +31,6 @@
   import util from "../../common/util";
   import dictCode from "../../common/dictCode";
 
-  let alarmEventQueryStrategyDetailVm = null
-
   export default {
     computed: {
       showItemParent () {
@@ -65,23 +63,11 @@
           return ''
         }
         return dictCode.rendCode('tms.alarm.process.type', value)
-      },
-      renderDisposal (value) {
-        if (value === undefined || value === '') {
-          return ''
-        }
-        for (let item of alarmEventQueryStrategyDetailVm.disposalListParent) {
-          if (item.dp_code === value) {
-            return item.dp_name
-          }
-        }
-        return ''
       }
     },
     props: ['showItem'],
     mounted: function () {
       this.$nextTick(function () {
-        alarmEventQueryStrategyDetailVm = this
       })
     },
     methods: {
