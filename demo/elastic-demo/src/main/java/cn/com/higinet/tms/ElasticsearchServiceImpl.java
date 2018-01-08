@@ -303,7 +303,7 @@ public class ElasticsearchServiceImpl{
      * @return
      */
     private XContentBuilder getClassMapping(String mappingName) {
-        Field[] fields = Trafficdata.class.getDeclaredFields();
+        Field[] fields = Field.class.getDeclaredFields();
         XContentBuilder builder=null;
         try {
         	builder=XContentFactory.jsonBuilder()

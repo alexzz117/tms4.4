@@ -1,14 +1,12 @@
 package cn.com.higinet.tms.web;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
@@ -21,10 +19,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSONObject;
-
 import cn.com.higinet.tms.ElasticsearchServiceImpl;
 import cn.com.higinet.tms.Pagination;
+import cn.com.higinet.tms.TrafficQueue;
 import cn.com.higinet.tms.Trafficdata;
 import cn.com.higinet.tms.adapter.ConditionMarkEnum;
 import cn.com.higinet.tms.adapter.ElasticsearchAdapter;
@@ -48,6 +45,10 @@ public class Test {
 	
 	@Autowired
 	private ElasticsearchConfig elasticsearchConfig;
+	
+	@Autowired
+	private TrafficQueue trafficQueue;
+	
 	
 	@ApiOperation(value = "创建index", notes = "说明:创建index")
     @RequestMapping(value = "createIndex", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -76,8 +77,7 @@ public class Test {
         boolean isOk = true;
         String msg = "成功";
         try {
-//        	elasticsearchServiceImpl.addIndex("tms",3,2);//创建索引
-        	elasticsearchServiceImpl.createMapping("trafficdata", "trafficdata");
+        	elasticsearchAdapter.createMapping("trafficdata", Trafficdata.class);
         } catch (Exception e) {
             isOk = false;
             msg = "失败";
@@ -217,6 +217,34 @@ public class Test {
         return "aaa";
 	}
 	
+	private Trafficdata createData(){
+    	Trafficdata data = new Trafficdata();
+      	data.setIpaddr("11.11.11.11");
+  		data.setTxntime(1513040400000L);
+  		data.setDisposal("PS01");
+  		data.setCountrycode("5044");
+  		data.setRegioncode("5044110000");
+  		data.setCitycode("5044110000");
+  		data.setIspcode("");
+  		data.setCreatetime(1513040400000L);
+  		data.setFinishtime(1513040400000L);
+  		data.setTxnstatus(1);
+  		data.setBatchno("123123");
+  		data.setHitrulenum(1);
+  		data.setIscorrect("1");
+  		data.setConfirmrisk("1");
+  		data.setIseval("1");
+  		data.setModelid("102");
+  		data.setNum1(1.012F);
+  		data.setText1("北京三里屯");
+  		data.setText2("北京西城区");
+  		data.setNum2(11F);
+  		data.setText3("啊啊啊啊啊啊啊大大大大大大撒大苏打似的");
+  		data.setTxncode(UUID.randomUUID().toString());
+  		return data;
+    }
+	
+	
 	@ApiOperation(value = "批量新增", notes = "说明:批量新增")
 //  @ApiImplicitParams({
 //          @ApiImplicitParam(name = "name", value = "优化索引名", paramType = "query", dataType = "String")
@@ -271,44 +299,17 @@ public class Test {
 	 
 	  @ApiOperation(value = "压测批量新增方法", notes = "说明:压测批量新增")
 	  @ApiImplicitParams({
-	    @ApiImplicitParam(name = "txncode", value = "交易流水", paramType = "query",required = true,  dataType = "String"),
-	    @ApiImplicitParam(name = "startId", value = "起始循环的数字", paramType = "query",required = true,  dataType = "Integer"),
-	    @ApiImplicitParam(name = "endId", value = "结束循环的数字", paramType = "query",required = true,  dataType = "Integer")
+	    @ApiImplicitParam(name = "txncode", value = "交易流水", paramType = "query",dataType = "String"),
+	    @ApiImplicitParam(name = "startId", value = "起始循环的数字", paramType = "query",  dataType = "Integer"),
+	    @ApiImplicitParam(name = "endId", value = "结束循环的数字", paramType = "query",  dataType = "Integer")
 	  })	
 	  @RequestMapping(value = "testbulkAddTrafficdata", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	  @ResponseBody
-	  public String testbulkAddTrafficdata(@RequestParam("txncode") String txncode
-			  ,@RequestParam("startId") Integer startId,@RequestParam("endId") Integer endId) {
+	  public String testbulkAddTrafficdata() {
 	      boolean isOk = true;
 	      String msg = "成功";
 	      try {
-	      	Trafficdata data = new Trafficdata();
-	      	data.setIpaddr("11.11.11.11");
-      		data.setTxntime(1513040400000L);
-      		data.setDisposal("PS01");
-      		data.setCountrycode("5044");
-      		data.setRegioncode("5044110000");
-      		data.setCitycode("5044110000");
-      		data.setIspcode("");
-      		data.setCreatetime(1513040400000L);
-      		data.setFinishtime(1513040400000L);
-      		data.setTxnstatus(1);
-      		data.setBatchno("123123");
-      		data.setHitrulenum(1);
-      		data.setIscorrect("1");
-      		data.setConfirmrisk("1");
-      		data.setIseval("1");
-      		data.setModelid("102");
-      		data.setNum1(1.012F);
-      		data.setText1("北京三里屯");
-      		data.setText2("北京西城区");
-      		BulkProcessor bulkProcessor = testbulkProcessorTrafficdata();
-	      	for(int i=startId;i<endId;i++){
-	      		data.setTxncode(txncode+i);
- 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON(data);
- 				bulkProcessor.add(new IndexRequest("tms", "trafficdata", jsonObject.getString("txncode")).source(jsonObject));
-	      	}
-	      	bulkProcessor.close();
+	    	  trafficQueue.put(createData());
 	      } catch (Exception e) {
 	    	  e.printStackTrace();
 //	          isOk = false;
@@ -365,7 +366,7 @@ public class Test {
              new BulkProcessor.Listener() {
                @Override
                  public void beforeBulk(long executionId,BulkRequest request) {
-             	  System.out.println("executionId:"+executionId+",numberOfActions:"+request.numberOfActions());
+//             	  System.out.println("executionId:"+executionId+",numberOfActions:"+request.numberOfActions());
                  }
                  @Override
                  public void afterBulk(long executionId, BulkRequest request,  BulkResponse response) {
@@ -384,5 +385,6 @@ public class Test {
              .build();
 		return bulkProcessor;
 	}
+	
 	
 }
