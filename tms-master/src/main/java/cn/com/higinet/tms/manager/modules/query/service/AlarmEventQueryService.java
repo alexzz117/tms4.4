@@ -2,8 +2,11 @@ package cn.com.higinet.tms.manager.modules.query.service;
 
 import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
+import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,11 +25,15 @@ public class AlarmEventQueryService {
     private SimpleDao offlineSimpleDao;
 
     @Autowired
+    @Qualifier("dynamicSimpleDao")
+    private SimpleDao dynamicSimpleDao;
+
+    @Autowired
     @Qualifier("onlineSimpleDao")
     private SimpleDao onlineSimpleDao;
 
     public Page<Map<String, Object>> queryAlarmEventData(RequestModel requestModel) {
-        String sql = "SELECT DISTINCT CONCAT(FROM_UNIXTIME(traffic.txntime / 1000, '%Y-%m-%d' ), ' ', '00:00:00') operate_time, FROM_UNIXTIME(traffic.txntime / 1000, '%Y-%m-%d %H:%i:%s') end_time, traffic.txncode, traffic.userid, u.username, traffic.txntype, (SELECT CONCAT(channel.channelname, '--', tab.tab_desc) FROM tms_dp_channel channel, tms_com_tab tab WHERE traffic.txntype = tab.tab_name AND tab.chann = channel.channelid) TXNNAME, traffic.txntime, CONCAT( IFNULL((SELECT country.countryname FROM TMS_COUNTRY country WHERE traffic.countrycode = country.countrycode), '未知'), '-', IFNULL((SELECT region.regionname FROM TMS_REGION region WHERE traffic.countrycode = region.countrycode AND traffic.regioncode = region.regioncode), '未知'), '-', IFNULL((SELECT city.cityname FROM TMS_CITY city WHERE traffic.countrycode = city.countrycode AND traffic.regioncode = city.regioncode AND traffic.citycode = city.citycode), '未知')) LOCATION, IFNULL(traffic.iscorrect, '2') iscorrect, (select DP_NAME from tms_com_disposal dp where traffic.disposal=dp.DP_CODE)  disposal, traffic.txnstatus, (select o.LOGIN_NAME from CMC_OPERATOR o where traffic.assignid = o.OPERATOR_ID) assign_name, traffic.assigntime, (select o.LOGIN_NAME from CMC_OPERATOR o where traffic.operid = o.OPERATOR_ID) oper_name, traffic.opertime, (select o.LOGIN_NAME from CMC_OPERATOR o where traffic.auditid = o.OPERATOR_ID) audit_name, traffic.audittime, traffic.psstatus, traffic.strategy FROM TMS_RUN_TRAFFICDATA traffic LEFT JOIN TMS_RUN_USER u ON traffic.userid = u.userid WHERE 1 = 1 and traffic.HITRULENUM !=0 ";
+        String sql = "SELECT DISTINCT CONCAT(FROM_UNIXTIME(traffic.txntime / 1000, '%Y-%m-%d' ), ' ', '00:00:00') operate_time, FROM_UNIXTIME(traffic.txntime / 1000, '%Y-%m-%d %H:%i:%s') end_time, traffic.txncode, traffic.userid, u.username, traffic.txntype, (SELECT CONCAT(channel.channelname, '--', tab.tab_desc) FROM tms_dp_channel channel, tms_com_tab tab WHERE traffic.txntype = tab.tab_name AND tab.chann = channel.channelid) TXNNAME, traffic.txntime, CONCAT( IFNULL((SELECT country.countryname FROM TMS_COUNTRY country WHERE traffic.countrycode = country.countrycode), '未知'), '-', IFNULL((SELECT region.regionname FROM TMS_REGION region WHERE traffic.countrycode = region.countrycode AND traffic.regioncode = region.regioncode), '未知'), '-', IFNULL((SELECT city.cityname FROM TMS_CITY city WHERE traffic.countrycode = city.countrycode AND traffic.regioncode = city.regioncode AND traffic.citycode = city.citycode), '未知')) LOCATION, IFNULL(traffic.iscorrect, '2') iscorrect, (select DP_NAME from tms_com_disposal dp where traffic.disposal=dp.DP_CODE)  disposal, traffic.txnstatus, (select o.LOGIN_NAME from CMC_OPERATOR o where traffic.assignid = o.OPERATOR_ID) assign_name, traffic.assigntime, (select o.LOGIN_NAME from CMC_OPERATOR o where traffic.operid = o.OPERATOR_ID) oper_name, traffic.opertime, (select o.LOGIN_NAME from CMC_OPERATOR o where traffic.auditid = o.OPERATOR_ID) audit_name, traffic.audittime, traffic.psstatus, traffic.strategy, traffic.deviceid FROM TMS_RUN_TRAFFICDATA traffic LEFT JOIN TMS_RUN_USER u ON traffic.userid = u.userid WHERE 1 = 1 and traffic.HITRULENUM !=0 ";
 
         String txncode = requestModel.getString("txncode");
         String userid = requestModel.getString("userid");
@@ -144,12 +151,41 @@ public class AlarmEventQueryService {
     }
 
     public List<Map<String, Object>> queryAlarmEventUserDetail(RequestModel requestModel) {
-        String sql = "select u.* from TMS_RUN_USER u where 1=1";
-
-        sql += " and u.userid = :userid";
+        String sql = "select u.* from TMS_RUN_USER u where u.userid = :userid";
 
         List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
         return list;
     }
+
+    public List<Map<String, Object>> queryAlarmEventDeviceDetail(RequestModel requestModel) {
+
+        String sql = "select * from TMS_DFP_DEVICE where device_id = :deviceid";
+
+        List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
+        return list;
+    }
+
+    public List<Map<String, Object>> queryAlarmEventdeviceFingerDetail(RequestModel requestModel) {
+
+        String sql = "SELECT P.PROP_NAME,p.PROP_TYPE,P.PROP_COMMENT,AP.STORECOLUMN" +
+                " FROM TMS_DFP_APP_PROPERTIES AP,TMS_DFP_PROPERTY P WHERE AP.PROP_ID=P.PROP_ID AND AP.APP_ID = :APP_ID";
+        Map<String, Object> conds = new HashMap<String, Object>();
+        conds.put("device_id", requestModel.get("device_id"));
+        Map<String, Object> deviceMap = offlineSimpleDao.retrieve("TMS_DFP_DEVICE", conds);
+        if (!CmcMapUtil.isEmpty(deviceMap)) {
+//            String appId = CmcMapUtil.getString(deviceMap, "APP_ID");
+            List<Map<String, Object>> appPropList = offlineSimpleDao.queryForList(sql, deviceMap);
+            for (Map<String, Object> appPropMap : appPropList) {
+                String column = CmcMapUtil.getString(appPropMap, "STORECOLUMN");
+                appPropMap.put("DEVICE_ID", CmcMapUtil.getString(deviceMap, "DEVICE_ID"));
+                if (!CmcStringUtil.isBlank(column)) {
+                    appPropMap.put("PROP_VALUE", CmcMapUtil.getString(deviceMap, column));
+                }
+            }
+            return appPropList;
+        }
+        return null;
+    }
+
 
 }
