@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="12">
             <span>交易模型</span>
-            <el-button type="text" icon="el-icon-circle-plus" @click="tmAddFunc" size="medium" title="新建交易模型"></el-button>
+            <el-button type="text" icon="el-icon-circle-plus" @click="tmAddFunc" size="medium" title="新建交易模型" :disabled="readonly"></el-button>
           </el-col>
         </el-row>
       </el-header>
@@ -150,12 +150,14 @@
     </el-dialog>
     <el-container style="border: 1px solid #eee;">
       <el-header height="30px" class="table-header">
-        <div>交易模型引用</div>
+        <el-row>
+          <el-col :span="12">
+            <span>交易模型引用</span>
+            <el-button type="text" class="el-icon-circle-plus" @click="tableAddFunc" :disabled="readonly"></el-button>
+          </el-col>
+        </el-row>
       </el-header>
       <el-main style="padding: 0px;">
-        <div style="padding-left: 10px;text-align: left;border-bottom: 1px solid #eee;">
-          <el-button type="text" class="el-icon-plus" @click="tableAddFunc">新建引用表</el-button>
-        </div>
         <el-table :data="tableData" ref="refTable"
                   :span-method="tableGroupHandle"
                   :row-class-name="groupClassName"
@@ -164,10 +166,10 @@
                   style="width: 100%">
           <el-table-column align="left" width="125px" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)"></el-button>
-              <el-button type="text" icon="el-icon-delete" title="删除" @click="tableDelFunc(scope.row)"></el-button>
+              <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)" :disabled="readonly"></el-button>
+              <el-button type="text" icon="el-icon-delete" title="删除" @click="tableDelFunc(scope.row)" :disabled="readonly"></el-button>
               <el-button type="text" icon="el-icon-search" title="查看" @click="tableInfoFunc(scope.row)"></el-button>
-              <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click="tableSetFunc(scope.row)"></el-button>
+              <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click="tableSetFunc(scope.row)" :disabled="readonly"></el-button>
             </template>
           </el-table-column>
           <el-table-column align="left" label="属性名称" prop="ref_desc">
@@ -472,7 +474,7 @@
         }
       }
     },
-    props: ['txnId', 'isVisibility', 'txnName'], // 父组件传递的参数【交易定义编号，功能显示标识,功能名称】
+    props: ['txnId', 'isVisibility', 'txnName', 'readonly'], // 父组件传递的参数【交易定义编号，功能显示标识,功能名称】
     data () {
       // 关联代码集合法校验
       let codeCheck = (rule, value, callback) => {
@@ -975,6 +977,9 @@
         return true
       },
       getToolBtnVisible (index, row) { // 只读控制方法
+        if (this.readonly) {
+          return true
+        }
         if (row.tab_name === this.txnId && (row.is_sys + '') !== '1') {
           return false
         }

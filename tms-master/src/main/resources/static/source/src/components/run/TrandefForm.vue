@@ -116,7 +116,7 @@
         }
       },
       saveVisible () {
-        return this.editVisible
+        return this.readonly || this.editVisible
       },
       addFlag () {
         return this.tranDefForm.op === 'add'
@@ -132,7 +132,7 @@
         return this.tranDefForm.op === 'add'
       },
       formReadonly () { // 表单只读控制
-        return this.tranDefForm.tab_name === 'T' || (this.tranDefForm.tab_name === '' && this.tranDefForm.op === '')
+        return this.readonly || this.tranDefForm.tab_name === 'T' || (this.tranDefForm.tab_name === '' && this.tranDefForm.op === '')
       }
     },
     data () {
@@ -199,7 +199,7 @@
         }
       }
     },
-    props: ['editVisible'],
+    props: ['editVisible', 'readonly'],
     watch: {
       tranDefForm: {
         handler (curVal) {

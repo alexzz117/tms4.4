@@ -7,7 +7,7 @@
     </el-header>
     <el-container style="height: 100%; border-top: 1px solid #eee" class="wrapper">
       <el-aside width="200px" style="min-height: 400px;border:0;border-right: 1px solid #eee;background-color: white">
-        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
+        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;" v-show="readonly">
           <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
           </el-button>
           <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
@@ -27,10 +27,10 @@
         <!--&lt;!&ndash;用router-view渲染视图&ndash;&gt;-->
         <!--<router-view/>-->
         <el-tabs v-model="activeName" @tab-click="handleClick" ref="tab">
-          <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;"><trandef :txnId='txnId' :isVisibility="tabVisibility.trandefVisibility" ref="trandef"></trandef></el-tab-pane>
-          <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl :txnId='txnId' :isVisibility="tabVisibility.tranmdlVisibility" :txnName="txnName"></tranmdl></el-tab-pane>
-          <el-tab-pane label="交易统计" name="stat"><stat :txnId='txnId' :isVisibility="tabVisibility.statVisibility" :readonly="false"></stat></el-tab-pane>
-          <el-tab-pane label="交易规则" name="rule"><rule :txnId='txnId' :isVisibility="tabVisibility.ruleVisibility" :readonly="false"></rule></el-tab-pane>
+          <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;"><trandef :txnId='txnId' :isVisibility="tabVisibility.trandefVisibility" ref="trandef" :readonly="readonly"></trandef></el-tab-pane>
+          <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl :txnId='txnId' :isVisibility="tabVisibility.tranmdlVisibility" :txnName="txnName" :readonly="readonly"></tranmdl></el-tab-pane>
+          <el-tab-pane label="交易统计" name="stat"><stat :txnId='txnId' :isVisibility="tabVisibility.statVisibility" :readonly="readonly"></stat></el-tab-pane>
+          <el-tab-pane label="交易规则" name="rule"><rule :txnId='txnId' :isVisibility="tabVisibility.ruleVisibility" :readonly="readonly"></rule></el-tab-pane>
         </el-tabs>
       </el-main>
     </el-container>
@@ -74,6 +74,7 @@
         activeName: 'trandef'
       }
     },
+    props: ['readonly'],
     methods: {
       // 功能树渲染方法
       renderContent (h, { node, data, store }) {

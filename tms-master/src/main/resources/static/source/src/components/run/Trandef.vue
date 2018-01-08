@@ -1,10 +1,10 @@
 <template>
   <div>
-    <trandefForm ref="infoForm" :editVisible="editVisible"
+    <trandefForm ref="infoForm" :editVisible="editVisible" :readonly="readonly"
                  v-on:listenToReloadPage="reloadPage"></trandefForm>
     <!-- Form -->
     <el-dialog title="新建交易" :visible.sync="addFormVisible" @open="resetForm" @close="resetValidate">
-      <trandefForm ref="addForm" :editVisible="false"
+      <trandefForm ref="addForm" :editVisible="false" :readonly="readonly"
                    v-on:listenToCloseDialog="syncDialogVisible"
                    v-on:listenToReloadPage="reloadPage"></trandefForm>
     </el-dialog>
@@ -35,7 +35,7 @@
         }
       }
     },
-    props: ['txnId', 'isVisibility'],
+    props: ['txnId', 'isVisibility', 'readonly'],
     mounted: function () {
       this.$nextTick(function () {
         vm = this
