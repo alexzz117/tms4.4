@@ -6,6 +6,7 @@
         :data="tableData"
         style="width: 100%">
         <el-table-column prop="device_id" label="设备标识" align="left">
+
         </el-table-column>
 
         <el-table-column prop="prop_name" label="属性名称" align="left">
