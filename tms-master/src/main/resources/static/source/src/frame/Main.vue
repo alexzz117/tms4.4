@@ -1,9 +1,9 @@
 <template>
   <el-container style="height: 100%; border: 1px solid #eee" class="wrapper">
     <el-container>
-      <el-aside width="220px" style="overflow: hidden">
+      <el-aside width="220px" style="overflow:hidden;height: 100%; padding-top:60px; box-sizing: border-box;">
         <div class="title">TMS</div>
-        <div class="scroll" style="overflow: auto; height: 550px;">
+        <div class="scroll" style="overflow: auto; height: 100%; margin: 60px 0px 10px 0px">
           <el-menu :default-openeds="['1', '3', '4']" >
             <el-submenu index="1">
               <template slot="title"><i class="el-icon-message"></i>运行管理</template>
@@ -140,6 +140,10 @@
     height: 60px;
     line-height: 60px;
     margin: 20px auto;
+    width: 220px;
+    position:absolute;
+    top:0;
+    left:0;
   }
 
   /*工具栏及表单样式设置*/
