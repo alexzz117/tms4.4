@@ -55,9 +55,9 @@
               <router-link :to="{ name:'alarmEventQuery'}" tag="li" replace>
                 <el-menu-item index="5-2">报警事件查询</el-menu-item>
               </router-link>
-              <router-link :to="{ name:'dashboard'}" tag="li" replace>
-                <el-menu-item index="5-3">交易监控</el-menu-item>
-              </router-link>
+              <!--<router-link :to="{ name:'dashboard'}" tag="li" replace>-->
+                <!--<el-menu-item index="5-3">交易监控</el-menu-item>-->
+              <!--</router-link>-->
             </el-submenu>
             <el-submenu index="6">
               <template slot="title"><i class="el-icon-setting"></i>风险处置</template>

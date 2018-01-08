@@ -35,7 +35,7 @@ import Log from '@/components/system/Log'
 
 import TxnEventQuery from '@/components/synquery/TxnEventQuery'
 import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
-import Dashboard from '@/components/Dashboard'
+// import Dashboard from '@/components/Dashboard'
 
 import Time from '@/components/mgr/Time'
 
@@ -176,12 +176,13 @@ export default new Router({
           path: 'time_vue',
           name: 'time',
           component: Time
-        },
-        {
-          path: 'dashboard_vue',
-          name: 'dashboard',
-          component: Dashboard
-        },
+        }
+        // ,
+        // {
+        //   path: 'dashboard_vue',
+        //   name: 'dashboard',
+        //   component: Dashboard
+        // }
       ]
     },
     {
