@@ -144,7 +144,11 @@
     <el-table
       :data="tnxEventTableData"
       style="width: 100%">
-      <el-table-column prop="txncode" label="流水号" align="left"></el-table-column>
+      <el-table-column prop="txncode" label="流水号" align="left" class-name="link-item">
+        <template slot-scope="scope">
+          <a @click="queryTxnStat(scope.row.txncode)">{{ scope.row.txncode }}</a>
+        </template>
+      </el-table-column>
       <el-table-column prop="userid" label="客户号" align="left"></el-table-column>
       <el-table-column prop="sessionid" label="会话标识" align="left"></el-table-column>
       <el-table-column prop="txnname" label="监控操作" align="left"></el-table-column>
@@ -171,6 +175,15 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
+    <el-dialog
+      title="操作实体信息"
+      :visible.sync="txnInfoDialogVisible"
+      width="50%">
+      <TxnStatQuery ref="txnStatQuery" :txnCode=txnCode></TxnStatQuery>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="txnInfoDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -179,6 +192,7 @@
   import util from '@/common/util'
   import dictCode from '@/common/dictCode'
   import check from '@/common/check'
+  import TxnStatQuery from '@/components/synquery/TxnStatQuery'
   /**
    * 认证状态下拉列表数据
    */
@@ -223,6 +237,7 @@
         callback()
       }
       return {
+        txnInfoDialogVisible: false,
         tnxEventTableData: [],    // 操作事件表数据
         queryFormShow: false,  // 查询条件表单显示控制
         queryShowForm: {      // 查询条件表单
@@ -259,6 +274,7 @@
         pageSize: 10,         // 分页显示条目
         total: 0,             // 表格记录总条数
         selectedRow: {},      // 表选中的行
+        txnCode: '',
         queryRules: {         // 查询条件表单校验
           txncode: [
             {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
@@ -441,7 +457,14 @@
       },
       renderTxnStatus (row, column, cellValue) {
         return dictCode.rendCode('tms.common.txnstatus', cellValue)
+      },
+      queryTxnStat (txncode) {
+        this.txnCode = txncode
+        this.txnInfoDialogVisible = true
       }
+    },
+    components: {
+      TxnStatQuery
     }
   }
 </script>
@@ -449,5 +472,9 @@
 <style>
   .alarm-event-query-form-item{
     width: 200px;
+  }
+  tbody .link-item:hover {
+    color: #FFA000;
+    cursor: pointer;
   }
 </style>
