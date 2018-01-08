@@ -14,19 +14,19 @@
   import ajax from '@/common/ajax'
 
   export default {
-    props: ['txnCode'],
+    props: ['showItem'],
     created () {
       this.initTable()
     },
     data () {
       return {
-        pTnxCode: this.txnCode,
+        pTnxCode: this.showItem.txncode,
         txnStatTableData: [],
         formLabelWidth: '120px'
       }
     },
     watch: {
-      txnCode: function (val) {
+      'showItem.txncode': function (val) {
         this.pTnxCode = val
         this.initTable(val)
       }

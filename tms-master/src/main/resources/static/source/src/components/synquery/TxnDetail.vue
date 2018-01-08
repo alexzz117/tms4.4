@@ -10,7 +10,7 @@
           <alarm-event-query-strategy-detail ref="strategyDetail" :showItem="selectedRow"></alarm-event-query-strategy-detail>
         </el-tab-pane>
         <el-tab-pane label="统计信息" name="count">
-
+          <TxnStatQuery ref="txnStatQuery" :showItem="selectedRow"></TxnStatQuery>
         </el-tab-pane>
         <el-tab-pane label="交易用户信息" name="user">
           <alarm-event-query-user-detail ref="userDetail" :showItem="selectedRow"></alarm-event-query-user-detail>

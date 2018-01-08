@@ -146,7 +146,7 @@
       style="width: 100%">
       <el-table-column prop="txncode" label="流水号" align="left" class-name="link-item">
         <template slot-scope="scope">
-          <a @click="queryTxnStat(scope.row.txncode)">{{ scope.row.txncode }}</a>
+          <a @click="queryTxnStat(scope.row)">{{ scope.row.txncode }}</a>
         </template>
       </el-table-column>
       <el-table-column prop="userid" label="客户号" align="left"></el-table-column>
@@ -179,7 +179,7 @@
       title="操作实体信息"
       :visible.sync="txnInfoDialogVisible"
       width="50%">
-      <TxnStatQuery ref="txnStatQuery" :txnCode=txnCode></TxnStatQuery>
+      <TxnStatQuery ref="txnStatQuery" :showItem="selectedRow"></TxnStatQuery>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="txnInfoDialogVisible = false">确 定</el-button>
       </span>
@@ -274,7 +274,6 @@
         pageSize: 10,         // 分页显示条目
         total: 0,             // 表格记录总条数
         selectedRow: {},      // 表选中的行
-        txnCode: '',
         queryRules: {         // 查询条件表单校验
           txncode: [
             {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
@@ -304,6 +303,7 @@
     created () {
       let self = this
       let txntime = self.initDateRange()
+      txntime = [ new Date('2018/1/5'), new Date('2018/1/6')]
       self.queryShowForm.txntime = txntime
       self.getTxnEventTableData({
         operate_time: txntime[0].getTime(),
@@ -458,8 +458,8 @@
       renderTxnStatus (row, column, cellValue) {
         return dictCode.rendCode('tms.common.txnstatus', cellValue)
       },
-      queryTxnStat (txncode) {
-        this.txnCode = txncode
+      queryTxnStat (row) {
+        this.selectedRow = row
         this.txnInfoDialogVisible = true
       }
     },
