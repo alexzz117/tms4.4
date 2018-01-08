@@ -22,7 +22,9 @@
           <el-input v-model="queryShowForm.sessionid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
         <el-form-item label="监控操作:" prop="txntype">
-          <el-input v-model="queryShowForm.txntype" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <div @click="openTxnTypedialog" >
+            <el-input v-model="queryShowForm.txntype" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
+          </div>
         </el-form-item>
         <el-form-item label="处置方式:" prop="disposal">
           <el-select v-model="queryShowForm.disposal" class="alarm-event-query-form-item" placeholder="请选择"
@@ -175,6 +177,22 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
+    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px">
+      <el-tree :data="treeData" node-key="id" ref="tree"
+               show-checkbox
+               :props="defaultTreeProps"
+               :highlight-current=true
+               :default-expanded-keys="expendKey"
+               :expand-on-click-node="false"
+               :render-content="renderContent"
+               @check-change="handleCheckChange"
+               style="overflow-y: auto;">
+      </el-tree>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
+      </div>
+    </el-dialog>
     <txn-detail ref="txnDetail" :txn="selectedRow"></txn-detail>
   </div>
 </template>
@@ -229,6 +247,13 @@
         callback()
       }
       return {
+        txntypeDialogVisible: false,
+        defaultTreeProps: {
+          children: 'children',
+          label: 'tab_desc'
+        },
+        expendKey: ['T'], // 默认展开的功能节点id
+        treeData: [],
         tnxEventTableData: [],    // 操作事件表数据
         queryFormShow: false,  // 查询条件表单显示控制
         queryShowForm: {      // 查询条件表单
@@ -308,11 +333,19 @@
         let self = this
         self.txnStatusList = dictCode.getCodeItems('tms.common.txnstatus')
         self.confirmRiskList = dictCode.getCodeItems('tms.confirmrisk.status')
+        this.selTree()
         ajax.post({
           url: '/monitor/alarm/get_all_country',
           param: {},
           success: function (data) {
             self.countryCodeList = data.row
+          }
+        })
+        ajax.post({
+          url: '/rule/disposal',
+          param: {},
+          success: function (data) {
+            self.disposalList = data.row
           }
         })
       })
@@ -452,6 +485,81 @@
       queryTxnStat (row) {
         this.selectedRow = row
         this.$refs['txnDetail'].open()
+      },
+      openTxnTypedialog () {
+        this.txntypeDialogVisible = true
+      },
+      handleCheckChange (data, checked, indeterminate) {
+        let checkedArr = this.$refs.tree.getCheckedNodes()
+        let checkedStrArr = []
+        let checkedStrKeyArr = []
+        for (let item of checkedArr) {
+          checkedStrArr.push(item.tab_desc)
+          checkedStrKeyArr.push(item.tab_name)
+        }
+        this.queryShowForm.txntype = checkedStrKeyArr.join(',')
+      },
+      // 功能树渲染方法
+      renderContent (h, { node, data, store }) {
+        if (node.data.enable === 0) { // 功能节点状态禁用
+          return (<span class="el-tree-node__label disabledFlag">{node.label}</span>)
+        } else { // 功能节点状态正常
+          return (<span class="el-tree-node__label">{node.label}</span>)
+        }
+      },
+      // 查询树结构
+      selTree () {
+        var self = this
+        var option = {
+          url: '/trandef/query',
+          success: function (data) {
+            if (data.list) {
+              self.treeList = (data.list)
+              self.treeData = self.formatTreeData(data.list)
+            }
+          }
+        }
+        ajax.post(option)
+      },
+      // 把功能节点列表格式化为树形Json结构
+      formatTreeData (list, rootNodes) {
+        var tree = []
+        // 如果根节点数组不存在，则取fid不存在或为空字符的节点为父节点
+        if (rootNodes === undefined || rootNodes.length === 0) {
+          rootNodes = []
+          for (var i in list) {
+            list[i].text = `${list[i].code_value}(${list[i].code_key})`
+            if (list[i].fid === undefined || list[i].fid === null || list[i].fid === '') {
+              rootNodes.push(list[i])
+            }
+          }
+        }
+        // 根节点不存在判断
+        if (rootNodes.length === 0) {
+          console.error('根节点不存在，请确认树结构是否正确')
+          console.info('树结构的根节点是fid不存在（或为空）的节点，否则需手动添加指定得根节点（参数）')
+        }
+        // 根据根节点遍历组装数据
+        for (var r in rootNodes) {
+          var node = rootNodes[r]
+          node.children = getChildren(list, node.id)
+          tree.push(node)
+        }
+
+        // 递归查询节点的子节点
+        function getChildren (list, id) {
+          var childs = []
+          for (var i in list) {
+            var node = list[i]
+            if (node.fid === id) {
+              node.children = getChildren(list, node.id)
+              // node.icon = 'el-icon-message'
+              childs.push(node)
+            }
+          }
+          return childs
+        }
+        return tree  // 返回树结构Json
       }
     },
     components: {
