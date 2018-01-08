@@ -53,7 +53,7 @@
       <el-col :span="6">操作状态:</el-col>
       <el-col :span="6">{{detailData.txnstatus|renderTxnstatus}}&nbsp</el-col>
       <el-col :span="6">用户标识:</el-col>
-      <el-col :span="6"><a href="javascript:void(0)" @click="showUserDetail">{{detailData.userid}}</a></el-col>
+      <el-col :span="6">{{detailData.userid}}&nbsp</el-col>
     </el-row>
     <el-row>
       <el-col :span="6">操作标识:</el-col>
@@ -121,7 +121,6 @@
   import AlarmEventQueryUserDetail from './AlarmEventQueryUserDetail'
 
   export default {
-    name: 'alarmEventQueryOperateDetail',
     computed: {
       showItemParent () {
         return this.showItem

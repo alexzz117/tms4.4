@@ -1,53 +1,58 @@
 <template>
   <div>
-    <el-row>
-      <el-col :span="6">用户ID:</el-col>
-      <el-col :span="6">{{detailData.userid}}&nbsp</el-col>
-      <el-col :span="6">用户名:</el-col>
-      <el-col :span="6">{{detailData.username}}&nbsp</el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6">客户姓名:</el-col>
-      <el-col :span="6">{{detailData.cusname}}&nbsp</el-col>
-      <el-col :span="6">证件号码:</el-col>
-      <el-col :span="6">{{detailData.certno}}&nbsp</el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6">证件类型:</el-col>
-      <el-col :span="6">{{detailData.certtype|renderCerttype}}&nbsp</el-col>
-      <el-col :span="6">手机号码:</el-col>
-      <el-col :span="6">{{detailData.cellphoneno}}&nbsp</el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6">渠道用户开户行:</el-col>
-      <el-col :span="6">{{detailData.opennode}}&nbsp</el-col>
-      <el-col :span="6">开户时间:</el-col>
-      <el-col :span="6">{{detailData.opentime|renderDateTime}}&nbsp</el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6">用户类型:</el-col>
-      <el-col :span="6">{{detailData.acctype}}&nbsp</el-col>
-      <el-col :span="6">性别:</el-col>
-      <el-col :span="6">{{detailData.sex|renderSex}}&nbsp</el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6">出生日期:</el-col>
-      <el-col :span="6">{{detailData.birthdate |renderDateTime}}&nbsp</el-col>
-      <el-col :span="6">累计分值:</el-col>
-      <el-col :span="6">{{detailData.sumscore}}&nbsp</el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6">条件类型:</el-col>
-      <el-col :span="6">{{detailData.risktype}}&nbsp</el-col>
-      <el-col :span="6">风险分值:</el-col>
-      <el-col :span="6">{{detailData.riskscore}}&nbsp</el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6">连续无风险次数:</el-col>
-      <el-col :span="6">{{detailData.norisknum}}&nbsp</el-col>
-      <el-col :span="6">开户城市:</el-col>
-      <el-col :span="6">{{detailData.opennodecity}}&nbsp</el-col>
-    </el-row>
+    <div v-show="!hasUser">
+      无信息记录
+    </div>
+    <div v-show="hasUser">
+      <el-row>
+        <el-col :span="6">用户ID:</el-col>
+        <el-col :span="6">{{detailData.userid}}&nbsp</el-col>
+        <el-col :span="6">用户名:</el-col>
+        <el-col :span="6">{{detailData.username}}&nbsp</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">客户姓名:</el-col>
+        <el-col :span="6">{{detailData.cusname}}&nbsp</el-col>
+        <el-col :span="6">证件号码:</el-col>
+        <el-col :span="6">{{detailData.certno}}&nbsp</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">证件类型:</el-col>
+        <el-col :span="6">{{detailData.certtype|renderCerttype}}&nbsp</el-col>
+        <el-col :span="6">手机号码:</el-col>
+        <el-col :span="6">{{detailData.cellphoneno}}&nbsp</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">渠道用户开户行:</el-col>
+        <el-col :span="6">{{detailData.opennode}}&nbsp</el-col>
+        <el-col :span="6">开户时间:</el-col>
+        <el-col :span="6">{{detailData.opentime|renderDateTime}}&nbsp</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">用户类型:</el-col>
+        <el-col :span="6">{{detailData.acctype}}&nbsp</el-col>
+        <el-col :span="6">性别:</el-col>
+        <el-col :span="6">{{detailData.sex|renderSex}}&nbsp</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">出生日期:</el-col>
+        <el-col :span="6">{{detailData.birthdate |renderDateTime}}&nbsp</el-col>
+        <el-col :span="6">累计分值:</el-col>
+        <el-col :span="6">{{detailData.sumscore}}&nbsp</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">条件类型:</el-col>
+        <el-col :span="6">{{detailData.risktype}}&nbsp</el-col>
+        <el-col :span="6">风险分值:</el-col>
+        <el-col :span="6">{{detailData.riskscore}}&nbsp</el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">连续无风险次数:</el-col>
+        <el-col :span="6">{{detailData.norisknum}}&nbsp</el-col>
+        <el-col :span="6">开户城市:</el-col>
+        <el-col :span="6">{{detailData.opennodecity}}&nbsp</el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 <script>
@@ -59,7 +64,6 @@
   let alarmEventQueryStrategyDetailVm = null
 
   export default {
-    name: 'alarmEventQueryUserDetail',
     computed: {
       showItemParent () {
         return this.showItem
@@ -67,7 +71,8 @@
     },
     data () {
       return {
-        detailData: {}
+        detailData: {},
+        hasUser: false
       }
     },
     filters: {
@@ -122,7 +127,10 @@
           },
           success: function (data) {
             if (data.row) {
+              self.hasUser = true
               self.detailData = data.row[0]
+            } else {
+              self.hasUser = false
             }
           }
         })

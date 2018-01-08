@@ -2,34 +2,25 @@
   <div>
     <!-- 处理信息 -->
     <section class="table">
-    <el-table
-      :data="tableData"
-      style="width: 100%">
+      <el-table
+        :data="tableData"
+        style="width: 100%">
+        <el-table-column prop="device_id" label="设备标识" align="left">
+        </el-table-column>
 
-      <el-table-column prop="ps_time" label="处理时间" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.ps_time | renderDateTime}}</span>
-        </template>
-      </el-table-column>
+        <el-table-column prop="prop_name" label="属性名称" align="left">
+        </el-table-column>
 
-      <el-table-column label="处理类型" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.ps_type | renderPsType}}</span>
-        </template>
-      </el-table-column>
+        <el-table-column prop="prop_type" label="属性类型" align="left">
+        </el-table-column>
 
-      <el-table-column prop="ps_opername" label="处理人员" align="left">
-      </el-table-column>
+        <el-table-column prop="prop_value" label="属性值" align="left">
+        </el-table-column>
 
-      <el-table-column label="处理结果" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.ps_result | renderPsResult}}</span>
-        </template>
-      </el-table-column>
+        <el-table-column prop="prop_comment" label="属性声明" align="left">
+        </el-table-column>
 
-      <el-table-column prop="ps_info" label="处理信息" align="left"></el-table-column>
-
-    </el-table>
+      </el-table>
     </section>
 
   </div>
@@ -98,9 +89,10 @@
         let self = this
         self.transHitRuleList = []
         ajax.post({
-          url: '/query/alarmEvent/handleDetail',
+          url: '/query/alarmEvent/deviceFingerDetail',
+          modal: ajax.model.dualaudit,
           param: {
-            txncode: row.txncode
+            device_id: row.deviceid
           },
           success: function (data) {
             if (data.row) {

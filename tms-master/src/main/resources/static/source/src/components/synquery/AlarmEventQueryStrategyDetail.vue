@@ -32,20 +32,17 @@
   let alarmEventQueryStrategyDetailVm = null
 
   export default {
-    name: 'alarmEventQueryStrategyDetail',
     computed: {
       showItemParent () {
         return this.showItem
-      },
-      disposalListParent () {
-        return this.disposalList
       }
     },
     data () {
       return {
         strategyList: [],
         strategyRuleEvalList: [],
-        transHitRuleList: []
+        transHitRuleList: [],
+        disposalList: []
       }
     },
     filters: {
@@ -74,7 +71,7 @@
         if (value === undefined || value === '') {
           return ''
         }
-        for (let item of alarmEventQueryStrategyDetailVm.disposalListParent) {
+        for (let item of alarmEventQueryStrategyDetailVm.disposalList) {
           if (item.dp_code === value) {
             return item.dp_name
           }
@@ -82,7 +79,7 @@
         return ''
       }
     },
-    props: ['showItem', 'disposalList'],
+    props: ['showItem'],
     mounted: function () {
       this.$nextTick(function () {
         alarmEventQueryStrategyDetailVm = this
@@ -93,23 +90,30 @@
         let self = this
         self.transHitRuleList = []
         ajax.post({
-          url: '/alarmevent/alarmStrategy',
-          param: {
-            txncode: row.txncode,
-            txntype: row.txntype,
-            stid: row.strategy
-          },
+          url: '/rule/disposal',
+          param: {},
           success: function (data) {
-            if (data.row) {
-              self.strategyList = data.row
-            }
-            if (data.list) {
-              self.strategyRuleEvalList = data.list
-            }
-            if (data.rulelist) {
-              self.transHitRuleList = data.rulelist
-            }
-            console.log(self.transHitRuleList)
+            self.disposalList = data.row
+            ajax.post({
+              url: '/alarmevent/alarmStrategy',
+              param: {
+                txncode: row.txncode,
+                txntype: row.txntype,
+                stid: row.strategy
+              },
+              success: function (data) {
+                if (data.row) {
+                  self.strategyList = data.row
+                }
+                if (data.list) {
+                  self.strategyRuleEvalList = data.list
+                }
+                if (data.rulelist) {
+                  self.transHitRuleList = data.rulelist
+                }
+                console.log(self.transHitRuleList)
+              }
+            })
           }
         })
       }
