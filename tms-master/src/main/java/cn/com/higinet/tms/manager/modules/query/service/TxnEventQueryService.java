@@ -2,8 +2,11 @@ package cn.com.higinet.tms.manager.modules.query.service;
 
 import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
+import cn.com.higinet.tms.manager.modules.common.DBConstant;
+import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -132,5 +135,33 @@ public class TxnEventQueryService {
         order.desc("traffic.txntime");
         Page<Map<String, Object>> page = offlineSimpleDao.pageQuery(sql, requestModel, order);
         return page;
+    }
+
+    public List<Map<String, Object>> queryTxnStatData(RequestModel requestModel) {
+        String txnCode = requestModel.getString("txnCode");
+
+        Map<String, Object> conds = new HashMap<String, Object>();
+        conds.put("txncode", txnCode);
+        Map<String, Object> txnMap = onlineSimpleDao.retrieve(DBConstant.TMS_RUN_TRAFFICDATA, conds);
+        if (!CmcMapUtil.isEmpty(txnMap)) {
+            String txnType = CmcMapUtil.getString(txnMap,
+                    DBConstant.TMS_RUN_TRAFFICDATA_TXNTYPE);
+            String sql = "select " + DBConstant.TMS_COM_STAT_STAT_DESC + ", "
+                    + DBConstant.TMS_COM_STAT_STORECOLUMN
+                    + " from TMS_COM_STAT where "
+                    + DBConstant.TMS_COM_STAT_STAT_TXN + " in ("
+                    + TransCommon.arr2str(TransCommon.cutToIds(txnType)) + ")"
+                    + " and (" + DBConstant.TMS_COM_STAT_STORECOLUMN + " is not null"
+                    + " or " + DBConstant.TMS_COM_STAT_STORECOLUMN + " <> '')"
+                    + " order by " + DBConstant.TMS_COM_STAT_STAT_ID;
+            List<Map<String, Object>> statList = onlineSimpleDao.queryForList(sql);
+            for (Map<String, Object> statMap : statList) {
+                String column = CmcMapUtil.getString(statMap, DBConstant.TMS_COM_STAT_STORECOLUMN);
+                Object value = CmcMapUtil.getObject(txnMap, column);
+                statMap.put("STOREVALUE", value);
+            }
+            return statList;
+        }
+        return null;
     }
 }

@@ -29,4 +29,10 @@ public class TxnEventQueryController {
         model.setPage(txnEventQueryService.queryTxnEventData(reqs));
         return model;
     }
+    @RequestMapping(value = "/txnStatQuery", method = RequestMethod.POST)
+    public Model txnStatQueryAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
+        Model model = new Model();
+        model.setList(txnEventQueryService.queryTxnStatData(reqs));
+        return model;
+    }
 }
