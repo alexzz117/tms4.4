@@ -175,15 +175,7 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
-    <el-dialog
-      title="操作实体信息"
-      :visible.sync="txnInfoDialogVisible"
-      width="50%">
-      <TxnStatQuery ref="txnStatQuery" :showItem="selectedRow"></TxnStatQuery>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="txnInfoDialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
+    <txn-detail ref="txnDetail" :txn="selectedRow"></txn-detail>
   </div>
 </template>
 
@@ -192,7 +184,7 @@
   import util from '@/common/util'
   import dictCode from '@/common/dictCode'
   import check from '@/common/check'
-  import TxnStatQuery from '@/components/synquery/TxnStatQuery'
+  import TxnDetail from '@/components/synquery/TxnDetail'
   /**
    * 认证状态下拉列表数据
    */
@@ -237,7 +229,6 @@
         callback()
       }
       return {
-        txnInfoDialogVisible: false,
         tnxEventTableData: [],    // 操作事件表数据
         queryFormShow: false,  // 查询条件表单显示控制
         queryShowForm: {      // 查询条件表单
@@ -460,11 +451,11 @@
       },
       queryTxnStat (row) {
         this.selectedRow = row
-        this.txnInfoDialogVisible = true
+        this.$refs['txnDetail'].open()
       }
     },
     components: {
-      TxnStatQuery
+      'txn-detail': TxnDetail
     }
   }
 </script>
