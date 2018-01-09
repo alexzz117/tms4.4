@@ -1,5 +1,6 @@
 package cn.com.higinet.tms;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -11,11 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Lists;
-
 import cn.com.higinet.tms.adapter.ElasticsearchAdapter;
-
-
 
 @Service
 public class TrafficQueue {
@@ -53,7 +50,7 @@ public class TrafficQueue {
 	}
 
 	private void save() {
-		List<Trafficdata> list = Lists.newArrayList();
+		List<Trafficdata> list = new ArrayList<Trafficdata>();
 		int count = queue.drainTo( list );
 
 		if( count > 0 ) {
