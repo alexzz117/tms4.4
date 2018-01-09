@@ -22,6 +22,16 @@
         </el-table-column>
 
       </el-table>
+
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     :current-page="currentPage"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :page-sizes="[5]"
+                     :page-size="pageSize"
+                     layout="total, prev, next, jumper"
+                     :total="total">
+      </el-pagination>
     </section>
 
   </div>
@@ -39,7 +49,10 @@
     },
     data () {
       return {
-        tableData: []
+        tableData: [],
+        currentPage: 1,
+        pageSize: 5,
+        total: 0
       }
     },
     filters: {
@@ -71,19 +84,36 @@
       })
     },
     methods: {
-
+      bindGridData (data) {
+        this.tableData = data.page.list
+        this.currentPage = data.page.index
+        this.pageSize = data.page.size
+        this.total = data.page.total
+      },
+      handleSizeChange (val) {
+        // console.log(`每页 ${val} 条`)
+        this.currentPage = 1
+        this.pageSize = val
+        this.loadData(this.showItemParent)
+      },
+      handleCurrentChange (val) {
+        this.currentPage = val
+        this.loadData(this.showItemParent)
+      },
       loadData (row) {
         let self = this
-        self.transHitRuleList = []
         ajax.post({
           url: '/query/alarmEvent/deviceFingerDetail',
           modal: ajax.model.dualaudit,
           param: {
-            device_id: row.deviceid
+            device_id: row.deviceid,
+            pageindex: this.currentPage,
+            pagesize: this.pageSize
           },
           success: function (data) {
-            if (data.row) {
-              self.tableData = data.row
+            if (data.page) {
+              self.bindGridData(data)
+              // self.tableData = data.row
             }
           }
         })
