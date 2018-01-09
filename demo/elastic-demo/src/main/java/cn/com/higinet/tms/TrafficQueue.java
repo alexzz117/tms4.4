@@ -40,7 +40,7 @@ public class TrafficQueue {
 	/**
 	 * 每秒进行一次ES写入
 	 * */
-	@Scheduled(cron = "0/1 * * * * ?")
+	@Scheduled(fixedRate = 500)
 	private void executeTask() {
 		this.save();
 	}
@@ -54,16 +54,14 @@ public class TrafficQueue {
 		int count = queue.drainTo( list );
 
 		if( count > 0 ) {
+			long time = System.currentTimeMillis();
 			executor.execute( new Runnable() {
 				@Override
 				public void run() {
 					elasticsearchAdapter.batchUpdate( "trafficdata", list, Trafficdata.class );
-					System.out.println( count + "条数据已提交" );
+					System.out.println( count + "条数据已提交，耗时：" + String.valueOf( System.currentTimeMillis() - time ) );
 				}
 			} );
-		}
-		else {
-			System.out.println( "无条数据提交" );
 		}
 	}
 
