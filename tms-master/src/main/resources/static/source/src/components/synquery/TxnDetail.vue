@@ -63,10 +63,32 @@
         }
       }
     },
-    props: ['txn'],
+    props: ['txn', 'defaultTab'],
     methods: {
       handleTabClick (tab, event) {
-        switch (tab.name) {
+        this.tabClick(tab.name)
+      },
+      open () {
+        let self = this
+        this.infoDialogVisible = true
+        if (this.defaultTab) {
+          this.tabActiveName = this.defaultTab
+        } else {
+          this.tabActiveName = 'operate'
+        }
+        for (let key in this.firstActive) {
+          this.firstActive[key] = true
+        }
+        setTimeout(function () {
+          if (self.defaultTab) {
+            self.tabClick(self.defaultTab)
+          } else {
+            self.$refs.operateDetail.loadData(self.selectedRow)
+          }
+        }, 200)
+      },
+      tabClick (tabName) {
+        switch (tabName) {
           case 'operate': {
             if (this.firstActive.operate) {
               let self = this
@@ -139,19 +161,6 @@
           default: {
           }
         }
-      },
-      open () {
-        let self = this
-        this.infoDialogVisible = true
-        this.tabActiveName = 'operate'
-        for (let key in this.firstActive) {
-          this.firstActive[key] = true
-        }
-        setTimeout(function () {
-          self.$refs.operateDetail.loadData(self.selectedRow)
-          // self.$refs.strategyDetail.loadData(row)
-          // self.$refs.handleDetail.loadData(row)
-        }, 200)
       }
     },
     components: {
