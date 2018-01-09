@@ -298,14 +298,9 @@ public class Test {
 	}
 	 
 	  @ApiOperation(value = "压测批量新增方法", notes = "说明:压测批量新增")
-	  @ApiImplicitParams({
-	    @ApiImplicitParam(name = "txncode", value = "交易流水", paramType = "query",dataType = "String"),
-	    @ApiImplicitParam(name = "startId", value = "起始循环的数字", paramType = "query",  dataType = "Integer"),
-	    @ApiImplicitParam(name = "endId", value = "结束循环的数字", paramType = "query",  dataType = "Integer")
-	  })	
-	  @RequestMapping(value = "testbulkAddTrafficdata", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	  @RequestMapping(value = "testBatchUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	  @ResponseBody
-	  public String testbulkAddTrafficdata() {
+	  public String testBatchUpdate() {
 	      boolean isOk = true;
 	      String msg = "成功";
 	      try {

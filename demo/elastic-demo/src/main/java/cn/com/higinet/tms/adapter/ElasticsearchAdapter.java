@@ -14,6 +14,10 @@ import java.util.concurrent.ExecutionException;
 
 import javax.persistence.Id;
 
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -22,9 +26,13 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -34,6 +42,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -53,16 +62,19 @@ public class ElasticsearchAdapter {
 	private ElasticsearchConfig elasticsearchConfig;
 	
 	//批量大小  默认为1000
-	private int commitNum = 5000;
+	@Value("${elasticsearch.commit.number}")
+	private int commitNum;
 	
 	//批量提交数据量大小，单位为M，默认为5M
-	private int byteSizeValue = 5;
+	@Value("${elasticsearch.commit.bytesize}")
+	private int byteSizeValue;
 	
 	//并发请求允许同时积累新的批量执行请求   0代表着只有一个单一的请求将被允许执行 默认为1
 	private int concurrentRequests = 1;
 	
 	//多少时间刷新为5s
-	private int flushTime = 5;
+	@Value("${elasticsearch.flush.second}")
+	private int flushTime;
 	
 	
 	/**
@@ -125,8 +137,6 @@ public class ElasticsearchAdapter {
 			 }else if(ConditionMarkEnum.OTHER.equals(condition.getQueryType())){
 				 if(ConditionMarkEnum.EQ.equals(condition.getStartMark())){
 					 searchRequestBuilder.setQuery(QueryBuilders.termQuery(condition.getName(),condition.getStartValue()));
-				 }else if(ConditionMarkEnum.LIKE.equals(condition.getStartMark())){
-					 searchRequestBuilder.setQuery(QueryBuilders.fuzzyQuery(condition.getName(), condition.getStartValue()));
 				 }else if(ConditionMarkEnum.LIKE_.equals(condition.getStartMark())){
 					 searchRequestBuilder.setQuery(QueryBuilders.prefixQuery(condition.getName(), String.valueOf(condition.getStartValue())));
 				 }else if(ConditionMarkEnum.GT.equals(condition.getStartMark())){
@@ -351,4 +361,73 @@ public class ElasticsearchAdapter {
 		}
 		return map;
 	}
+	
+	public <T> boolean createMapping(String indexName,Class<T> entityType){
+		if(!exists(elasticsearchConfig.getTransportClient(),indexName)){
+			logger.warn("index is not exist");
+			return false;
+		}
+		PutMappingRequest mapping = Requests.putMappingRequest(indexName).type(indexName).source(getClassMapping(indexName,entityType));
+		PutMappingResponse response = elasticsearchConfig.getTransportClient().admin().indices().putMapping(mapping).actionGet();
+		return response.isAcknowledged();
+	}
+	
+	
+	private boolean exists(TransportClient client,String index){ 
+	 	IndicesAdminClient adminClient = client.admin().indices();    
+        IndicesExistsRequest request = new IndicesExistsRequest(index);  
+        IndicesExistsResponse response = adminClient.exists(request).actionGet();  
+        if (response.isExists()) {  
+            return true;  
+        }  
+        return false;  
+	}
+	
+	private <T> XContentBuilder getClassMapping(String mappingName,Class<T> entityType) {
+	        Field[] fields = entityType.getDeclaredFields();
+	        XContentBuilder builder=null;
+	        try {
+	        	builder=XContentFactory.jsonBuilder()
+						.startObject()
+						.startObject(mappingName)
+						.startObject("properties");
+				for (int i = 0; i < fields.length; i++) {
+					builder.startObject(fields[i].getName()).field("type", 
+							getElasticSearchMappingType(fields[i].getType().getSimpleName())).endObject();
+				}
+				builder.endObject()
+				.endObject()
+				.endObject();
+			} catch (IOException e) {
+				logger.error("create XContentBuilder is error",e);
+			}
+	        return builder;
+	   }
+	 
+	 	/**
+	     * 实体类型与字段类型映射
+	     * @param varType
+	     * @return
+	     */
+	    private String getElasticSearchMappingType(String varType) {
+	        String es = "String";
+	        switch (varType) {
+	        case "String":
+	        	es = "keyword";
+	            break;
+	        case "Integer":
+	        	es = "integer";
+	            break;
+	        case "Float":
+	            es = "float";
+	            break;
+	        case "Long":
+	            es = "long";
+	            break;
+	        default:
+	            es = "keyword";
+	            break;
+	        }
+	        return es;
+	    }  
 }
