@@ -3,26 +3,28 @@
     <el-dialog title="交易流水详细信息" :visible.sync="infoDialogVisible" width="900px">
 
       <el-tabs v-model="tabActiveName" @tab-click="handleTabClick">
-        <el-tab-pane label="交易信息" name="operate">
+        <el-tab-pane label="交易信息" name="operate" v-if="getTabItemShow('operate')">
           <alarm-event-query-operate-detail ref="operateDetail" :showItem="selectedRow"></alarm-event-query-operate-detail>
         </el-tab-pane>
-        <el-tab-pane label="规则命中信息" name="strategy">
+        <el-tab-pane label="规则命中信息" name="strategy" v-if="getTabItemShow('strategy')">
           <alarm-event-query-strategy-detail ref="strategyDetail" :showItem="selectedRow"></alarm-event-query-strategy-detail>
         </el-tab-pane>
-        <el-tab-pane label="统计信息" name="count">
+        <el-tab-pane label="统计信息" name="count" v-if="getTabItemShow('count')">
           <txn-stat-query ref="txnStatQuery" :showItem="selectedRow"></txn-stat-query>
         </el-tab-pane>
-        <el-tab-pane label="交易用户信息" name="user">
+        <el-tab-pane label="交易用户信息" name="user" v-if="getTabItemShow('user')">
           <alarm-event-query-user-detail ref="userDetail" :showItem="selectedRow"></alarm-event-query-user-detail>
         </el-tab-pane>
-        <el-tab-pane label="报警处置信息" name="handle">
+        <el-tab-pane label="报警处置信息" name="handle" v-if="getTabItemShow('handle')">
           <alarm-event-query-handle-detail ref="handleDetail" :showItem="selectedRow"></alarm-event-query-handle-detail>
         </el-tab-pane>
-        <el-tab-pane label="设备信息" name="device">
+        <el-tab-pane label="设备信息" name="device" v-if="getTabItemShow('device')">
           <alarm-event-query-device-detail ref="deviceDetail" :showItem="selectedRow"></alarm-event-query-device-detail>
         </el-tab-pane>
-        <el-tab-pane label="设备指纹信息" name="deviceFinger">
+        <el-tab-pane label="设备指纹信息" name="deviceFinger" v-if="getTabItemShow('deviceFinger')">
           <alarm-event-query-device-finger-detail ref="deviceFingerDetail" :showItem="selectedRow"></alarm-event-query-device-finger-detail>
+        </el-tab-pane>
+        <el-tab-pane label="会话信息" name="session" v-if="getTabItemShow('session')">
         </el-tab-pane>
       </el-tabs>
 
@@ -52,6 +54,7 @@
       return {
         infoDialogVisible: false,
         tabActiveName: 'operate',
+        tabShowItem: ['operate', 'strategy', 'count', 'user', 'handle', 'device', 'deviceFinger', 'session'],
         firstActive: {
           operate: true,
           strategy: true,
@@ -63,7 +66,7 @@
         }
       }
     },
-    props: ['txn', 'defaultTab'],
+    props: ['txn', 'defaultTab', 'showItem'],
     methods: {
       handleTabClick (tab, event) {
         this.tabClick(tab.name)
@@ -71,6 +74,9 @@
       open () {
         let self = this
         this.infoDialogVisible = true
+        if (this.showItem) {
+          this.tabShowItem = this.showItem
+        }
         if (this.defaultTab) {
           this.tabActiveName = this.defaultTab
         } else {
@@ -160,6 +166,14 @@
           }
           default: {
           }
+        }
+      },
+      getTabItemShow (name) {
+        let showItems = this.tabShowItem
+        if (showItems.indexOf(name) > -1) {
+          return true
+        } else {
+          return false
         }
       }
     },

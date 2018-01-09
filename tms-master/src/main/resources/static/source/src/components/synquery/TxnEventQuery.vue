@@ -191,7 +191,7 @@
         <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
       </div>
     </el-dialog>
-    <txn-detail ref="txnDetail" :txn="selectedRow"></txn-detail>
+    <txn-detail ref="txnDetail" :txn="selectedRow" :showItem=showItem></txn-detail>
   </div>
 </template>
 
@@ -288,6 +288,7 @@
         pageSize: 10,         // 分页显示条目
         total: 0,             // 表格记录总条数
         selectedRow: {},      // 表选中的行
+        showItem: ['operate', 'strategy', 'count', 'user', 'handle', 'device', 'deviceFinger', 'session'],
         queryRules: {         // 查询条件表单校验
           txncode: [
             {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
