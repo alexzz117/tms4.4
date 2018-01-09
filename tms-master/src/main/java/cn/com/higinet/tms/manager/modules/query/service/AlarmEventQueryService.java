@@ -6,6 +6,8 @@ import cn.com.higinet.tms.manager.common.util.CmcMapUtil;
 import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
+import cn.com.higinet.tms.manager.modules.common.DBConstant;
+import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,7 +167,7 @@ public class AlarmEventQueryService {
         return list;
     }
 
-    public List<Map<String, Object>> queryAlarmEventdeviceFingerDetail(RequestModel requestModel) {
+    public Page<Map<String, Object>> queryAlarmEventdeviceFingerDetail(RequestModel requestModel) {
 
         String sql = "SELECT P.PROP_NAME,p.PROP_TYPE,P.PROP_COMMENT,AP.STORECOLUMN" +
                 " FROM TMS_DFP_APP_PROPERTIES AP,TMS_DFP_PROPERTY P WHERE AP.PROP_ID=P.PROP_ID AND AP.APP_ID = :APP_ID";
@@ -174,7 +176,9 @@ public class AlarmEventQueryService {
         Map<String, Object> deviceMap = offlineSimpleDao.retrieve("TMS_DFP_DEVICE", conds);
         if (!CmcMapUtil.isEmpty(deviceMap)) {
 //            String appId = CmcMapUtil.getString(deviceMap, "APP_ID");
-            List<Map<String, Object>> appPropList = offlineSimpleDao.queryForList(sql, deviceMap);
+            requestModel.put("APP_ID", deviceMap.get("APP_ID"));
+            Page<Map<String, Object>> appPropPage = offlineSimpleDao.pageQuery(sql, requestModel, new Order());
+            List<Map<String, Object>> appPropList = appPropPage.getList();
             for (Map<String, Object> appPropMap : appPropList) {
                 String column = CmcMapUtil.getString(appPropMap, "STORECOLUMN");
                 appPropMap.put("DEVICE_ID", CmcMapUtil.getString(deviceMap, "DEVICE_ID"));
@@ -182,9 +186,17 @@ public class AlarmEventQueryService {
                     appPropMap.put("PROP_VALUE", CmcMapUtil.getString(deviceMap, column));
                 }
             }
-            return appPropList;
+            return appPropPage;
         }
         return null;
+    }
+
+    public List<Map<String, Object>> getShowFields(String tabName){
+        String parentSql = "select q.tab_name, q.tab_type, q.view_cond, q.base_tab, q.parent_tab from tms_com_tab q where q.tab_name in (" + TransCommon.arr2str(TransCommon.cutToIds(tabName)) + ")";
+        parentSql = "select t." + DBConstant.TMS_COM_TAB.TAB_NAME + " from (" + parentSql + ") t";
+        String sql = "select * from " + DBConstant.TMS_COM_FD + " fd where fd." + DBConstant.TMS_COM_FD_TAB_NAME + " in (" + parentSql + ")" + " and (fd." + DBConstant.TMS_COM_FD_FD_NAME + " is not null or fd." + DBConstant.TMS_COM_FD_FD_NAME + " <> '')" + " order by fd."
+                + DBConstant.TMS_COM_FD_TAB_NAME + ", fd." + DBConstant.TMS_COM_FD_ORDERBY;// 查询表字段及其父表字段信息
+        return onlineSimpleDao.queryForList(sql);
     }
 
 

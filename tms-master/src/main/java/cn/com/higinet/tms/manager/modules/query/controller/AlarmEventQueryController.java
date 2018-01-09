@@ -39,7 +39,8 @@ public class AlarmEventQueryController {
         Model model = new Model();
 
         model.setRow(alarmEventQueryService.queryAlarmEventOperateDetail(reqs));
-
+        String txnType = reqs.getString("txnTypeShowFields");
+        model.set("showFields", alarmEventQueryService.getShowFields(txnType));
         return model;
     }
 
@@ -74,7 +75,7 @@ public class AlarmEventQueryController {
     public Model showQuerydeviceFingerDetailAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
 
-        model.setRow(alarmEventQueryService.queryAlarmEventdeviceFingerDetail(reqs));
+        model.setPage(alarmEventQueryService.queryAlarmEventdeviceFingerDetail(reqs));
 
         return model;
     }
