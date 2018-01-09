@@ -13,7 +13,6 @@ setInterval(function(){
 
 function getCodeData(type) {
   if (util.isEmptyObject(dictCode) || type === 'reload') {
-    console.log('重新加载数据字典')
     ajax.get({
       url: '/common/dict',
       success: function (data) {
