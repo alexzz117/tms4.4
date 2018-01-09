@@ -170,9 +170,13 @@
         this.selectedRow = row
         let self = this
         self.detailData = {}
+        console.log(row)
         ajax.post({
           url: '/query/alarmEvent/operateDetail',
-          param: {txncode: row.txncode},
+          param: {
+            txncode: row.txncode,
+            txnTypeShowFields: row.txntype
+          },
           success: function (data) {
             self.detailData = data.row[0]
           }
