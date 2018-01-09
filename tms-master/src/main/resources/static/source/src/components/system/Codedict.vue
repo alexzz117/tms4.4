@@ -188,6 +188,7 @@
   import ajax from '@/common/ajax'
   import check from '@/common/check'
   import util from '@//common/util'
+  import dictCode from "../../common/dictCode";
 
   export default {
     computed: {
@@ -371,6 +372,7 @@
                 self.getData()
                 self.$message.success('添加成功')
                 self.dictDialogVisible = false
+                dictCode.getCodeData('reload')
               }
             })
           } else {
@@ -390,6 +392,7 @@
                 self.handleSelectionChange(self.showDictInfoRow)
                 self.$message.success('添加成功')
                 self.infoDialogVisible = false
+                dictCode.getCodeData('reload')
               }
             })
           } else {
@@ -412,6 +415,7 @@
             success: function (data) {
               self.$message.success('删除成功')
               self.getData()
+              dictCode.getCodeData('reload')
             }
           })
         })
@@ -431,6 +435,7 @@
             success: function (data) {
               self.$message.success('删除成功')
               self.handleSelectionChange(self.showDictInfoRow)
+              dictCode.getCodeData('reload')
             }
           })
         })
@@ -447,6 +452,7 @@
                 self.getData()
                 self.$message.success('编辑成功')
                 self.dictDialogVisible = false
+                dictCode.getCodeData('reload')
               }
             })
           } else {
@@ -466,6 +472,7 @@
                 self.handleSelectionChange(self.showDictInfoRow)
                 self.$message.success('编辑成功')
                 self.infoDialogVisible = false
+                dictCode.getCodeData('reload')
               }
             })
           } else {

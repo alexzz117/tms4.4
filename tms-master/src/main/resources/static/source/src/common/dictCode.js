@@ -6,25 +6,36 @@ import util from '@/common/util'
 
 var dictCode = {}
 
-function getCodeData(cb) {
-  if (util.isEmptyObject(dictCode)){
+// 每五分钟重新加载数据字典一次
+setInterval(function(){
+  getCodeData('reload')
+}, 300000)
+
+function getCodeData(type) {
+  if (util.isEmptyObject(dictCode) || type === 'reload') {
+    console.log('重新加载数据字典')
     ajax.get({
       url: '/common/dict',
       success: function (data) {
         dictCode = data.codes ? data.codes : {}
-        if (cb) {
-          cb()
+        if (typeof window.localStorage !== 'undefined') {
+          sessionStorage.setItem('_dictCode', JSON.stringify(dictCode))
         }
       }
     })
   }
 }
 
-function rendCode(codeName, codeVal) {
+function rendCode (codeName, codeVal) {
+  if (util.isEmptyObject(dictCode)) {
+    if (typeof window.localStorage !== 'undefined') {
+      dictCode = JSON.parse(sessionStorage.getItem('_dictCode'))
+    }
+  }
   var items = dictCode[codeName] ? dictCode[codeName].items:[]
   codeVal = codeVal + ''
-  for (var i = 0 ; i < items.length; i++){
-    if(items[i].value === codeVal){
+  for (var i = 0 ; i < items.length; i++) {
+    if (items[i].value === codeVal) {
       return items[i].label
     }
   }
@@ -32,27 +43,42 @@ function rendCode(codeName, codeVal) {
 }
 
 function getCodeItems(codeName) {
+  if (util.isEmptyObject(dictCode)) {
+    if (typeof window.localStorage !== 'undefined') {
+      dictCode = JSON.parse(sessionStorage.getItem('_dictCode'))
+    }
+  }
   var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
   return items
 }
 
-function getCodeItemsCb(codeName, cb) {
-  if (util.isEmptyObject(dictCode)){
-    ajax.get({
-      url: '/common/dict',
-      success: function (data) {
-        dictCode = data.codes ? data.codes : {}
-        var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
-        cb(items)
-      }
-    })
-  } else {
-    var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
-    cb(items)
-  }
-}
+// function getCodeItemsCb(codeName, cb) {
+//   if (util.isEmptyObject(dictCode)) {
+//     if (typeof window.localStorage !== 'undefined') {
+//       dictCode = sessionStorage.getItem('_dictCode')
+//     }
+//   }
+//   if (util.isEmptyObject(dictCode)){
+//     ajax.get({
+//       url: '/common/dict',
+//       success: function (data) {
+//         dictCode = data.codes ? data.codes : {}
+//         var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
+//         cb(items)
+//       }
+//     })
+//   } else {
+//     var [...items] = dictCode[codeName] ? dictCode[codeName].items:[]
+//     cb(items)
+//   }
+// }
 
 function getCode(codeName) {
+  if (util.isEmptyObject(dictCode)) {
+    if (typeof window.localStorage !== 'undefined') {
+      dictCode = JSON.parse(sessionStorage.getItem('_dictCode'))
+    }
+  }
   return dictCode[codeName]
 }
 
@@ -84,7 +110,7 @@ export default {
   getCodeData: getCodeData,
   rendCode: rendCode,
   getCodeItems: getCodeItems,
-  getCodeItemsCb: getCodeItemsCb,
+  // getCodeItemsCb: getCodeItemsCb,
   getCode: getCode,
   rendDatetime: rendDatetime
 }
