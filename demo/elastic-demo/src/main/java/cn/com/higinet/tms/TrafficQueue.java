@@ -15,6 +15,8 @@ import com.google.common.collect.Lists;
 
 import cn.com.higinet.tms.adapter.ElasticsearchAdapter;
 
+
+
 @Service
 public class TrafficQueue {
 
