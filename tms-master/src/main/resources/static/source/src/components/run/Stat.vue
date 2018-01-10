@@ -1326,13 +1326,54 @@
             if (data.list && data.list.length > 0) {
               data.row = data.list
               self.treeList = (data.row)
-              self.refsTreeData = util.formatTreeData(data.row)
+              self.refsTreeData = this.formatTreeData(data.row)
               // self.expendNodesByLevel(1)
             }
           }
         }
         ajax.post(option)
-      }
+      },
+      formatTreeData (list, rootNodes) {
+        var tree = []
+        // 如果根节点数组不存在，则取fid不存在或为空字符的节点为父节点
+        if (rootNodes === undefined || rootNodes.length === 0) {
+          rootNodes = []
+          for (var i in list) {
+            if (list[i].fid === undefined || list[i].fid === null || list[i].fid === '' || list[i].fid === '-1') {
+              if (list[i].id !== undefined && list[i].id !== null && list[i].id !== '') {
+                rootNodes.push(list[i])
+              }
+            }
+          }
+        }
+        // 根节点不存在判断
+        if (rootNodes.length === 0) {
+          console.error('根节点不存在，请确认树结构是否正确')
+          console.info('树结构的根节点是fid不存在（或为空）的节点，否则需手动添加指定得根节点（参数）')
+        }
+        // 根据根节点遍历组装数据
+        for (var r in rootNodes) {
+          var node = rootNodes[r]
+          node.children = getChildren(list, node.id)
+          tree.push(node)
+        }
+
+        // 递归查询节点的子节点
+        function getChildren (list, id) {
+          var childs = []
+          for (var i in list) {
+            var node = list[i]
+            if (node.fid === id) {
+              node.children = getChildren(list, node.id)
+              // node.icon = 'el-icon-message'
+              childs.push(node)
+            }
+          }
+          return childs
+        }
+
+        return tree  // 返回树结构Json
+      },
     },
     components: {
       AllPickSelect,
