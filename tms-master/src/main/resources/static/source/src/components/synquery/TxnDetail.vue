@@ -4,7 +4,7 @@
 
       <el-tabs v-model="tabActiveName" @tab-click="handleTabClick">
         <el-tab-pane label="交易信息" name="operate" v-if="getTabItemShow('operate')">
-          <alarm-event-query-operate-detail ref="operateDetail" :showItem="selectedRow"></alarm-event-query-operate-detail>
+          <txn-info-query ref="operateDetail" :showItem="selectedRow"></txn-info-query>
         </el-tab-pane>
         <el-tab-pane label="规则命中信息" name="strategy" v-if="getTabItemShow('strategy')">
           <alarm-event-query-strategy-detail ref="strategyDetail" :showItem="selectedRow"></alarm-event-query-strategy-detail>
@@ -42,6 +42,7 @@
   import AlarmEventQueryDeviceDetail from '@/components/synquery/AlarmEventQueryDeviceDetail'
   import AlarmEventQueryDeviceFingerDetail from '@/components/synquery/AlarmEventQueryDeviceFingerDetail'
   import TxnStatQuery from '@/components/synquery/TxnStatQuery'
+  import TxnInfoQuery from '@/components/synquery/TxnInfoQuery'
 
   export default {
     name: 'txnDetail',
@@ -184,7 +185,8 @@
       'alarm-event-query-user-detail': AlarmEventQueryUserDetail,
       'alarm-event-query-device-detail': AlarmEventQueryDeviceDetail,
       'alarm-event-query-device-finger-detail': AlarmEventQueryDeviceFingerDetail,
-      'txn-stat-query': TxnStatQuery
+      'txn-stat-query': TxnStatQuery,
+      'txn-info-query': TxnInfoQuery
     }
   }
 </script>

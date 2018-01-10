@@ -318,6 +318,7 @@
     created () {
       let self = this
       let txntime = self.initDateRange()
+      txntime = [new Date('2018/1/5'), new Date('2018/1/6')]
       self.queryShowForm.txntime = txntime
       self.getTxnEventTableData({
         operate_time: txntime[0].getTime(),
