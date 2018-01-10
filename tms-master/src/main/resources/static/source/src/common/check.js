@@ -42,6 +42,13 @@ var check = {
     }
     callback()
   },
+  checkFormZhSpecialCharacterHasPunctuation: function (rule, value, callback) {
+    if (!check.checkSpecialCharacterHasPunctuation(value)){
+      // return callback(new Error('请不要输入特殊字符！如($,%)'));
+      return callback(new Error('只能包含汉字,字母,数字,下划线,逗号,句号,问号'));
+    }
+    callback()
+  },
   checkFormIp: function (rule, value, callback) {
     if(value == null || value === '') {
       callback()
@@ -62,6 +69,13 @@ var check = {
     return type == '1'
       ? /^[a-zA-Z][\w]*$/.test(src)
       : /^[\w\u4e00-\u9fa5]*$/.test(src);
+  },
+  /*
+   * 校验特殊字符
+   * 名称:汉字,字母,数字,下划线(位置无区别)
+   */
+  checkSpecialCharacterHasPunctuation: function (src) {
+    return /^[\w\u4e00-\u9fa5,\.，。!！\?？]*$/.test(src);
   },
   /*
    * 校验特殊字符

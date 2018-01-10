@@ -12,7 +12,7 @@
         </el-form-item>
         <el-form-item label="统计引用对象:" prop="stat_param">
 
-          <AllPickSelect :dataList="statParamList" @dataChange="statParamDataChange"></AllPickSelect>
+          <AllPickSelect :dataList="statParamList" @dataChange="statParamDataChange" class="stat-query-form-item"></AllPickSelect>
 
         </el-form-item>
         <el-form-item label="统计目标:" prop="stat_datafd">
@@ -95,26 +95,26 @@
         </el-table-column>
 
         <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
-        <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
-        <el-table-column prop="stat_name" label="统计名称" align="left" width="80"></el-table-column>
-        <el-table-column prop="stat_desc" label="统计描述" align="left" width="250"></el-table-column>
-        <el-table-column label="统计引用对象" align="left">
+        <el-table-column prop="stat_name" label="统计名称" align="left" width="70"></el-table-column>
+        <el-table-column prop="stat_name" label="统计名称" align="left" width="70"></el-table-column>
+        <el-table-column prop="stat_desc" label="统计描述" align="left"></el-table-column>
+        <el-table-column label="统计引用对象" align="left" width="120">
           <template slot-scope="scope">
             <span>{{scope.row.stat_param | statParamFilter}}</span>
           </template>
         </el-table-column>
 
-        <el-table-column prop="stat_datafd" label="统计目标" align="left">
+        <el-table-column prop="stat_datafd" label="统计目标" align="left" width="80">
           <template slot-scope="scope">
             <span>{{scope.row.stat_datafd | statDataFdFilter}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="统计函数" align="left">
+        <el-table-column label="统计函数" align="left" width="80">
           <template slot-scope="scope">
             <span>{{scope.row.stat_fn | statFnFilter}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="storecolumn" label="存储字段" align="left"></el-table-column>
+        <el-table-column prop="storecolumn" label="存储字段" align="left" width="80"></el-table-column>
         <el-table-column label="有效性" align="left" width="60">
           <template slot-scope="scope">
             <el-switch
@@ -129,7 +129,7 @@
       </el-table>
     </section>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px" :close-on-click-modal="false">
       <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true" :rules="dialogFormRules">
         <el-form-item label="统计描述:" :label-width="formLabelWidth" prop="stat_desc" :style="formItemStyle" v-show="formStatDescShow">
           <el-input v-model="dialogForm.stat_desc" auto-complete="off" :maxlength=200 :style="formItemContentStyle" :disabled="viewDisabled || readonlyParent"></el-input>
@@ -276,7 +276,7 @@
     </StatCondPicker>
     <FuncParamPicker ref="FuncParamPickerDialog" @valueCallback="funcParamValueCallBack"></FuncParamPicker>
 
-    <el-dialog :title="refsDialogTitle" :visible.sync="refsDialogVisible" width="500px">
+    <el-dialog :title="refsDialogTitle" :visible.sync="refsDialogVisible" width="500px" :close-on-click-modal="false">
 
       <el-tree :data="refsTreeData" node-key="id" ref="refsTree"
                :props="defaultRefsTreeProps"
@@ -591,7 +591,7 @@
     },
     methods: {
       // 重建一个新的表单对象
-      initDialogForm() {
+      initDialogForm () {
         return {
           stat_desc: '',
           stat_param: '',
@@ -608,7 +608,7 @@
           storecolumn: '',
           continues: 0,
           stat_unresult: 0,
-          stat_valid: 0
+          stat_valid: '1'
         }
       },
       // 选中列 现在没用了
@@ -655,6 +655,12 @@
                 self.statParamList.push(value)
                 self.statDataFdList.push(value)
               }
+              self.statParamList.sort(function compareFunction (param1, param2) {
+                return param1.code_value.localeCompare(param2.code_value, 'zh')
+              })
+              self.statDataFdList.sort(function compareFunction (param1, param2) {
+                return param1.code_value.localeCompare(param2.code_value, 'zh')
+              })
               ajax.post({
                 url: '/stat/code',
                 model: ajax.model.manager,
@@ -756,7 +762,7 @@
         this.dialogType = dialogType
         let self = this
         if (dialogType === 'edit') {
-          this.allPickCollapse = true // 编辑时多选为隐藏多的标签
+          this.allPickCollapse = false // 编辑时多选为隐藏多的标签
           this.dialogTitle = '编辑交易统计'
           if(this.readonlyParent) {
             this.dialogTitle = '查看交易统计'
@@ -1336,17 +1342,11 @@
   }
 </script>
 
-<style>
+<style scoped>
   .stat-query-form-item{
     width: 200px;
   }
   .stat-query-box{
     float: right
-  }
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity .5s
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
-    opacity: 0
   }
 </style>

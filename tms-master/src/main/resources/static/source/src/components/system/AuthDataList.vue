@@ -2,7 +2,7 @@
   <div>
     <div style="margin-bottom: 10px;text-align: left ">
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
-      <!--<el-button plain class="el-icon-tickets" @click="auth" :disabled="notSelectOne">授权</el-button>-->
+      <el-button plain class="el-icon-tickets" @click="auth" :disabled="notSelect">授权</el-button>
       <!--<el-button plain class="el-icon-view" @click="showSub" :disabled="notSelectOne">查看子操作</el-button>-->
       <!--<el-button plain class="el-icon-view" @click="showLog()" :disabled="notSelectOne">查看日志</el-button>-->
     </div>
@@ -11,12 +11,19 @@
       :data="tableData"
       style="width: 100%"
       @selection-change="handleSelectionChange">
+
+      <el-table-column
+        align="left"
+        type="selection"
+        width="55">
+      </el-table-column>
+
       <el-table-column
         fixed="left"
         label="操作"
-        width="200">
+        width="150">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="auth(scope.row)">授权</el-button>
+          <!--<el-button type="text" size="small" @click="auth(scope.row)">授权</el-button>-->
           <el-button type="text" size="small" @click="showSub(scope.row)">查看子操作</el-button>
           <el-button type="text" size="small" @click="showLog(scope.row)">查看日志</el-button>
         </template>
@@ -49,7 +56,7 @@
     </el-pagination>
     </section>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false">
       <el-form :model="dialogForm" :rules="rules" ref="dialogForm" style="text-align: left;">
         <el-form-item label="是否通过授权:" :label-width="formLabelWidth" prop="auth_status">
           <!--<el-radio v-model="dialogForm.auth_status" label="1">是</el-radio>-->
@@ -84,6 +91,9 @@
     computed: {
       notSelectOne () {
         return this.selectedRows.length !== 1
+      },
+      notSelect () {
+        return this.selectedRows.length === 0
       },
       txnnameRowShow () {
         return this.modelName !== '名单管理'
@@ -175,32 +185,34 @@
           if (valid) {
             let self = this
 
-            let authIds
-            let funcName
-            let operatedataValue
+            let authIds = []
+            let funcName = []
+            let operatedataValue = []
+            let txnnameTemp = []
             let txnname = ''
+            var operatenameTemp = []
             let operatename = ''
 
             let selectedRow = this.selectRow
-            authIds = selectedRow.auth_id
-            funcName = selectedRow.funcname
-            operatedataValue = selectedRow.operatedata_value
-            let txnnameTemp = selectedRow.txnname
-            if (txnnameTemp !== undefined && txnnameTemp !== '') {
-              txnname = txnnameTemp
+            for (let loop of this.selectedRows) {
+              authIds.push(loop.auth_id)
+              funcName.push(loop.funcname)
+              operatedataValue.push(loop.operatedata_value)
+              if (loop.txnname !== undefined && loop.txnname !== '') {
+                txnnameTemp.push(loop.txnname)
+              }
+              if (loop.operatename !== undefined && loop.operatename !== '') {
+                operatenameTemp.push(loop.operatename)
+              }
             }
 
-            var operatenameTemp = selectedRow.operatename
-            if (operatenameTemp !== undefined && operatenameTemp !== '') {
-              operatename = operatenameTemp
-            }
 
             let paramsObj = {
-              AUTH_IDS: authIds,
-              FUNCNAME: funcName,
-              TXNNAME: txnname,
-              OPERATENAME: operatename,
-              OPERATEDATA_VALUE: operatedataValue,
+              AUTH_IDS: authIds.join(','),
+              FUNCNAME: funcName.join(','),
+              TXNNAME: txnnameTemp.join(','),
+              OPERATENAME: operatenameTemp.join(','),
+              OPERATEDATA_VALUE: operatedataValue.join('~'),
               AUTH_STATUS: this.dialogForm.auth_status,
               AUTH_MSG: this.dialogForm.auth_msg
             }

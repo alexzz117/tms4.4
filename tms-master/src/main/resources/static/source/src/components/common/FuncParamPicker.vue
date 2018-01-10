@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog ref="StatCondDialog" title="参数配置" :visible.sync="dialogVisible" width="500px">
+    <el-dialog ref="StatCondDialog" title="参数配置" :visible.sync="dialogVisible" width="500px" :close-on-click-modal="false">
       <div v-if="paramsType === 'date'">
         <div class="fn-param-item" v-for="(item, index) in dateDataList">
           <el-time-picker

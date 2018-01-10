@@ -1,6 +1,6 @@
 <template>
   <!--<div>-->
-  <el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible" width="770px" :modal="false">
+  <el-dialog ref="StatCondDialog" title="条件" :visible.sync="statCondInDialogVisible" width="770px" :modal="false" :close-on-click-modal="false">
     <el-form :model="statCondInDictDialogForm"  ref="statCondInDictDialogForm" style="text-align: left"  :inline="true">
       <el-form-item label="交易属性:" :label-width="formLabelWidth" prop="stat_datafd" :style="formItemStyle" v-show="itemShow.stat_datafd">
         <el-select v-model="statCondInDictDialogForm.stat_datafd" placeholder="请选择" :style="formItemContentStyle"
@@ -127,7 +127,7 @@
 
     </el-form>
 
-    <el-dialog title="交易统计" :visible.sync="statFnDialogVisible" width="400px" :modal="false">
+    <el-dialog title="交易统计" :visible.sync="statFnDialogVisible" width="400px" :modal="false" :close-on-click-modal="false">
       <el-tree :data="treeData" node-key="id" ref="tree"
                :props="defaultProps"
                :highlight-current=true

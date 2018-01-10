@@ -111,7 +111,7 @@
           </el-table-column>
         </el-table>
     </section>
-        <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px">
+        <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px" :close-on-click-modal="false">
 
           <el-tabs ref="dialogTab" v-model="dialogTabActive" type="card">
             <el-tab-pane label="数据编辑" name="dataMod">
@@ -233,7 +233,7 @@
             </el-tab-pane>
           </el-tabs>
 
-          <el-dialog :title="actionDialogTitle" :visible.sync="actionDialogVisible" width="450px" :modal="false">
+          <el-dialog :title="actionDialogTitle" :visible.sync="actionDialogVisible" width="450px" :modal="false" :close-on-click-modal="false">
             <el-form :model="actionDialogForm" ref="actionDialogForm" style="text-align: left" :rules="actionRules" :inline="true">
               <el-form-item label="动作名称:" :label-width="formLabelWidth" prop="ac_desc" :style="formItemStyle">
                 <el-input v-model="actionDialogForm.ac_desc" auto-complete="off" :style="formItemContentStyle" :maxlength="128" :disabled="readonlyParent"></el-input>
@@ -289,7 +289,7 @@
 
         </StatCondPicker>
 
-        <el-dialog :title="refsDialogTitle" :visible.sync="refsDialogVisible" width="1000px">
+        <el-dialog :title="refsDialogTitle" :visible.sync="refsDialogVisible" width="1000px" :close-on-click-modal="false">
           <el-table
             :data="refsTableData"
             style="width: 100%">
@@ -377,7 +377,7 @@
           rule_shortdesc: [
             { required: true, message: '请输入规则名称', trigger: 'blur' },
             { max: 128, message: '长度在128个字符以内', trigger: 'blur' },
-            { validator: check.checkFormZhSpecialCharacter, trigger: 'blur' }
+            { validator: check.checkFormZhSpecialCharacterHasPunctuation, trigger: 'blur' }
           ],
           rule_cond: [
             { required: true, message: '请输入规则条件', trigger: 'blur' },
@@ -1092,7 +1092,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .rule-query-form-item{
     width: 200px;
   }

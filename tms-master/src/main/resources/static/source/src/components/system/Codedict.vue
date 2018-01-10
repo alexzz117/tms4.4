@@ -131,7 +131,7 @@
                    <!--:total="total">-->
     <!--</el-pagination>-->
 
-    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false">
       <el-form :model="dictDialogForm" :rules="rules" ref="dictDialogForm" style="text-align: left">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
           <el-input v-model="dictDialogForm.category_id" auto-complete="off" :disabled="categoryIdReadonly" :maxlength="50"></el-input>
@@ -155,7 +155,7 @@
       </el-form>
     </el-dialog>
 
-    <el-dialog :title="infoDialogTitle" :visible.sync="infoDialogVisible" style="text-align: left">
+    <el-dialog :title="infoDialogTitle" :visible.sync="infoDialogVisible" style="text-align: left" :close-on-click-modal="false">
       <el-form :model="dictInfoDialogForm" :rules="infoRules" ref="dictInfoDialogForm">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
           <el-input v-model="dictInfoDialogForm.category_id" auto-complete="off" :disabled="true" :maxlength=50></el-input>
