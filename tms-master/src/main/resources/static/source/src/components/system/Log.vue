@@ -140,20 +140,10 @@
           operate_time: '',
           end_time: ''
         },
-        roleData: [{
-          operate_time: 1513130185000,
-          func_name: '用户登录',
-          operate_data: '用户名称:admin;',
-          split_rows_num: 1,
-          log_mac: '530BB7696F839F0606CC375A201CBF74',
-          operate_result: '1',
-          log_id: '77564A9B988A40359DADCBE08D49D40A',
-          real_name: '系统管理员',
-          login_name: 'admin'
-        }],
-        currentPage: 4,
+        roleData: [],
+        currentPage: 1,
         pagesize: 10,
-        total: 100,
+        total: 0,
         formLabelWidth: '100px',
         multipleSelection: [],
         flag: ''
