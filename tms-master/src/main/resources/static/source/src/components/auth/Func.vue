@@ -137,6 +137,9 @@
       // 日志配置校验
       var checkFunctionLogConf = (rule, value, callback) => {
         var self = this
+        if (util.trim(value) === '') {
+          return callback()
+        }
         if (value.indexOf('GET:') === 0) {
           self.funcForm.logurlMethod = '0'
           self.funcForm.loguri = value.substring(4)
@@ -146,7 +149,6 @@
         } else {
           return callback(new Error('[日志记录配置]只支持GET: 或POST:开头'))
         }
-        return callback()
       }
       return {
         toolBtn: { // 功能树操作按钮
@@ -435,11 +437,13 @@
         this.$refs['funcForm'].resetFields()
         var self = this
         var selectNode = self.$refs.tree.getCurrentNode()
-        console.info(selectNode)
-        self.funcForm.ftype_name = self.nodeTypes[Number(selectNode.func_type) + 1]
+        var funcType = Number(selectNode.func_type) + 1
+        self.funcForm.parent_id = selectNode.id
+        self.funcForm.func_type = funcType
+        self.funcForm.ftype_name = self.nodeTypes[funcType]
           // 功能表单为编辑状态
         self.funcFormReadonly = false
-        self.showNodeAttr(Number(selectNode.func_type) + 1 + '')
+        self.showNodeAttr(funcType + '')
       },
       // 编辑功能事件处理
       editFunc () {
@@ -458,7 +462,7 @@
           ajax.post({
             url: '/func/del',
             param: {
-              funcId: selectNode.id,
+              funcId: selectNode.data.id,
               rf: 'json'
             },
             success: function (data) {
@@ -484,42 +488,28 @@
       },
       submitFunc () {
         var self = this
-        // var selectNode = self.$refs.tree.currentNode.node
-        var url = ''
-        if (self.funcForm.func_id === '') {
-          url = '/func/add'
-        } else {
-          url = '/func/mod'
-        }
-        ajax.post({
-          url: url,
-          param: self.funcForm,
-          success: function (data) {
-            // self.funcFormReadonly = true
-            // var nodeData = {
-            //   fid: self.funcForm.parent_id,
-            //   onum: self.funcForm.onum,
-            //   flag: self.funcForm.flag,
-            //   islog: self.funcForm.islog,
-            //   func_type: self.funcForm.func_type,
-            //   conf: self.funcForm.conf,
-            //   menu: self.funcForm.menu,
-            //   logurlMethod: self.funcForm.logurlMethod,
-            //   loguri: self.funcForm.loguri,
-            //   text: self.funcForm.text,
-            //   id: self.funcForm.func_id,
-            //   isgrant: self.funcForm.isgrant,
-            //   info: self.funcForm.info
-            // }
-            // self.$refs.tree.updateKeyChildren(selectNode.id, nodeData)
-            self.$message.success('操作成功。')
-            self.selTree()
-            self.resetPage()
-          },
-          fail: function (e) {
-            if (e.response.data.message) {
-              self.$message.error(e.response.data.message)
+        this.$refs['funcForm'].validate((valid) => {
+          if (valid) {
+            var url = ''
+            if (self.funcForm.func_id === '') {
+              url = '/func/add'
+            } else {
+              url = '/func/mod'
             }
+            ajax.post({
+              url: url,
+              param: self.funcForm,
+              success: function (data) {
+                self.$message.success('操作成功。')
+                self.selTree()
+                self.resetPage()
+              },
+              fail: function (e) {
+                if (e.response.data.message) {
+                  self.$message.error(e.response.data.message)
+                }
+              }
+            })
           }
         })
       }
