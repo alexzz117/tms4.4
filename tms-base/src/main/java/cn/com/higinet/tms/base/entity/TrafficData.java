@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.base.entity.common;
+package cn.com.higinet.tms.base.entity;
 
 import javax.persistence.Id;
 
