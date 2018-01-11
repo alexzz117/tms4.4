@@ -1,28 +1,28 @@
 <template>
   <el-container style="height: 100%; border: 1px solid #eee">
-    <el-header height="38px" style="background-color: white;">
-      <el-breadcrumb separator-class="el-icon-arrow-right" style="padding: 13px 0px;">
-        <el-breadcrumb-item v-for="item in breadcrumbData" :key = "item.text">{{ item.text }}</el-breadcrumb-item>
-      </el-breadcrumb>
-    </el-header>
+    <el-aside width="200px" style="min-height: 400px;border:0;border-right: 1px solid #eee;background-color: white">
+      <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;" v-show="!readonly">
+        <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
+        </el-button>
+        <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
+        </el-button>
+      </div>
+      <el-tree :data="treeData" node-key="id" ref="tree"
+               :props="defaultProps"
+               :highlight-current=true
+               :default-expanded-keys="expendKey"
+               :expand-on-click-node="false"
+               @node-click="handleNodeClick"
+               :render-content="renderContent"
+               style="overflow-y: auto;">
+      </el-tree>
+    </el-aside>
     <el-container style="height: 100%; border-top: 1px solid #eee" class="wrapper">
-      <el-aside width="200px" style="min-height: 400px;border:0;border-right: 1px solid #eee;background-color: white">
-        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;" v-show="!readonly">
-          <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
-          </el-button>
-          <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
-          </el-button>
-        </div>
-        <el-tree :data="treeData" node-key="id" ref="tree"
-                 :props="defaultProps"
-                 :highlight-current=true
-                 :default-expanded-keys="expendKey"
-                 :expand-on-click-node="false"
-                 @node-click="handleNodeClick"
-                 :render-content="renderContent"
-                 style="overflow-y: auto;">
-        </el-tree>
-      </el-aside>
+      <el-header height="38px" class="header-breadcrumb">
+        <el-breadcrumb separator-class="el-icon-arrow-right" style="padding: 13px 0px;">
+          <el-breadcrumb-item v-for="item in breadcrumbData" :key = "item.text">{{ item.text }}</el-breadcrumb-item>
+        </el-breadcrumb>
+      </el-header>
       <el-main style="padding: 5px; background-color: white">
         <!--&lt;!&ndash;用router-view渲染视图&ndash;&gt;-->
         <!--<router-view/>-->
@@ -219,6 +219,9 @@
 </script>
 
 <style>
+  .header-breadcrumb {
+    margin-bottom: 0px;
+  }
   .disabledFlag {
     color: #dcdfe6;
   }

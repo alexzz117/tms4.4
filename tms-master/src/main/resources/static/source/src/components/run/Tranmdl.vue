@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="12">
             <span>交易模型</span>
-            <el-button type="text" icon="el-icon-circle-plus" @click="tmAddFunc" size="medium" title="新建交易模型" :disabled="readonly"></el-button>
+            <el-button type="text" icon="el-icon-circle-plus" @click="tmAddFunc" title="新建交易模型" :disabled="readonly"></el-button>
           </el-col>
         </el-row>
       </el-header>
@@ -1667,6 +1667,6 @@
   .table-header {
     text-align: left;
     line-height: 2em;
-    background-color: aquamarine;
+    margin-bottom: 0px;
   }
 </style>
