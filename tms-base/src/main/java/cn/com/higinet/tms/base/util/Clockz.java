@@ -1,14 +1,21 @@
 package cn.com.higinet.tms.base.util;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * 计时工具类
  * */
-public class Timez {
+public class Clockz {
 
-	private static Map<String, Long> timezs = new HashMap<String, Long>();
+	private static Map<String, Long> timezs = new LinkedHashMap<String, Long>() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected boolean removeEldestEntry( Map.Entry<String, Long> eldest ) {
+			return size() > 10000;
+		}
+	};
 
 	public static Long start() {
 		Long time = System.currentTimeMillis();
