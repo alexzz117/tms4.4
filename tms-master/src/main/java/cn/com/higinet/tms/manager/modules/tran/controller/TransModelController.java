@@ -364,7 +364,7 @@ public class TransModelController {
 					if(entry.getKey() == "old") {
 						Map<String,Object> tmpMap = new HashMap<>();
 						Map<String,Object> oldMap = (Map<String,Object>)entry.getValue();
-						for (Map.Entry<String, Object> item: loop.entrySet()) {
+						for (Map.Entry<String, Object> item: oldMap.entrySet()) {
 							tmpMap.put(item.getKey().toUpperCase(), item.getValue());
 						}
 						loopMapTemp.put(entry.getKey(), tmpMap);
