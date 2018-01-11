@@ -3,33 +3,31 @@ package cn.com.higinet.tms.base.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 计时工具类
+ * */
 public class Timez {
 
-	private long _time = System.currentTimeMillis();
+	private static Map<String, Long> timezs = new HashMap<String, Long>();
 
-	private static Map<String, Timez> timezs = new HashMap<String, Timez>();
-
-	public static Timez getInstance() {
-		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-		String className = stack[stack.length - 1].getClassName();
-		Timez timez = timezs.get( className );
-		if( timez == null ) {
-			timez = new Timez();
-			timezs.put( className, timez );
-		}
-		return timez;
+	public static Long start() {
+		Long time = System.currentTimeMillis();
+		timezs.put( Stringz.valueOf( Thread.currentThread().getId() ), time );
+		return time;
 	}
 
-	public static long start() {
-		Timez.getInstance()._time = System.currentTimeMillis();
-		return Timez.getInstance()._time;
+	public static Long stop() {
+		String threadId = Stringz.valueOf( Thread.currentThread().getId() );
+		return System.currentTimeMillis() - timezs.remove( threadId );
 	}
 
-	public static long stop() {
-		long now = System.currentTimeMillis();
-		long end = now - Timez.getInstance()._time;
-		Timez.getInstance()._time = now;
-		return end;
+	public static Long start( String key ) {
+		Long time = System.currentTimeMillis();
+		timezs.put( key, time );
+		return time;
 	}
 
+	public static Long stop( String key ) {
+		return System.currentTimeMillis() - timezs.remove( key );
+	}
 }
