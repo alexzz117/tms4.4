@@ -25,7 +25,7 @@ public class TrafficQueue {
 	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
 	private final long saveInterval = 1000; //定时提交时间间隔
 	private int saveDataSize = 5000; //当queue达到一定数量时提交
-	private int queueCapacity = 50000; //队列最大堆积数量，当超过时put操作将堵塞
+	private int queueCapacity = 50000; //队列最大堆积数量，当超过时，put操作将堵塞
 	private Long preSaveTime = System.currentTimeMillis();
 	private BlockingQueue<TrafficData> queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
 
@@ -49,37 +49,47 @@ public class TrafficQueue {
 
 	/**
 	 * 定时进行一次ES写入
+	 * 当并发量较小时，主要是定时提交起作用
 	 * fixedDelay 堵塞执行模式
 	 * */
 	@Scheduled(fixedDelay = saveInterval)
 	private void executeTask() {
 		if( (System.currentTimeMillis() - preSaveTime) > (saveInterval - 100) ) {
-			this.save();
+			this.save( null );
 		}
 	}
 
 	public void put( TrafficData tarffic ) throws Exception {
 		queue.put( tarffic );
+		
 		//当queue数量达到一定数量，将进行数据提交
+		//当并发量较大时，主要是这里的提交起作用
 		if( queue.size() >= saveDataSize ) {
-			synchronized (queue) {
-				this.save();
-			}
+			this.save( saveDataSize );
 		}
 	}
 
-	private void save() {
+	private void save( Integer size ) {
 		executor.execute( new Runnable() {
 			@Override
 			public void run() {
 				Clockz.start();
-				//在线程中再获取queue内的数据，这样当线程池占满时，不会造成数据丢失
+				
 				List<TrafficData> list = new ArrayList<TrafficData>();
-				queue.drainTo( list, saveDataSize );
+				synchronized( queue ) {
+					if( size != null && size > 0 ) {
+						if( queue.size() < size ) return;
+						else queue.drainTo( list, size );
+					}
+					else {
+						queue.drainTo( list ); //获取全部
+					}
+				}
 				if( list.size() > 0 ) {
 					elasticsearchAdapter.batchUpdate( "trafficdata", list, TrafficData.class );
 					preSaveTime = System.currentTimeMillis(); //记录最近一次提交时间
 				}
+				
 				logger.info( list.size() + "条数据已提交，耗时：" + Clockz.stop() );
 			}
 		} );
