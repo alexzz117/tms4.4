@@ -1,0 +1,18 @@
+
+spring:
+  cloud:
+    zookeeper:
+      #zookeeper地址
+      connectString: 5.higinet.net:2181
+      discovery:
+        register: true
+        instancePort: ${server.port}
+      config: 
+        #启用zookeeper作为配置中心
+        enabled: true
+        #配置根路径
+        root: config/tms
+        #配置默认上下文 默认为spring.application.name
+        defaultContext : engine
+        #配置profile分隔符
+        profileSeparator : '-'

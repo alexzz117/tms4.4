@@ -7,9 +7,6 @@
 			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 			http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
-	<!-- 此文件rapid框架使用，无需修改 -->
-	<context:property-placeholder location="classpath:server.properties" />
-
 	<bean id="serviceContext" class="cn.com.higinet.rapid.znet.ServiceContext" />
 
 	<bean class="cn.com.higinet.rapid.server.core.Server">
@@ -104,28 +101,5 @@
 		        <ref bean="cn.com.higinet.tms35.core.cache.refresh.DefaultCacheRefresh"/>  
 		    </list>  
 		</property>  
-	</bean>
-		
-		<!-- 持久化类注入 2017-09-04 王兴添加 -->
-	<bean id="cn.com.higinet.tms35.core.persist.Traffic" class="cn.com.higinet.tms35.core.persist.impl.CacheTrafficImpl" destroy-method="destroy">
-	</bean>
-	<!-- 签约数据注入 2017-09-25添加 -->
-	<!-- 数据仓管理 -->
-	<bean class="cn.com.higinet.tms.common.repository.RepositoryManager" destroy-method="stop">
-		<property name="description" value="数据仓管理"></property>
-		<property name="initializer" ref="TMSDBInitializer"></property>
-	</bean>
-	<!-- 初始化器 -->
-	<bean id="TMSDBInitializer" class="cn.com.higinet.tms35.core.persist.TMSDBInitializer"></bean>
-	<!-- 持久化数据仓注入模板，非单例 -->
-	<bean class="cn.com.higinet.tms.common.repository.PersistedDataRepository" scope="prototype">
-		<property name="cacheManager" ref="cn.com.higinet.tms.common.cache.CacheManager"></property>
-		<property name="persistence" ref="TMSPersistence"></property>
-	</bean>
-	<!--持久化接口实现注入-->
-	<bean id="TMSPersistence" class="cn.com.higinet.tms35.core.persist.TMSPersistence" scope="prototype"></bean>
-		<!-- 缓存数据仓注入模板，非单例 -->
-	<bean class="cn.com.higinet.tms.common.repository.CachedDataRepository" scope="prototype">
-		<property name="cacheManager" ref="cn.com.higinet.tms.common.cache.CacheManager"></property>
 	</bean>
 </beans>
