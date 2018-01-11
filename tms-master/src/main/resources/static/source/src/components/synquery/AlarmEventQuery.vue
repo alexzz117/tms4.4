@@ -212,7 +212,8 @@
                    :page-sizes="[10, 25, 50, 100]"
                    :page-size="pageSize"
                    layout="total, sizes, prev, pager, next, jumper"
-                   :total="total">
+                   :total="total"
+    >
     </el-pagination>
     </section>
 
@@ -435,7 +436,8 @@
       },
       bindGridData (data) {
         this.tableData = data.page.list
-        this.currentPage = data.page.index
+        // 加上这个会出现页码之间来回跳的问题
+        // this.currentPage = data.page.index
         this.pageSize = data.page.size
         this.total = data.page.total
       },

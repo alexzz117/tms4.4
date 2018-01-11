@@ -1326,7 +1326,7 @@
             if (data.list && data.list.length > 0) {
               data.row = data.list
               self.treeList = (data.row)
-              self.refsTreeData = this.formatTreeData(data.row)
+              self.refsTreeData = self.formatTreeData(data.row)
               // self.expendNodesByLevel(1)
             }
           }
