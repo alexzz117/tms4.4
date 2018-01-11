@@ -246,6 +246,7 @@
             param: {operatorId: row.operator_id},
             success: function (data) {
               var info = data.row
+              self.multipleSelection = [info]
               self.userDialogForm = {
                 operator_id: info.operator_id,
                 login_name: info.login_name,
@@ -454,8 +455,8 @@
         var item = this
         if (value.trim() === '' && item.userDialogForm.credentialnum !== '') { // 证件类型为空，证件号不为空的处理
           return callback(new Error('请选择证件类型'))
-        } else if (value.trim() !== '' && item.userDialogForm.credentialnum !== '') { // 证件类型和证件号都为为空时，校验一次证件号码
-          item.$refs.userDialogForm.validateField('credentialnum')
+        } else if (value.trim() !== '' && item.userDialogForm.credentialnum !== '') { // 证件类型和证件号都为空时，校验一次证件号码
+          // item.$refs.userDialogForm.validateField('credentialnum')
           callback()
         } else {
           callback()
