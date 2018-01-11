@@ -20,7 +20,7 @@ public class Base64Util {
 	}
 
 	public static void main(String[] args) {
-		String pwd = "tmst";
+		String pwd = "123456";
 		System.out.println("原文：" + pwd);
 		String en = Base64Util.base64Encode(pwd);
 		System.out.println("加密后：" + en);

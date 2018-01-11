@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.comm.tms_exception;
@@ -19,7 +20,7 @@ import cn.com.higinet.tms35.stat.stat_win_time;
 //对应一条tms_run_stat数据库记录
 public class stat_value
 {
-	private static Logger logger = Logger.getLogger(stat_value.class);
+	private static Logger logger = LoggerFactory.getLogger(stat_value.class);
 	static int g_min_save_span = tmsapp.get_config("tms.stat.min_save_span", 0);;// 分钟,比该值小的窗口*窗口数将不再存储到数据库
 	public String m_param, m_value;
 	Map<Integer, String> m_map = null;

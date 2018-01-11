@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.com.higinet.tms.common.cache.Cache;
 import cn.com.higinet.tms.common.cache.CacheManager;
@@ -65,9 +66,12 @@ public class CacheTrafficImpl implements Traffic {
 
 	private static final String CACHE_ID = "temp";//缓存ID
 
+	@Autowired
+	private CacheManager cacheManager;
+	
 	@Override
 	public void initialize() {
-		trafficProvider = bean.get(CacheManager.class).getProvider(CACHE_ID);
+		trafficProvider = cacheManager.getProvider(CACHE_ID);
 		ds = new data_source((DataSource) bean.get("tmsDataSource"));
 		reader = new dao_trafficdata_read(db_cache.get().table(), db_cache.get().field(), ds);
 		TrafficdCommit.commit_pool().start(); //启动提交队列

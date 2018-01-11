@@ -105,7 +105,7 @@ public class DecryptPropertyPlaceholderConfigurer extends PropertyPlaceholderCon
 				try {
 					is = location.getInputStream();
 					// 将配置文件的内容加载到props中,begin
-					if (location.getFilename().endsWith(XML_FILE_EXTENSION)) {
+					if (location.getFilename().endsWith(".xml")) {
 						// XML文件
 						persister.loadFromXml(props, is);
 					} else {

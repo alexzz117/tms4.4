@@ -12,7 +12,7 @@ import cn.com.higinet.rapid.server.core.Request;
 import cn.com.higinet.rapid.server.core.Response;
 import cn.com.higinet.tms35.core.cache.refresh.RefreshChain;
 
-@Service("cacheRefreshService")
+//@Service("cacheRefreshService")
 public class service_cache_refresh extends AsyncService {
 	Logger log = LoggerFactory.getLogger(service_cache_refresh.class);
 

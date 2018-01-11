@@ -3,7 +3,8 @@ package cn.com.higinet.tms35.stat.serv;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.tms.common.cache.Cache;
 import cn.com.higinet.tms.common.cache.CacheManager;
@@ -18,7 +19,7 @@ public class filter_log {
 
 	private static CacheProvider cacheProvider = cacheManager.getMainProvider();
 
-	public static Logger log = Logger.getLogger(filter_log.class);
+	public static Logger log = LoggerFactory.getLogger(filter_log.class);
 
 	private static int thread_cnt = tmsapp.get_config("tms.stat.eval.workerCount", 2);
 
