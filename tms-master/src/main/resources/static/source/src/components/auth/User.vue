@@ -16,14 +16,18 @@
                 <el-input v-model="userForm.real_name"></el-input>
               </el-form-item>-->
               <el-form-item label="状态">
-                <el-select v-model="userForm.flag" placeholder="状态">
+                <el-select v-model="userForm.flag" clearable placeholder="状态">
                   <el-option label="全部" value=""></el-option>
-                  <el-option label="停用" value="1"></el-option>
-                  <el-option label="正常" value="2"></el-option>
+                  <el-option
+                    v-for="item in flagList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
                 </el-select>
               </el-form-item>
               <!--<el-form-item label="角色">
-                <el-select v-model="userForm.role" placeholder="角色">
+                <el-select v-model="userForm.role" clearable placeholder="角色">
                   <el-option label="全部" value=""></el-option>
                   <el-option
                     v-for="item in roles"
@@ -50,13 +54,13 @@
             <el-button type="text" icon="el-icon-edit" title="编辑" @click="openDialog('edit',scope.$index, scope.row)"></el-button>
             <el-button type="text" icon="el-icon-delete"  title="删除" @click="delUser(scope.$index, scope.row)"></el-button>
             <el-button type="text" icon="el-icon-refresh" title="重置密码" @click="resetPwd(scope.$index, scope.row)"></el-button>
-            <el-button type="text" icon="el-icon-circle-check-outline" title="解锁" @click="resetFlag(scope.$index, scope.row)"></el-button>
+            <el-button type="text" icon="el-icon-circle-check-outline" title="解锁" @click="resetFlag(scope.$index, scope.row)" :disabled="scope.row.flag !== '0'"></el-button>
           </template>
         </el-table-column>
         <el-table-column prop="login_name" label="用户名" align="left"></el-table-column>
         <el-table-column prop="real_name" label="姓名" align="left"></el-table-column>
         <el-table-column prop="role_name" label="角色" align="left"></el-table-column>
-        <el-table-column prop="flag" label="状态" align="left"></el-table-column>
+        <el-table-column prop="flag" label="状态" align="left" :formatter=renderFlag></el-table-column>
         <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left"></el-table-column>
         <el-table-column prop="lockout" label="锁定次数" align="left"></el-table-column>
         <el-table-column prop="lockout_date" label="锁定时间" align="left"></el-table-column>
@@ -82,8 +86,7 @@
           <el-input v-model="userDialogForm.real_name" auto-complete="off" :style="formItemContentStyle"></el-input>
         </el-form-item>
         <el-form-item label="角色" :label-width="formLabelWidth" prop="role" style="text-align: left;" :style="formItemStyle">
-          <el-select v-model="userDialogForm.role" placeholder="角色" :style="formItemContentStyle">
-            <el-option label="全部" value="0"></el-option>
+          <el-select v-model="userDialogForm.role" clearable placeholder="角色" :style="formItemContentStyle">
             <el-option
               v-for="item in roles"
               :key="item.role_id"
@@ -97,20 +100,13 @@
           <el-radio v-model="userDialogForm.flag" label="2">停用</el-radio>
         </el-form-item>
         <el-form-item label="证件类型" :label-width="formLabelWidth" prop="credentialtype" style="text-align: left;" :style="formItemStyle">
-          <el-select v-model="userDialogForm.credentialtype" placeholder="证件类型" :style="formItemContentStyle">
-            <el-option label="" value=""></el-option>
-            <el-option label="身份证" value="0"></el-option>
-            <el-option label="临时居民身份证" value="2"></el-option>
-            <el-option label="军人身份证" value="4"></el-option>
-            <el-option label="武装警察身份证" value="5"></el-option>
-            <el-option label="港澳居民通行证" value="6"></el-option>
-            <el-option label="台湾居民通行证" value="7"></el-option>
-            <el-option label="护照" value="8"></el-option>
-            <el-option label="其他证件" value="9"></el-option>
-            <el-option label="港澳台居民往来内地通行证" value="10"></el-option>
-            <el-option label="外交人员身份证" value="11"></el-option>
-            <el-option label="外国人居留许可证" value="12"></el-option>
-            <el-option label="边民出入境通行证" value="13"></el-option>
+          <el-select v-model="userDialogForm.credentialtype" clearable placeholder="证件类型" :style="formItemContentStyle">
+            <el-option
+              v-for="item in credentialList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="证件号码" :label-width="formLabelWidth" prop="credentialnum" :style="formItemStyle">
@@ -154,21 +150,30 @@
   import check from '@/common/check'
   import ajax from '@/common/ajax'
   import crypt from '@/common/crypt'
+  import dictCode from '@/common/dictCode'
 
   export default {
     created () {
       this.selUser()
       this.selRole()
+      this.credentialList = dictCode.getCodeItems('tms.certificate.type')
+      this.flagList = dictCode.getCodeItems('cmc.cmc_operate.flag')
     },
     methods: {
       handleSizeChange (val) {
-        console.log(`每页 ${val} 条`)
+        this.currentPage = 1
+        this.pageSize = val
+        this.selUser()
       },
       handleCurrentChange (val) {
-        console.log(`当前页: ${val}`)
+        this.currentPage = val
+        this.selUser()
       },
       handleSelectionChange (val) {
         this.multipleSelection = val
+      },
+      renderFlag (row, column, cellValue) {
+        return dictCode.rendCode('cmc.cmc_operate.flag', cellValue)
       },
       resetForm (formName) {
         this.$refs[formName].resetFields()
@@ -182,7 +187,7 @@
               this.updateUser()
             }
           } else {
-            this.$message('请正确填写用户信息')
+            // this.$message('请正确填写用户信息')
             return false
           }
         })
@@ -216,8 +221,8 @@
             real_name: this.userForm.real_name,
             flag: this.userForm.flag,
             role: this.userForm.role,
-            pageindex: 1,
-            pagesize: 10
+            pageindex: self.currentPage,
+            pagesize: self.pagesize
           },
           success: function (data) {
             if (data.page) {
@@ -331,9 +336,7 @@
         }).then(() => {
           ajax.post({
             url: '/operator/del',
-            param: {
-              operatorId: row.operator_id
-            },
+            param: [row.operator_id],
             success: function (data) {
               self.$message.success('删除成功。')
               self.selUser()
@@ -386,7 +389,11 @@
               operatorId: row.operator_id
             },
             success: function (data) {
-              self.$message.success('用户解锁成功。')
+              if (data.result) {
+                self.$message.success('用户解锁成功。')
+              } else {
+                self.$message.success('用户解锁失败。')
+              }
               self.selUser()
             },
             fail: function (e) {
@@ -402,10 +409,10 @@
       // 用户名格式校验 只能是长度为6的字母和数字组成
       var UserNameCheck = (rule, value, callback) => {
         var type = /^[0-9a-zA-Z]*$/
-        if (type.test(value) && value.length === 6) {
+        if (type.test(value)) {
           callback()
         } else {
-          return callback(new Error('用户名只能由6位数字或字母组成'))
+          return callback(new Error('用户名只能由6-50位数字或字母组成'))
         }
       }
       // 用户名重复校验
@@ -499,27 +506,18 @@
         },
         inline: true,
         roles: [],
+        credentialList: [],
+        flagList: [],
         userForm: {
           login_name: '',
           real_name: '',
           flag: '',
           role: ''
         },
-        roleData: [{
-          operator_id: '123123123123123123',
-          login_name: '测试假用户',
-          real_name: '王某某',
-          role_name: 'tms系统管理员',
-          flag: '1',
-          failed_login_attempts: '0',
-          lockout: '0',
-          lockout_date: new Date().toLocaleDateString(),
-          email: '123@qwe.com',
-          mobile: '13366666666'
-        }],
-        currentPage: 4,
+        roleData: [],
+        currentPage: 1,
         pagesize: 10,
-        total: 100,
+        total: 0,
         roleDialogVisible: false,
         userDialogForm: {
           operator_id: '',
@@ -542,7 +540,7 @@
         rules: {
           login_name: [
             {required: true, message: '请输入用户名', trigger: 'blur'},
-            {len: 6, message: '用户名只能由6位数字或字母组成', trigger: 'blur'},
+            {min: 6, max: 50, message: '用户名只能由6-50位数字或字母组成', trigger: 'blur'},
             {validator: UserNameCheck, trigger: 'blur'}, // 用户名格式校验
             {validator: UserNameExist, trigger: 'blur'} // 用户名重复校验
           ],
