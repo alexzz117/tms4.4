@@ -41,7 +41,7 @@ public class TrafficData {
 
 	@Text("score")
 	@JSONField(name = "score")
-	private Float score;
+	private Double score;
 
 	@Text("ssss")
 	@JSONField(name = "txnCode")
@@ -171,46 +171,66 @@ public class TrafficData {
 	private String text38;
 	private String text39;
 	private String text40;
+	private String text41;
+	private String text42;
+	private String text43;
+	private String text44;
+	private String text45;
+	private String text46;
+	private String text47;
+	private String text48;
+	private String text49;
+	private String text50;
 
-	private Float num1;
-	private Float num2;
-	private Float num3;
-	private Float num4;
-	private Float num5;
-	private Float num6;
-	private Float num7;
-	private Float num8;
-	private Float num9;
-	private Float num10;
-	private Float num11;
-	private Float num12;
-	private Float num13;
-	private Float num14;
-	private Float num15;
-	private Float num16;
-	private Float num17;
-	private Float num18;
-	private Float num19;
-	private Float num20;
-	private Float num21;
-	private Float num22;
-	private Float num23;
-	private Float num24;
-	private Float num25;
-	private Float num26;
-	private Float num27;
-	private Float num28;
-	private Float num29;
-	private Float num30;
-	private Float num31;
-	private Float num32;
-	private Float num33;
-	private Float num34;
-	private Float num35;
-	private Float num36;
-	private Float num37;
-	private Float num38;
-	private Float num39;
-	private Float num40;
+	private Double num1;
+	private Double num2;
+	private Double num3;
+	private Double num4;
+	private Double num5;
+	private Double num6;
+	private Double num7;
+	private Double num8;
+	private Double num9;
+	private Double num10;
+	private Double num11;
+	private Double num12;
+	private Double num13;
+	private Double num14;
+	private Double num15;
+	private Double num16;
+	private Double num17;
+	private Double num18;
+	private Double num19;
+	private Double num20;
+	private Double num21;
+	private Double num22;
+	private Double num23;
+	private Double num24;
+	private Double num25;
+	private Double num26;
+	private Double num27;
+	private Double num28;
+	private Double num29;
+	private Double num30;
+	private Double num31;
+	private Double num32;
+	private Double num33;
+	private Double num34;
+	private Double num35;
+	private Double num36;
+	private Double num37;
+	private Double num38;
+	private Double num39;
+	private Double num40;
+	private Double num41;
+	private Double num42;
+	private Double num43;
+	private Double num44;
+	private Double num45;
+	private Double num46;
+	private Double num47;
+	private Double num48;
+	private Double num49;
+	private Double num50;
 
 }
