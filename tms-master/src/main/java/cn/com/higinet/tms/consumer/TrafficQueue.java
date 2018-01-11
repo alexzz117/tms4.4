@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
@@ -17,6 +16,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
+import cn.com.higinet.tms.base.util.Timez;
 import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
 
 @Service
@@ -24,32 +24,19 @@ public class TrafficQueue {
 
 	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
 	private final long saveInterval = 1000; //定时提交时间间隔
-	private final int saveSize = 10000; //当queue达到一定数量时提交
-	private final int queueCapacity = 50000; //队列最大堆积数量，超过put操作将堵塞
+	private int saveDataSize = 5000; //当queue达到一定数量时提交
+	private int queueCapacity = 50000; //队列最大堆积数量，超过put操作将堵塞
 	private Long preSaveTime = System.currentTimeMillis();
 	private BlockingQueue<TrafficData> queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
 
 	@Bean("trafficExecutor")
 	public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize( 4 );
-		executor.setMaxPoolSize( 16 );
-		executor.setQueueCapacity( 8 );
-		executor.setKeepAliveSeconds( 300 );
-		executor.setRejectedExecutionHandler( new RejectedExecutionHandler() {
-			//当线程启动拒绝时，说明当前线程池占满，等待一定时间后重新启动
-			@Override
-			public void rejectedExecution( Runnable r, ThreadPoolExecutor executor ) {
-				try {
-					logger.info( "Traffic ElasticSearch 提交线程堵塞，2秒后重试" );
-					Thread.sleep( 2000 );
-					executor.execute( r );
-				}
-				catch( InterruptedException e ) {
-					logger.error( e.getMessage(), e );
-				}
-			}
-		} );
+		executor.setCorePoolSize( 4 ); //线程池维护线程的最小数量
+		executor.setMaxPoolSize( 16 ); //线程池维护线程的最大数量
+		executor.setQueueCapacity( 8 ); //持有等待执行的任务队列
+		executor.setKeepAliveSeconds( 300 ); //空闲线程的存活时间
+		executor.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() ); //不能执行的任务将被删除
 		return executor;
 	}
 
@@ -67,33 +54,30 @@ public class TrafficQueue {
 	@Scheduled(fixedDelay = saveInterval)
 	private void executeTask() {
 		if( (System.currentTimeMillis() - preSaveTime) > (saveInterval - 100) ) {
-			List<TrafficData> list = new ArrayList<TrafficData>();
-			queue.drainTo( list );
-			this.save( list );
+			this.save();
 		}
 	}
 
 	public void put( TrafficData object ) throws Exception {
 		queue.put( object );
-
 		//当queue数量达到一定数量，将进行数据提交
-		if( queue.size() >= saveSize ) {
-			List<TrafficData> list = new ArrayList<TrafficData>();
+		if( queue.size() >= saveDataSize ) {
 			synchronized (queue) {
-				if( queue.size() >= saveSize ) queue.drainTo( list );
+				this.save();
 			}
-			this.save( list );
+
 		}
 	}
 
-	private void save( List<TrafficData> list ) {
-		if( list == null || list.isEmpty() ) return;
+	private void save() {
 		executor.execute( new Runnable() {
 			@Override
 			public void run() {
-				long time = System.currentTimeMillis();
-				elasticsearchAdapter.batchUpdate( "trafficdata", list, TrafficData.class );
-				System.out.println( list.size() + "条数据已提交，耗时：" + String.valueOf( System.currentTimeMillis() - time ) );
+				Timez.start();
+				List<TrafficData> list = new ArrayList<TrafficData>();
+				queue.drainTo( list, saveDataSize );
+				if( list.size() > 0 ) elasticsearchAdapter.batchUpdate( "trafficdata", list, TrafficData.class );
+				System.out.println( list.size() + "条数据已提交，耗时：" + String.valueOf( System.currentTimeMillis() - Timez.stop() ) );
 			}
 		} );
 		preSaveTime = System.currentTimeMillis(); //记录最近一次提交时间
