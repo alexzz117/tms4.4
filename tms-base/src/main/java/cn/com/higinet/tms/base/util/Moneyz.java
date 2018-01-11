@@ -32,5 +32,4 @@ public class Moneyz {
 			return null;
 		}
 	}
-
 }
