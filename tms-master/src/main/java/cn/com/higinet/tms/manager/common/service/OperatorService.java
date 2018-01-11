@@ -245,4 +245,17 @@ public class OperatorService {
 		String sql = " select OPERATOR_ID,LOGIN_NAME,REAL_NAME from " + DBConstant.CMC_OPERATOR + " where flag!='9' and operator_id !='1'";
 		return cmcSimpleDao.queryForList( sql );
 	}
+	/**
+	 * 解锁用户，用于登录失败后发生的锁定状态
+	 * @return
+	 */
+	public boolean resetLoginFailedAttempts(String operatorId) {
+		boolean flag = true;
+		String sql = "update CMC_OPERATOR set flag = 1 where operator_id = ? and flag = 0";
+		int i = cmcSimpleDao.executeUpdate( sql, operatorId );
+		if( i == 0 ) {
+			flag = false;
+		}
+		return flag;
+	}
 }

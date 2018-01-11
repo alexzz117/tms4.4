@@ -264,4 +264,16 @@ public class OperatorController {
 		return model;
 	}
 
+
+	/**
+	 * 方法描述:解锁用户
+	 * @param operatorId
+	 * @return
+	 */
+	@RequestMapping(value = "/resetLoginFailedAttempts", method = RequestMethod.POST)
+	public Model resetLoginFailedAttempts( @RequestBody RequestModel modelMap ) {
+		Model model = new Model();
+		model.set("result",operatorService.resetLoginFailedAttempts(modelMap.getString( "operatorId" )));
+		return model;
+	}
 }
