@@ -16,7 +16,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
-import cn.com.higinet.tms.base.util.Timez;
+import cn.com.higinet.tms.base.util.Clockz;
 import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
 
 @Service
@@ -25,7 +25,7 @@ public class TrafficQueue {
 	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
 	private final long saveInterval = 1000; //定时提交时间间隔
 	private int saveDataSize = 5000; //当queue达到一定数量时提交
-	private int queueCapacity = 50000; //队列最大堆积数量，超过put操作将堵塞
+	private int queueCapacity = 50000; //队列最大堆积数量，当超过时put操作将堵塞
 	private Long preSaveTime = System.currentTimeMillis();
 	private BlockingQueue<TrafficData> queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
 
@@ -36,7 +36,7 @@ public class TrafficQueue {
 		executor.setMaxPoolSize( 16 ); //线程池维护线程的最大数量
 		executor.setQueueCapacity( 8 ); //持有等待执行的任务队列
 		executor.setKeepAliveSeconds( 300 ); //空闲线程的存活时间
-		executor.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() ); //不能执行的任务将被删除
+		executor.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() ); //DiscardPolicys模式，不能执行的任务将被删除
 		return executor;
 	}
 
@@ -58,14 +58,13 @@ public class TrafficQueue {
 		}
 	}
 
-	public void put( TrafficData object ) throws Exception {
-		queue.put( object );
+	public void put( TrafficData tarffic ) throws Exception {
+		queue.put( tarffic );
 		//当queue数量达到一定数量，将进行数据提交
 		if( queue.size() >= saveDataSize ) {
 			synchronized (queue) {
 				this.save();
 			}
-
 		}
 	}
 
@@ -73,14 +72,17 @@ public class TrafficQueue {
 		executor.execute( new Runnable() {
 			@Override
 			public void run() {
-				Timez.start();
+				Clockz.start();
+				//在线程中再获取queue内的数据，这样当线程池占满时，不会造成数据丢失
 				List<TrafficData> list = new ArrayList<TrafficData>();
 				queue.drainTo( list, saveDataSize );
-				if( list.size() > 0 ) elasticsearchAdapter.batchUpdate( "trafficdata", list, TrafficData.class );
-				System.out.println( list.size() + "条数据已提交，耗时：" + String.valueOf( System.currentTimeMillis() - Timez.stop() ) );
+				if( list.size() > 0 ) {
+					elasticsearchAdapter.batchUpdate( "trafficdata", list, TrafficData.class );
+					preSaveTime = System.currentTimeMillis(); //记录最近一次提交时间
+				}
+				logger.info( list.size() + "条数据已提交，耗时：" + Clockz.stop() );
 			}
 		} );
-		preSaveTime = System.currentTimeMillis(); //记录最近一次提交时间
 	}
 
 }
