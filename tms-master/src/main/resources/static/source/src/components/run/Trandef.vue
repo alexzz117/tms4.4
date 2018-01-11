@@ -60,10 +60,10 @@
     methods: {
       initForm () {
         var self = this
-        self.$refs['infoForm'].$refs['tranDefForm'].clearValidate()
         if (self.txnId === '') {
           return
         }
+        self.$refs['infoForm'].resetForm()
         ajax.post({
           url: '/trandef/edit_prepare',
           param: {

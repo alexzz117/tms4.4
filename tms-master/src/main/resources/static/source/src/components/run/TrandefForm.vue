@@ -138,11 +138,14 @@
     data () {
       var txnIdCheck = (rule, value, callback) => {
         var self = this
-        if (value.trim() === '' && self.tranDefForm.txn_type === '1') {
-          return callback(new Error('当交易类型为交易时,交易识别标识不能为空'))
-        } else {
-          callback()
+        if (self.tranDefForm.txn_type === '1') {
+          if (value.trim() === '') {
+            return callback(new Error('当交易类型为交易时,交易识别标识不能为空'))
+          } else if (!(/^[a-zA-Z][\w]*$/.test(value))) {
+            return callback(new Error('请以字母开头，包括字母、数字和下划线'))
+          }
         }
+        callback()
       }
       var channCheck = (rule, value, callback) => {
         var self = this
@@ -178,7 +181,6 @@
         rules: {
           txnid: [
             {max: 20, message: '交易识别标识不能超过20个字符', trigger: 'blur'},
-            {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'}, // 输入格式校验：包含字母,数字和下划线
             {validator: txnIdCheck, trigger: 'blur'} // 交易识别标识空校验;交易类型为交易的时候不允许为空
           ],
           chann: [
@@ -221,28 +223,35 @@
       reloadPage () {
         this.$emit('listenToReloadPage')
       },
+      resetForm () {
+        this.$refs['tranDefForm'].resetFields()
+      },
       submitForm () { // 提交表单；op：操作方式；
         var self = this
         var params = self.tranDefForm
         var op = params.op
-        ajax.post({
-          url: '/trandef/save',
-          param: params,
-          success: function (data) {
-            if (data.success) {
-              if (op === 'add') {
-                self.$message.success('添加成功')
-                self.closeAddDialog()
-              } else {
-                self.$message.success('修改成功')
+        this.$refs['tranDefForm'].validate((valid) => {
+          if (valid) {
+            ajax.post({
+              url: '/trandef/save',
+              param: params,
+              success: function (data) {
+                if (data.success) {
+                  if (op === 'add') {
+                    self.$message.success('添加成功')
+                    self.closeAddDialog()
+                  } else {
+                    self.$message.success('修改成功')
+                  }
+                  self.reloadPage()
+                }
+              },
+              fail: function (e) {
+                if (e.response.data.message) {
+                  self.$message.error(e.response.data.message)
+                }
               }
-              self.reloadPage()
-            }
-          },
-          fail: function (e) {
-            if (e.response.data.message) {
-              self.$message.error(e.response.data.message)
-            }
+            })
           }
         })
       }

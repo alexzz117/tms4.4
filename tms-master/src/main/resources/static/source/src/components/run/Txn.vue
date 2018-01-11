@@ -7,7 +7,7 @@
     </el-header>
     <el-container style="height: 100%; border-top: 1px solid #eee" class="wrapper">
       <el-aside width="200px" style="min-height: 400px;border:0;border-right: 1px solid #eee;background-color: white">
-        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;" v-show="readonly">
+        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;" v-show="!readonly">
           <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
           </el-button>
           <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除

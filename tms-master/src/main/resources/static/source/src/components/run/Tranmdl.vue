@@ -102,7 +102,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="处理函数" prop="genesisrul" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmFuncVisible}">
-              <el-select v-model="tmForm.genesisrul" placeholder="请选择">
+              <el-select v-model="tmForm.genesisrul" placeholder="请选择" @change="genesisRulChange">
                 <el-option
                   v-for="item in tmFuncList"
                   :key="item.value"
@@ -138,7 +138,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row v-show="!tmFormReadOnly">
           <el-col :span="24">
             <el-form-item>
               <el-button type="primary" @click="submitTmForm" size="large">保存</el-button>
@@ -986,8 +986,20 @@
         return true
       },
       tmTypeChange () {
-        this.tmForm.src_default = ''
-        this.tmForm.fd_name = ''
+        let self = this
+        self.tmForm.src_default = ''
+        self.tmForm.fd_name = ''
+        self.tmForm.code = ''
+        self.tmForm.genesisrul = ''
+      },
+      genesisRulChange () {
+        let fields = this.$refs['tmForm'].fields
+        let list = ['params1', 'params2']
+        for (let i in fields) {
+          if (list.indexOf(fields[i].prop) > -1) {
+            fields[i].resetField()
+          }
+        }
       },
       openTmDialog () { // 当新建交易模型窗口打开时触发
         this.tmTypeList = dictCode.getCodeItems('tms.model.datatype') // 加载类型下拉列表
@@ -1098,7 +1110,7 @@
         this.$refs['tmForm'].validate((valid) => {
           if (valid) {
             let op = self.op
-            let rowData = self.selectTmRows[0]
+            let rowData = Object.assign({}, self.selectTmRows[0])
             let formData = self.tmForm
             let row = {}
             if (op === 'mod') {
@@ -1127,8 +1139,9 @@
                   genesisrul = genesisrul + ',' + row.params2
                 }
               }
+              genesisrul = genesisrul + ')'
             }
-            row.genesisrul = genesisrul + ')'
+            row.genesisrul = genesisrul
             let jsonData = {}
             jsonData[op] = [row]
             ajax.post({
@@ -1148,7 +1161,6 @@
               }
             })
           } else {
-            this.$message('请正确填写交易模型信息')
             return false
           }
         })
@@ -1543,7 +1555,7 @@
             let op = this.tableInfoForm.op
             let jsonData = {}
             let row = self.tableInfoForm
-            let rowData = self.selectTableInfoRows[0]
+            let rowData = Object.assign({}, self.selectTableInfoRows[0])
             row = Object.assign(row, {old: rowData})
             jsonData[op] = [row]
             ajax.post({
