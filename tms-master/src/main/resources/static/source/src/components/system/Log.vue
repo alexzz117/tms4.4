@@ -67,10 +67,13 @@
     },
     methods: {
       handleSizeChange (val) {
-        console.log(`每页 ${val} 条`)
+        this.currentPage = 1
+        this.pageSize = val
+        this.selLog()
       },
       handleCurrentChange (val) {
-        console.log(`当前页: ${val}`)
+        this.currentPage = val
+        this.selLog()
       },
       handleSelectionChange (val) {
         this.multipleSelection = val
@@ -110,8 +113,8 @@
             operate_func: self.logForm.operate_func,
             operate_time: operateTime,
             end_time: endTime,
-            pageindex: 1,
-            pagesize: 10
+            pageindex: self.currentPage,
+            pagesize: self.pagesize
           },
           success: function (data) {
             if (data.page) {
