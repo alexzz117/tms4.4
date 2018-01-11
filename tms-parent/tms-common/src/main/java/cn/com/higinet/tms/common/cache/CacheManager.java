@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.com.higinet.tms.common.exception.FatalException;
 import cn.com.higinet.tms.common.exception.UnsupportedParameterException;
 import cn.com.higinet.tms.common.lifecycle.Service;
 import cn.com.higinet.tms.common.lifecycle.StartServiceException;
@@ -96,37 +97,41 @@ public class CacheManager extends Service {
 	 */
 	@Override
 	protected void doStart() throws Throwable {
-		if (envInitializer == null) {
-			throw new StartServiceException("CacheEnv initializer of CacheManager can not be null.");
-		}
-		envInitializer.initialize();
-		providers = new HashMap<String, CacheProvider>();
-		List<CacheEnv> envs = envInitializer.initCacheEnv();
-		if (envs != null && !envs.isEmpty()) {
-			String cacheId;
-			for (int i = 0, len = envs.size(); i < len; i++) {
-				CacheEnv env = envs.get(i);
-				cacheId = env.getCacheId();
-				String providerClass = env.getString(Constants.BASE_CONFIG_PROVIDER, null);// provider的class，此参数是必须配置
-				if (StringUtils.isNull(providerClass)) {
-					throw new UnsupportedParameterException("The cache attribute \"providerClass\" can not be null for cache id=\"%s\"", cacheId);
-				}
-				CacheProvider cacheProvider = (CacheProvider) ObjectUtils.createObject(providerClass);
-				if (cacheProvider instanceof Service) {
-					((Service) cacheProvider).setName("CacheProvider[" + cacheId + "]");
-				}
-				cacheProvider.setEnv(env);
-				boolean success = cacheProvider.start(); //及时启动，如果有问题，则立即抛出
-				if (!success) {
-					throw new StartServiceException("");
-				}
-				try {
-					cacheProvider.getCache().get(new KV("test", "test")); //此处用于测试缓存服务是否正常
-				} catch (Exception e) {
-					throw new StartServiceException(StringUtils.format("Cache provider is \"%s\"", cacheId), e);
-				}
-				providers.put(cacheId, cacheProvider);
+		try {
+			if (envInitializer == null) {
+				throw new StartServiceException("CacheEnv initializer of CacheManager can not be null.");
 			}
+			envInitializer.initialize();
+			providers = new HashMap<String, CacheProvider>();
+			List<CacheEnv> envs = envInitializer.initCacheEnv();
+			if (envs != null && !envs.isEmpty()) {
+				String cacheId;
+				for (int i = 0, len = envs.size(); i < len; i++) {
+					CacheEnv env = envs.get(i);
+					cacheId = env.getCacheId();
+					String providerClass = env.getString(Constants.BASE_CONFIG_PROVIDER, null);// provider的class，此参数是必须配置
+					if (StringUtils.isNull(providerClass)) {
+						throw new UnsupportedParameterException("The cache attribute \"providerClass\" can not be null for cache id=\"%s\"", cacheId);
+					}
+					CacheProvider cacheProvider = (CacheProvider) ObjectUtils.createObject(providerClass);
+					if (cacheProvider instanceof Service) {
+						((Service) cacheProvider).setName("CacheProvider[" + cacheId + "]");
+					}
+					cacheProvider.setEnv(env);
+					boolean success = cacheProvider.start(); //及时启动，如果有问题，则立即抛出
+					if (!success) {
+						throw new FatalException("Cache provider %s start failed.", cacheId);
+					}
+					try {
+						cacheProvider.getCache().get(new KV("test", "test")); //此处用于测试缓存服务是否正常
+					} catch (Exception e) {
+						throw new FatalException(StringUtils.format("Cache provider is \"%s\"", cacheId), e);
+					}
+					providers.put(cacheId, cacheProvider);
+				}
+			}
+		} catch (Exception e) {
+			throw new FatalException("CacheManager start failed.", e);
 		}
 	}
 

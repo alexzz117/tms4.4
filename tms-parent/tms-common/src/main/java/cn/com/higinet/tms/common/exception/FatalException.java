@@ -1,9 +1,9 @@
 /*
  ***************************************************************************************
  * All rights Reserved, Designed By www.higinet.com.cn
- * @Title:  StopServiceException.java   
+ * @Title:  StartServiceException.java   
  * @Package cn.com.higinet.tms.common.lifecycle   
- * @Description: 空字符异常
+ * @Description: 区分生命周期中的异常
  * @author: 王兴
  * @date:   2017-5-7 17:32:46   
  * @version V1.0 
@@ -14,45 +14,39 @@
  *     文件版本：         修改人：             修改原因：
  ***************************************************************************************
  */
-package cn.com.higinet.tms.common.cache;
-
-import cn.com.higinet.tms.common.exception.BaseRuntimeException;
-import cn.com.higinet.tms.common.exception.FatalException;
+package cn.com.higinet.tms.common.exception;
 
 /**
- * 没有找到生产类.
+ * 致命异常
  *
  * @author: 王兴
  * @date:   2017-5-7 17:32:52
  * @since:  v4.3
  */
-public class ProviderNotFoundException extends FatalException {
+public class FatalException extends BaseRuntimeException {
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String)
 	 */
-	public ProviderNotFoundException(String msg) {
+	public FatalException(String msg) {
 		super(msg);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(Throwable)
 	 */
-	public ProviderNotFoundException(Throwable ex) {
+	public FatalException(Throwable ex) {
 		super(ex);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String,Throwable)
 	 */
-	public ProviderNotFoundException(String msg, Throwable ex) {
+	public FatalException(String msg, Throwable ex) {
 		super(msg, ex);
 	}
 
-	/**
-	 * @see BaseRuntimeException#BaseRuntimeException(String,Object...)
-	 */
-	public ProviderNotFoundException(String msg, Object... args) {
+	public FatalException(String msg, Object... args) {
 		super(msg, args);
 	}
 }

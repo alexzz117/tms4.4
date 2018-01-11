@@ -19,6 +19,8 @@ package cn.com.higinet.tms.common.lifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cn.com.higinet.tms.common.exception.BaseRuntimeException;
+import cn.com.higinet.tms.common.exception.FatalException;
 import cn.com.higinet.tms.common.util.StringUtils;
 
 /**
@@ -285,9 +287,12 @@ public abstract class Service implements Lifecycle, Sortable {
 	 * 服务启动的时候，发生异常时调用此方法进行处理，默认是选择性实现，根据子类需求。
 	 *
 	 * @param ex 发生的异常对象
+	 * @throws Throwable 
 	 */
 	protected void doException(Throwable ex) {
-
+		if(ex instanceof FatalException){
+			throw (BaseRuntimeException)ex;
+		}
 	}
 
 	/**
