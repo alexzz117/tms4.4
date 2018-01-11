@@ -28,7 +28,7 @@
       </el-form-item>
     </el-form>
     <div style="margin-bottom: 10px;text-align: left ">
-      <el-button class="el-icon-search" type="primary" @click="selLog">查询</el-button>
+      <el-button class="el-icon-search" type="primary" @click="searchFunc">查询</el-button>
     </div>
     <el-table
       :data="roleData"
@@ -97,6 +97,10 @@
             }
           }
         })
+      },
+      searchFunc () {
+        this.currentPage = 1
+        this.selLog()
       },
       selLog () {
         var self = this
