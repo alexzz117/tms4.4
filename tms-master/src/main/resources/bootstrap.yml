@@ -11,11 +11,11 @@ spring:
         #启用zookeeper作为配置中心
         enabled: true
         #配置根路径
-        root: config/higinet-tms
+        root: config/tms
         #配置默认上下文 默认为spring.application.name
-        #defaultContext : tms-master
+        defaultContext : master
         #配置profile分隔符
-        #profileSeparator : '-'
+        profileSeparator : '-'
 
 #下面的配置将会从zookeeper内获取
 #zuul:

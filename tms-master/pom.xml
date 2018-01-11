@@ -32,50 +32,44 @@
 			<artifactId>tms-base</artifactId>
 			<version>4.4.0-SNAPSHOT</version>
 		</dependency>
+		<!-- tms-base End -->
+		
 		<!-- log4j2 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
+		<!-- log4j2 End -->
+		
 		<!-- Log4j2 异步支持 -->
 		<dependency>
 			<groupId>com.lmax</groupId>
 			<artifactId>disruptor</artifactId>
 			<version>3.3.7</version>
 		</dependency>
+		<!-- Log4j2 异步支持 End -->
+		
 		<!-- 代码简化Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+		<!-- 代码简化Lombok End-->
+		
 		<!-- spring热部署 -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>springloaded</artifactId>
 		</dependency>
+		<!-- spring热部署 End -->
+		
 		<!-- 序列化 -->
 		<dependency>
 			<groupId>com.esotericsoftware</groupId>
 			<artifactId>kryo</artifactId>
 			<version>4.0.0</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch</artifactId>
-			<version>6.1.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.elasticsearch.client</groupId>
-			<artifactId>transport</artifactId>
-			<version>6.1.1</version>
-		</dependency>
+		<!-- 序列化 End -->
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -192,9 +186,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency> <groupId>cn.com.higinet</groupId> <artifactId>tms-core</artifactId> 
-			<version>4.3.0</version> <exclusions> <exclusion> <groupId>cn.com.higinet</groupId> 
-			<artifactId>rapid-server</artifactId> </exclusion> </exclusions> </dependency> -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
@@ -236,8 +227,6 @@
 			<artifactId>AESWithJCE</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-		<!-- <dependency> <groupId>com.higinet</groupId> <artifactId>sypay-risk-proxy-skeleton</artifactId> 
-			<version>1.1.2</version> </dependency> -->
 		<dependency>
 			<groupId>com.googlecode.concurrentlinkedhashmap</groupId>
 			<artifactId>concurrentlinkedhashmap-lru</artifactId>
@@ -257,7 +246,50 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- Elastic Search -->
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<version>6.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>transport</artifactId>
+			<version>6.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>x-pack-transport</artifactId>
+			<version>6.1.1</version>
+		</dependency>
+		<!-- Elastic Search End -->
+
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>shenzhen-cloud</id>
+			<name>shenzhen-cloud-server</name>
+			<url>http://maven.higinet.net:8888/repository/maven-public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>elasticsearch-releases</id>
+			<url>https://artifacts.elastic.co/maven</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<dependencyManagement>
 		<dependencies>
