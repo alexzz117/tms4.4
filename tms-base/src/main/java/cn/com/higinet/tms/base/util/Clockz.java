@@ -13,7 +13,7 @@ public class Clockz {
 
 		@Override
 		protected boolean removeEldestEntry( Map.Entry<String, Long> eldest ) {
-			return size() > 10000;
+			return size() > 1000;
 		}
 	};
 
