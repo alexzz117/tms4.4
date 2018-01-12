@@ -5,36 +5,38 @@ import java.util.Map;
 
 /**
  * 计时工具类
+ * 支持多线程使用
+ * @author zhang.lei
  * */
 public class Clockz {
 
-	private static Map<String, Long> timezs = new LinkedHashMap<String, Long>() {
+	private static Map<Object, Long> timezs = new LinkedHashMap<Object, Long>() {
 		private static final long serialVersionUID = 1L;
 
+		//map超过一定数量删除，避免未调用stop造成map无限扩大
 		@Override
-		protected boolean removeEldestEntry( Map.Entry<String, Long> eldest ) {
+		protected boolean removeEldestEntry( Map.Entry<Object, Long> eldest ) {
 			return size() > 1000;
 		}
 	};
 
 	public static Long start() {
-		Long time = System.currentTimeMillis();
-		timezs.put( Stringz.valueOf( Thread.currentThread().getId() ), time );
-		return time;
+		return start( Thread.currentThread().getId() );
 	}
 
 	public static Long stop() {
-		String threadId = Stringz.valueOf( Thread.currentThread().getId() );
-		return System.currentTimeMillis() - timezs.remove( threadId );
+		return stop( Thread.currentThread().getId() );
 	}
 
-	public static Long start( String key ) {
+	public static Long start( Object key ) {
 		Long time = System.currentTimeMillis();
 		timezs.put( key, time );
 		return time;
 	}
 
-	public static Long stop( String key ) {
-		return System.currentTimeMillis() - timezs.remove( key );
+	public static Long stop( Object key ) {
+		Long startTime = timezs.remove( key );
+		if( startTime != null ) return System.currentTimeMillis() - startTime;
+		else return null;
 	}
 }
