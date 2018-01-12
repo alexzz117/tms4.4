@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form  label-position="right" :model="listForm" ref="listForm" label-width="100px"  class="demo-form-inline"  :inline="inline"  >
+    <el-form  label-position="right" :model="listForm" ref="listForm"   class="demo-form-inline"  :inline="inline"  >
       <el-row>
         <el-col :span="2"><div><el-form-item label="流水号"/></div> </el-col>
         <el-col :span="4"><div>
@@ -58,10 +58,10 @@
     <!-- 报警事件处理弹窗 -->
     <el-dialog title="报警事件处理" :visible.sync="listDialogVisible" append-to-body  >
       <div>
-        <el-form  label-position="right" :model="executeForm"  :rules="executeFormRules" ref="executeForm" label-width="100px"  :inline="inline"  >
+        <el-form  label-position="right" :model="executeForm"  :rules="executeFormRules" ref="executeForm"    >
           <el-row>
             <el-col :span="4"> <div ><el-form-item label="欺诈类型"  prop="FRAUD_TYPE"  data="fraud_type"/></div> </el-col>
-            <el-col :span="20"><div >
+            <el-col :span="10"><div >
               <el-select v-model="executeForm.FRAUD_TYPE" placeholder="请选择" @focus="selectFocus('fraud_type')" :clearable="clearable">
                 <el-option
                   v-for="item in datatypeOptions"
@@ -81,70 +81,75 @@
             </el-input></div></el-col>
           </el-row>
         </el-form>
-        <el-collapse accordion>
-          <el-collapse-item>
-            <template slot="title">添加动作</template>
-            <el-form  label-position="right" :model="actionForm"  ref="actionForm" :rules="rules" class="demo-form-inline"  :inline="inline"  >
-              <el-row>
-                <el-col :span="3"><div ><el-form-item label="动作名称"/></div></el-col>
-                <el-col :span="9"><div ><el-form-item prop="ac_name" clearable>
-                  <el-input v-model="actionForm.ac_name" /></el-form-item>
-                </div>
-                </el-col>
-                <el-col :span="2"><div ><el-form-item label="条件"/></div></el-col>
-                <el-col :span="10">
-                  <div >
-                    <el-form-item prop="ac_cond_in" clearable>
-                     <div @dblclick="statCondInPopup">
-                       <el-input v-model="actionForm.ac_cond" auto-complete="off"
-                                 v-show="false"   />
-                       <el-input v-model="actionForm.ac_cond_in" auto-complete="off"  />
-                     </div>
-                    </el-form-item>
-                  </div></el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="3"><div ><el-form-item label="表达式"/></div></el-col>
-                <el-col :span="10"><div ><el-form-item prop="ac_expr" clearable>
-                  <el-input v-model="actionForm.ac_expr" /></el-form-item>
-                </div>
-                </el-col>
-                <el-col :span="11"><div >
-                  <el-button type="primary" icon="el-icon-success" @click="savePsAct('actionForm')">保存</el-button>
-                  <el-button type="primary" icon="el-icon-back" @click="">取消</el-button>
-                </div>
-                </el-col>
-              </el-row>
-            </el-form>
-          </el-collapse-item>
-        </el-collapse>
+
+        <div>动作信息</div>
         <div>
-          <el-button-group size="small">
+            <el-button type="primary" plain icon="el-icon-circle-plus-outline" @click="addPsAct('add')"></el-button>
             <el-button type="primary" plain icon="el-icon-delete" @click="delPsAct()" :disabled="delBtnStatus"></el-button>
-          </el-button-group>
         </div>
               <!-- GRID -->
               <el-table
-                :data="actionData" highlight-current-row height="200"
+                :data="actionData" highlight-current-row height="200" stripe
                 tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
                 <el-table-column  type="selection" width="45" />
-                <el-table-column fixed="left" label="操 作" width="50" alert="center" >
+                <el-table-column fixed="left" label="操 作" width="55" alert="center" >
                   <template slot-scope="scope"  >
-                    <el-button type="text" @click="editPsAct(scope.$index, scope.row, 'edit')"  icon="el-icon-edit" />
+                    <el-button type="text" @click="editPsAct(scope.$index, scope.row,'edit')"  icon="el-icon-edit" />
                   </template>
                 </el-table-column>
                 <el-table-column  prop="ac_name" label="动作名称" width="140"  />
                 <el-table-column  prop="ac_cond_in" label="条件" width="180"  />
                 <el-table-column  prop="ac_expr_in" label="表达式" width="180"  />
+
               </el-table>
+
+        <!-- 添加动作FROM -->
+        <div>
+        <transition name="fade">
+          <el-form  label-position="right" :model="actionForm"  ref="actionForm" :rules="rules"   :inline="inline" >
+            <el-row>
+              <el-col :span="3"><div ><el-form-item label="动作名称"/></div></el-col>
+              <el-col :span="9"><div ><el-form-item prop="ac_name" clearable>
+                <el-input v-model="actionForm.ac_name" /></el-form-item>
+              </div>
+              </el-col>
+              <el-col :span="2"><div ><el-form-item label="条件"/></div></el-col>
+              <el-col :span="10">
+                <div >
+                  <el-form-item prop="ac_cond" clearable>
+                    <div @dblclick="statCondInPopup" :disabled="ac_condviewDisabled">
+                      <el-input v-model="actionForm.ac_cond" auto-complete="off" :style="formItemContentStyle" v-show="false" readonly />
+                      <el-input v-model="actionForm.ac_cond_in" auto-complete="off"  :style="formItemContentStyle" readonly />
+                    </div>
+                  </el-form-item>
+                </div></el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="3"><div ><el-form-item label="表达式"/></div></el-col>
+              <el-col :span="10"><div ><el-form-item prop="ac_expr" clearable>
+                <el-input v-model="actionForm.ac_expr" /></el-form-item>
+              </div>
+              </el-col>
+            </el-row>
+          </el-form>
+        </transition>
+        </div>
+        <!-- 添加动作FROM结束 -->
           <div class="dialog-footer"  align="center"  slot="footer">
+            <el-button type="primary" icon="el-icon-success" @click="savePsAct('actionForm')">保存动作</el-button>
            <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="saveProcess('executeForm')" >提交审核</el-button>
-           <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false" >取消</el-button>
+           <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="closeDialog()" >取消</el-button>
         </div>
       </div>
     </el-dialog>
 
 
+    <!-- 表达式弹出引用common目录的StatCondPicker.vue -->
+    <StatCondPicker ref="StatCondDialog" @valueCallback="statCondInValueCallBack"
+                    :statCond="actionForm.ac_cond" :statCondIn="actionForm.ac_cond_in" :txnId="txnId"
+                    :hideItems="['rule_func', 'ac_func']" >
+
+    </StatCondPicker>
   </div>
 </template>
 
@@ -152,6 +157,7 @@
   import util from '@/common/util'
   import ajax from '@/common/ajax'
   import dictCode from '@/common/dictCode'
+  import StatCondPicker from '@/components/common/StatCondPicker'
 
   export default {
     created () {
@@ -259,34 +265,93 @@
           }
         })
       },
+      //新增动作信息
+      addPsAct(flag){
+        var self = this
+        this.flag = flag
+        this.actionForm= {
+          ac_name: "",
+          ac_cond: "",
+          ac_cond_in: "",
+          ac_expr: "",
+          ac_expr_in: ""
+        }
+      },
       //编辑动作信息
-      editPsAct(index, row, flag) {
-        alert(flag)
-        this.actionForm = Object.assign({}, row, flag)
+      editPsAct(index, row,flag) {
+        var self = this
+        this.flag = flag
+        this.actionForm = Object.assign({}, row)
       },
       // 统计条件弹窗
       statCondInPopup () {
+        this.$refs.StatCondDialog.open()
+        this.$refs.StatCondDialog.setValue({
+          ac_cond: this.actionForm.ac_cond,
+          ac_cond_in: this.actionForm.ac_cond_in
+        })
+      },
+      checkStatCond(rule, value, callback) {
+        let ac_cond = this.dialogForm.stat_cond
+        let name = this.formStatCondInName.replace(':', '')
+        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
+        if (isCaExFunc) {
+          if (ac_cond === '') {
+            return callback(new Error(`${name}不能为空`))
+          }
+        }
+        if (ac_cond !== '') {
+          if (ac_cond.length > 512) {
+            return callback(new Error(`${name}不能超过512个字符`))
+          }
+          // 之前的代码这个校验放在后台了
+          // if(!check.checkeCondSpecialCode(statCond)){
+          //   alert(cond_caption+'不能包含特殊字符');
+          //   return false;
+          // }
+        }
+        callback()
       },
       //增加修改保存动作信息
       savePsAct(formName) {
         var self = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            var param = util.extend({
-              TXN_CODE: this.vTxncode
-            }, this.actionForm)
-            ajax.post({
-              url: '/alarmevent/addPsAct',
-              param: param,
-              success: function (data) {
-                self.$message({
-                  type: 'success',
-                  message: '保存成功。'
-                })
-                //刷新动作列表
-                self.sel()
-              }
-            })
+           if(this.flag === 'add'){
+             var param = util.extend({
+               TXN_CODE: this.vTxncode
+             }, this.actionForm)
+             ajax.post({
+               url: '/alarmevent/addPsAct',
+               param: param,
+               success: function (data) {
+                 self.$message({
+                   type: 'success',
+                   message: '新增成功。'
+                 })
+                 //刷新动作列表
+                 self.addPsAct()
+               }
+             })
+           }else{
+             //编辑保存
+             var param = util.extend({
+                 TXN_CODE: this.vTxncode,
+                 ac_id: this.ac_id
+               }, this.actionForm)
+             ajax.post({
+               url: '/alarmevent/updPsAct',
+               param: param,
+               success: function (data) {
+                 self.$message({
+                   type: 'success',
+                   message: '修改成功。'
+                 })
+                 //刷新动作列表
+                 self.addPsAct()
+               }
+             })
+           }
           } else {
             return false
           }
@@ -342,10 +407,15 @@
               }
             })
           } else {
-            console.log('error submit!!')
             return false
           }
         })
+      },
+      //关闭窗体
+      closeDialog(){
+        var self = this
+        this.listDialogVisible = false
+        self.sel()
       }
     },
     data() {
@@ -354,6 +424,8 @@
         clearable: true,
         listDialogVisible: false,
         delBtnStatus: true,
+        ac_condviewDisabled: false,
+        flag: '',
         listForm: {
           txncode: '',
           passtatus: '',
@@ -362,6 +434,7 @@
           userid: ''
         },
         actionForm: {
+          ac_id: '',
           ac_name: '',
           ac_cond: '',
           ac_cond_in: '',
@@ -371,8 +444,8 @@
         rules: {
           ac_name: [{ required: true, message: '动作名称不能为空', trigger: 'blur' },
                     { min: 3, max: 64, message: '长度在3到64个字符', trigger: 'blur' }],
-          ac_cond_in: [{ required: true, message: '条件不能为空', trigger: 'blur' },
-                    { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }],
+          ac_cond: [{ required: true, message: '条件不能为空', trigger: 'blur' },
+                    { validator: this.checkStatCond, trigger: 'blur' }],
           ac_expr: [{ required: true, message: '表达式不能为空', trigger: 'blur' },
                     { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
         },
@@ -381,7 +454,7 @@
           PS_INFO: ''
         },
         executeFormRules: {
-          FRAUD_TYPE: [{ required: true, message: '欺诈类型不能为空', trigger: 'blur' }],
+          FRAUD_TYPE: [{ required: true, message: '欺诈类型不能为空', trigger: 'change' }],
           PS_INFO: [{ required: true, message: '处理信息不能为空', trigger: 'blur' },
             { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
         },
@@ -394,7 +467,7 @@
         total: 100,
         datatypeOptions: []
       }
-    }
+    },props: ['ac_id'], components: {StatCondPicker}
   }
 </script>
 

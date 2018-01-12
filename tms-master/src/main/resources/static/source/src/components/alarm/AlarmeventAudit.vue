@@ -92,17 +92,17 @@
             <el-table
               :data="ExecuteData" highlight-current-row height="100"
               tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
-              <el-table-column  prop="ac_name" label="处理时间" width="140"  />
-              <el-table-column  prop="ac_cond_in" label="处理类型" width="80"  />
-              <el-table-column  prop="ac_expr_in" label="处理人员" width="80"  />
-              <el-table-column  prop="ac_expr_in" label="处理结果" width="80"  />
-              <el-table-column  prop="ac_expr_in" label="处理信息" width="140"  />
+              <el-table-column  prop="PS_TIME" label="处理时间" width="140"  />
+              <el-table-column  prop="ps_type" label="处理类型" width="80"  />
+              <el-table-column  prop="login_name" label="处理人员" width="80"  />
+              <el-table-column  prop="ps_result" label="处理结果" width="80"  />
+              <el-table-column  prop="ps_info" label="处理信息" width="140"  />
             </el-table>
           </el-collapse-item>
         </el-collapse>
 
         <!--审核信息 -->
-        <el-form  label-position="right" :model="auditForm"  ref="auditForm" :rules="rules"   :inline="inline"  >
+        <el-form  label-position="right" :model="auditForm"  ref="auditForm" :rules="rules"    >
           <el-row>
             <el-col :span="3.5"><div ><el-form-item label="审核结果" prop="PS_RESULT"/></div></el-col>
             <el-col :span="9"><div >
@@ -237,11 +237,15 @@
           url: '/alarmevent/audit',
           param: {TXN_CODE: TXN_CODE},
           success: function (data) {
-            if (data.list) {
-              self.actionData = data.row
+            console.log(data)
+            debugger
+
+            self.ExecuteData = data.psList
+            if (data.actList) {
+              self.actionData = data.actList
             }
-            if (data.list) {
-              self.ExecuteData = data.list
+            if (data.psList) {
+
             }
           }
         })
@@ -293,8 +297,8 @@
           PS_INFO: ''
         },
         rules: {
-          PS_RESULT: [{ required: true, message: '审核结果不能为空', trigger: 'blur' }],
-          PS_INFO: [{ required: true, message: '处理信息不能为空', trigger: 'blur' },
+          PS_RESULT: [{ required: true, message: '审核结果为空', trigger: 'blur' }],
+          PS_INFO: [{ required: true, message: '处理信息为空', trigger: 'blur' },
             { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
         },
         gridData: [],
