@@ -27,7 +27,6 @@ import com.esotericsoftware.kryo.pool.KryoPool;
 
 /**
  * Byte工具类.
- *
  * @author 王兴
  * @since v1.0
  * @date Aug 7, 2015
@@ -46,22 +45,20 @@ public class Kryoz {
 
 	/**
 	 * 将对象序列化成kryo的byte数组
-	 *
 	 * @param obj the obj
 	 * @return the byte[]
 	 */
-	public static byte[] object2KryoBytes( Object obj ) {
-		return object2KryoBytes( obj, false );
+	public static byte[] toBytes( Object obj ) {
+		return toBytes( obj, false );
 	}
 
 	/**
 	 * 将对象序列化成kryo的byte数组
-	 *
 	 * @param obj the obj
 	 * @param reference the reference
 	 * @return the byte[]
 	 */
-	public static byte[] object2KryoBytes( Object obj, boolean reference ) {
+	public static byte[] toBytes( Object obj, boolean reference ) {
 		Kryo kryo = KRYOPOOL.borrow();
 		kryo.setReferences( reference );
 		try {
@@ -83,20 +80,19 @@ public class Kryoz {
 	 * @param data the data
 	 * @return the t
 	 */
-	public static <T> T KryoBytes2Object( Class<T> type, byte[] data ) {
-		return KryoBytes2Object( type, data, false );
+	public static <T> T toObject( Class<T> type, byte[] data ) {
+		return toObject( type, data, false );
 	}
 
 	/**
 	 * 将kryo序列化后的byte数组范序列化成指定class的对象
-	 *
 	 * @param <T> the generic type
 	 * @param type the type
 	 * @param data the data
 	 * @param reference the reference
 	 * @return the t
 	 */
-	public static <T> T KryoBytes2Object( Class<T> type, byte[] data, boolean reference ) {
+	public static <T> T toObject( Class<T> type, byte[] data, boolean reference ) {
 		Kryo kryo = KRYOPOOL.borrow();
 		kryo.setReferences( reference );
 		try {
