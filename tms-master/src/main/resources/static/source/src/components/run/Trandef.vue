@@ -80,6 +80,7 @@
             if (info.txnid !== '' && info.txnid !== undefined) {
               txnType = '1'// 交易类型：交易
             }
+            self.$refs['infoForm'].getModelUsedList(info.modelused)
             self.$refs['infoForm'].tranDefForm = {
               parent_tab: info.parent_tab,
               tab_name: info.tab_name,

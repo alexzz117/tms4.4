@@ -102,10 +102,9 @@
   import AllPickSelect from '@/components/common/AllPickSelect'
   import check from '@/common/check'
   import ajax from '@/common/ajax'
+  import dictCode from '@/common/dictCode'
 
   export default {
-    create () {
-    },
     computed: {
       selectedList: function () { // 交易识别标识是否可见（组：不可见；交易：可见）
         let tabDisposal = this.tranDefForm.tab_disposal
@@ -254,6 +253,15 @@
             })
           }
         })
+      },
+      getModelUsedList (val) {
+        let self = this
+        let list = dictCode.getCodeItems('tms.model.modelused')
+        let modelUsed = val || self.tranDefForm.modelused
+        if (modelUsed === null || modelUsed === '0') {
+          list.pop()
+        }
+        self.modelUsedList = list
       }
     },
     components: {
