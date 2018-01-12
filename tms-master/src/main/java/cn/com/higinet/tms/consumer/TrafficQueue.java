@@ -24,7 +24,7 @@ import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
 public class TrafficQueue {
 
 	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
-	private final long saveInterval = 1000; //定时提交时间间隔
+	private final long saveInterval = 2000; //定时提交时间间隔
 	private int saveDataSize = 5000; //当queue达到一定数量时提交
 	private int queueCapacity = 50000; //队列最大堆积数量，当超过时，put操作将堵塞
 	private Long preSaveTime = System.currentTimeMillis();
