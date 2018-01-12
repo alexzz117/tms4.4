@@ -19,6 +19,10 @@ public class Clockz {
 			return size() > 1000;
 		}
 	};
+	
+	public static Long now() {
+		return System.currentTimeMillis();
+	}
 
 	public static Long start() {
 		return start( Thread.currentThread().getId() );
