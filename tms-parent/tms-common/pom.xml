@@ -6,7 +6,6 @@
     <version>4.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>tms-common</artifactId>
-    <version>4.4.0-SNAPSHOT</version>
     <properties>
 		<!-- base setting -->
 		<java.version>1.7</java.version>
