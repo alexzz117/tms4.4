@@ -67,7 +67,7 @@
               <el-radio v-model="funcForm.flag" label="0" :disabled="funcFormReadonly">停用</el-radio>
             </el-form-item>
             <el-form-item label="顺序" prop="onum" v-bind:class="{hidden:funcFormVisible.onum}">
-              <el-input v-model.number="funcForm.onum" auto-complete="off" :readonly="funcFormReadonly"></el-input>
+              <el-input v-model="funcForm.onum" auto-complete="off" :readonly="funcFormReadonly"></el-input>
             </el-form-item>
             <el-form-item label="描述信息" prop="info" v-bind:class="{hidden:funcFormVisible.info}">
               <el-input type="textarea" v-model="funcForm.info" :readonly="funcFormReadonly"></el-input>
@@ -130,7 +130,7 @@
         } else { // 编辑功能节点
           var siblings = currentNode.parent.childNodes
           for (var j in siblings) {
-            if (siblings[j].data.onum === value && siblings[j].data.id !== funcInfo.func_id) {
+            if (siblings[j].data.onum === Number(value) && siblings[j].data.id !== funcInfo.func_id) {
               return callback(new Error('[顺序]不能重复'))
             }
           }

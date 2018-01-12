@@ -29,7 +29,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="顺序" prop="show_order">
-            <el-input v-model.number="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly"></el-input>
+            <el-input v-model="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly" :maxlength="4"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -195,7 +195,7 @@
           ],
           show_order: [
             {required: true, message: '请输入顺序', trigger: 'blur'},
-            {type: 'number', max: 9999, min: 0, message: '顺序必须为小于5位数的正整数', trigger: 'blur'}
+            {pattern: /^[1-9]\d{0,3}$/, message: '顺序必须为小于5位数的正整数', trigger: 'blur'}
           ]
         }
       }
