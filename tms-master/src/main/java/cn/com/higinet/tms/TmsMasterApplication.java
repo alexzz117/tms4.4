@@ -11,6 +11,14 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 public class TmsMasterApplication {
 
 	public static void main( String[] args ) {
+		/*try {
+			System.getProperties().put( "server.ip", InetAddress.getLocalHost().getHostAddress() );
+		}
+		catch( UnknownHostException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+
 		SpringApplication.run( TmsMasterApplication.class, args );
 	}
 }

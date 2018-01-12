@@ -7,9 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
-
 import cn.com.higinet.tms.base.entity.TrafficData;
+import cn.com.higinet.tms.base.util.Kryoz;
 import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
 
 @Component
@@ -23,12 +22,10 @@ public class TrafficConsumer {
 	TrafficQueue trafficQueue;
 
 	@KafkaListener(topics = { "traffic" })
-	public void listen( ConsumerRecord<String, String> record ) {
-		logger.info( JSON.toJSONString( record ) );
-
-		TrafficData traffic = new TrafficData();
+	public void listen( ConsumerRecord<String, byte[]> record ) {
 		try {
-			trafficQueue.put( traffic );
+			TrafficData traffic = Kryoz.toObject( TrafficData.class, record.value() );
+			if( traffic != null ) trafficQueue.put( traffic );
 		}
 		catch( Exception e ) {
 			logger.error( e.getMessage(), e );
