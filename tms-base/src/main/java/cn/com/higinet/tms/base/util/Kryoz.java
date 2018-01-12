@@ -26,10 +26,7 @@ import com.esotericsoftware.kryo.pool.KryoFactory;
 import com.esotericsoftware.kryo.pool.KryoPool;
 
 /**
- * Byte工具类.
- * @author 王兴
- * @since v1.0
- * @date Aug 7, 2015
+ * Kryo工具类.
  */
 public class Kryoz {
 
