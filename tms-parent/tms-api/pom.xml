@@ -1,15 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cn.com.higinet</groupId>
-		<artifactId>tms-parent</artifactId>
-		<version>4.3.0</version>
-	</parent>
+	<groupId>cn.com.higinet</groupId>
 	<artifactId>tms-api</artifactId>
 	<version>4.3.1-RELEASE</version>
 	<properties>
-		<java.version>1.6</java.version>
+		<slf4j-api.versin>1.7.25</slf4j-api.versin>
+		<log4j-core.version>2.10.0</log4j-core.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -22,7 +19,39 @@
 			<artifactId>open4j</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		    <version>${slf4j-api.versin}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>${log4j-core.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>${log4j-core.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-slf4j-impl</artifactId>
+		    <version>${log4j-core.version}</version>
+		</dependency>
 	</dependencies>
+	<distributionManagement>
+		<repository>
+			<id>sz-cloud-release</id>
+			<name> Nexus Release Repository</name>
+			<url>http://maven.higinet.net:9000/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>sz-cloud-snapshots</id>
+			<name> Nexus Snapshot Repository</name>
+			<url>http://maven.higinet.net:9000/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<pluginManagement>
 			<plugins>
