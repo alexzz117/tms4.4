@@ -42,15 +42,6 @@ public class PublicBeans {
 		return cm;
 	}
 
-	@Bean
-	@Qualifier("EnvInitializer")
-	public EnvInitializer envInitializer() {
-		ConfigInitializer ei = new ConfigInitializer();
-		ei.setCachePrefix("tms.svc.cache.");
-		ei.setConfigPath("/application.properties");
-		return ei;
-	}
-
 	/**
 	 * 统计的持久化接口注入.
 	 *

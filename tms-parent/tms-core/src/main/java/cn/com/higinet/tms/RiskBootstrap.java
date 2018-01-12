@@ -82,7 +82,7 @@ public class RiskBootstrap extends Service implements ApplicationContextAware {
 	@Override
 	protected void doStart() throws Throwable {
 		//1、初始化serverconfig文件
-		Resource serverConfig = new ClassPathResource("application.properties");
+		Resource serverConfig = new ClassPathResource("riskConfig.properties");
 		Properties serverProps = new Properties();
 		try (InputStream in = serverConfig.getInputStream();) {
 			serverProps.load(in);

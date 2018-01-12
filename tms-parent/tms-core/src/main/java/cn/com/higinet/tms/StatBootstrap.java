@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -54,6 +55,9 @@ public class StatBootstrap extends ThreadService {
 
 	private static ServerSocket g_ss;
 
+	@Value("${tms.stat.eval.workerCount}")
+	private int wc;
+	
 	static List<worker> g_worker_list = new ArrayList<worker>(256);
 
 	public void worker_connected(worker w) {
@@ -65,13 +69,14 @@ public class StatBootstrap extends ThreadService {
 	@Override
 	protected void onStart() throws Throwable {
 		//1、初始化serverconfig文件
-		Resource serverConfig = new ClassPathResource("application.properties");
+		Resource serverConfig = new ClassPathResource("statConfig.properties");
 		Properties serverProps = new Properties();
 		try (InputStream in = serverConfig.getInputStream();) {
 			serverProps.load(in);
 		}
 		tmsapp.set_config(serverProps);
 		cacheManager.start();
+		System.out.println(wc);
 		int port = 0;
 		port = Integer.parseInt(serverProps.getProperty("tms.stat.port", "4000"));
 		tmsapp.set_config("tms.stat.port", port);

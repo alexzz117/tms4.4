@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Scope;
 
 import cn.com.higinet.tms.RiskBootstrap;
 import cn.com.higinet.tms.common.cache.CacheManager;
+import cn.com.higinet.tms.common.cache.EnvInitializer;
+import cn.com.higinet.tms.common.cache.initializer.ConfigInitializer;
 import cn.com.higinet.tms.common.repository.CachedDataRepository;
 import cn.com.higinet.tms.common.repository.PersistedDataRepository;
 import cn.com.higinet.tms.common.repository.RepositoryInitializer;
@@ -46,6 +48,15 @@ public class RiskBeans {
 		return new RiskBootstrap();
 	}
 
+	@Bean
+	@Qualifier("EnvInitializer")
+	public EnvInitializer envInitializer() {
+		ConfigInitializer ei = new ConfigInitializer();
+		ei.setCachePrefix("tms.svc.cache.");
+		ei.setConfigPath("/riskConfig.properties");
+		return ei;
+	}
+	
 	/**
 	 * 交易流水入库持久化类.
 	 *
