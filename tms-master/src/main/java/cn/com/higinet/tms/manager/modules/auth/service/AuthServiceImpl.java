@@ -68,6 +68,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	private DataOperCenter dataOperCenter;
 
 	@Autowired
+	@Qualifier("refreshCacheExecutor")
 	private TaskExecutor refreshCacheExecutor;
 
 	@Autowired
@@ -78,7 +79,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 
 	private int logOrder = 1;
 
-	@Bean()
+	@Bean("refreshCacheExecutor")
 	public TaskExecutor refreshCacheExecutor() {
 		SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
 		simpleAsyncTaskExecutor.setDaemon( true );

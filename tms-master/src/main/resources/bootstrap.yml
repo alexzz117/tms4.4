@@ -3,7 +3,7 @@ spring:
   cloud:
     zookeeper:
       #zookeeper地址
-      connectString: 5.higinet.net:2181
+      connectString: 192.168.10.188:2181
       discovery:
         register: true
         instancePort: ${server.port}
