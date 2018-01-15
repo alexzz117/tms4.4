@@ -125,7 +125,7 @@
             userid: row.userid
           },
           success: function (data) {
-            if (data.row) {
+            if (data.row && data.row.length > 0) {
               self.hasUser = true
               self.detailData = data.row[0]
             } else {
