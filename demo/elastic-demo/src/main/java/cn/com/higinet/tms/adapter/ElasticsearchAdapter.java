@@ -327,8 +327,8 @@ public class ElasticsearchAdapter {
 					        i++;
 					    }
 					}
-					logger.info(fail.toString());
 					logger.info( "失败条数为:"+i+"---------------");
+					logger.info(fail.toString());
 				}
 			}
 
@@ -345,10 +345,12 @@ public class ElasticsearchAdapter {
 					error.append("Type:").append(t.type()).append("-----after2 结束----");
 					j++;
 				}
-				logger.info(error.toString());
 				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() +",afterBulk2 numberOfActions:" + request.numberOfActions()+"失败条数为:"+j);
+				logger.info(error.toString());
+				
 			}
 		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
+				//设置回退策略，当请求执行错误时，可进行回退操作,执行错误后延迟100MS，重试三次后执行回退
 				.setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)).setConcurrentRequests( concurrentRequests ).build();
 		return bulkProcessor;
 	}
