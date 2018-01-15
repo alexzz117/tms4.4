@@ -1,6 +1,11 @@
 package cn.com.higinet.tms;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,24 +17,42 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
-import cn.com.higinet.tms.base.util.Kryoz;
 
 @Component
 public class Producer {
 
 	private static final Logger logger = LoggerFactory.getLogger( Producer.class );
+	ExecutorService executorService;
 
 	@Autowired
-	private KafkaTemplate<String, byte[]> kafkaTemplate;
+	private KafkaTemplate<String, TrafficData> kafkaTemplate;
+
+	@PostConstruct
+	public void init() {
+		executorService = Executors.newFixedThreadPool( 20 );
+	}
 
 	//每秒10000条
-	@Scheduled(fixedRate = 1000)
+	@Scheduled(fixedRate = 300)
 	private void executeTask() throws Exception {
-		for( int i = 0; i < 10; i++ ) {
-			TrafficData tarffic = createData();
-			ListenableFuture<SendResult<String, byte[]>> result = kafkaTemplate.send( "traffic", tarffic.getTxnCode(), Kryoz.toBytes( tarffic ) );
-			logger.info( result.get().getProducerRecord().key() + ", " + result.get().getProducerRecord().topic() + ", " + result.get().getProducerRecord().partition() );
-		}
+		executorService.execute( new Runnable() {
+			@Override
+			public void run() {
+				for( int i = 0; i < 20000; i++ ) {
+					TrafficData tarffic = createData();
+					ListenableFuture<SendResult<String, TrafficData>> result = kafkaTemplate.send( "traffic", tarffic.getTxnCode(), tarffic );
+					try {
+						logger.info( result.get().getProducerRecord().key() + ", " + result.get().getProducerRecord().topic() + ", " + result.get().getProducerRecord().partition() );
+					}
+					catch( InterruptedException | ExecutionException e ) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+
+		} );
+
 	}
 
 	private TrafficData createData() {
