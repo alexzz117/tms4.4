@@ -2,7 +2,6 @@ package cn.com.higinet.tms.base.entity.offline;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import cn.com.higinet.tms.base.entity.common.EntityBase;
@@ -14,7 +13,6 @@ public class tms_mgr_rostervalue implements EntityBase<tms_mgr_rostervalue> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(generator = "generator")
 	@Column(name = "ROSTERVALUEID")
 	private Integer rostervalueid;
 
