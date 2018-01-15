@@ -5,10 +5,13 @@ import javax.persistence.Id;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import cn.com.higinet.tms.base.constant.Text;
+import cn.com.higinet.tms.base.entity.common.EntityBase;
 import lombok.Data;
 
 @Data
-public class TrafficData {
+public class TrafficData implements EntityBase<TrafficData> {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Text("txnCode")
