@@ -29,16 +29,16 @@ public class TrafficQueue {
 	private ThreadPoolTaskExecutor executor;
 	private BlockingQueue<TrafficData> queue;
 
-	@Value("${elasticsearch.trafficdata.indexName:trafficdata}")
+	@Value("${elasticsearch.trafficdata.indexName}")
 	private String trafficDataIndexName; //trafficdata es索引名
 
-	@Value("${elasticsearch.trafficdata.queueCapacity:50000}")
+	@Value("${elasticsearch.trafficdata.queueCapacity}")
 	private int queueCapacity; //队列最大堆积数量，当超过时，put操作将堵塞
 
-	@Value("${elasticsearch.trafficdata.saveMaxSize:10000}")
+	@Value("${elasticsearch.trafficdata.saveMaxSize}")
 	private int saveMaxSize; //单次提交的数量
 
-	@Value("${elasticsearch.trafficdata.saveWhenSize:10000}")
+	@Value("${elasticsearch.trafficdata.saveWhenSize}")
 	private int saveWhenSize; //当queue达到一定数量时提交
 
 	@Autowired
@@ -61,9 +61,9 @@ public class TrafficQueue {
 	/**
 	 * 定时进行一次ES写入
 	 * 当并发量较小时，主要是定时提交起作用
-	 * fixedDelay 堵塞执行模式
+	 * fixedRate 并发执行模式
 	 * */
-	@Scheduled(fixedDelay = saveInterval)
+	@Scheduled(fixedRate = saveInterval)
 	private void executeTask() {
 		if( (System.currentTimeMillis() - preSaveTime) >= saveInterval && queue.size() > 0 ) {
 			this.save( null );

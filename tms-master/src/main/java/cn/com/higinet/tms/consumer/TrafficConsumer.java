@@ -8,7 +8,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
-import cn.com.higinet.tms.base.util.Kryoz;
 import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
 
 @Component
@@ -22,13 +21,7 @@ public class TrafficConsumer {
 	TrafficQueue trafficQueue;
 
 	@KafkaListener(topics = { "traffic" })
-	public void listen( ConsumerRecord<String, byte[]> record ) {
-		try {
-			TrafficData traffic = Kryoz.toObject( TrafficData.class, record.value() );
-			if( traffic != null ) trafficQueue.put( traffic );
-		}
-		catch( Exception e ) {
-			logger.error( e.getMessage(), e );
-		}
+	public void listen( ConsumerRecord<String, TrafficData> record ) throws Exception {
+		trafficQueue.put( record.value() );
 	}
 }

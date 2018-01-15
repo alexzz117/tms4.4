@@ -8,6 +8,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 //@EnableJdbcHttpSession(maxInactiveIntervalInSeconds = 1800)
 @EnableDiscoveryClient
 //@EnableZuulProxy
+//@EnableKafka
 public class TmsMasterApplication {
 
 	public static void main( String[] args ) {
