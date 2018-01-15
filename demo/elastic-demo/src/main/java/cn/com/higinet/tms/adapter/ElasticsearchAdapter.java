@@ -8,16 +8,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import javax.persistence.Id;
 
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.bulk.BackoffPolicy;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -309,16 +313,43 @@ public class ElasticsearchAdapter {
 
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
-				//logger.info( "executionId:" + executionId + ",is exists error:" + response.hasFailures() );
+				if(response.hasFailures()){
+					StringBuffer fail = new StringBuffer();
+					int i = 0;
+					for (BulkItemResponse bulkItemResponse : response) {
+					    if (bulkItemResponse.isFailed()) { 
+					        BulkItemResponse.Failure failure = bulkItemResponse.getFailure(); 
+					        fail.append("failId:").append(failure.getId()).append(",index:")
+					        .append(failure.getIndex()).append(",type:").append(failure.getType())
+					        .append(",responseId:").append(bulkItemResponse.getId()).append(",responseIndex:")
+					        .append(bulkItemResponse.getIndex()).append(",responseType:")
+					        .append(bulkItemResponse.getType()).append("---结束----");
+					        i++;
+					    }
+					}
+					logger.info(fail.toString());
+					logger.info( "失败条数为:"+i+"---------------");
+				}
 			}
 
 			//设置ConcurrentRequest 为0，Throwable不抛错
+			@SuppressWarnings("rawtypes")
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
-				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() );
+				StringBuffer error = new StringBuffer();
+				int j = 0;
+				while(request.requests().iterator().hasNext()){
+					DocWriteRequest t = request.requests().iterator().next();
+					error.append("Id:").append(t.id());
+					error.append("Index:").append(t.index());
+					error.append("Type:").append(t.type()).append("-----after2 结束----");
+					j++;
+				}
+				logger.info(error.toString());
+				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() +",afterBulk2 numberOfActions:" + request.numberOfActions()+"失败条数为:"+j);
 			}
 		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
-				.setConcurrentRequests( concurrentRequests ).build();
+				.setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)).setConcurrentRequests( concurrentRequests ).build();
 		return bulkProcessor;
 	}
 
