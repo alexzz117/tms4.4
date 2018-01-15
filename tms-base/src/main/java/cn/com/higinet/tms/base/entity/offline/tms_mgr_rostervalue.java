@@ -5,8 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import cn.com.higinet.tms.base.entity.common.EntityBase;
 import lombok.Data;
 
@@ -17,7 +15,6 @@ public class tms_mgr_rostervalue implements EntityBase<tms_mgr_rostervalue> {
 
 	@Id
 	@GeneratedValue(generator = "generator")
-	@GenericGenerator(name = "generator", strategy = "increment")
 	@Column(name = "ROSTERVALUEID")
 	private Integer rostervalueid;
 

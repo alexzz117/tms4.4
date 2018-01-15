@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 
@@ -38,7 +35,7 @@ public class RequestModel extends ModelMap {
 		}
 	}
 
-	public PageRequest getPageRequest( Order... order ) {
+	/*public PageRequest getPageRequest( Order... order ) {
 		if( super.get( "pageindex" ) != null && Stringz.isNotEmpty( super.get( "pageindex" ).toString() ) ) {
 			pageindex = Integer.valueOf( super.get( "pageindex" ).toString() );
 		}
@@ -61,7 +58,7 @@ public class RequestModel extends ModelMap {
 
 		PageRequest pageRequest = new PageRequest( pageindex - 1, pagesize );
 		return pageRequest;
-	}
+	}*/
 
 	public Object getPagePageHelper() {
 		if( super.get( "pageindex" ) != null && Stringz.isNotEmpty( super.get( "pageindex" ).toString() ) ) {
