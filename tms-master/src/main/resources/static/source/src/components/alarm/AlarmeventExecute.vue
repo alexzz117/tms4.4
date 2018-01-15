@@ -1,27 +1,27 @@
 <template>
-  <div>
-    <el-form  label-position="right" :model="listForm" ref="listForm"   class="demo-form-inline"  :inline="inline"  >
-      <el-row>
+  <div >
+    <el-form  label-position="right" :model="listForm" ref="listForm"   class="demo-form-inline" label-width="100px"  :inline="inline"  >
+      <el-row :gutter="10">
         <el-col :span="2"><div><el-form-item label="流水号"/></div> </el-col>
         <el-col :span="4"><div>
           <el-form-item  prop="txncode" data="txncode">
             <el-input v-model="listForm.txncode" clearable></el-input>
           </el-form-item></div>
         </el-col>
-        <el-col :span="2"><div ><el-form-item label="交易时间"/></div></el-col>
-        <el-col :span="3"><div>
+        <el-col :span="2"><div ><el-form-item label="交易时间起"/></div></el-col>
+        <el-col :span="4"><div>
           <el-form-item >
             <el-date-picker  type="datetime" placeholder="选择时间" v-model="listForm.operate_time" ></el-date-picker>
           </el-form-item></div>
         </el-col>
-        <el-col :span="2"><div ><el-form-item label="-"/></div></el-col>
-        <el-col :span="3"><div>
+        <el-col :span="2"><div ><el-form-item label="交易时间止"/></div></el-col>
+        <el-col :span="4"><div>
           <el-form-item >
             <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.end_time" ></el-date-picker>
           </el-form-item>
         </div>
         </el-col>
-        <el-col :span="3"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button></div></el-col>
+        <el-col :span="1"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button></div></el-col>
       </el-row>
     </el-form>
     <!--   数据列表  -->
@@ -97,7 +97,7 @@
                     <el-button type="text" @click="editPsAct(scope.$index, scope.row,'edit')"  icon="el-icon-edit" />
                   </template>
                 </el-table-column>
-                <el-table-column  prop="ac_name" label="动作名称" width="140"  />
+                <el-table-column  prop="ac_name" label="动作名称" width="120"  />
                 <el-table-column  prop="ac_cond_in" label="条件" width="180"  />
                 <el-table-column  prop="ac_expr_in" label="表达式" width="180"  />
 
@@ -127,7 +127,11 @@
             <el-row>
               <el-col :span="3"><div ><el-form-item label="表达式"/></div></el-col>
               <el-col :span="10"><div ><el-form-item prop="ac_expr" clearable>
-                <el-input v-model="actionForm.ac_expr" /></el-form-item>
+                <div @dblclick="ruleCondInPopup" :disabled="ac_condviewDisabled">
+                <el-input v-model="actionForm.ac_expr" :style="formItemContentStyle"  v-show="false" readonly />
+                  <el-input v-model="actionForm.ac_expr_in" auto-complete="off" :style="formItemContentStyle" readonly />
+                </div>
+                </el-form-item>
               </div>
               </el-col>
             </el-row>
@@ -144,10 +148,16 @@
     </el-dialog>
 
 
-    <!-- 表达式弹出引用common目录的StatCondPicker.vue -->
+    <!-- 条件弹出引用common目录的StatCondPicker.vue -->
     <StatCondPicker ref="StatCondDialog" @valueCallback="statCondInValueCallBack"
-                    :statCond="actionForm.ac_cond" :statCondIn="actionForm.ac_cond_in" :txnId="txnId"
+                    :statCond="actionForm.ac_cond" :statCondIn="actionForm.ac_cond_in" :txnId="this.vTxncode"
                     :hideItems="['rule_func', 'ac_func']" >
+
+    </StatCondPicker>
+    <!-- 表达式弹出引用common目录的StatCondPicker.vue -->
+    <StatCondPicker ref="RuleCondDialog" @valueCallback="ruleCondInValueCallBack"
+                    :statCond="actionForm.ac_expr" :statCondIn="actionForm.ac_expr_in" :txnId="this.vTxncode"
+                    :hideItems="['rule_func']" >
 
     </StatCondPicker>
   </div>
@@ -291,26 +301,23 @@
           ac_cond_in: this.actionForm.ac_cond_in
         })
       },
-      checkStatCond(rule, value, callback) {
-        let ac_cond = this.dialogForm.stat_cond
-        let name = this.formStatCondInName.replace(':', '')
-        let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
-        if (isCaExFunc) {
-          if (ac_cond === '') {
-            return callback(new Error(`${name}不能为空`))
-          }
-        }
-        if (ac_cond !== '') {
-          if (ac_cond.length > 512) {
-            return callback(new Error(`${name}不能超过512个字符`))
-          }
-          // 之前的代码这个校验放在后台了
-          // if(!check.checkeCondSpecialCode(statCond)){
-          //   alert(cond_caption+'不能包含特殊字符');
-          //   return false;
-          // }
-        }
-        callback()
+      //表达式弹窗
+      ruleCondInPopup () {
+        this.$refs.RuleCondDialog.open()
+        this.$refs.RuleCondDialog.setValue({
+          ac_expr: this.actionForm.ac_expr,
+          ac_expr_in: this.actionForm.ac_expr_in
+        })
+      },
+      //条件弹窗回调
+      statCondInValueCallBack (value) {
+        this.actionForm.ac_cond = value.stat_cond_value
+        this.actionForm.ac_cond_in = value.stat_cond_in
+      },
+      //表达式弹窗回调
+      ruleCondInValueCallBack (value) {
+        this.actionForm.ac_expr = value.stat_cond_value
+        this.actionForm.ac_expr_in = value.stat_cond_in
       },
       //增加修改保存动作信息
       savePsAct(formName) {
@@ -444,8 +451,6 @@
         rules: {
           ac_name: [{ required: true, message: '动作名称不能为空', trigger: 'blur' },
                     { min: 3, max: 64, message: '长度在3到64个字符', trigger: 'blur' }],
-          ac_cond: [{ required: true, message: '条件不能为空', trigger: 'blur' },
-                    { validator: this.checkStatCond, trigger: 'blur' }],
           ac_expr: [{ required: true, message: '表达式不能为空', trigger: 'blur' },
                     { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
         },

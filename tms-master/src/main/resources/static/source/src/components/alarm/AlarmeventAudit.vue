@@ -1,27 +1,27 @@
 <template>
   <div>
     <el-form  label-position="right" :model="listForm" ref="listForm"  label-width="100px" :inline="inline"  >
-      <el-row>
+      <el-row :gutter="10">
         <el-row>
           <el-col :span="2"><div ><el-form-item label="客户号"/></div></el-col>
           <el-col :span="4"><div ><el-form-item prop="userid" >
             <el-input v-model="listForm.userid" /></el-form-item>
           </div>
           </el-col>
-        <el-col :span="2"><div ><el-form-item label="交易时间"/></div></el-col>
-        <el-col :span="3"><div>
+        <el-col :span="2"><div ><el-form-item label="交易时间起"/></div></el-col>
+        <el-col :span="4"><div>
           <el-form-item >
             <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.operate_time" ></el-date-picker>
           </el-form-item></div>
         </el-col>
-        <el-col :span="2"><div ><el-form-item label="-"/></div></el-col>
-        <el-col :span="3"><div>
+          <el-col :span="2"><div ><el-form-item label="交易时间止"/></div></el-col>
+        <el-col :span="4"><div>
           <el-form-item >
             <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.end_time" ></el-date-picker>
           </el-form-item>
         </div>
         </el-col>
-          <el-col :span="5"><el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button></el-col>
+          <el-col :span="1"><el-button class="el-icon-search" type="primary" @click="sel" ref="selBtn" id="selBtn">查询</el-button></el-col>
       </el-row>
       </el-row>
     </el-form>
@@ -63,8 +63,8 @@
         <el-form label-position="right"  :model="actionForm" :inline="inline" >
           <el-row>
             <el-col :span="3"><div ><el-form-item label="欺诈类型"/></div></el-col>
-            <el-col :span="9"><div ><el-form-item prop="ac_name" clearable>
-              <el-select v-model="actionForm.FRAUD_TYPE" placeholder="请选择" @focus="selectFocus('fraud_type')" disabled>
+            <el-col :span="9"><div ><el-form-item prop="fraud_type" clearable>
+              <el-select v-model="actionForm.fraud_type" placeholder="请选择" @focus="selectFocus('fraud_type')" disabled>
                 <el-option
                   v-for="item in datatypeOptions"
                   :key="item.value"
@@ -90,12 +90,12 @@
           </el-collapse-item>
           <el-collapse-item title="报警处理信息" name="2">
             <el-table
-              :data="ExecuteData" highlight-current-row height="100"
+              :data="executeData" highlight-current-row height="120"
               tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
-              <el-table-column  prop="PS_TIME" label="处理时间" width="140"  />
-              <el-table-column  prop="ps_type" label="处理类型" width="80"  />
-              <el-table-column  prop="login_name" label="处理人员" width="80"  />
-              <el-table-column  prop="ps_result" label="处理结果" width="80"  />
+              <el-table-column  prop="ps_time" label="处理时间" width="140"  />
+              <el-table-column  prop="ps_type" label="处理类型" width="90"   :formatter="formatter"/>
+              <el-table-column  prop="login_name" label="处理人员" width="90"  />
+              <el-table-column  prop="ps_result" label="处理结果" width="90"   :formatter="formatter"/>
               <el-table-column  prop="ps_info" label="处理信息" width="140"  />
             </el-table>
           </el-collapse-item>
@@ -174,8 +174,8 @@
       },
       selectFocus (name) {
         //查询条件下拉值转换
-        if (name === 'passtatus' && this.datatypeOptions.length === 0) {
-          this.datatypeOptions = dictCode.getCodeItems('tms.alarm.process.status')
+        if (name === 'fraud_type' && this.datatypeOptions.length === 0) {
+          this.datatypeOptions = dictCode.getCodeItems('tms.alarm.fraudtype')
         }
       },
       formatter(row, column, cellValue) {
@@ -184,6 +184,12 @@
         {
           case 'psstatus':
             return dictCode.rendCode('tms.alarm.process.status', cellValue)
+            break;
+          case 'ps_result':
+            return dictCode.rendCode('tms.alarm.process.result', cellValue)
+            break;
+          case 'ps_type':
+            return dictCode.rendCode('tms.alarm.process.type', cellValue)
             break;
           case 'txntime':
             return dictCode.rendDatetime(cellValue)
@@ -239,14 +245,18 @@
           success: function (data) {
             console.log(data)
             debugger
+            var aa = data['txnmap']
+            var psStatus = aa['fraud_type']
 
-            self.ExecuteData = data.psList
-            if (data.actList) {
-              self.actionData = data.actList
+            if (data.actlist) {
+              self.actionData = data.actlist
             }
-            if (data.psList) {
-
+            if (data.pslist) {
+              self.executeData = data.pslist
             }
+            // if (data.txnmap) {
+            //   self.actionForm =  Object.assign({}, txnmap.fraud_type)
+            // }
           }
         })
       },
@@ -290,7 +300,7 @@
           userid: ''
         },
         actionForm: {
-          FRAUD_TYPE: ''
+          fraud_type: ''
         },
         auditForm: {
           PS_RESULT: '',
@@ -302,8 +312,8 @@
             { min: 3, max: 255, message: '长度在3到255个字符', trigger: 'blur' }]
         },
         gridData: [],
-        ActionData: [],
-        ExecuteData: [],
+        actionData: [],
+        executeData: [],
         vTxncode: '',
         pageindex: 1,
         pagesize: 10,
