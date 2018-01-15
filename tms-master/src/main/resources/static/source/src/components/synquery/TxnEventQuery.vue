@@ -146,19 +146,35 @@
     <el-table :data="tnxEventTableData">
       <el-table-column prop="txncode" label="流水号" align="left" fixed class-name="link-item" min-width="120px" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <a @click="queryTxnStat(scope.row)">{{ scope.row.txncode }}</a>
+          <a @click="queryTxnInfo(scope.row, 'operate')">{{ scope.row.txncode }}</a>
         </template>
       </el-table-column>
-      <el-table-column prop="userid" label="客户号" align="left" fixed min-width="115px" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="sessionid" label="会话标识" align="left" min-width="100px" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="userid" label="客户号" align="left" fixed class-name="link-item" min-width="115px" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <a @click="queryTxnInfo(scope.row, 'user')">{{ scope.row.userid }}</a>
+        </template>
+      </el-table-column>
+      <el-table-column prop="sessionid" label="会话标识" align="left" class-name="link-item" min-width="100px" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <a @click="queryTxnInfo(scope.row, 'session')">{{ scope.row.sessionid }}</a>
+        </template>
+      </el-table-column>
       <el-table-column prop="txnname" label="监控操作" align="left" min-width="100px"></el-table-column>
       <el-table-column prop="txntime" label="操作时间" align="left" :formatter="renderDateTime" min-width="100px" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="location" label="地理信息" align="left"  min-width="100px"></el-table-column>
-      <el-table-column prop="deviceid" label="设备信息" align="left"></el-table-column>
+      <el-table-column prop="deviceid" label="设备信息" align="left" class-name="link-item">
+        <template slot-scope="scope">
+          <a @click="queryTxnInfo(scope.row, 'device')">{{ scope.row.deviceid }}</a>
+        </template>
+      </el-table-column>
       <el-table-column prop="ipaddr" label="IP地址" align="left" min-width="112px"></el-table-column>
       <el-table-column prop="iseval" label="是否评估" align="left" :formatter="renderIsEval"></el-table-column>
       <el-table-column prop="ismodelrisk" label="风险类型" align="left" :formatter="renderIsModelRisk"></el-table-column>
-      <el-table-column prop="hitrulenum" label="规则命中数" align="left"></el-table-column>
+      <el-table-column prop="hitrulenum" label="规则命中数" align="left" class-name="link-item">
+        <template slot-scope="scope">
+          <a @click="queryTxnInfo(scope.row, 'strategy')">{{ scope.row.hitrulenum }}</a>
+        </template>
+      </el-table-column>
       <el-table-column prop="score" label="风险分值" align="left"></el-table-column>
       <el-table-column prop="iscorrect" label="认证状态" align="left" :formatter="renderIsCorrect"></el-table-column>
       <el-table-column prop="disposal" label="处置方式" align="left"></el-table-column>
@@ -191,7 +207,7 @@
         <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
       </div>
     </el-dialog>
-    <txn-detail ref="txnDetail" :txn="selectedRow" :showItem=showItem></txn-detail>
+    <txn-detail ref="txnDetail" :txn="selectedRow" :defaultTab="defaultTab" :showItem=showItem></txn-detail>
   </div>
 </template>
 
@@ -289,6 +305,7 @@
         total: 0,             // 表格记录总条数
         selectedRow: {},      // 表选中的行
         showItem: ['operate', 'strategy', 'count', 'user', 'handle', 'device', 'deviceFinger', 'session'],
+        defaultTab: '',
         queryRules: {         // 查询条件表单校验
           txncode: [
             {max: 32, message: '长度在32个字符以内', trigger: 'blur'}
@@ -318,7 +335,7 @@
     created () {
       let self = this
       let txntime = self.initDateRange()
-      txntime = [new Date('2018/1/5'), new Date('2018/1/6')]
+      // txntime = [new Date('2018/1/5'), new Date('2018/1/6')]
       self.queryShowForm.txntime = txntime
       self.getTxnEventTableData({
         operate_time: txntime[0].getTime(),
@@ -481,9 +498,21 @@
       renderTxnStatus (row, column, cellValue) {
         return dictCode.rendCode('tms.common.txnstatus', cellValue)
       },
-      queryTxnStat (row) {
-        this.selectedRow = row
-        this.$refs['txnDetail'].open()
+      queryTxnInfo (row, defaultTab) {
+        let self = this
+        self.selectedRow = row
+        self.defaultTab = defaultTab
+        let num = 0
+        let openTimer = window.setInterval(function () {
+          if (defaultTab === self.defaultTab) {
+            window.clearInterval(openTimer)
+            self.$refs['txnDetail'].open()
+          }
+          if (num > 10) {
+            self.$message('网络异常，请刷新后重试')
+          }
+          num++
+        }, 100)
       },
       openTxnTypedialog () {
         this.txntypeDialogVisible = true
