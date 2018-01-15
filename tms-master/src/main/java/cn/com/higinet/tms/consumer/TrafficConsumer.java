@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import cn.com.higinet.tms.base.constant.Constants;
 import cn.com.higinet.tms.base.entity.TrafficData;
 import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
 
@@ -20,7 +21,7 @@ public class TrafficConsumer {
 	@Autowired
 	TrafficQueue trafficQueue;
 
-	@KafkaListener(topics = { "traffic" })
+	@KafkaListener(topics = { Constants.Kafka.Topic.TRAFFIC })
 	public void listen( ConsumerRecord<String, TrafficData> record ) throws Exception {
 		trafficQueue.put( record.value() );
 	}
