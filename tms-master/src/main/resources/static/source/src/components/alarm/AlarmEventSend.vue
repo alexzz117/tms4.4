@@ -19,20 +19,20 @@
         </el-option>
       </el-select></div>
     </el-col>
-    <el-col :span="2"><div ><el-form-item label="交易时间"/></div></el-col>
+    <el-col :span="2"><div ><el-form-item label="交易时间起"/></div></el-col>
     <el-col :span="3"><div>
           <el-form-item >
             <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.operate_time" ></el-date-picker>
           </el-form-item></div>
     </el-col>
-    <el-col :span="2"><div ><el-form-item label="-"/></div></el-col>
+    <el-col :span="2"><div ><el-form-item label="交易时间止"/></div></el-col>
     <el-col :span="3"><div>
         <el-form-item >
           <el-date-picker type="datetime" placeholder="选择时间" v-model="listForm.end_time" ></el-date-picker>
         </el-form-item>
     </div>
     </el-col>
-      <el-col :span="3"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel"  ref="selBtn" id="selBtn">查询</el-button></div></el-col>
+      <el-col :span="1"><div align="right" ><el-button class="el-icon-search" type="primary" @click="sel"  ref="selBtn" id="selBtn">查询</el-button></div></el-col>
     </el-row>
   <el-row>
     <el-col :span="1"><div >  <el-button type="primary" :align="left"  icon="el-icon-success" @click="openDialog" :disabled="sendBtnStatus">分派</el-button></div></el-col>
