@@ -44,6 +44,7 @@ public class ElasticsearchConfig {
                     .put("cluster.name",clusterName )
                     .put("xpack.security.user", username+":"+password)//用户名：密码
                     .put("client.transport.sniff", true)//增加嗅探机制，找到ES集群
+                    .put("client.transport.ping_timeout", "120s")//設置ping節點生效時間為120s
                     .build();
 			String[] cluster = clusterNodes.split(";");
 			TransportAddress[] address = new TransportAddress[cluster.length];
@@ -70,6 +71,5 @@ public class ElasticsearchConfig {
 	public static void main(String[] args) {
 		ElasticsearchConfig config = new ElasticsearchConfig();
 		config.init();
-		
 	}
 }
