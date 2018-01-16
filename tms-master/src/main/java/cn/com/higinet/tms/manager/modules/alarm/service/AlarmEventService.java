@@ -212,6 +212,47 @@ public class AlarmEventService {
 		return _map_;
 	}
 
+	
+	/**
+	 * 修改报警处理动作列表信息
+	 * 
+	 * @param cond
+	 *            查询条件
+	 * @return
+	 */
+	public Map<String, Object> updAlarmProcessAction(Map<String, Object> map) {
+		String sql ="update tms_mgr_alarm_action set ";
+		StringBuffer sb = new StringBuffer();
+		if (MapUtil.isContainsKey(map, "ac_name")) {
+			sb.append("ac_name = :ac_name");
+		}
+		if (MapUtil.isContainsKey(map, "ac_cond")) {
+			if (sb.length() > 0)
+				sb.append(", ");
+			sb.append("ac_cond = :ac_cond");
+		}
+		if (MapUtil.isContainsKey(map, "ac_cond_in")) {
+			if (sb.length() > 0)
+				sb.append(", ");
+			sb.append("ac_cond_in = :ac_cond_in ");
+		}
+		if (MapUtil.isContainsKey(map, "ac_expr")) {
+			if (sb.length() > 0)
+				sb.append(", ");
+			sb.append("ac_expr = :ac_expr");
+		}
+		if (MapUtil.isContainsKey(map, "ac_expr_in")) {
+			if (sb.length() > 0)
+				sb.append(", ");
+			sb.append("ac_expr_in = :ac_expr_in");
+		}
+		sb.append(" WHERE  ac_id = :ac_id");
+		sql += sb.toString();
+		offlineSimpleDao.executeUpdate(sql, map);
+		return map;
+	}
+	
+	
 	public void delOneAlarmProcessAction(Map<String, String> cond) {
 		String sql = "delete from TMS_MGR_ALARM_ACTION where AC_ID = ?";
 		offlineSimpleDao.executeUpdate(sql, MapUtil.getString(cond, "AC_ID"));

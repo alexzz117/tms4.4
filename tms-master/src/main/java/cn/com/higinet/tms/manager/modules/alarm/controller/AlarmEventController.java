@@ -168,6 +168,21 @@ public class AlarmEventController {
 		model.setRow(alarmEventService.addAlarmProcessAction(reqs));
 		return model;
 	}
+	
+
+	/**
+	 * 编辑报警事件处理动作
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/updPsAct", method = RequestMethod.POST)
+	public Model updAlarmPsActAction(@RequestBody Map<String, Object> reqs) {
+		Model model = new Model();
+		reqs.put("AC_TYPE", "1");
+		model.setRow(alarmEventService.updAlarmProcessAction(reqs));
+		return model;
+	}
+	
 
 	/**
 	 * 删除报警事件处理动作
@@ -200,8 +215,10 @@ public class AlarmEventController {
 		Model model = new Model();
 		Map<String, Object> txnMap = alarmEventService.getTrafficDataForAlarmProcessInfo(reqs);
 		reqs.put("AC_TYPE", "1");// 普通动作
-		List<Map<String, Object>> actList = alarmEventService.getAlarmProcessActions(reqs);
-		List<Map<String, Object>> psList = alarmEventService.getAlarmProcessInfoList(reqs);
+		List<Map<String, Object>> actList = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> psList = new ArrayList<Map<String, Object>>();
+		actList = alarmEventService.getAlarmProcessActions(reqs);
+		psList = alarmEventService.getAlarmProcessInfoList(reqs);
 		model.set("txnMap", txnMap);
 		model.set("actList", actList);
 		model.set("psList", psList);
