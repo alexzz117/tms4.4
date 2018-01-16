@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,7 @@ import jxl.write.biff.RowsExceededException;
  */
 
 @RestController("ruleReportController")
-@RequestMapping("/report/rule")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/report/rule")
 public class RuleReportController {
 
 	@Autowired

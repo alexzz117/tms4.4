@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +34,7 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 @RestController("areaReportController")
-@RequestMapping("/report/area")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/report/area")
 public class AreaReportController {
 
 	@Autowired
