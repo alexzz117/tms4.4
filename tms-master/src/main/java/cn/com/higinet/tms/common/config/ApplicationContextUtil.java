@@ -30,7 +30,7 @@ public class ApplicationContextUtil implements ApplicationContextAware {
 	}
 
 	public static boolean containsBean( String name ) {
-		return ApplicationContextUtil.applicationContext.containsBeanDefinition( name );
+		return ApplicationContextUtil.applicationContext.containsBean( name );
 	}
 
 }
