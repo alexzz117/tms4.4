@@ -415,6 +415,7 @@ var util = {
         }
       }
     }
+
     // 根节点不存在判断
     if (rootNodes.length === 0) {
       console.error('根节点不存在，请确认树结构是否正确')

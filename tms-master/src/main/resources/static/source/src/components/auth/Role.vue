@@ -5,7 +5,7 @@
       <el-form label-position="right" label-width="80px" :model="roleForm"
                :inline="inline" class="toolbar-form">
         <el-form-item label="角色名称">
-          <el-input v-model="roleForm.role_name"></el-input>
+          <el-input v-model="roleForm.role_name" :clearable="clearable"></el-input>
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="roleForm.flag" @focus="selectFocus()" placeholder="请选择" :clearable="clearable">
@@ -54,7 +54,7 @@
         </el-table-column>
         <el-table-column prop="role_name" label="角色名称" align="left" width="180"></el-table-column>
         <el-table-column prop="flag" label="状态" align="left" width="180" :formatter="formatter"></el-table-column>
-        <el-table-column prop="info" label="描述信息" align="left"></el-table-column>
+        <el-table-column prop="info" label="描述信息" align="left" :show-overflow-tooltip="showOverflow"></el-table-column>
       </el-table>
       <el-pagination style="margin-top: 10px; text-align: right;"
                      @size-change="handleSizeChange"
@@ -67,7 +67,7 @@
       </el-pagination>
     </section>
 
-    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="35%">
+    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="35%" :close-on-click-modal="closeOnClickModal">
       <el-form :model="roleDialogform" :rules="rules" ref="roleDialogform">
         <el-form-item label="角色名称" :label-width="formLabelWidth" prop="role_name">
           <el-input v-model="roleDialogform.role_name" auto-complete="off"></el-input>
@@ -86,21 +86,24 @@
       </el-form>
     </el-dialog>
 
-    <el-dialog title="功能授权" :visible.sync="grantDialogVisible" width="35%">
-      <el-tree
-        :data="grantData"
-        :default-expanded-keys="expendKey"
-        :default-checked-keys="checkedKeys"
-        show-checkbox
-        node-key="id"
-        ref="grantTree"
-        highlight-current
-        :props="defaultProps">
-      </el-tree>
-      <div style="text-align: left; margin: 20px">
-        <el-button type="primary" @click="saveGrant" :disabled="savebtnStatus">保 存</el-button>
-        <el-button @click="roleDialogVisible = false">取 消</el-button>
+    <el-dialog title="功能授权" :visible.sync="grantDialogVisible" width="35%" :close-on-click-modal="closeOnClickModal">
+      <div style="overflow: auto; max-height: 500px">
+        <el-tree
+          :data="grantData"
+          :default-expanded-keys="expendKey"
+          :default-checked-keys="checkedKeys"
+          show-checkbox
+          node-key="id"
+          ref="grantTree"
+          highlight-current
+          :props="defaultProps">
+        </el-tree>
+        <div style="text-align: left; margin: 20px">
+          <el-button type="primary" @click="saveGrant" :disabled="savebtnStatus">保 存</el-button>
+          <el-button @click="grantDialogVisible = false">取 消</el-button>
+        </div>
       </div>
+
     </el-dialog>
   </div>
 </template>
@@ -307,7 +310,7 @@
           url: '/role/grant/mod',
           param: {
             roleid: this.selectedRow.role_id,
-            funcs: this.$refs.grantTree.getCheckedNodes()
+            funcs: this.$refs.grantTree.getCheckedNodes(true)
           },
           success: function (data) {
             self.$message({
@@ -365,7 +368,7 @@
             role_name: self.roleDialogform.role_name
           },
           success: function (data) {
-            if('false' === data.checke_result){
+            if('false' === data.check_result){
               callback(new Error('角色名称已被占用'));
             }else{
               callback();
@@ -416,7 +419,9 @@
           children: 'children',
           label: 'text'
         },
-        selectedRow: {}
+        selectedRow: {},
+        closeOnClickModal: false,
+        showOverflow: true
       }
     }
   }

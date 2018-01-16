@@ -11,7 +11,7 @@
       <el-form label-position="right" label-width="100px" :model="listForm"
                :inline="inline" class="toolbar-form">
         <el-form-item label="名单名称" prop="listFormFosterdesc">
-          <el-input v-model="listForm.rosterdesc"></el-input>
+          <el-input v-model="listForm.rosterdesc" :clearable="clearable"></el-input>
         </el-form-item>
         <!--<el-form-item label="名单数据类型">-->
         <!--<el-select v-model="listForm.datatype" @focus="selectFocus('datatype')" placeholder="请选择" :clearable="clearable">-->
@@ -80,7 +80,7 @@
         <el-table-column prop="valuecount" label="值数量" align="left" ></el-table-column>
         <el-table-column prop="createtime" label="创建时间" align="left" width="160" :formatter="formatter"></el-table-column>
         <el-table-column prop="iscache" label="是否缓存" align="left" :formatter="formatter"></el-table-column>
-        <el-table-column prop="remark" label="备注" align="left"></el-table-column>
+        <el-table-column prop="remark" label="备注" align="left" :show-overflow-tooltip="showOverflow"></el-table-column>
       </el-table>
       <el-pagination style="margin-top: 10px; text-align: right;"
                      @size-change="handleSizeChange"
@@ -93,7 +93,7 @@
       </el-pagination>
     </section>
 
-    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible" width="40%">
+    <el-dialog :title="dialogTitle" :visible.sync="listDialogVisible" width="40%" :close-on-click-modal="closeOnClickModal">
       <el-form :model="listDialogform" :rules="rules" ref="listDialogform" :label-width="formLabelWidth"
                style="text-align: left">
         <el-form-item label="名单英文名" prop="rostername" data="rostername">
@@ -137,7 +137,7 @@
       </el-form>
     </el-dialog>
 
-    <el-dialog title="名单管理导入" :visible.sync="importDialogVisible">
+    <el-dialog title="名单管理导入" :visible.sync="importDialogVisible" :close-on-click-modal="closeOnClickModal">
       <el-upload
         class="upload-demo"
         ref="upload"
@@ -154,7 +154,7 @@
       </el-upload>
     </el-dialog>
 
-    <el-dialog title="选择导出名单格式" :visible.sync="exportDialogVisible">
+    <el-dialog title="选择导出名单格式" :visible.sync="exportDialogVisible" :close-on-click-modal="closeOnClickModal">
       <el-button type="text"  @click="exportAction('txt')">TXT</el-button>
       <el-button type="text" @click="exportAction('csv')">CSV</el-button>
       <el-button type="text" @click="exportAction('xls')">Excel2003及以下版本</el-button>
@@ -501,7 +501,9 @@
         exportDialogVisible: false,
         fileList: [],
         multiple: false,
-        selectedRow: {}
+        selectedRow: {},
+        closeOnClickModal: false,
+        showOverflow: true
       }
     }
   }

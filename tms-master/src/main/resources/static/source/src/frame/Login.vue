@@ -70,12 +70,9 @@
         }
         ajax.post({
           url: '/login',
-          model: ajax.model.login,
           param: param,
           success: function (data) {
-//            sessionStorage.setItem("loginStatus", true)
-//            sessionStorage.setItem("userToken",'1111')
-            self.$router.push({ name: 'list'})
+            self.$router.push({ name: 'dashboard'})
           }
         })
       },

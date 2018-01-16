@@ -43,11 +43,11 @@
               title="值转换"></el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="rostervalue" label="名单值" align="left"></el-table-column>
+        <el-table-column prop="rostervalue" label="名单值" align="left" :show-overflow-tooltip="showOverflow"></el-table-column>
         <el-table-column prop="enabletime" label="开始时间" align="left"></el-table-column>
         <el-table-column prop="disabletime" label="结束时间" align="left"></el-table-column>
         <el-table-column prop="createtime" label="创建时间" align="left"></el-table-column>
-        <el-table-column prop="remark" label="备注" align="left"></el-table-column>
+        <el-table-column prop="remark" label="备注" align="left" :show-overflow-tooltip="showOverflow"></el-table-column>
       </el-table>
       <el-pagination style="margin-top: 10px; text-align: right;"
                      @size-change="handleSizeChange"
@@ -60,7 +60,10 @@
       </el-pagination>
     </section>
 
-    <el-dialog :title="dialogTitle" :visible.sync="valueListDialogVisible">
+    <el-dialog :title="dialogTitle"
+               :visible.sync="valueListDialogVisible"
+               :close-on-click-modal="closeOnClickModal"
+               width="40%">
       <el-form :model="valueListDialogform" :rules="rules" ref="valueListDialogform" :label-width="formLabelWidth"
                style="text-align: left">
         <el-form-item label="名单值" prop="rostervalue">
@@ -77,27 +80,28 @@
         <el-form-item label="备注" prop="remark">
           <el-input type="textarea" v-model="valueListDialogform.remark"></el-input>
         </el-form-item>
+        <el-form-item label="">
+          <el-button type="primary" @click="submitForm('valueListDialogform')">保 存</el-button>
+          <el-button @click="valueListDialogVisible = false">取 消</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="valueListDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('valueListDialogform')">保 存</el-button>
-      </div>
     </el-dialog>
 
-    <el-dialog title="值转换" :visible.sync="changeValueDialogVisible">
+    <el-dialog title="值转换"
+               :visible.sync="changeValueDialogVisible"
+               :close-on-click-modal="closeOnClickModal"
+               width="40%">
       <el-table
         :data="changeValueTableData"
         highlight-current-row
-        @current-change="handleCurrentChangeValueTable"
-        style="width: 100%">
-        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
-        <el-table-column prop="rosterdesc" label="名单名称" align="left" width="200"></el-table-column>
-        <el-table-column prop="datatype" label="名单数据类型" align="left" width="200"></el-table-column>
-        <el-table-column prop="rostertype" label="名单类型" align="left" width="200"></el-table-column>
+        @current-change="handleCurrentChangeValueTable">
+        <el-table-column prop="rosterdesc" label="名单名称" align="left"></el-table-column>
+        <el-table-column prop="datatype" label="名单数据类型" align="left"></el-table-column>
+        <el-table-column prop="rostertype" label="名单类型" align="left" :formatter="formatter"></el-table-column>
       </el-table>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="changeValueDialogVisible = false">取 消</el-button>
+      <div style="text-align: left; margin-top: 18px">
         <el-button type="primary" @click="constrast">确 定</el-button>
+        <el-button @click="changeValueDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -360,9 +364,67 @@
             return
             break;
         }
-      }
+      },
+      formatter(row, column, cellValue) {
+        switch(column.property )
+        {
+          case 'rostertype':
+            return dictCode.rendCode('tms.mgr.rostertype', cellValue)
+            break;
+          default:
+            return cellValue
+            break;
+        }
+      },
     },
     data() {
+      var self = this
+      var checkTime = function (rule, value, callback) {
+        if (self.valueListDialogform.disabletime === "") {
+          return callback()
+        }
+        var enabletime = Date.parse(self.valueListDialogform.enabletime)
+        var disabletime = Date.parse(self.valueListDialogform.disabletime)
+        if (enabletime > disabletime) {
+          return callback(new Error('开始日期不得大于结束日期'));
+        } else {
+          return callback()
+        }
+      }
+
+      var checkRostervalue = function (rule, value, callback) {
+        var datatype = self.listData.datatype
+        if (datatype != 'ip' && !check.checkSpecialCode(value)){
+          return callback(new Error('请不要输入特殊字符！如($,%)'));
+        }
+
+        //格式检查
+        if (datatype == 'ip' && !check.isIP(value)) {
+          return callback(new Error('IP名单值格式错误'));
+        }
+
+        callback()
+      }
+
+      var rostervalueExist = function (rule, value, callback) {
+        if (value === self.selectedRow.rostervalue) {
+          return callback();
+        }
+        ajax.post({
+          url: '/mgr/checkRostervalue',
+          param: {
+            rostervalue: self.valueListDialogform.rostervalue
+          },
+          success: function (data) {
+            if('false' === data.check_result){
+              callback(new Error('名单值已经存在'));
+            }else{
+              callback();
+            }
+          }
+        })
+      }
+
       return {
         inline: true,
         valueListForm: {
@@ -383,22 +445,21 @@
           remark: ""
         },
         dialogTitle: "",
-        title: "testdddd",
-        formLabelWidth: '150px',
+        title: "",
+        formLabelWidth: '100px',
         rules: {
           rostervalue: [
-            { required: true, message: '请输入名单英文名', trigger: 'blur' }
-//            ,
-//            { max: 32, message: '长度在50个字符以内', trigger: 'blur' },
-//            { validator: check.checkFormEnSpecialCharacter, trigger: 'blur' }
+            { required: true, message: '请输入名单英文名', trigger: 'blur' },
+            { max: 64, message: '长度在64个字符以内', trigger: 'blur' },
+            { validator: checkRostervalue, trigger: 'blur' },
+            { validator: rostervalueExist, trigger: 'blur' }
           ],
           enabletime: [
-//            { required: true, message: '请输入名单名称', trigger: 'blur' },
-//            { max: 64, message: '长度在50个字符以内', trigger: 'blur' },
-//            { validator: check.checkFormSpecialCode, trigger: 'blur' }
+            { required: true, message: '开始日期不能为空', trigger: 'blur' },
+            { validator: checkTime, trigger: 'blur' }
           ],
           disabletime: [
-//            { required: true, message: '请输入名单数据类型', trigger: 'blur' }
+            { validator: checkTime, trigger: 'blur' }
           ],
           remark: [
             { max: 512, message: '长度在512个字符以内', trigger: 'blur' },
@@ -412,7 +473,9 @@
         valuecurrentRow: {},
         btnStatus: true,
         delBtnStatus: true,
-        selectedRow: {}
+        selectedRow: {},
+        closeOnClickModal: false,
+        showOverflow: true
       }
     }
   }

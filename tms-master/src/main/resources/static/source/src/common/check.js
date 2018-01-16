@@ -87,6 +87,20 @@ var check = {
       alert(desc + "只能包含汉字,字母,数字和下划线");
     }
     return legal;
+  },
+  /* 用途：校验ip地址的格式
+
+   输入：strIP：ip地址
+
+   返回：如果通过验证返回true,否则返回false；
+   */
+
+  isIP: function (strIP) {
+    var re=/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/g //匹配IP地址的正则表达式
+    if(re.test(strIP)) {
+      if( RegExp.$1 <256 && RegExp.$2<256 && RegExp.$3<256 && RegExp.$4<256) return true;
+    }
+    return false;
   }
 }
 export default check

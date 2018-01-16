@@ -454,12 +454,4 @@
   }
 </script>
 <style>
-  .section {
-    padding: 20px;
-    background-color: #FFFFFF;
-    border: 1px solid rgba(112, 112, 112, 0.12);
-    border-radius: 7px;
-    height:100%;
-  }
-
 </style>

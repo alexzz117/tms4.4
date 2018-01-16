@@ -1,34 +1,45 @@
 <template>
   <div>
+    <div class="toolbar">
+      <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn">新建
+      </el-button>
+      <el-button plain class="el-icon-edit" @click="editFunc" :disabled="toolBtn.editBtn">编辑
+      </el-button>
+      <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn">删除
+      </el-button>
+    </div>
 
-    <el-row style="height: 100%;border: 1px solid #eee">
-      <el-col :span="6" style="border-right: 1px solid #eee">
-        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
-          <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
-          </el-button>
-          <el-button plain class="el-icon-edit" @click="editFunc" :disabled="toolBtn.editBtn" style="margin-left: 0px;">编辑
-          </el-button>
-          <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
-          </el-button>
-        </div>
-        <el-tree :data="treeData" node-key="id" ref="tree"
-                 :default-expanded-keys="expendKey"
-                 :props="defaultProps"
-                 :highlight-current=true
-                 :expand-on-click-node="false"
-                 @node-click="handleNodeClick"
-                 :render-content="renderContent"
-                 style="height: 76vh;overflow-y: auto;">
-        </el-tree>
+    <el-row :gutter="20">
+      <el-col :span="6" style="height: 650px;">
+        <!--<div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">-->
+          <!--<el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建-->
+          <!--</el-button>-->
+          <!--<el-button plain class="el-icon-edit" @click="editFunc" :disabled="toolBtn.editBtn" style="margin-left: 0px;">编辑-->
+          <!--</el-button>-->
+          <!--<el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除-->
+          <!--</el-button>-->
+        <!--</div>-->
+        <section class="section">
+          <el-tree :data="treeData" node-key="id" ref="tree"
+                   :default-expanded-keys="expendKey"
+                   :props="defaultProps"
+                   :highlight-current=true
+                   :expand-on-click-node="false"
+                   @node-click="handleNodeClick"
+                   :render-content="renderContent">
+          </el-tree>
+        </section>
+
       </el-col>
-
-      <el-col :span="18">
-        <div style="height:38px;width:100%;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;">
-          <el-breadcrumb id="funcPath" separator=">" style="padding: 10px 15px;">
-            <el-breadcrumb-item v-for="item in breadcrumbData" :key="item.text">{{ item.text }}</el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
-        <el-main style="max-height: 76vh;overflow-y: auto;">
+      <el-col :span="18" style="height: 650px;">
+        <section class="section">
+          <div style="height:38px;width:100%;text-align: left;">
+            <el-breadcrumb id="funcPath" separator=">" style="padding: 10px 15px;">
+              <el-breadcrumb-item v-for="item in breadcrumbData" :key="item.text">
+                {{ item.text }}
+              </el-breadcrumb-item>
+            </el-breadcrumb>
+          </div>
           <el-form :model="funcForm"
                    :rules="rules"
                    ref="funcForm"
@@ -83,7 +94,7 @@
               <el-button @click="closeFuncForm" size="large">取 消</el-button>
             </el-form-item>
           </el-form>
-        </el-main>
+        </section>
       </el-col>
     </el-row>
   </div>
