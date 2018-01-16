@@ -35,6 +35,11 @@ import Log from '@/components/system/Log'
 
 import TxnEventQuery from '@/components/synquery/TxnEventQuery'
 import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
+
+import TxnListReport from '@/components/report/TxnListReport'
+import RuleListReport from '@/components/report/RuleListReport'
+import AreaListReport from '@/components/report/AreaListReport'
+import DateListReport from '@/components/report/DateListReport'
 // import Dashboard from '@/components/Dashboard'
 
 import Time from '@/components/mgr/Time'
@@ -171,6 +176,24 @@ export default new Router({
           path: 'alarmEventQuery_vue',
           name: 'alarmEventQuery',
           component: AlarmEventQuery
+        },
+        {
+          path: 'txnListReport_vue',
+          name: 'txnListReport',
+          component: TxnListReport
+        },
+        {
+          path: 'ruleListReport_vue',
+          name: 'ruleListReport',
+          component: RuleListReport
+        },{
+          path: 'areaListReport_vue',
+          name: 'areaListReport',
+          component: AreaListReport
+        },{
+          path: 'dateListReport_vue',
+          name: 'dateListReport',
+          component: DateListReport
         },
         {
           path: 'time_vue',

@@ -86,6 +86,21 @@
                 <el-menu-item index="6-3">报警事件审核</el-menu-item>
               </router-link>
             </el-submenu>
+            <el-submenu index="7">
+              <template slot="title"><i class="el-icon-setting"></i>运行报表</template>
+              <router-link :to="{ name:'txnListReport'}" tag="li" replace>
+                <el-menu-item index="7-1">操作报警信息</el-menu-item>
+              </router-link>
+              <router-link :to="{ name:'ruleListReport'}" tag="li" replace>
+                <el-menu-item index="7-2">规则报警信息</el-menu-item>
+              </router-link>
+              <router-link :to="{ name:'areaListReport'}" tag="li" replace>
+                <el-menu-item index="7-3">地区报警信息</el-menu-item>
+              </router-link>
+              <router-link :to="{ name:'dateListReport'}" tag="li" replace>
+                <el-menu-item index="7-3">日期报警信息</el-menu-item>
+              </router-link>
+            </el-submenu>
           </el-menu>
         </div>
       </el-aside>
