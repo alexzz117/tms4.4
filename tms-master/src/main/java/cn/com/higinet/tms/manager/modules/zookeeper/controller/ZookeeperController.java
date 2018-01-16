@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.controller;
+package cn.com.higinet.tms.manager.modules.zookeeper.controller;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.util.Stringz;
+import cn.com.higinet.tms.manager.modules.zookeeper.model.ZkNode;
 
 @RestController
 @RequestMapping("/zookeeper")

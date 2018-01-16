@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.controller;
+package cn.com.higinet.tms.manager.modules.zookeeper.model;
 
 public class ZkNode {
 
