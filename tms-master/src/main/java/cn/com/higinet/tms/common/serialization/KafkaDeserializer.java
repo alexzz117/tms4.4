@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.kafka.common.serialization.Deserializer;
 
 import cn.com.higinet.tms.base.constant.Constants;
+import cn.com.higinet.tms.base.entity.TrafficData;
 import cn.com.higinet.tms.base.util.Kryoz;
 
 public class KafkaDeserializer implements Deserializer<Object> {
@@ -24,7 +25,7 @@ public class KafkaDeserializer implements Deserializer<Object> {
 		Object obj = null;
 		switch( topic ) {
 			case Constants.Kafka.Topic.TRAFFIC :
-				obj = Kryoz.toObject( Object.class, data );
+				obj = Kryoz.toObject( TrafficData.class, data );
 				break;
 			case Constants.Kafka.Topic.RULE_HIT :
 				obj = Kryoz.toObject( Object.class, data );

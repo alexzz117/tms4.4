@@ -33,7 +33,7 @@ public class ZookeeperDemoController {
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
 	public Model get() throws Exception {
 		Model model = new Model();
-		String test = new String( curator.getData().forPath( "/config/tms-master/test" ) );
+		String test = new String( curator.getData().forPath( "/config/tms/master/test" ) );
 
 		model.put( "aaaaaaa", zookeeperProperties );
 		model.put( "bbb", curator );
@@ -48,6 +48,7 @@ public class ZookeeperDemoController {
 		if(curator.checkExists().forPath( "/config/higinet-tms" ) == null ) {
 			curator.create().forPath( "/config/higinet-tms" );
 		}
+		curator.getChildren().forPath( "/config/tms-master" ).iterator();
 		
 		return new Model();
 	}
