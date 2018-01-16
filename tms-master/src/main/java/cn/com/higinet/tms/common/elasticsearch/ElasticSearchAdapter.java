@@ -218,12 +218,10 @@ public class ElasticSearchAdapter {
 				return;
 			}
 			BulkProcessor bulkProcessor = getBulkProcessor();
-			long s = System.currentTimeMillis();
 			for( int i = 0; i < dataList.size(); i++ ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
 			}
-			System.out.println( System.currentTimeMillis() - s );
 			bulkProcessor.close();
 		}
 		catch( Exception e ) {
