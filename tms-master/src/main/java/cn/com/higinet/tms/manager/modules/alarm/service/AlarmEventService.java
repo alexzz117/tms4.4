@@ -2,10 +2,7 @@ package cn.com.higinet.tms.manager.modules.alarm.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -773,13 +770,11 @@ public class AlarmEventService {
 	 * @return
 	 */
 	private List<Map<String, Object>> getAlarmFuncAuthorityOperators(String funcId) {
-		// String sql = "SELECT co.OPERATOR_ID, co.LOGIN_NAME FROM cmc_operator co,
-		// cmc_operator_role_rel corr, cmc_role_func_rel crfr " +
-		// "WHERE co.OPERATOR_ID = corr.OPERATOR_ID AND corr.ROLE_ID = crfr.ROLE_ID AND
-		// co.FLAG = '1' AND crfr.FUNC_ID = ?";
-		// List<Map<String, Object>> list = tmpSimpleDao.queryForList(sql, funcId);
-		String sql = "SELECT co.OPERATOR_ID, co.LOGIN_NAME FROM cmc_operator co where login_name!='admin'";
-		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql);
+		 String sql = "SELECT co.OPERATOR_ID, co.LOGIN_NAME FROM cmc_operator co, cmc_operator_role_rel corr, cmc_role_func_rel crfr " +
+		 "WHERE co.OPERATOR_ID = corr.OPERATOR_ID AND corr.ROLE_ID = crfr.ROLE_ID AND co.FLAG = '1' AND crfr.FUNC_ID = ?";
+		 List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, funcId);
+//		String sql = "SELECT co.OPERATOR_ID, co.LOGIN_NAME FROM cmc_operator co where login_name!='admin'";
+//		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql);
 		return list;
 	}
 
@@ -1089,11 +1084,18 @@ public class AlarmEventService {
 	 * @return
 	 */
 	public List<Map<String, Object>> getTrafficDataForAlarmProcessList(String rosterIds) {
+//		String sql = "select TXNCODE, CHANCODE, TXNID, TXNTYPE, USERID, COUNTRYCODE, REGIONCODE, CITYCODE, TXNTIME, "
+//				+ "DISPOSAL, MODELID, STRATEGY, PSSTATUS, ASSIGNID, ASSIGNTIME, OPERID, OPERTIME, AUDITID, AUDITTIME, "
+//				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN(" + rosterIds + ")";
+
 		String sql = "select TXNCODE, CHANCODE, TXNID, TXNTYPE, USERID, COUNTRYCODE, REGIONCODE, CITYCODE, TXNTIME, "
 				+ "DISPOSAL, MODELID, STRATEGY, PSSTATUS, ASSIGNID, ASSIGNTIME, OPERID, OPERTIME, AUDITID, AUDITTIME, "
-				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN(" + rosterIds + ")";
+				+ "FRAUD_TYPE,M_NUM2 from TMS_RUN_TRAFFICDATA t where TXNCODE IN(:rosterIds)";
 
-		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql);
+		String[] rosterIdStrs = rosterIds.split(",");
+		Map<String, Object> paramsMap = new HashMap<>();
+		paramsMap.put("rosterIds", new ArrayList<>(Arrays.asList(rosterIdStrs)));
+		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, paramsMap);
 		if (list == null || list.isEmpty())
 			return null;
 		return list;

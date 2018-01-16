@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -247,7 +248,7 @@ public class AlarmEventController {
 	 * @return
 	 */
 	@RequestMapping(value = "/assign", method = RequestMethod.POST)
-	public Model alarmAssignAction(@RequestBody Map<String, List<Map<String, String>>> modelMap) {
+	public Model alarmAssignAction(@RequestBody RequestModel modelMap) {
 		Model model = new Model();
 		Map<String, Object> cond = new HashMap<String, Object>();
 		//报警事件处理人员工作量
@@ -259,14 +260,16 @@ public class AlarmEventController {
 		}
 		// 20180101-lemon 修改 由单个改成批量
 		//通过查询交易流水, 获取其中报警处理相关信息
-		List<Map<String, String>> condList = modelMap.get("TXNCODES");
-		String rosterIds = "";
-		for (Map<String, String> delMap : condList) {
-			String rosterId = MapUtil.getString(delMap, "txncode");
-			rosterIds += ",'" + rosterId + "'";
-		}
-		rosterIds = rosterIds.substring(1);
-		List<Map<String, Object>> txnMapList = alarmEventService.getTrafficDataForAlarmProcessList(rosterIds);
+//		List<Map<String, String>> condList = modelMap.getString("TXNCODES");
+//		String rosterIds = "";
+//		for (Map<String, String> delMap : condList) {
+//			String rosterId = MapUtil.getString(delMap, "txncode");
+//			rosterIds += ",'" + rosterId + "'";
+//		}
+//		rosterIds = rosterIds.substring(1);
+//		List<String> rosterIds = new ArrayList<>(1);
+//		rosterIds.add(modelMap.getString("txn_code"));
+		List<Map<String, Object>> txnMapList = alarmEventService.getTrafficDataForAlarmProcessList(modelMap.getString("txn_code"));
 		model.set("txnMap", txnMapList);
 		model.set("operList", list);
 		model.setList(operCapacityList);
