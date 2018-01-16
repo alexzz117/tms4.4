@@ -453,7 +453,6 @@
       },
       handleCheckChange (data, checked, indeterminate) {
         // console.log(data, checked, indeterminate)
-        console.log()
         let checkedArr = this.$refs.tree.getCheckedNodes()
         let checkedStrArr = []
         let checkedStrKeyArr = []

@@ -24,7 +24,9 @@ import Tranmdl from '@/components/run/Tranmdl'
 
 
 import AuthCenter from '@/components/system/AuthCenter'
+import AuthCenterShow from '@/components/system/AuthCenterShow'
 import AuthDataList from '@/components/system/AuthDataList'
+import AuthDataListShow from '@/components/system/AuthDataListShow'
 import AuthLogList from '@/components/system/AuthLogList'
 import AuthSubDataList from '@/components/system/AuthSubDataList'
 import AuthDataCompare from '@/components/system/AuthDataCompare'
@@ -32,6 +34,7 @@ import Codedict from '@/components/system/Codedict'
 import CodedictInfo from '@/components/system/CodedictInfo'
 import Ipaddr from '@/components/system/Ipaddr'
 import Log from '@/components/system/Log'
+import DeviceFingerPrint from '@/components/system/DeviceFingerPrint'
 
 import TxnEventQuery from '@/components/synquery/TxnEventQuery'
 import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
@@ -128,6 +131,11 @@ export default new Router({
           component: AuthCenter
         },
         {
+          path: 'authCenterShow_vue',
+          name: 'authCenterShow',
+          component: AuthCenterShow
+        },
+        {
           path: 'authDataCompare_vue',
           name: 'authDataCompare',
           component: AuthDataCompare
@@ -136,6 +144,11 @@ export default new Router({
           path: 'authDataList_vue',
           name: 'authDataList',
           component: AuthDataList
+        },
+        {
+          path: 'authDataListShow_vue',
+          name: 'authDataListShow',
+          component: AuthDataListShow
         },
         {
           path: 'authLogList_vue',
@@ -199,6 +212,11 @@ export default new Router({
           path: 'time_vue',
           name: 'time',
           component: Time
+        },
+        {
+          path: 'dfp',
+          name: 'dfp',
+          component: DeviceFingerPrint
         }
         // ,
         // {

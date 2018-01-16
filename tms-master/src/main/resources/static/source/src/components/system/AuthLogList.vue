@@ -18,7 +18,11 @@
         </template>
       </el-table-column>
       <el-table-column prop="func_name" label="所属功能" align="left"></el-table-column>
-      <el-table-column prop="operate_result" label="操作结果" align="left"></el-table-column>
+      <el-table-column label="操作结果" align="left">
+        <template slot-scope="scope">
+          <span>{{scope.row.operate_result | renderOperateResult}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="operate_data" label="操作数据" align="left"></el-table-column>
     </el-table>
     <el-pagination style="margin-top: 10px; text-align: right;"
@@ -38,6 +42,7 @@
 <script>
   import ajax from '@/common/ajax'
   import util from '@/common/util'
+  import dictCode from "../../common/dictCode";
 
   export default {
     computed: {
@@ -79,6 +84,12 @@
     filters: {
       renderDateTime: function (value) {
         return util.renderDateTime(value)
+      },
+      renderOperateResult: function (value) {
+        if (value === undefined || value === '') {
+          return ''
+        }
+        return dictCode.rendCode('common.operateresult', value.toString())
       }
     },
     methods: {

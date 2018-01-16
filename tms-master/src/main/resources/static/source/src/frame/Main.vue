@@ -4,7 +4,7 @@
       <el-aside width="220px" style="overflow:hidden;height: 100%; padding-top:60px; box-sizing: border-box;">
         <div class="title">TMS</div>
         <div class="scroll" style="overflow: auto; height: 100%; margin: 60px 0px 10px 0px">
-          <el-menu :default-openeds="['1', '3', '4']" >
+          <el-menu>
             <!--<el-submenu v-for="(menu, index) in menus" :key="menu.id" :index= "index.toString()">-->
               <!--<template slot="title"><i class="el-icon-message"></i>{{ menu.text }}</template>-->
 
@@ -55,11 +55,17 @@
               <router-link :to="{ name:'authCenter'}" tag="li" replace>
                 <el-menu-item index="4-3">授权中心</el-menu-item>
               </router-link>
+              <router-link :to="{ name:'authCenterShow'}" tag="li" replace>
+                <el-menu-item index="4-4">授权查看</el-menu-item>
+              </router-link>
               <router-link :to="{ name:'log'}" tag="li" replace>
-                <el-menu-item index="4-4">操作日志管理</el-menu-item>
+                <el-menu-item index="4-5">操作日志管理</el-menu-item>
               </router-link>
               <router-link :to="{ name:'time'}" tag="li" replace>
-                <el-menu-item index="4-5">定时任务管理</el-menu-item>
+                <el-menu-item index="4-6">定时任务管理</el-menu-item>
+              </router-link>
+              <router-link :to="{ name:'dfp'}" tag="li" replace>
+                <el-menu-item index="4-7">设备指纹</el-menu-item>
               </router-link>
             </el-submenu>
             <el-submenu index="5">
