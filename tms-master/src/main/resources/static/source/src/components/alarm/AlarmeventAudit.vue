@@ -60,7 +60,7 @@
     <!--报警事件审核ExecuteData -->
     <el-dialog title="报警事件审核" :visible.sync="listDialogVisible" append-to-body  >
       <div>
-        <el-form label-position="right"  :model="actionForm" :inline="inline" >
+        <el-form label-position="right" :model="actionForm" :inline="inline" >
           <el-row>
             <el-col :span="3"><div ><el-form-item label="欺诈类型"/></div></el-col>
             <el-col :span="9"><div ><el-form-item prop="fraud_type" clearable>
@@ -80,23 +80,22 @@
 
         <el-collapse v-model="activeNames" @change="handleChange">
           <el-collapse-item title="处理动作信息" name="1">
-            <el-table
-              :data="actionData" highlight-current-row height="100"
-              tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
-              <el-table-column  prop="ac_name" label="动作名称" width="180"  />
-              <el-table-column  prop="ac_cond_in" label="条件" width="180"  />
-              <el-table-column  prop="ac_expr_in" label="表达式" width="180"  />
+            <el-table :data="actionData" highlight-current-row max-height="120"
+              tooltip-effect="dark" @selection-change="handleCurrentRow">
+              <el-table-column  prop="ac_name" label="动作名称"/>
+              <el-table-column  prop="ac_cond_in" label="条件"/>
+              <el-table-column  prop="ac_expr_in" label="表达式"/>
             </el-table>
           </el-collapse-item>
           <el-collapse-item title="报警处理信息" name="2">
             <el-table
-              :data="executeData" highlight-current-row height="120"
-              tooltip-effect="dark" style="width: 90%" @selection-change="handleCurrentRow">
+              :data="executeData" highlight-current-row max-height="120"
+              tooltip-effect="dark" @selection-change="handleCurrentRow">
               <el-table-column  prop="ps_time" label="处理时间" width="140"  />
               <el-table-column  prop="ps_type" label="处理类型" width="90"   :formatter="formatter"/>
               <el-table-column  prop="login_name" label="处理人员" width="90"  />
               <el-table-column  prop="ps_result" label="处理结果" width="90"   :formatter="formatter"/>
-              <el-table-column  prop="ps_info" label="处理信息" width="140"  />
+              <el-table-column  prop="ps_info" label="处理信息"/>
             </el-table>
           </el-collapse-item>
         </el-collapse>
@@ -104,7 +103,7 @@
         <!--审核信息 -->
         <el-form  label-position="right" :model="auditForm"  ref="auditForm" :rules="rules"    >
           <el-row>
-            <el-col :span="3.5"><div ><el-form-item label="审核结果" prop="PS_RESULT"/></div></el-col>
+            <el-col :span="3"><div ><el-form-item label="审核结果" prop="PS_RESULT"/></div></el-col>
             <el-col :span="9"><div >
               <el-form-item  >
                 <el-radio v-model="auditForm.PS_RESULT" label="1">通过</el-radio>
@@ -114,7 +113,7 @@
             </el-col>
           </el-row>
           <el-row>
-            <el-col :span="3.5" :rows="3"><div><el-form-item label="处理信息"  prop="PS_INFO"  /></div></el-col>
+            <el-col :span="3" :rows="3"><div><el-form-item label="处理信息"  prop="PS_INFO"  /></div></el-col>
             <el-col :span="20"><div><el-input
               type="textarea"resize="none" v-model="auditForm.PS_INFO"
               :rows="3"  auto-complete="off"
@@ -122,10 +121,10 @@
             </el-input></div></el-col>
           </el-row>
         </el-form>
-        <div class="dialog-footer"  align="center"  slot="footer">
-          <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="onSaveAudit('auditForm')" >提 交</el-button>
-          <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false" >返 回</el-button>
-        </div>
+      </div>
+      <div class="dialog-footer" align="left" slot="footer">
+        <el-button data="cancelBtn" icon="el-icon-success" type="primary"  @click="onSaveAudit('auditForm')" >提 交</el-button>
+        <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false" >返 回</el-button>
       </div>
     </el-dialog>
   </div>
@@ -139,6 +138,7 @@
   export default {
     created () {
       this.sel()
+      this.datatypeOptions = dictCode.getCodeItems('tms.alarm.fraudtype')
     },
     methods: {
       handleSizeChange(val) {
@@ -244,9 +244,10 @@
           param: {TXN_CODE: TXN_CODE},
           success: function (data) {
             console.log(data)
-            debugger
             var aa = data['txnmap']
             var psStatus = aa['fraud_type']
+            var execueResult = aa['execue_result']
+            var execueInfo = aa['execue_info']
 
             if (data.actlist) {
               self.actionData = data.actlist
@@ -254,11 +255,20 @@
             if (data.pslist) {
               self.executeData = data.pslist
             }
+            if (util.trim(psStatus)) {            // 欺诈类型
+              self.actionForm.fraud_type = psStatus
+            } else {
+              self.actionForm.fraud_type = ''
+            }
+            self.auditForm.PS_RESULT = execueResult || '1'  // 审核结果
+            self.auditForm.PS_INFO = execueInfo || ''       // 处理信息
+            console.info(self.auditForm.PS_RESULT, self.auditForm.PS_INFO)
             // if (data.txnmap) {
             //   self.actionForm =  Object.assign({}, txnmap.fraud_type)
             // }
           }
         })
+        self.activeNames = ['1', '2']
       },
       //报警事件审核提交
       onSaveAudit(formName){
@@ -285,11 +295,15 @@
             return false
           }
         })
+      },
+      handleChange () {
+
       }
     },
     data() {
       return {
         inline: true,
+        activeNames: ['1', '2'], // 折叠面板展开配置
         clearable: true,
         listDialogVisible: false,
         listForm: {
