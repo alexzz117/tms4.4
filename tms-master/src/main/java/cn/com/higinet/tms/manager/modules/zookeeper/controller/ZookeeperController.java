@@ -38,7 +38,7 @@ public class ZookeeperController {
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
 	public Model list( @RequestBody ZkNode indata ) throws Exception {
 		String path = "";
-		if( Stringz.isEmpty( indata.getPath() ) ) path = this.getZookeeperPath();
+		if( Stringz.isEmpty( indata.getPath() ) ) path = this.getRootPath();
 		else path = indata.getPath();
 
 		List<ZkNode> nodeList = Lists.newArrayList();
@@ -52,7 +52,7 @@ public class ZookeeperController {
 		return new Model().setRow( nodeList );
 	}
 
-	private String getZookeeperPath() {
+	private String getRootPath() {
 		String path = "/" + zookeeperConfigProperties.getRoot();
 		return path.replace( "//", "/" );
 	}
