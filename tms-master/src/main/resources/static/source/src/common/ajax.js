@@ -2,10 +2,8 @@ import axios from 'axios'
 import util from '@/common/util'
 
 var config = {
-  suffix: '?format=json',
-  prefix: util.getWebRootPath()  // 正式测试环境
-  // prefix: '/context' // 分离测试环境
-  // prefix: '/api' // local mock
+  // prefix: util.getWebRootPath()  // 正式测试环境
+  prefix: '/context' // 分离测试环境
 }
 
 let modelDef = {
@@ -28,7 +26,7 @@ let defaultOption = {
 function post (opt) {
   let option = {}
   Object.assign(option, defaultOption, opt)
-  var sendUrl = config.prefix + option.model + option.url + config.suffix
+  var sendUrl = config.prefix + option.model + option.url
   axios.post(sendUrl, option.param)
     .then(function (response) {
       if (response.status === 200) {
@@ -53,7 +51,7 @@ function post (opt) {
 function get (opt) {
   let option = {}
   Object.assign(option, defaultOption, opt)
-  var sendUrl = config.prefix + option.model + option.url + config.suffix
+  var sendUrl = config.prefix + option.model + option.url
 
   axios.get(sendUrl)
     .then(function (response) {

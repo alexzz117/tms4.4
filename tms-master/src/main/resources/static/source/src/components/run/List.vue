@@ -72,7 +72,6 @@
               title="导出"></el-button>
           </template>
         </el-table-column>
-        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
         <el-table-column prop="rostername" label="名单英文名" align="left" width="160"></el-table-column>
         <el-table-column prop="rosterdesc" label="名单名称" align="left" width="120"></el-table-column>
         <el-table-column prop="datatype" label="名单数据类型" align="left" width="120" :formatter="formatter"></el-table-column>
@@ -123,8 +122,6 @@
           </el-select>
         </el-form-item>
         <el-form-item label="是否缓存" prop="iscache" data="iscache">
-          <!--<el-radio v-model="listDialogform.iscache" label="1">是</el-radio>-->
-          <!--<el-radio v-model="listDialogform.iscache" label="0">否</el-radio>-->
           <el-switch v-model="listDialogform.iscache" active-value= "1"  inactive-value= "0"></el-switch>
         </el-form-item>
         <el-form-item label="备注" prop="remark" data="remark">
@@ -146,7 +143,7 @@
         :on-remove="handleRemove"
         :on-change="handleChange"
         :file-list="fileList"
-        :multiple = 'multiple'
+        :multiple = "multiple"
         :auto-upload="false">
         <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
         <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
@@ -338,6 +335,7 @@
         this.$router.push({ name: 'valuelist', params: { rosterid: rosterid, datatype: datatype}})
       },
       importList() {
+        this.fileList = []
         this.importDialogVisible = true
       },
       exportList() {
@@ -378,33 +376,29 @@
         }
       },
       submitUpload() {
-        var self = this
-//        this.$refs.upload.submit();
-        var format = this.file.name.split('.').pop()
+        let self = this
+        let format = `.${this.file.name.split('.').pop()}`
+        let row = this.selectedRow
         this.uploadForm = new FormData()
-        this.uploadForm.append('importFile', this.file)
-        this.uploadForm.append('rosterid',  this.multipleSelection[0].rosterid)
-        this.uploadForm.append('rosterdesc',  this.multipleSelection[0].rosterdesc)
+        this.uploadForm.append('importFile', this.file.raw)
+        this.uploadForm.append('rosterid',  row.rosterid)
+        this.uploadForm.append('rosterdesc',  row.rosterdesc)
         this.uploadForm.append('format',  format)
         ajax.post({
           url: '/mgr/import',
           param: self.uploadForm,
           success: function (data) {
-            console.log(data)
+            self.importDialogVisible = false
+            self.$message({
+              type: 'success',
+              message: '导入成功!'
+            })
           }
         })
       },
       handleChange(file, fileList) {
+        this.fileList = [file]
         this.file = file
-        debugger
-        console.log(file);
-        console.log(fileList)
-      },
-      handleRemove(file, fileList) {
-        console.log(file, fileList);
-      },
-      handlePreview(file) {
-        console.log(file);
       },
       exportAction(flag) {
 //        let row = this.multipleSelection[0]
