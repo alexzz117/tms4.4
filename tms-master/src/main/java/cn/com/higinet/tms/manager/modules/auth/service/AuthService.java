@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.manager.modules.aop.cache.common.MethodConfig;
 
 /**
@@ -54,7 +55,7 @@ public interface AuthService {
 	 * @param conds
 	 * @return
 	 */
-	public Page<Map<String,Object>> historyDataList(Map<String,String> conds);
+	public Page<Map<String,Object>> historyDataList(RequestModel conds);
 	/**
 	 * 根据表名，主键及主键值获取正式表数据
 	 * @param tableName

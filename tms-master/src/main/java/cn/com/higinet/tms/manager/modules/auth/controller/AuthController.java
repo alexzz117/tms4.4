@@ -5,13 +5,13 @@
  */
 package cn.com.higinet.tms.manager.modules.auth.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import cn.com.higinet.tms.base.entity.common.RequestModel;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -257,25 +257,31 @@ public class AuthController extends ApplicationObjectSupport {
 	 * @return
 	 */
 	@RequestMapping(value = "/dataquary", method = RequestMethod.POST)
-	public Model dataQueryActoin( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
+	public Model dataQueryActoin(@RequestBody RequestModel reqs, HttpServletRequest request ) {
 		Model model = new Model();
 
 		try {
 			String[] time = request.getParameterValues( "PROPOSER_TIME" );
-			if( time != null && time.length == 1 ) {
-				if( !CmcStringUtil.isBlank( time[0] ) ) {
-					reqs.put( "START_TIME", time[0] );
-				}
+			String startTime = reqs.getString("startDate");
+			String endTime = reqs.getString("endDate");
+			if(StringUtils.isNotEmpty(startTime) && StringUtils.isNotEmpty(endTime)){
+				reqs.put( "start_time", startTime);
+				reqs.put( "end_time", endTime);
 			}
-
-			if( time != null && time.length == 2 ) {
-				if( !CmcStringUtil.isBlank( time[0] ) ) {
-					reqs.put( "START_TIME", MgrDateConvertUtil.convert2Millisr( time[0], MgrDateConvertUtil.FORMATE1 ) + "" );
-				}
-				if( !CmcStringUtil.isBlank( time[1] ) ) {
-					reqs.put( "END_TIME", MgrDateConvertUtil.convert2Millisr( time[1], MgrDateConvertUtil.FORMATE1 ) + "" );
-				}
-			}
+//			if( time != null && time.length == 1 ) {
+//				if( !CmcStringUtil.isBlank( time[0] ) ) {
+//
+//				}
+//			}
+//
+//			if( time != null && time.length == 2 ) {
+//				if( !CmcStringUtil.isBlank( time[0] ) ) {
+//					reqs.put( "START_TIME", MgrDateConvertUtil.convert2Millisr( time[0], MgrDateConvertUtil.FORMATE1 ) + "" );
+//				}
+//				if( !CmcStringUtil.isBlank( time[1] ) ) {
+//					reqs.put( "END_TIME", MgrDateConvertUtil.convert2Millisr( time[1], MgrDateConvertUtil.FORMATE1 ) + "" );
+//				}
+//			}
 			model.setPage( authService.historyDataList( reqs ) );
 		}
 		catch( Exception e ) {

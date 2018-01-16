@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -246,25 +247,25 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 * @param conds
 	 * @return
 	 */
-	public Page<Map<String, Object>> historyDataList( Map<String, String> conds ) {
+	public Page<Map<String, Object>> historyDataList( RequestModel conds ) {
 		String modelName = MapUtil.getString( conds, "modelName" );
 		String sql = "SELECT AI.ORIG_OPERATENAME, AI.OPERATEDATA_VALUE, AI.AUTH_MSG, AI.AUTH_ID, AI.TXN_ID, AI.AUTH_STATUS, AI.PROPOSER_TIME, AI.REFRESH_STATUS, AI.REFRESH_INFO FROM TMS_MGR_AUTHINFO AI WHERE AI.MODULE_NAME = '"
 				+ modelName + "'";
 		if( !MapUtil.isEmpty( conds ) ) {
-			String txnId = MapUtil.getString( conds, "TXN_ID" );
+			String txnId = MapUtil.getString( conds, "txn_id" );
 			if( !StringUtil.isEmpty( txnId ) ) {
 				String[] txnIdArr = txnId.split( "," );
 				String txnIdStr = SqlWhereHelper.getInWhere( txnIdArr );
 				sql += " AND AI.TXN_ID in (" + txnIdStr + ")";
 			}
-			if( !StringUtil.isEmpty( MapUtil.getString( conds, "AUTH_STATUS" ) ) ) {
-				sql += " AND AI.AUTH_STATUS = :AUTH_STATUS ";
+			if( !StringUtil.isEmpty( MapUtil.getString( conds, "auth_status" ) ) ) {
+				sql += " AND AI.AUTH_STATUS = :auth_status ";
 			}
-			if( !StringUtil.isEmpty( MapUtil.getString( conds, "START_TIME" ) ) ) {
-				sql += " AND AI.PROPOSER_TIME >= :START_TIME ";
+			if( !StringUtil.isEmpty( MapUtil.getString( conds, "start_time" ) ) ) {
+				sql += " AND AI.PROPOSER_TIME >= :start_time ";
 			}
-			if( !StringUtil.isEmpty( MapUtil.getString( conds, "END_TIME" ) ) ) {
-				sql += " AND AI.PROPOSER_TIME <= :END_TIME ";
+			if( !StringUtil.isEmpty( MapUtil.getString( conds, "end_time" ) ) ) {
+				sql += " AND AI.PROPOSER_TIME <= :end_time ";
 			}
 		}
 
