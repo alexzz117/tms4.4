@@ -226,13 +226,11 @@ public class ElasticSearchAdapter {
 			Map<BulkProcessor, List<String>> mapProcessor = getBulkProcessor();
 			BulkProcessor bulkProcessor = mapProcessor.keySet().iterator().next();
 			List<String> failIdList = mapProcessor.values().iterator().next();
-			long s = System.currentTimeMillis();
 			for( int i = 0; i < dataList.size(); i++ ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
 				map.put( jsonObject.get( primaryKeyName ).toString(), dataList.get( i ) );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
 			}
-			System.out.println( System.currentTimeMillis() - s );
 			bulkProcessor.close();
 			if( !failIdList.isEmpty() ) {
 				logger.info( "异常数据处理----" + failIdList.size() );
