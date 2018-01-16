@@ -1,15 +1,16 @@
-package cn.com.higinet.tms.consumer;
+package cn.com.higinet.tms.consumer.traffic;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -25,8 +26,6 @@ public class TrafficQueue {
 
 	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
 	private Long preSaveTime = System.currentTimeMillis();
-	private final long saveInterval = 2000; //定时提交时间间隔
-	private ThreadPoolTaskExecutor executor;
 	private BlockingQueue<TrafficData> queue;
 
 	@Value("${elasticsearch.trafficdata.indexName}")
@@ -41,6 +40,10 @@ public class TrafficQueue {
 	@Value("${elasticsearch.trafficdata.saveWhenSize}")
 	private int saveWhenSize; //当queue达到一定数量时提交
 
+	@Autowired
+	@Qualifier("commitTaskExecutor")
+	private ThreadPoolTaskExecutor executor;
+
 	private ElasticSearchAdapter elasticsearchAdapter;
 
 	@PostConstruct
@@ -54,16 +57,8 @@ public class TrafficQueue {
 		}
 		catch( Exception e ) {
 			logger.info( "elasticsearchAdapter is null" );
+			return;
 		}
-
-		//初始化线程池
-		executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize( 4 ); //线程池维护线程的最小数量
-		executor.setMaxPoolSize( 16 ); //线程池维护线程的最大数量
-		executor.setQueueCapacity( 8 ); //持有等待执行的任务队列
-		executor.setKeepAliveSeconds( 300 ); //空闲线程的存活时间
-		executor.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() ); //DiscardPolicys模式，不能执行的任务将被删除
-		executor.initialize();
 	}
 
 	/**
@@ -71,9 +66,9 @@ public class TrafficQueue {
 	 * 当并发量较小时，主要是定时提交起作用
 	 * fixedRate 并发执行模式
 	 * */
-	@Scheduled(fixedRate = saveInterval)
+	@Scheduled(fixedRate = 2000)
 	private void executeTask() {
-		if( (System.currentTimeMillis() - preSaveTime) >= saveInterval && queue.size() > 0 ) {
+		if( (System.currentTimeMillis() - preSaveTime) >= 2000 && queue.size() > 0 ) {
 			this.save( null );
 		}
 	}

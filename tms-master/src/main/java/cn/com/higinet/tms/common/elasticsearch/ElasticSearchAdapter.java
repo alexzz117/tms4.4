@@ -14,10 +14,13 @@ import java.util.concurrent.ExecutionException;
 
 import javax.persistence.Id;
 
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.bulk.BackoffPolicy;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -210,23 +213,45 @@ public class ElasticSearchAdapter {
 	 * @param mappingName
 	 * @param list
 	 */
-	public <T> void batchUpdate( String indexName, List<T> dataList, Class<T> entityType ) {
+	public <T> FailData<T> batchUpdate( String indexName, List<T> dataList, Class<T> entityType ) {
+
+		FailData<T> failData = null;
 		try {
+			Map<String, T> map = new HashMap<String, T>();
 			String primaryKeyName = getPrimaryKeyName( entityType );
 			if( StringUtils.isEmpty( primaryKeyName ) ) {
 				logger.warn( "primaryKeyName is empty" );
-				return;
+				return failData;
 			}
-			BulkProcessor bulkProcessor = getBulkProcessor();
+			Map<BulkProcessor, List<String>> mapProcessor = getBulkProcessor();
+			BulkProcessor bulkProcessor = mapProcessor.keySet().iterator().next();
+			List<String> failIdList = mapProcessor.values().iterator().next();
+			long s = System.currentTimeMillis();
 			for( int i = 0; i < dataList.size(); i++ ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
+				map.put( jsonObject.get( primaryKeyName ).toString(), dataList.get( i ) );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
 			}
+			System.out.println( System.currentTimeMillis() - s );
 			bulkProcessor.close();
+			if( !failIdList.isEmpty() ) {
+				logger.info( "异常数据处理----" + failIdList.size() );
+				List<T> failObjectList = new ArrayList<T>();
+				for( String id : failIdList ) {
+					failObjectList.add( map.get( id ) );
+				}
+				failData = new FailData<T>();
+				failData.setDataList( failObjectList );
+				failData.setEntityType( entityType );
+				failData.setIndexName( indexName );
+				logger.info( "异常数据存储完毕----" + failObjectList.size() );
+			}
 		}
 		catch( Exception e ) {
 			logger.error( "batchUpdate is error", e );
 		}
+		return failData;
+
 	}
 
 	/**
@@ -291,7 +316,9 @@ public class ElasticSearchAdapter {
 		}
 	}
 
-	private BulkProcessor getBulkProcessor() {
+	private <T> Map<BulkProcessor, List<String>> getBulkProcessor() {
+		Map<BulkProcessor, List<String>> returnMap = new HashMap<BulkProcessor, List<String>>();
+		List<String> failIdList = new ArrayList<String>();
 		BulkProcessor bulkProcessor = BulkProcessor.builder( elasticsearchConfig.getTransportClient(), new BulkProcessor.Listener() {
 			@Override
 			public void beforeBulk( long executionId, BulkRequest request ) {
@@ -300,16 +327,40 @@ public class ElasticSearchAdapter {
 
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
-				//logger.info( "executionId:" + executionId + ",is exists error:" + response.hasFailures() );
+				if( response.hasFailures() ) {
+					int i = 0;
+					for( BulkItemResponse bulkItemResponse : response ) {
+						if( bulkItemResponse.isFailed() ) {
+							failIdList.add( bulkItemResponse.getId() );
+							i++;
+						}
+					}
+					logger.info( "总共请求为：" + request.numberOfActions() + ",异常为：" + i );
+				}
 			}
 
 			//设置ConcurrentRequest 为0，Throwable不抛错
+			@SuppressWarnings("rawtypes")
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
-				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() );
+				StringBuffer error = new StringBuffer();
+				int j = 0;
+				while( request.requests().iterator().hasNext() ) {
+					DocWriteRequest t = request.requests().iterator().next();
+					error.append( "Id:" ).append( t.id() );
+					error.append( "Index:" ).append( t.index() );
+					error.append( "Type:" ).append( t.type() ).append( "-----after2 结束----" );
+					j++;
+				}
+				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() + ",afterBulk2 numberOfActions:" + request.numberOfActions() + "失败条数为:" + j );
+				logger.info( error.toString() );
+
 			}
-		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) ).setConcurrentRequests( concurrentRequests ).build();
-		return bulkProcessor;
+		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
+				//设置回退策略，当请求执行错误时，可进行回退操作,执行错误后延迟100MS，重试三次后执行回退
+				.setBackoffPolicy( BackoffPolicy.exponentialBackoff( TimeValue.timeValueMillis( 100 ), 3 ) ).setConcurrentRequests( concurrentRequests ).build();
+		returnMap.put( bulkProcessor, failIdList );
+		return returnMap;
 	}
 
 	/**

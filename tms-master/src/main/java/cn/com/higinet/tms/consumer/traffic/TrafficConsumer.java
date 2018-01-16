@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.consumer;
+package cn.com.higinet.tms.consumer.traffic;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -59,6 +59,7 @@ public class SendRateMessage {
 	@Qualifier("offlineSimpleDao")
 	private SimpleDao offlineSimpleDao;
 	@Autowired
+	@Qualifier("refreshCacheExecutor")
 	private TaskExecutor taskExecutor;
 	@Autowired
 	private CacheRefresh commonCacheRefresh;
@@ -103,8 +104,7 @@ public class SendRateMessage {
 
 		Map<String, Object> transaction;
 
-		public SaveReturnInfoTask( Map<String, Object> transaction, String user_id, Map<Integer, Map<String, Object>> ser_map, String head, String body, int index,
-				String signal ) {
+		public SaveReturnInfoTask( Map<String, Object> transaction, String user_id, Map<Integer, Map<String, Object>> ser_map, String head, String body, int index, String signal ) {
 			this.user_id = user_id;
 			this.ser_map = ser_map;
 			this.head = head;
@@ -123,7 +123,7 @@ public class SendRateMessage {
 			if( "single".equals( signal ) ) {
 				refresh( signal + "," + user_id );
 			}
-			synchronized (SaveReturnInfoTask.class) {
+			synchronized( SaveReturnInfoTask.class ) {
 				count++;
 			}
 			;
@@ -131,7 +131,7 @@ public class SendRateMessage {
 		}
 
 		public String refresh( String refreshMsg ) {
-			while (commonCacheRefresh.refreshUserCache( refreshMsg ).isEmpty())
+			while( commonCacheRefresh.refreshUserCache( refreshMsg ).isEmpty() )
 				break;
 			return "";
 		}
