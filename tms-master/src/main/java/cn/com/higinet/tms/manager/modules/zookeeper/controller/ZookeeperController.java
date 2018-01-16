@@ -41,17 +41,14 @@ public class ZookeeperController {
 		if( Stringz.isEmpty( indata.getPath() ) ) path = this.getZookeeperPath();
 		else path = indata.getPath();
 
-		List<String> list = curator.getChildren().forPath( path );
-
 		List<ZkNode> nodeList = Lists.newArrayList();
-		for( String name : list ) {
+		for( String name : curator.getChildren().forPath( path ) ) {
 			ZkNode node = new ZkNode();
 			node.setLabel( name );
 			node.setPath( (path + "/" + name) );
 			node.setValue( new String( curator.getData().forPath( node.getPath() ) ) );
 			nodeList.add( node );
 		}
-
 		return new Model().setRow( nodeList );
 	}
 
@@ -63,7 +60,9 @@ public class ZookeeperController {
 	@RequestMapping(value = "/get", method = RequestMethod.POST)
 	public Model get( @RequestBody ZkNode indata ) throws Exception {
 		if( Stringz.isEmpty( indata.getPath() ) ) new Model().addError( "path is empty" );
+		if( curator.checkExists().forPath( indata.getPath() ) == null ) return new Model().addError( "节点不存在" );
 
+		indata.setLabel( indata.getPath().substring( indata.getPath().lastIndexOf( "/" ) + 1, indata.getPath().length() ) );
 		byte[] bytes = curator.getData().forPath( indata.getPath() );
 		if( bytes != null ) {
 			indata.setValue( new String( bytes ) );
