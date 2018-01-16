@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -51,9 +50,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.com.higinet.tms.common.config.ElasticSearchConfig;
-
-@Component
 public class ElasticSearchAdapter {
 	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchAdapter.class );
 
@@ -116,8 +112,7 @@ public class ElasticSearchAdapter {
 
 	@SuppressWarnings("rawtypes")
 	private SearchRequestBuilder queryCondition( String indexName, Pagination page, List<QueryConditionEntity> dataList ) {
-		SearchRequestBuilder searchRequestBuilder = elasticsearchConfig.getTransportClient().prepareSearch( indexName ).setTypes( indexName )
-				.setSearchType( SearchType.DFS_QUERY_THEN_FETCH );
+		SearchRequestBuilder searchRequestBuilder = elasticsearchConfig.getTransportClient().prepareSearch( indexName ).setTypes( indexName ).setSearchType( SearchType.DFS_QUERY_THEN_FETCH );
 		searchRequestBuilder.setFrom( (page.getPageNo() - 1) * page.getPageSize() ).setSize( page.getPageSize() ).setExplain( true );
 		for( int i = 0; i < dataList.size(); i++ ) {
 			QueryConditionEntity condition = dataList.get( i );
@@ -252,8 +247,7 @@ public class ElasticSearchAdapter {
 				return;
 			}
 			JSONObject jsonObject = (JSONObject) JSONObject.toJSON( t );
-			IndexRequest indexRequest = new IndexRequest( indexName, indexName, primaryKeyValue )
-					.source( XContentFactory.jsonBuilder().startObject().field( primaryKeyName, primaryKeyValue ).endObject() );
+			IndexRequest indexRequest = new IndexRequest( indexName, indexName, primaryKeyValue ).source( XContentFactory.jsonBuilder().startObject().field( primaryKeyName, primaryKeyValue ).endObject() );
 			UpdateRequest updateRequest = new UpdateRequest( indexName, indexName, primaryKeyValue ).doc( jsonObject ).upsert( indexRequest );
 			try {
 				elasticsearchConfig.getTransportClient().update( updateRequest ).get();
@@ -316,8 +310,7 @@ public class ElasticSearchAdapter {
 			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
 				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() );
 			}
-		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
-				.setConcurrentRequests( concurrentRequests ).build();
+		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) ).setConcurrentRequests( concurrentRequests ).build();
 		return bulkProcessor;
 	}
 
@@ -421,7 +414,7 @@ public class ElasticSearchAdapter {
 	 */
 	private String getElasticSearchMappingType( String varType ) {
 		String es = "String";
-		switch ( varType ) {
+		switch( varType ) {
 			case "String" :
 				es = "keyword";
 				break;

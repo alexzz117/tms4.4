@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.config;
+package cn.com.higinet.tms.common.elasticsearch;
 
 import java.net.InetAddress;
 
@@ -11,13 +11,10 @@ import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  * ES配置类
  * */
-
-@Component
 public class ElasticSearchConfig {
 
 	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchConfig.class );
@@ -44,9 +41,7 @@ public class ElasticSearchConfig {
 			return;
 		}
 		try {
-			Settings esSetting = Settings.builder()
-					.put( "cluster.name", clusterName )
-					.put( "xpack.security.user", username + ":" + password )//用户名：密码
+			Settings esSetting = Settings.builder().put( "cluster.name", clusterName ).put( "xpack.security.user", username + ":" + password )//用户名：密码
 					.put( "client.transport.sniff", true )//增加嗅探机制，找到ES集群
 					.build();
 			String[] cluster = clusterNodes.split( "," );

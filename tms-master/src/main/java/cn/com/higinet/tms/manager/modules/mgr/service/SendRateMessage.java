@@ -23,10 +23,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
+import cn.com.higinet.tms.common.config.ApplicationContextUtil;
 import cn.com.higinet.tms.engine.core.dao.stmt.batch_stmt_jdbc;
 import cn.com.higinet.tms.engine.core.dao.stmt.batch_stmt_jdbc.row_fetch;
 import cn.com.higinet.tms.engine.core.dao.stmt.data_source;
-import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;

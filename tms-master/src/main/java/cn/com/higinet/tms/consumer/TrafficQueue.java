@@ -10,7 +10,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
 import cn.com.higinet.tms.base.util.Clockz;
+import cn.com.higinet.tms.common.config.ApplicationContextUtil;
 import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
 
 @Service
@@ -41,13 +41,21 @@ public class TrafficQueue {
 	@Value("${elasticsearch.trafficdata.saveWhenSize}")
 	private int saveWhenSize; //当queue达到一定数量时提交
 
-	@Autowired
 	private ElasticSearchAdapter elasticsearchAdapter;
 
 	@PostConstruct
 	public void init() {
 		//初始化traffic数据队列
 		queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
+
+		try {
+			elasticsearchAdapter = ApplicationContextUtil.getBean( ElasticSearchAdapter.class );
+			logger.info( "elasticsearchAdapter is not null" );
+		}
+		catch( Exception e ) {
+			logger.info( "elasticsearchAdapter is null" );
+		}
+
 		//初始化线程池
 		executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize( 4 ); //线程池维护线程的最小数量
@@ -81,6 +89,8 @@ public class TrafficQueue {
 	}
 
 	private void save( Integer size ) {
+		if( elasticsearchAdapter == null ) return;
+
 		executor.execute( new Runnable() {
 			@Override
 			public void run() {

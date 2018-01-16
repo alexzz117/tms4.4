@@ -3,11 +3,13 @@ package cn.com.higinet.tms;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
 @SpringBootApplication
 //@EnableJdbcHttpSession(maxInactiveIntervalInSeconds = 1800)
 @EnableDiscoveryClient
-//@EnableZuulProxy
+@EnableZuulProxy
+//@EnableElasticSearch
 //@EnableKafka
 public class TmsMasterApplication {
 

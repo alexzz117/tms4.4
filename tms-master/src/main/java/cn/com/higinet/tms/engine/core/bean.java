@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
+import cn.com.higinet.tms.common.config.ApplicationContextUtil;
 
 @Service("bean_fac")
 public class bean implements ApplicationContextAware {

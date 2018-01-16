@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.com.higinet.tms.base.entity.common.Page;
-import cn.com.higinet.tms.manager.common.ApplicationContextUtil;
+import cn.com.higinet.tms.common.config.ApplicationContextUtil;
 import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
