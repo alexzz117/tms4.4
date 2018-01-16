@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.common.demo.zookeeper;
+package cn.com.higinet.tms.common.demo;
 
 import java.util.List;
 
@@ -20,39 +20,10 @@ import cn.com.higinet.tms.base.entity.common.Model;
 @RequestMapping("/demo/zookeeper")
 @RefreshScope
 public class ZookeeperDemoController {
-	
+
 	@Value("${spring.application.name}")
 	String appName;
 
-	@Autowired
-	ZookeeperProperties zookeeperProperties;
-
-	@Autowired
-	CuratorFramework curator;
-
-	@RequestMapping(value = "/get", method = RequestMethod.GET)
-	public Model get() throws Exception {
-		Model model = new Model();
-		String test = new String( curator.getData().forPath( "/config/tms/master/test" ) );
-
-		model.put( "aaaaaaa", zookeeperProperties );
-		model.put( "bbb", curator );
-		model.put( "ccc", test );
-
-		return model;
-	}
-
-	@RequestMapping(value = "/set", method = RequestMethod.GET)
-	public Model set() throws Exception {
-		
-		if(curator.checkExists().forPath( "/config/higinet-tms" ) == null ) {
-			curator.create().forPath( "/config/higinet-tms" );
-		}
-		curator.getChildren().forPath( "/config/tms-master" ).iterator();
-		
-		return new Model();
-	}
- 
 	@Autowired
 	LoadBalancerClient loadBalance;
 
