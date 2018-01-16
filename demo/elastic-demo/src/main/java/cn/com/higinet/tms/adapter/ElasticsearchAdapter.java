@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -55,13 +54,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cn.com.higinet.tms.FailData;
 import cn.com.higinet.tms.Pagination;
 import cn.com.higinet.tms.provider.ElasticsearchConfig;
 
 @Component
 public class ElasticsearchAdapter {
 	private static final Logger logger = LoggerFactory.getLogger( ElasticsearchAdapter.class );
-
+	
 	@Autowired
 	private ElasticsearchConfig elasticsearchConfig;
 
@@ -213,35 +213,6 @@ public class ElasticsearchAdapter {
 	}
 
 	/**
-	 * 批量添加数据
-	 * @param <T>
-	 * @param <T>
-	 * @param indexName
-	 * @param mappingName
-	 * @param list
-	 */
-	public <T> void batchUpdate( String indexName, List<T> dataList, Class<T> entityType ) {
-		try {
-			String primaryKeyName = getPrimaryKeyName( entityType );
-			if( StringUtils.isEmpty( primaryKeyName ) ) {
-				logger.warn( "primaryKeyName is empty" );
-				return;
-			}
-			BulkProcessor bulkProcessor = getBulkProcessor();
-			long s = System.currentTimeMillis();
-			for( int i = 0; i < dataList.size(); i++ ) {
-				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
-				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
-			}
-			System.out.println( System.currentTimeMillis() - s );
-			bulkProcessor.close();
-		}
-		catch( Exception e ) {
-			logger.error( "batchUpdate is error", e );
-		}
-	}
-
-	/**
 	 * 存在更新不存在插入
 	 * @param <T>
 	 * @param indexName
@@ -303,8 +274,58 @@ public class ElasticsearchAdapter {
 			logger.error( "update is error", e );
 		}
 	}
+	
+	/**
+	 * 批量添加数据
+	 * @param <T>
+	 * @param <T>
+	 * @param indexName
+	 * @param mappingName
+	 * @param list
+	 */
+	@SuppressWarnings("rawtypes")
+	public <T> FailData batchUpdate( String indexName, List<T> dataList, Class<T> entityType ) {
+		FailData<T> failData = null;
+		try {
+			Map<String,T> map = new HashMap<String,T>();
+			String primaryKeyName = getPrimaryKeyName( entityType );
+			if( StringUtils.isEmpty( primaryKeyName ) ) {
+				logger.warn( "primaryKeyName is empty" );
+				return failData;
+			}
+			Map<BulkProcessor,List<String>> mapProcessor = getBulkProcessor();
+			BulkProcessor bulkProcessor = mapProcessor.keySet().iterator().next();
+			List<String> failIdList = mapProcessor.values().iterator().next();
+			long s = System.currentTimeMillis();
+			for( int i = 0; i < dataList.size(); i++ ) {
+				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
+				map.put(jsonObject.get(primaryKeyName).toString(),dataList.get( i ));
+				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
+			}
+			System.out.println( System.currentTimeMillis() - s );
+			bulkProcessor.close();
+			if(!failIdList.isEmpty()){
+				logger.info("异常数据处理----"+failIdList.size());
+				List<T> failObjectList = new ArrayList<T>();
+				for (String id : failIdList) {
+					failObjectList.add(map.get(id));
+				}
+				failData = new FailData<T>();
+				failData.setDataList(failObjectList);
+				failData.setEntityType(entityType);
+				failData.setIndexName(indexName);
+				logger.info("异常数据存储完毕----"+failObjectList.size());
+			}
+		}
+		catch( Exception e ) {
+			logger.error( "batchUpdate is error", e );
+		}
+		return failData;
+	}
 
-	private BulkProcessor getBulkProcessor() {
+	private <T> Map<BulkProcessor,List<String>> getBulkProcessor() {
+		Map<BulkProcessor,List<String>> returnMap = new HashMap<BulkProcessor,List<String>>();
+		List<String> failIdList = new ArrayList<String>();
 		BulkProcessor bulkProcessor = BulkProcessor.builder( elasticsearchConfig.getTransportClient(), new BulkProcessor.Listener() {
 			@Override
 			public void beforeBulk( long executionId, BulkRequest request ) {
@@ -314,24 +335,16 @@ public class ElasticsearchAdapter {
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
 				if(response.hasFailures()){
-					StringBuffer fail = new StringBuffer();
 					int i = 0;
 					for (BulkItemResponse bulkItemResponse : response) {
 					    if (bulkItemResponse.isFailed()) { 
-					        BulkItemResponse.Failure failure = bulkItemResponse.getFailure(); 
-					        fail.append("failId:").append(failure.getId()).append(",index:")
-					        .append(failure.getIndex()).append(",type:").append(failure.getType())
-					        .append(",responseId:").append(bulkItemResponse.getId()).append(",responseIndex:")
-					        .append(bulkItemResponse.getIndex()).append(",responseType:")
-					        .append(bulkItemResponse.getType()).append("---结束----");
-					        i++;
+					    	failIdList.add(bulkItemResponse.getId());
+					    	i++;
 					    }
 					}
-					logger.info( "失败条数为:"+i+"---------------");
-					logger.info(fail.toString());
+					logger.info("总共请求为："+request.numberOfActions()+",异常为："+i);
 				}
 			}
-
 			//设置ConcurrentRequest 为0，Throwable不抛错
 			@SuppressWarnings("rawtypes")
 			@Override
@@ -352,7 +365,8 @@ public class ElasticsearchAdapter {
 		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
 				//设置回退策略，当请求执行错误时，可进行回退操作,执行错误后延迟100MS，重试三次后执行回退
 				.setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)).setConcurrentRequests( concurrentRequests ).build();
-		return bulkProcessor;
+		returnMap.put(bulkProcessor, failIdList);
+		return returnMap;
 	}
 
 	/**
