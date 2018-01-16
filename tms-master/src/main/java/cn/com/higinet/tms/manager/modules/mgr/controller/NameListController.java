@@ -395,14 +395,15 @@ public class NameListController {
 	 * @return
 	 */
 	@RequestMapping(value = "/import", method = RequestMethod.POST)
-	public String importNameListAction( @RequestBody Map<String, String> reqs, HttpServletRequest request ) {
+	public Model importNameListAction( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+		Model model = new Model();
 		Map<String, Object> inputNode = new HashMap<String, Object>();
 		MultipartHttpServletRequest multipartrequest = (MultipartHttpServletRequest) request;
 		MultipartFile file = multipartrequest.getFile( "importFile" );
-		String pathfilePath = this.getClass().getClassLoader().getResource( "/" ).getPath();
-		String rosterId = reqs.get( "ROSTERID" );
-		String rosterDesc = reqs.get( "ROSTERDESC" );
-		String format = reqs.get( "FORMAT" );
+//		String pathfilePath = this.getClass().getClassLoader().getResource( "/" ).getPath();
+		String rosterId = reqs.get( "rosterid" );
+		String rosterDesc = reqs.get( "rosterdesc" );
+		String format = reqs.get( "format" );
 		if( ".xls".equals( format ) ) {
 			inputNode.put( "TYPE", "excel2k3" );
 		}
@@ -413,7 +414,7 @@ public class NameListController {
 			inputNode.put( "TYPE", "text" );
 		}
 		inputNode.put( "importFile", file );
-		inputNode.put( "filePath", pathfilePath.replace( "%20", " " ) );
+//		inputNode.put( "filePath", pathfilePath.replace( "%20", " " ) );
 		inputNode.put( "ROSTERID", rosterId );
 		inputNode.put( "ROSTERDESC", rosterDesc );
 
@@ -434,7 +435,8 @@ public class NameListController {
 			this.rosterDesc = rosterDesc;
 		}
 		//Map<String,Object> roster = nameListService.selectById(rosterId);
-		return "/tms/mgr/name_error";
+//		return "/tms/mgr/name_error";
+		return model;
 	}
 
 	/**
@@ -636,6 +638,23 @@ public class NameListController {
 		int export_size = dateList.size();
 		request.setAttribute( "rosterdesc", rosterdesc );
 		request.setAttribute( "size", String.valueOf( export_size ) ); //导出的数据条数
+		return model;
+	}
+	
+	/**
+	 * 检查角色名是否重复
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/checkRostervalue", method = RequestMethod.POST)
+	public Model checkeRostervalueAction(@RequestBody Map<String, String> reqs) {
+		Model model = new Model();
+		boolean flag = nameListService.listRostervalue(reqs);
+		if (flag == true) {
+			model.set("check_result", "true");
+		} else {
+			model.set("check_result", "false");
+		}
 		return model;
 	}
 }

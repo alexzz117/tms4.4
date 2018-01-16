@@ -1180,4 +1180,23 @@ public class NameListService {
 		long dupCount = getSimpleDao().count( sql, rosterName.toUpperCase() );
 		return dupCount > 0;
 	}
+	
+	/**
+	 * 按名单值名称获取名单值列表
+	 * 
+	 * @param conds
+	 *            条件参数 （Map<列名称, 列值>）
+	 * @return 记录行的值列表 （列表中存放 Map<列名称, 列值>）
+	 */
+	public boolean listRostervalue(Map<String, String> conds) {
+		String sql = "select * from " + DBConstant.TMS_MGR_ROSTERVALUE + " where 1=1";
+		if (conds.get("rostervalue") != null && !"".equals(conds.get("rostervalue"))) {
+			sql += " and rostervalue = ? ";
+		}
+		List<Map<String, Object>> list = getSimpleDao().queryForList(sql, conds.get("rostervalue"));
+		if (list != null && list.size() > 0) {
+			return false;
+		}
+		return true;
+	}
 }

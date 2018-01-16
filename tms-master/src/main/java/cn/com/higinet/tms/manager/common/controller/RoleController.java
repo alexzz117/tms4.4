@@ -276,9 +276,9 @@ public class RoleController {
 		Model model = new Model();
 		boolean flag = roleService.listRoleName(reqs);
 		if (flag == true) {
-			model.set("checke_result", "true");
+			model.set("check_result", "true");
 		} else {
-			model.set("checke_result", "false");
+			model.set("check_result", "false");
 		}
 		return model;
 	}

@@ -47,7 +47,7 @@ public class RoleService {
 		String sql = "select * from " + DBConstant.CMC_ROLE;
 		conds.put("ROLE_NAME", ConditionUtil.like(conds.get("role_name")));
 		String where = ConditionUtil.and(conds,
-				new String[][] { { "like", "ROLE_NAME", "role_name" }, { "=", "FLAG", "flag" }, });
+				new String[][] { { "like", "ROLE_NAME", "ROLE_NAME" }, { "=", "FLAG", "flag" }, });
 		sql += ConditionUtil.where(where);
 		Order order = new Order().asc("ROLE_ID");// 默认用主键排序
 		return cmcSimpleDao.pageQuery(sql, conds, order);
