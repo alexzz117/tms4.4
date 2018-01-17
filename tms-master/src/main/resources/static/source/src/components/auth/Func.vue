@@ -481,7 +481,7 @@
             success: function (data) {
               selectNode.visible = false
               self.resetPage()
-              self.$message.success('删除功能成功')
+              self.$message.success('删除成功')
             },
             fail: function (e) {
               if (e.response.data.message) {
@@ -503,17 +503,20 @@
         var self = this
         this.$refs['funcForm'].validate((valid) => {
           if (valid) {
-            var url = ''
+            let url = ''
+            let opStr = ''
             if (self.funcForm.func_id === '') {
               url = '/func/add'
+              opStr = '创建'
             } else {
               url = '/func/mod'
+              opStr = '编辑'
             }
             ajax.post({
               url: url,
               param: self.funcForm,
               success: function (data) {
-                self.$message.success('操作成功。')
+                self.$message.success(opStr + '成功')
                 self.selTree()
                 self.resetPage()
               },
