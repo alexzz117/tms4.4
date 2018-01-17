@@ -6,6 +6,8 @@ import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -1031,8 +1033,34 @@ public class AlarmEventService {
 		if (!StringUtil.isEmpty(conds.get("userid"))) {
 			sb.append("TRAFFIC.USERID =:userid  AND ");
 		}
+		if (!StringUtil.isEmpty(conds.get("username"))) {
+			sb.append("U.USERNAME =:username  AND ");
+		}
 		if (!StringUtil.isEmpty(conds.get("txncode"))) {
 			sb.append("TRAFFIC.TXNCODE =:txncode  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("deviceid"))) {
+			sb.append("TRAFFIC.DEVICEID =:deviceid  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("ipaddr"))) {
+			sb.append("TRAFFIC.IPADDR =:ipaddr  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("txntype"))) {
+			sb.append("TRAFFIC.TXNTYPE =:txntype  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("disposal"))) {
+			sb.append("TRAFFIC.DISPOSAL =:disposal  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("iscorrect"))) {
+			sb.append("TRAFFIC.ISCORRECT =:iscorrect  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("txnstatus"))) {
+			sb.append("TRAFFIC.TXNSTATUS =:txnstatus  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("psstatus"))) {
+			sb.append("TRAFFIC.PSSTATUS =:psstatus  AND ");
+		} else {
+			sb.append("TRAFFIC.PSSTATUS = '03' AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("operate_time"))) {
 			conds.put("operate_time", String.valueOf(getMillisTime(conds.get("operate_time"))));
@@ -1042,10 +1070,24 @@ public class AlarmEventService {
 			conds.put("end_time", String.valueOf(getMillisTime(conds.get("end_time"))));
 			sb.append("TRAFFIC.TXNTIME <=:end_time  AND ");
 		}
-		sb.append("TRAFFIC.PSSTATUS = '03' ");
+		if (!StringUtil.isEmpty(conds.get("countrycode"))) {
+			sb.append("TRAFFIC.COUNTRYCODE =:countrycode  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("regioncode"))) {
+			sb.append("TRAFFIC.REGIONCODE =:regioncode  AND ");
+		}
+		if (!StringUtil.isEmpty(conds.get("citycode"))) {
+			sb.append("TRAFFIC.CITYCODE =:citycode  AND ");
+		}
+		String sqlStr = sb.toString().trim();
+		if (sqlStr.endsWith("WHERE")) {
+			sqlStr = StringUtils.removeEnd(sqlStr, "WHERE");
+		}else{
+			sqlStr = StringUtils.removeEnd(sqlStr, "AND");
+		}
 		Order order = new Order().desc("TXNTIME");
 		System.out.println(sb.toString());
-		Page<Map<String, Object>> listPage = offlineSimpleDao.pageQuery(sb.toString(), conds, order);
+		Page<Map<String, Object>> listPage = offlineSimpleDao.pageQuery(sqlStr.trim(), conds, order);
 		return listPage;
 	}
 	
