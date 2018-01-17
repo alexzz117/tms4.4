@@ -2,7 +2,7 @@
   <div>
     <!-- 操作信息 -->
     <el-row>
-      <el-col v-for="item in showFields" :key="fd_name" :span="12">
+      <el-col v-for="item in showFields" :key="item.fd_name" :span="12">
         <el-col :span="10" tag="label" class="item-label">
           {{item.name}}:
         </el-col>
