@@ -120,8 +120,7 @@
         style="width: 100%" tooltip-effect="dark" @selection-change="handleSelectionChange">
         <el-table-column fixed="left" label="操作" width="65" alert="center" >
           <template slot-scope="scope"  >
-            <el-button type="text"  @click="openDialog(scope.$index, scope.row)" size="mini"  icon="el-icon-edit-outline" />
-            <el-button type="text"  @click="" size="mini"  icon="el-icon-search" />
+            <el-button type="text"  @click="openDialog(scope.$index, scope.row)" icon="el-icon-edit-outline" />
           </template>
         </el-table-column>
         <el-table-column  prop="txncode" label="流水号" width="235" align="left" class-name="link-item">
