@@ -61,8 +61,8 @@
         <el-table-column prop="real_name" label="姓名" align="left"></el-table-column>
         <el-table-column prop="role_name" label="角色" align="left"></el-table-column>
         <el-table-column prop="flag" label="状态" align="left" :formatter=renderFlag></el-table-column>
-        <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left"></el-table-column>
-        <el-table-column prop="lockout" label="锁定次数" align="left"></el-table-column>
+        <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left" :formatter="emptyCheck"></el-table-column>
+        <el-table-column prop="lockout" label="锁定次数" align="left" :formatter="emptyCheck"></el-table-column>
         <el-table-column prop="lockout_date" label="锁定时间" align="left"></el-table-column>
         <el-table-column prop="email" label="电子邮件" align="left"></el-table-column>
         <el-table-column prop="mobile" label="移动电话" align="left"></el-table-column>
@@ -404,6 +404,10 @@
             }
           })
         }).catch(() => {})
+      },
+      emptyCheck (row, item) {
+        let val = row[item.property]
+        return val || 0
       }
     },
     data () {
