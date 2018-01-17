@@ -108,7 +108,7 @@ public class JobController {
 		String description = task.getDescription();
 		if( Stringz.isEmpty( name, taskId, cron, className ) ) model.addError( "param is empty" );
 		if( Stringz.isEmpty( CronExpression.isValidExpression( cron ) ) ) model.addError( "cron表达式错误" );
-		if( scheduler.checkExists( TriggerKey.triggerKey( taskId ) ) ) model.addError( "任务不存在" );
+		if( !scheduler.checkExists( TriggerKey.triggerKey( taskId ) ) ) model.addError( "任务不存在" );
 		if( model.hasError() ) return model;
 
 		JSONObject descJson = new JSONObject();
@@ -245,7 +245,7 @@ public class JobController {
 	@RequestMapping(value = "/pause", method = RequestMethod.POST)
 	public Model pause( @RequestBody TaskEntity task ) throws Exception {
 		String taskId = task.getTaskId();
-		if( Stringz.isEmpty( taskId ) ) new Model().addError( "param is empty" );
+		if( Stringz.isEmpty( taskId ) ) return new Model().addError( "taskId is empty" );
 
 		scheduler.pauseJob( JobKey.jobKey( taskId ) );
 		return new Model();
@@ -257,7 +257,7 @@ public class JobController {
 	@RequestMapping(value = "/resume", method = RequestMethod.POST)
 	public Model resume( @RequestBody TaskEntity task ) throws Exception {
 		String taskId = task.getTaskId();
-		if( Stringz.isEmpty( taskId ) ) new Model().addError( "param is empty" );
+		if( Stringz.isEmpty( taskId ) ) return new Model().addError( "taskId is empty" );
 		scheduler.resumeJob( JobKey.jobKey( taskId ) );
 		return new Model();
 	}
@@ -268,7 +268,7 @@ public class JobController {
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	public Model delete( @RequestBody TaskEntity task ) throws Exception {
 		String taskId = task.getTaskId();
-		if( Stringz.isEmpty( taskId ) ) new Model().addError( "param is empty" );
+		if( Stringz.isEmpty( taskId ) ) return new Model().addError( "taskId is empty" );
 
 		TriggerKey triggerKey = TriggerKey.triggerKey( taskId );
 		if( scheduler.checkExists( triggerKey ) ) {
