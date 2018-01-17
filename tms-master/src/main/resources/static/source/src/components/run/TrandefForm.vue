@@ -89,8 +89,8 @@
         </el-col>
         <el-col :span="24">
           <el-form-item>
-            <el-button v-if="addFlag" @click="closeAddDialog" size="large">取消</el-button>
             <el-button type="primary" @click="submitForm" size="large" :disabled="saveVisible">保存</el-button>
+            <el-button v-if="addFlag" @click="closeAddDialog" size="large">取消</el-button>
           </el-form-item>
         </el-col>
       </el-row>
@@ -179,7 +179,7 @@
         formLabelWidth: '120px',
         rules: {
           txnid: [
-            {max: 20, message: '交易识别标识不能超过20个字符', trigger: 'blur'},
+            {max: 20, message: '长度不能超过20个字符', trigger: 'blur'},
             {validator: txnIdCheck, trigger: 'blur'} // 交易识别标识空校验;交易类型为交易的时候不允许为空
           ],
           chann: [
@@ -190,7 +190,7 @@
           ],
           tab_desc: [
             {required: true, message: '请输入名称', trigger: 'blur'},
-            {max: 32, message: '交易识别标识不能超过32个字符', trigger: 'blur'},
+            {max: 32, message: '长度不能超过32个字符', trigger: 'blur'},
             {validator: check.checkFormZhSpecialCharacter, trigger: 'blur'} // 输入格式校验：只能包含汉字,字母,数字和下划线
           ],
           show_order: [
@@ -237,10 +237,10 @@
               success: function (data) {
                 if (data.success) {
                   if (op === 'add') {
-                    self.$message.success('添加成功')
+                    self.$message.success('创建成功')
                     self.closeAddDialog()
                   } else {
-                    self.$message.success('修改成功')
+                    self.$message.success('编辑成功')
                   }
                   self.reloadPage()
                 }

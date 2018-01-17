@@ -171,7 +171,7 @@
       },
       delInfo (param) {
         var self = this
-        this.$confirm('确定要删除交易吗？', '提示', {
+        this.$confirm('确定删除', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -181,7 +181,7 @@
             param: param,
             success: function (data) {
               if (data.success) {
-                self.$message.success('删除交易成功')
+                self.$message.success('删除成功')
                 self.reloadPage()
               }
             },
