@@ -38,7 +38,7 @@ public class Test {
 		data.setCounTryCode( "5044啊啊啊啊啊啊啊大大大大大大撒大" );
 		data.setRegionCode( "5044110000啊啊啊啊啊啊啊大大大" );
 		data.setCityCode( "5044110000啊啊啊啊啊啊啊大大大大大大撒大苏打" );
-		data.setIspCode( "" );
+		data.setIspCode( "504411000050441100005044110000" );
 		data.setCreateTime( 1513040400000L );
 		data.setFinishTime( 1513040400000L );
 		data.setTxnStatus( 1 );

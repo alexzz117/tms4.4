@@ -40,14 +40,13 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.util.Stringz;
 
 public class ElasticSearchAdapter<T> implements DisposableBean {
+
 	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchAdapter.class );
 
 	@Autowired
@@ -61,10 +60,10 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * @param pageSize
 	 * @param pageNo
 	 * @param dataList
-	 * @param entityType
+	 * @param classz
 	 * @return
 	 */
-	public Pagination<T> search( String indexName, Integer pageSize, Integer pageNo, List<QueryConditionEntity> dataList, Class<T> entityType ) {
+	public Pagination<T> search( String indexName, Integer pageSize, Integer pageNo, List<QueryConditionEntity> dataList, Class<T> classz ) {
 		Pagination<T> page = new Pagination<T>();
 		pageNo = null == pageNo ? 1 : pageNo;
 		page.setPageNo( pageNo );
@@ -74,21 +73,9 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 		List<T> list = new ArrayList<T>();
 		for( SearchHit searchHit : hits ) {
 			Map<String, Object> source = searchHit.getSourceAsMap();
-			String json = searchHit.getSourceAsString();
 			if( !source.isEmpty() ) {
-				ObjectMapper mapper = new ObjectMapper();
-				try {
-					list.add( mapper.readValue( json, entityType ) );
-				}
-				catch( JsonParseException e ) {
-					logger.error( "convert json to entity is error", e );
-				}
-				catch( JsonMappingException e ) {
-					logger.error( "convert json to entity is error", e );
-				}
-				catch( IOException e ) {
-					logger.error( "convert json to entity is error", e );
-				}
+				String json = searchHit.getSourceAsString();
+				list.add( JSON.parseObject( json, classz ) );
 			}
 		}
 		page.setDataList( list );
@@ -156,24 +143,12 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * @param obj
 	 * @return
 	 */
-	public Object getById( String indexName, String primaryKeyValue, Class<T> entityClass ) {
+	public T getById( String indexName, String primaryKeyValue, Class<T> classz ) {
 		GetResponse response = elasticsearchConfig.getTransportClient().prepareGet( indexName, indexName, primaryKeyValue ).get();
-		String json = response.getSourceAsString();
-		Object data = null;
+		T data = null;
 		if( !response.getSourceAsMap().isEmpty() ) {
-			ObjectMapper mapper = new ObjectMapper();
-			try {
-				data = mapper.readValue( json, entityClass );
-			}
-			catch( JsonParseException e ) {
-				logger.error( "convert json to entity is error", e );
-			}
-			catch( JsonMappingException e ) {
-				logger.error( "convert json to entity is error", e );
-			}
-			catch( IOException e ) {
-				logger.error( "convert json to entity is error", e );
-			}
+			String json = response.getSourceAsString();
+			data = JSON.parseObject( json, classz );
 		}
 		return data;
 	}
@@ -403,5 +378,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * 应用关闭时调用
 	 * */
 	@Override
-	public void destroy() throws Exception {}
+	public void destroy() throws Exception {
+		logger.info( "ElasticSearchAdapter shutdown" );
+	}
 }
