@@ -6,28 +6,28 @@
                :inline="true" style="text-align: left" v-show="queryFormShow" >
 
         <el-form-item label="流水号:" prop="txncode">
-          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="客户号:" prop="userid">
-          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="客户名称:" prop="username">
-          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="设备标识:" prop="deviceid">
-          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="IP地址:" prop="ipaddr">
-          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="监控交易:" prop="txntypeShow">
           <div @click="openTxnTypedialog" >
-            <el-input v-model="queryShowForm.txntypeShow" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
+            <el-input v-model="queryShowForm.txntypeShow" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
           </div>
         </el-form-item>
 
@@ -407,8 +407,12 @@
         })
       },
       searchData (formName) {
-        Object.assign(this.queryForm, this.queryShowForm)
-        this.getData()
+        this.$refs['queryShowForm'].validate((valid) => {
+          if (valid) {
+            Object.assign(this.queryForm, this.queryShowForm)
+            this.getData()
+          }
+        })
       },
       getData () {
         let self = this

@@ -5,10 +5,10 @@
       <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
                :inline="true" style="text-align: left" v-show="queryFormShow" >
         <el-form-item label="统计名称:" prop="stat_name">
-          <el-input v-model="queryShowForm.stat_name" class="stat-query-form-item" auto-complete="off"></el-input>
+          <el-input v-model="queryShowForm.stat_name" class="stat-query-form-item" auto-complete="off" clearable></el-input>
         </el-form-item>
         <el-form-item label="统计描述:" prop="stat_desc">
-          <el-input v-model="queryShowForm.stat_desc" class="stat-query-form-item" auto-complete="off"></el-input>
+          <el-input v-model="queryShowForm.stat_desc" class="stat-query-form-item" auto-complete="off" clearable></el-input>
         </el-form-item>
         <el-form-item label="统计引用对象:" prop="stat_param">
 
@@ -67,7 +67,7 @@
       <!--<el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>-->
       <!--<el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>-->
       <div class="stat-query-box">
-        <el-input v-model="queryShowForm.stat_desc" placeholder="统计描述" class="stat-query-form-item" auto-complete="off">
+        <el-input v-model="queryShowForm.stat_desc" placeholder="统计描述" class="stat-query-form-item" auto-complete="off" clearable>
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
@@ -453,7 +453,7 @@
         viewDisabled: false,
         dialogFormRules: {
           stat_desc: [
-            { required: true, message: '统计描述不能为空', trigger: 'blur' },
+            { required: true, message: '请输入统计描述', trigger: 'blur' },
             { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
             { validator: check.checkFormZhSpecialCharacter, trigger: 'blur' }
           ],
@@ -461,7 +461,7 @@
             { validator: this.checkStatCond, trigger: 'blur' }
           ],
           stat_fn: [
-            { required: true, message: '统计函数不能为空', trigger: 'change' }
+            { required: true, message: '请输入统计函数', trigger: 'change' }
           ],
           stat_param: [
             // { required: true, message: '统计引用对象不能为空', trigger: 'none' }
@@ -794,7 +794,7 @@
           this.dialogTitle = '查看交易统计'
           let length = this.selectedRows.length
           if (length !== 1) {
-            this.$message('请选择一行交易统计信息。')
+            this.$message('请选择一行交易统计信息')
             return
           }
           this.viewDisabled = true
@@ -851,7 +851,7 @@
             let message = '提交成功'
             if (this.dialogType === 'add') {
               jsonData.add = [submitParam]
-              message = '新建成功'
+              message = '创建成功'
             } else {
               jsonData.mod = [submitParam]
               message = '编辑成功'
@@ -1188,7 +1188,7 @@
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (isCaExFunc) {
           if (statCond === '') {
-            return callback(new Error(`${name}不能为空`))
+            return callback(new Error(`请输入${name}`))
           }
         }
         if (statCond !== '') {
@@ -1208,7 +1208,7 @@
         // let fnParam = this.dialogForm.fn_param
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if ((!isCaExFunc && statFn !== 'count' && statFn !== 'status') && this.dialogForm.stat_datafd === '') {
-          return callback(new Error(`统计目标不能为空`))
+          return callback(new Error(`请输入统计目标`))
         }
         callback()
       },
@@ -1218,7 +1218,7 @@
         // let fnParam = this.dialogForm.fn_param
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc && (statParam.length === 0 || statParam === '')) {
-          return callback(new Error(`统计引用对象不能为空`))
+          return callback(new Error(`请输入统计引用对象`))
         } else {
           if (statParam.length > 6) {
             return callback(new Error(`统计引用对象最多选择6个`))
@@ -1245,10 +1245,10 @@
         let fnParam = this.dialogForm.fn_param
         if (statFn === 'rang_bin_dist') {
           if (fnParam === undefined || fnParam === '') {
-            return callback(new Error(`函数参数不能为空`))
+            return callback(new Error(`请输入函数参数`))
           } else {
             if (fnParam.length > 512) {
-              return callback(new Error(`函数参数不能超过512个字符`))
+              return callback(new Error(`函数参数在512个字符以内`))
             }
           }
         }
@@ -1259,7 +1259,7 @@
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc) {
           if (coununit === '') {
-            return callback(new Error(`单位不能为空`))
+            return callback(new Error(`请输入单位`))
           }
         }
         callback()
@@ -1271,7 +1271,7 @@
         if (!isCaExFunc) {
           if (coununit !== '7' || coununit !== '9') { // 永久，会话不需要周期
             if (util.trim(countround) === '') {
-              return callback(new Error(`周期不能为空`))
+              return callback(new Error(`请输入周期`))
             } else {
               if (!util.isNumber(countround, '+', '0') || parseInt(countround) < 1 || parseInt(countround) > 100) {
                 return callback(new Error(`周期只能输入1-100的正整数`))
@@ -1286,7 +1286,7 @@
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc) {
           if (util.trim(resultCond) === '') {
-            return callback(new Error(`交易结果不能为空`))
+            return callback(new Error(`请输入交易结果`))
           }
         }
         callback()
@@ -1296,7 +1296,7 @@
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (isCaExFunc) {
           if (util.trim(datatype) === '') {
-            return callback(new Error(`数据类型不能为空`))
+            return callback(new Error(`请输入数据类型`))
           }
         }
         callback()
@@ -1306,7 +1306,7 @@
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc) {
           if (util.trim(statValid) === '') {
-            return callback(new Error(`有效性不能为空`))
+            return callback(new Error(`请输入有效性`))
           }
         }
         callback()

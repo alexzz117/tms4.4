@@ -6,23 +6,23 @@
                :inline="true" style="text-align: left" v-show="queryFormShow" >
 
         <el-form-item label="流水号:" prop="txncode">
-          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="客户号:" prop="userid">
-          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="客户名称:" prop="username">
-          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="设备标识:" prop="deviceid">
-          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="IP地址:" prop="ipaddr">
-          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
         <el-form-item label="监控操作:" prop="txntypeShow">
@@ -153,9 +153,9 @@
       <!--   数据列表  -->
       <el-table
         :data="tableData"
-        style="width: 100%" tooltip-effect="dark">
+        style="width: 100%" tooltip-effect="dark" :cell-style="tableRowClass">
         <!--<el-table-column type="selection" width="40" align="left" />-->
-        <el-table-column fixed="left" label="操 作" width="50" alert="center">
+        <el-table-column fixed="left" label="操 作" width="50" alert="center" align="left">
           <template slot-scope="scope">
             <el-button type="text" @click="openDialog(scope.row)" size="mini" icon="el-icon-sort" title="分派"/>
           </template>
@@ -215,13 +215,36 @@
           <el-table-column prop="process_number" label="已处理" width="100" align="left"/>
           <el-table-column prop="unprocess_number" label="未处理" width="100" align="left"/>
         </el-table>
-        <div class="dialog-footer" align="center" slot="footer">
-          <el-button data="cancelBtn" icon="el-icon-success" type="primary" @click="onSaveAssign" :disabled="btnStatus">
-            确 定
-          </el-button>
-          <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false">返 回
-          </el-button>
-        </div>
+
+        <el-form label-position="right" label-width="120px" :model="alarmSendForm" ref="alarmSendForm" :rules="alarmSendRules"
+                 :inline="true" style="text-align: left;margin-top: 15px;">
+
+          <el-form-item v-show="oldOperIdShow" label="处理人员:" prop="old_operid">
+            <el-input v-model="alarmSendForm.old_operid" class="alarm-event-query-form-item" auto-complete="off" readonly></el-input>
+          </el-form-item>
+
+          <el-form-item label="分派人员:" prop="operid">
+            <el-select v-model="alarmSendForm.operid" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in operidList"
+                :key="item.operator_id"
+                :label="item.login_name"
+                :value="item.operator_id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <div>
+            <el-form-item  label=" ">
+              <el-button type="primary" @click="onSaveAssign()" :disabled="sendBtnDisabled" size="large">分 派</el-button>
+              <el-button @click="listDialogVisible = false" size="large">取 消</el-button>
+            </el-form-item>
+          </div>
+
+        </el-form>
+
+
       </div>
     </el-dialog>
   </div>
@@ -245,6 +268,8 @@
         txntypeDialogVisible: false,
         infoDialogVisible: false,
         btnStatus: false,
+        oldOperIdShow: false,
+        sendBtnDisabled: false,
         defaultTreeProps: {
           children: 'children',
           label: 'tab_desc'
@@ -253,6 +278,11 @@
         treeData: [],
         userData: [],
         queryFormShow: false,
+        operidList: [],
+        alarmSendForm: {
+          old_operid: '',
+          operid: ''
+        },
         queryShowForm: {
           txncode: '',
           userid: '',
@@ -290,6 +320,11 @@
         queryRules: {
           ipaddr: [
             { validator: check.checkFormIp, trigger: 'blur' }
+          ]
+        },
+        alarmSendRules:{
+          operid:[
+            { required: true, message: '分派人员不能为空', trigger: 'blur' }
           ]
         },
         dialogTitle: '',
@@ -382,6 +417,25 @@
         let end = new Date()
         return [start, end]
       },
+      tableRowClass (rowInfo) {
+        if(rowInfo.columnIndex === 0){
+          return {}
+        }
+        let row = rowInfo.row
+        let currenttime = row.currenttime
+        let timeout = row.timeout
+        let psstatus = row.psstatus
+        let conpareTime = null
+        if(psstatus === '02') {
+          conpareTime = row.m_assigntime
+        } else if (psstatus === '04'){
+          conpareTime = row.m_audittime
+        }
+        if(conpareTime != null && 1*currenttime-1*conpareTime>1*timeout) {
+          return {'background-color': '#f56c6c'}
+          // return 'red-row'
+        }
+      },
       formatter(row, column, cellValue) {
         //GRID数据列表值转换
         switch (column.property) {
@@ -412,9 +466,13 @@
           resolve()
         })
       },
-      searchData (formName) {
-        Object.assign(this.queryForm, this.queryShowForm)
-        this.getData()
+      searchData () {
+        this.$refs['queryShowForm'].validate((valid) => {
+          if (valid) {
+            Object.assign(this.queryForm, this.queryShowForm)
+            this.getData()
+          }
+        })
       },
       getData () {
         let self = this
@@ -555,18 +613,26 @@
       },
       //分派按钮弹出报警事件人员窗体
       openDialog(row) {
-        var self = this
-        this.listDialogVisible = true
-        var param = {
-          txn_code: row.txncode
+        let self = this
+        console.log(row)
+        let param = {
+          txn_code: row.txncode,
+          oper_id: row.oper_id
         }
+        this.alarmSendForm = {
+          old_operid: '',
+          operid: ''
+        }
+        self.selectedRow = row
+        this.sendBtnDisabled = false
         ajax.post({
           url: '/alarmevent/assign',
           param: param,
           success: function (data) {
+
             if (data.list) {
               // self.userData = data.list
-              let txn = data['txnmap']
+              let txn = data['txnmap'][0]
               let opers = data['list']
               let operId = null
               if (txn) {
@@ -578,6 +644,7 @@
                   // disableView(assignForm);
                 }
               }
+              let hasOldOper = false
               if (opers) {
                 let _list_ = []
                 let items = []
@@ -585,14 +652,22 @@
                   var row = opers[i]
                   if (row['isenable'] * 1 === 1) {
                     _list_.push(row)
-                    items.push({text: row['login_name'], value: row['operator_id']})
+                    // items.push({text: row['login_name'], value: row['operator_id']})
                   } else {
                     if (row['operator_id'] === operId) {
+                      hasOldOper = true
+                      self.alarmSendForm.old_operid = row.login_name
                       // assignForm.getItem('OLD_OPERID').val(row['LOGIN_NAME'])
                     }
                   }
                 }
                 self.userData = _list_
+                self.operidList = _list_
+                if(hasOldOper){
+                  self.oldOperIdShow = true
+                } else {
+                  self.oldOperIdShow = false
+                }
                 // operStatGrid.renderPage({list:_list_});
                 // if(!IsEmpty(assignForm.getItem('OLD_OPERID').val())){
                 //   assignForm.getItem('OLD_OPERID').jqDom.remove();
@@ -600,11 +675,31 @@
                 // assignForm.getItem('OPERID').component.reload(items);
               }
             }
+            self.listDialogVisible = true
           }
         })
       },
       onSaveAssign () {
-
+        var self = this
+        console.log(this.selectedRow)
+        var param = {
+          TXNCODES: this.selectedRow.txncode, //需要分派的流水交易
+          OPERATER: this.alarmSendForm.operid //选中操作员
+        }
+        this.sendBtnDisabled = true
+        ajax.post({
+          url: '/alarmevent/onsaveAssign',
+          param: param,
+          success: function (data) {
+            this.sendBtnDisabled = false
+            self.$message({
+              message: '分派成功。',
+              type: 'success'
+            })
+            self.listDialogVisible = false
+            self.getData()
+          }
+        })
       }
     },
     components: {
@@ -616,5 +711,8 @@
 <style scoped>
   .alarm-event-query-form-item{
     width: 200px;
+  }
+  .red-row{
+    background-color: red;
   }
 </style>

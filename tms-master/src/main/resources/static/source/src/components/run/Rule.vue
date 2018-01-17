@@ -4,7 +4,7 @@
           <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
                    :inline="true" style="text-align: left" v-show="queryFormShow" >
             <el-form-item label="规则名称:" prop="stat_name">
-              <el-input v-model="queryShowForm.rule_shortdesc" class="rule-query-form-item" auto-complete="off"></el-input>
+              <el-input v-model="queryShowForm.rule_shortdesc" class="rule-query-form-item" auto-complete="off" clearable></el-input>
             </el-form-item>
 
             <el-form-item label="评估类型:" prop="eval_type">
@@ -52,7 +52,7 @@
 
           <el-button plain class="el-icon-plus" @click="openDialog('add')" :disabled="readonlyParent">新建</el-button>
           <div style="float:right">
-            <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off">
+            <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off" clearable>
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
             <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
@@ -679,7 +679,7 @@
           if (rowTemp.ac_desc.length > 128) {
             this.$message({
               type: 'error',
-              message: '动作复制后动作名称超过128个字符，复制失败！'
+              message: '动作复制后动作名称超过128个字符，复制失败'
             })
             return
           }
@@ -878,7 +878,7 @@
             let message = '提交成功'
             if (this.dialogType === 'add') {
               jsonData.add = [submitParam]
-              message = '新建成功'
+              message = '创建成功'
             } else {
               jsonData.mod = [submitParam]
               message = '编辑成功'

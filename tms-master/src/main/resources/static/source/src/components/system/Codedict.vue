@@ -11,7 +11,7 @@
             <el-col :span="8">
                 <div style="margin-right: 10px">
                   <el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50
-                            @keyup.enter.native="searchData('queryShowForm')"   placeholder="请输入搜索内容">
+                            @keyup.enter.native="searchData('queryShowForm')"   placeholder="请输入搜索内容" clearable>
                     <i slot="prefix" class="el-input__icon el-icon-search"></i>
                   </el-input>
 
@@ -300,7 +300,7 @@
             { validator: check.checkFormSpecialCode, trigger: 'blur' }
           ],
           onum: [
-            { pattern: /^[1-9]\d{0,2}$/, message: '顺序最多只能输入3位数字' }
+            { pattern: /^(0|[1-9]\d{0,2})$/, message: '顺序最多只能输入3位数字' }
           ],
           info: [
             { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
@@ -370,7 +370,7 @@
               param: paramsObj,
               success: function (data) {
                 self.getData()
-                self.$message.success('添加成功')
+                self.$message.success('创建成功')
                 self.dictDialogVisible = false
                 dictCode.getCodeData('reload')
               }
@@ -390,7 +390,7 @@
               param: paramsObj,
               success: function (data) {
                 self.handleSelectionChange(self.showDictInfoRow)
-                self.$message.success('添加成功')
+                self.$message.success('创建成功')
                 self.infoDialogVisible = false
                 dictCode.getCodeData('reload')
               }

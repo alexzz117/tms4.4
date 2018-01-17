@@ -330,8 +330,12 @@
         }
       },
       searchData (formName) {
-        Object.assign(this.queryForm, this.queryShowForm)
-        this.sel()
+        this.$refs['queryShowForm'].validate((valid) => {
+          if (valid) {
+            Object.assign(this.queryForm, this.queryShowForm)
+            this.sel()
+          }
+        })
       },
       sel(pageinfo) {
         //界面初始化和查询按钮事件

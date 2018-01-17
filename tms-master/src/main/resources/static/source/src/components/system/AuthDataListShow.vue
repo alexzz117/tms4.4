@@ -7,7 +7,7 @@
 
         <el-form-item label="所属交易:" prop="txn_id">
           <div @click="openTxnDialog" >
-            <el-input v-model="queryShowForm.txnIdShow" class="alarm-event-query-form-item" auto-complete="off" readonly></el-input>
+            <el-input v-model="queryShowForm.txnIdShow" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
           </div>
         </el-form-item>
 
