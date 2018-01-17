@@ -139,8 +139,6 @@
         class="upload-demo"
         ref="upload"
         action="/context/manager/mgr/import"
-        :on-preview="handlePreview"
-        :on-remove="handleRemove"
         :on-change="handleChange"
         :file-list="fileList"
         :multiple = "multiple"
@@ -256,7 +254,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '创建成功!'
+              message: '创建成功'
             })
             self.listDialogVisible = false
             self.sel()
@@ -279,7 +277,7 @@
             success: function (data) {
               self.$message({
                 type: 'success',
-                message: '删除成功!'
+                message: '删除成功'
               })
               self.sel()
             }
@@ -320,7 +318,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '更新成功!'
+              message: '编辑成功'
             })
             self.listDialogVisible = false
             self.sel()
@@ -341,7 +339,7 @@
       exportList() {
 //        var row = this.multipleSelection[0]
         if(this.selectedRow.valuecount === 0){
-          this.$message('名单中没有名单值。');
+          this.$message('名单中没有名单值');
           return;
         }
         this.exportDialogVisible = true
@@ -391,7 +389,7 @@
             self.importDialogVisible = false
             self.$message({
               type: 'success',
-              message: '导入成功!'
+              message: '导入成功'
             })
           }
         })

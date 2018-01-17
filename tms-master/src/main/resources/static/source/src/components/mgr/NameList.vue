@@ -39,7 +39,7 @@
           label="操作"
           width="80">
           <template slot-scope="scope" >
-            <el-button type="text"  @click="openDialog(scope.$index, scope.row)"  icon="el-icon-view"  v-show="typeof(scope.row.rosterid)=='number'" title="查看"></el-button>
+            <el-button type="text"  @click="openDialog(scope.$index, scope.row)"  icon="el-icon-zoom-in"  v-show="typeof(scope.row.rosterid)=='number'" title="查看"></el-button>
             <el-button type="text"  @click="showValueList(scope.$index, scope.row)" icon="el-icon-document" v-show="typeof(scope.row.rosterid)=='number'" title="名单值"></el-button>
           </template>
         </el-table-column>

@@ -35,9 +35,16 @@ let defaultOption = {
     });
   },
   fail: function (error) {
+    let response = error.response
+    let message
+    if (response && response.data && response.data.message) {
+      message = response.data.message
+    } else {
+      message = error.message
+    }
     vue.$message({
       showClose: true,
-      message: error.message,
+      message: message,
       type: 'error'
     });
   }

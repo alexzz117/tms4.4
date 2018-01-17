@@ -198,7 +198,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '创建成功!'
+              message: '创建成功'
             })
             this.savebtnStatus = false
             self.roleDialogVisible = false
@@ -223,7 +223,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '删除成功!'
+              message: '删除成功'
             })
             self.sel()
           }
@@ -264,7 +264,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '更新成功!'
+              message: '编辑成功'
             })
             this.savebtnStatus = false
             self.roleDialogVisible = false
@@ -315,7 +315,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '更新成功!'
+              message: '编辑成功'
             })
             self.savebtnStatus = false
             self.grantDialogVisible = false

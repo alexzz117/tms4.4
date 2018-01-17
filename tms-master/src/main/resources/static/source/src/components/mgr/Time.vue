@@ -306,7 +306,7 @@
           param: this.timerForm,
           success: function (data) {
             self.$message({
-              message: '更新成功',
+              message: '编辑成功',
               type: 'success'
             })
             self.sel()
@@ -331,17 +331,12 @@
             success: function (data) {
               self.$message({
                 type: 'success',
-                message: '删除成功!'
+                message: '删除成功'
               })
               self.sel()
             }
           })
-        }).catch(() => {
-          self.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+        }).catch(() => {})
       },
       openDialog(flag) {
         this.flag = flag

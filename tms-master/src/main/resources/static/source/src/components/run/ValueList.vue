@@ -225,7 +225,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '创建成功!'
+              message: '创建成功'
             })
             self.valueListDialogVisible = false
             self.sel()
@@ -250,7 +250,7 @@
             success: function (data) {
               self.$message({
                 type: 'success',
-                message: '删除成功!'
+                message: '删除成功'
               })
               self.sel()
             }
@@ -296,7 +296,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '更新成功!'
+              message: '编辑成功'
             })
             self.valueListDialogVisible = false
             self.sel()
@@ -334,7 +334,7 @@
           success: function (data) {
             self.$message({
               type: 'success',
-              message: '值转换成功!'
+              message: '值转换成功'
             })
             self.changeValueDialogVisible= false
             self.sel()
@@ -386,7 +386,13 @@
         var enabletime = Date.parse(self.valueListDialogform.enabletime)
         var disabletime = Date.parse(self.valueListDialogform.disabletime)
         if (enabletime > disabletime) {
-          return callback(new Error('开始日期不得大于结束日期'));
+          if (rule.field === 'enabletime') {
+            return callback(new Error('开始时间不得晚于结束时间'));
+          } else if (rule.field === 'disabletime') {
+            return callback(new Error('结束时间不得早于开始时间'));
+          } else {
+            return callback()
+          }
         } else {
           return callback()
         }
