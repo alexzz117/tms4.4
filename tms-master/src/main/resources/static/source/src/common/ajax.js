@@ -1,6 +1,14 @@
 import axios from 'axios'
 import util from '@/common/util'
 
+import Vue from 'vue'
+import { Message } from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+
+Vue.prototype.$ELEMENT = { size: 'small' }
+Vue.use(Message)
+let vue = new Vue({})
+
 var config = {
   // prefix: util.getWebRootPath()  // 正式测试环境
   prefix: '/context' // 分离测试环境
@@ -19,8 +27,20 @@ let defaultOption = {
   model: modelDef.manager,
   toLowerCase: true,
   success: function (data) {},
-  error: function (data) { alert(data.error) },
-  fail: function (error) { alert(error) }
+  error: function (data) {
+    vue.$message({
+      showClose: true,
+      message: data.error,
+      type: 'error'
+    });
+  },
+  fail: function (error) {
+    vue.$message({
+      showClose: true,
+      message: error.message,
+      type: 'error'
+    });
+  }
 }
 
 function post (opt) {
