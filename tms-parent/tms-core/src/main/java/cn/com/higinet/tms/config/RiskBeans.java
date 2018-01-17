@@ -26,16 +26,26 @@ import cn.com.higinet.tms.RiskBootstrap;
 import cn.com.higinet.tms.common.cache.CacheManager;
 import cn.com.higinet.tms.common.cache.EnvInitializer;
 import cn.com.higinet.tms.common.cache.initializer.ConfigInitializer;
+import cn.com.higinet.tms.common.event.EventChannelHandler;
 import cn.com.higinet.tms.common.repository.CachedDataRepository;
 import cn.com.higinet.tms.common.repository.PersistedDataRepository;
 import cn.com.higinet.tms.common.repository.RepositoryInitializer;
 import cn.com.higinet.tms.common.repository.RepositoryManager;
+import cn.com.higinet.tms.event.modules.kafka.KafkaMessageHandler;
 import cn.com.higinet.tms35.core.persist.TMSDBInitializer;
 import cn.com.higinet.tms35.core.persist.TMSPersistence;
 import cn.com.higinet.tms35.core.persist.Traffic;
 import cn.com.higinet.tms35.core.persist.impl.CacheTrafficImpl;
 import cn.com.higinet.tms35.service.service_cache_refresh;
 
+/**
+ * RiskEngine专用bean定义类
+ *
+ * @ClassName:  RiskBeans
+ * @author: 王兴
+ * @date:   2018-1-16 15:42:06
+ * @since:  v4.4
+ */
 @Configuration
 public class RiskBeans {
 	/**
@@ -48,6 +58,11 @@ public class RiskBeans {
 		return new RiskBootstrap();
 	}
 
+	/**
+	 * Env initializer.
+	 *
+	 * @return the env initializer
+	 */
 	@Bean
 	@Qualifier("EnvInitializer")
 	public EnvInitializer envInitializer() {
@@ -132,9 +147,23 @@ public class RiskBeans {
 		return rm;
 	}
 	
+	/**
+	 * Cache refresh service.
+	 *
+	 * @return the service cache refresh
+	 */
 	@Bean(name="cacheRefreshService")
 	public service_cache_refresh cacheRefreshService(){
 		return new service_cache_refresh();
 	}
 	
+	
+	/**
+	 * Kafka message handler.
+	 *
+	 * @return the event channel handler
+	 */
+	public EventChannelHandler kafkaMessageHandler(){
+		return new KafkaMessageHandler();
+	}
 }

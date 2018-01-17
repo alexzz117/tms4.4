@@ -59,8 +59,7 @@ public class run_mntstat {
 		return stat_commit;
 	}
 
-	public void monitor_stat(run_db_commit row, long curr_time) {
-		run_txn_values txn = row.get_txn_data();
+	public void monitor_stat(run_txn_values txn, long curr_time) {
 		try {
 			long txn_time = ((Number) txn.get_fd(txn.m_env.field_cache().INDEX_TXNTIME)).longValue();
 			long run_time = (Long) txn.m_env.getStartTime();

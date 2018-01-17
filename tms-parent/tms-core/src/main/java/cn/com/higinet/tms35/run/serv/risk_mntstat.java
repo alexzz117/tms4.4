@@ -23,13 +23,12 @@ import cn.com.higinet.tms35.core.dao.dao_monitor_stat_txn_time;
 import cn.com.higinet.tms35.core.dao.row_in_db;
 import cn.com.higinet.tms35.core.dao.stmt.batch_stmt_jdbc_obj;
 import cn.com.higinet.tms35.core.dao.stmt.data_source;
-import cn.com.higinet.tms35.run.run_db_commit;
 import cn.com.higinet.tms35.run.run_mntstat;
 import cn.com.higinet.tms35.run.run_mntstat.run_stat_commit;
 import cn.com.higinet.tms35.run.run_txn_values;
 
-public class risk_mntstat extends tms_worker_base<run_db_commit> {
-	static tms_worker<run_db_commit> inst;
+public class risk_mntstat extends tms_worker_base<run_txn_values> {
+	static tms_worker<run_txn_values> inst;
 	final static int batch_size = tmsapp.get_config("tms.mntstat.commit.batchsize", 512);
 	final static int batch_time = tmsapp.get_config("tms.mntstat.commit.batchtime", 100);
 	final static int deque_size = tmsapp.get_config("tms.mntstat.commit.dequesize", 8192);
@@ -38,7 +37,7 @@ public class risk_mntstat extends tms_worker_base<run_db_commit> {
 	final static boolean isOnStat = tmsapp.get_config("tms.monitor.stat.isOn", 0) == 1;
 	final static boolean isStatSyncLog = tmsapp.get_config("sync.log.stat.isOn", 0) == 1;
 	
-	public static tms_worker<run_db_commit> commit_worker()
+	public static tms_worker<run_txn_values> commit_worker()
 	{
 		if (inst != null)
 			return inst;
@@ -81,8 +80,8 @@ public class risk_mntstat extends tms_worker_base<run_db_commit> {
 		monitor_stat = run_mntstat.load(ds, m_dao_stat_rule, m_dao_stat_txn_area);
 	}
 	
-	List<run_db_commit> request = new ArrayList<run_db_commit>();
-	List<run_db_commit> temp_list = new ArrayList<run_db_commit>();
+	List<run_txn_values> request = new ArrayList<run_txn_values>();
+	List<run_txn_values> temp_list = new ArrayList<run_txn_values>();
 	String batch_code, error;
 	clock c = new clock();
 	clock m_commit_clock = new clock();
@@ -189,15 +188,14 @@ public class risk_mntstat extends tms_worker_base<run_db_commit> {
 		try {
 			//实时监控统计
 			long curr_time = System.currentTimeMillis();// 当前时间
-			Iterator<run_db_commit> it = temp_list.iterator();
+			Iterator<run_txn_values> it = temp_list.iterator();
 			while (it.hasNext())
 			{
-				run_db_commit row = it.next();
+				run_txn_values rtv = it.next();
 				it.remove();
-				run_txn_values rtv = row.get_txn_data();
 				if (rtv == null)
 					continue;
-		        monitor_stat.monitor_stat(row, curr_time);
+		        monitor_stat.monitor_stat(rtv, curr_time);
 		        curr_txn_time = ((Number) rtv.get_fd(rtv.m_env.field_cache().INDEX_TXNTIME)).longValue();
 		        if (max_txn_time < curr_txn_time)
 		        {

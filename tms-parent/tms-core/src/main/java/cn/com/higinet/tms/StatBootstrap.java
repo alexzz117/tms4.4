@@ -55,10 +55,10 @@ public class StatBootstrap extends ThreadService {
 
 	private static ServerSocket g_ss;
 
-	@Value("${tms.stat.eval.workerCount}")
-	private int wc;
-	
 	static List<worker> g_worker_list = new ArrayList<worker>(256);
+
+	@Value("${server.port:4000}")
+	private int serverPort;
 
 	public void worker_connected(worker w) {
 		g_worker_list.add(w);
@@ -76,10 +76,8 @@ public class StatBootstrap extends ThreadService {
 		}
 		tmsapp.set_config(serverProps);
 		cacheManager.start();
-		System.out.println(wc);
 		int port = 0;
-		port = Integer.parseInt(serverProps.getProperty("tms.stat.port", "4000"));
-		tmsapp.set_config("tms.stat.port", port);
+		tmsapp.set_config("tms.stat.port", serverPort);
 		cache_init.init_for_stat(new data_source());
 		stat_serv.eval_inst().start();
 		translog_worker.worker().start();// 监控每个统计各个时间点统计

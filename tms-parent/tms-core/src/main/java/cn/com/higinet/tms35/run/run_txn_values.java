@@ -18,7 +18,6 @@ import cn.com.higinet.tms35.comm.tm_tool;
 import cn.com.higinet.tms35.comm.tms_exception;
 import cn.com.higinet.tms35.core.bean;
 import cn.com.higinet.tms35.core.cache.db_fd;
-import cn.com.higinet.tms35.core.cache.db_fd_ref;
 import cn.com.higinet.tms35.core.cache.db_stat;
 import cn.com.higinet.tms35.core.cache.db_tab_ref;
 import cn.com.higinet.tms35.core.cache.linear;
@@ -159,177 +158,177 @@ public final class run_txn_values extends row_in_db_impl {
 		}
 	}
 
-	public void update_ref_tabdata(run_db_commit rdc, dao_combin dc) throws Exception {
+	/*public void update_ref_tabdata(run_db_commit rdc, dao_combin dc) throws Exception {
 		for (db_tab_ref ref : m_env.get_txn().m_ref_tabs) {
 			List<Integer> fields = m_env.get_txn().m_ref_tab_fields.get(ref.ref_id);
 			update_ref_data(rdc, dc, ref, fields, m_env.get_txn().m_fd, m_env.get_txn().m_fd_refid);
 		}
-	}
+	}*/
 
-	private void update_ref_data(run_db_commit rdc, dao_combin dc, db_tab_ref ref, List<Integer> fields, linear<db_fd> mFd, linear<str_id> mFdRefid) throws Exception {
-		if (fields.isEmpty())
-			return;
-
-		String tab_name = ref.ref_tab_name;
-		String key_value = str_tool.to_str(ref.expr_node.exec(this.m_env));
-
-		if (str_tool.is_empty(key_value))
-			return;
-
-		boolean need_update = false;
-		for (int i = 0, len = fields.size(); i < len; i++) {
-			db_fd fd = mFd.get(fields.get(i));
-			db_fd_ref dfr = fd.ref;
-			if (dfr.src != null && //
-					(dfr.cond == null || //
-							dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
-				need_update = true;
-				break;
-			}
-		}
-
-		if (!need_update)
-			return;
-		need_update = false;
-		DataRepository repository = repositoryManager.getRepository(tab_name);
-		StructuredData data = repository.get(key_value);
-		for (int i = 0, len = fields.size(); i < len; i++) {
-			db_fd fd = mFd.get(fields.get(i));
-			db_fd_ref dfr = fd.ref;
-			if (dfr.src != null && (dfr.cond == null || //
-					dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
-				if (!need_update)
-					need_update = true;
-				Object o = dfr.src.exec(this.m_env);
-				if (o == null) {
-					data.setData(dfr.ref_fd_name, null);
-					continue;
-				}
-
-				o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
-				data.setData(dfr.ref_fd_name, str_tool.to_str(o));
-			}
-		}
-		if (need_update)
-			repository.save(data);
-		//		if (tab_name.equals("TMS_RUN_USER")) {
-		//			db_user row = dc.stmt_user.read(key_value);
-		//			/*if (!row.is_indb())
-		//				return;*/
-		//			for (int i = 0, len = fields.size(); i < len; i++) {
-		//				db_fd fd = mFd.get(fields.get(i));
-		//				db_fd_ref dfr = fd.ref;
-		//				if (dfr.src != null && (dfr.cond == null || //
-		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
-		//					if (!need_update)
-		//						need_update = true;
-		//					Object o = dfr.src.exec(this.m_env);
-		//					if (o == null) {
-		//						row.put(dfr.ref_fd_name, null);
-		//						continue;
-		//					}
-		//
-		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
-		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
-		//				}
-		//			}
-		//			if (need_update)
-		//				rdc.add_user(row);
-		//		} else if (tab_name.equals("TMS_RUN_ACCOUNT")) {
-		//			db_ref_row row = dc.stmt_account.read(key_value);
-		//			/*if (!row.is_indb())
-		//				return;*/
-		//			for (int i = 0, len = fields.size(); i < len; i++) {
-		//				db_fd fd = mFd.get(fields.get(i));
-		//				db_fd_ref dfr = fd.ref;
-		//				if (dfr.src != null && (dfr.cond == null || //
-		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
-		//					if (!need_update)
-		//						need_update = true;
-		//					Object o = dfr.src.exec(this.m_env);
-		//					if (o == null) {
-		//						row.put(dfr.ref_fd_name, null);
-		//						continue;
-		//					}
-		//
-		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
-		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
-		//				}
-		//			}
-		//			if (need_update)
-		//				rdc.add_acc(row);
-		//		}
-		//		////商户信息新增的
-		//		else if (tab_name.equals("TMS_RUN_MERCHANTS")) {
-		//			db_merchant row = dc.stmt_merchant.read(key_value);
-		//			/*if (!row.is_indb())
-		//				return;*/
-		//			for (int i = 0, len = fields.size(); i < len; i++) {
-		//				db_fd fd = mFd.get(fields.get(i));
-		//				db_fd_ref dfr = fd.ref;
-		//				if (dfr.src != null && (dfr.cond == null || //
-		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
-		//					if (!need_update)
-		//						need_update = true;
-		//					Object o = dfr.src.exec(this.m_env);
-		//					if (o == null) {
-		//						row.put(dfr.ref_fd_name, null);
-		//						continue;
-		//					}
-		//
-		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
-		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
-		//				}
-		//			}
-		//			if (need_update)
-		//				rdc.add_merchant(row);
-		//		}
-		//		//新增商户信息结束
-		//		//新增pos商户信息
-		//		else if (tab_name.equals("TMS_RUN_MERCHANT_POS")) {
-		//			db_pos_merchant row = (db_pos_merchant) dc.stmt_pos_merchant.read(new Object[] { key_value });
-		//
-		//			int i = 0;
-		//			for (int len = fields.size(); i < len; i++) {
-		//				db_fd fd = (db_fd) mFd.get(((Integer) fields.get(i)).intValue());
-		//				db_fd_ref dfr = fd.ref;
-		//				if ((dfr.src != null) && ((dfr.cond == null) || ((dfr.cond != null) && (func_map.is_true(dfr.cond.exec(this.m_env)))))) {
-		//					if (!need_update) {
-		//						need_update = true;
-		//					}
-		//					Object o = dfr.src.exec(this.m_env);
-		//					if (o == null) {
-		//						row.put(dfr.ref_fd_name, null);
-		//					} else {
-		//						o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
-		//						row.put(dfr.ref_fd_name, str_tool.to_str(o));
-		//					}
-		//				}
-		//			}
-		//			if (need_update) {
-		//				rdc.add_pos_merchant(row);
-		//			}
-		//		}
-		//		//新增pos商户信息结束
-		//		else if (tab_name.equals("TMS_RUN_SESSION")) {
-		//			db_session row = rdc.get_session();
-		//			for (int i = 0, len = fields.size(); i < len; i++) {
-		//				db_fd fd = mFd.get(fields.get(i));
-		//				db_fd_ref dfr = fd.ref;
-		//				if (dfr.src != null && (dfr.cond == null || //
-		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
-		//					Object o = dfr.src.exec(this.m_env);
-		//					if (o == null) {
-		//						row.put(dfr.ref_fd_name, null);
-		//						continue;
-		//					}
-		//
-		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
-		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
-		//				}
-		//			}
-		//		}
-	}
+//	private void update_ref_data(run_db_commit rdc, dao_combin dc, db_tab_ref ref, List<Integer> fields, linear<db_fd> mFd, linear<str_id> mFdRefid) throws Exception {
+//		if (fields.isEmpty())
+//			return;
+//
+//		String tab_name = ref.ref_tab_name;
+//		String key_value = str_tool.to_str(ref.expr_node.exec(this.m_env));
+//
+//		if (str_tool.is_empty(key_value))
+//			return;
+//
+//		boolean need_update = false;
+//		for (int i = 0, len = fields.size(); i < len; i++) {
+//			db_fd fd = mFd.get(fields.get(i));
+//			db_fd_ref dfr = fd.ref;
+//			if (dfr.src != null && //
+//					(dfr.cond == null || //
+//							dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
+//				need_update = true;
+//				break;
+//			}
+//		}
+//
+//		if (!need_update)
+//			return;
+//		need_update = false;
+//		DataRepository repository = repositoryManager.getRepository(tab_name);
+//		StructuredData data = repository.get(key_value);
+//		for (int i = 0, len = fields.size(); i < len; i++) {
+//			db_fd fd = mFd.get(fields.get(i));
+//			db_fd_ref dfr = fd.ref;
+//			if (dfr.src != null && (dfr.cond == null || //
+//					dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
+//				if (!need_update)
+//					need_update = true;
+//				Object o = dfr.src.exec(this.m_env);
+//				if (o == null) {
+//					data.setData(dfr.ref_fd_name, null);
+//					continue;
+//				}
+//
+//				o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
+//				data.setData(dfr.ref_fd_name, str_tool.to_str(o));
+//			}
+//		}
+//		if (need_update)
+//			repository.save(data);
+//		//		if (tab_name.equals("TMS_RUN_USER")) {
+//		//			db_user row = dc.stmt_user.read(key_value);
+//		//			/*if (!row.is_indb())
+//		//				return;*/
+//		//			for (int i = 0, len = fields.size(); i < len; i++) {
+//		//				db_fd fd = mFd.get(fields.get(i));
+//		//				db_fd_ref dfr = fd.ref;
+//		//				if (dfr.src != null && (dfr.cond == null || //
+//		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
+//		//					if (!need_update)
+//		//						need_update = true;
+//		//					Object o = dfr.src.exec(this.m_env);
+//		//					if (o == null) {
+//		//						row.put(dfr.ref_fd_name, null);
+//		//						continue;
+//		//					}
+//		//
+//		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
+//		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
+//		//				}
+//		//			}
+//		//			if (need_update)
+//		//				rdc.add_user(row);
+//		//		} else if (tab_name.equals("TMS_RUN_ACCOUNT")) {
+//		//			db_ref_row row = dc.stmt_account.read(key_value);
+//		//			/*if (!row.is_indb())
+//		//				return;*/
+//		//			for (int i = 0, len = fields.size(); i < len; i++) {
+//		//				db_fd fd = mFd.get(fields.get(i));
+//		//				db_fd_ref dfr = fd.ref;
+//		//				if (dfr.src != null && (dfr.cond == null || //
+//		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
+//		//					if (!need_update)
+//		//						need_update = true;
+//		//					Object o = dfr.src.exec(this.m_env);
+//		//					if (o == null) {
+//		//						row.put(dfr.ref_fd_name, null);
+//		//						continue;
+//		//					}
+//		//
+//		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
+//		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
+//		//				}
+//		//			}
+//		//			if (need_update)
+//		//				rdc.add_acc(row);
+//		//		}
+//		//		////商户信息新增的
+//		//		else if (tab_name.equals("TMS_RUN_MERCHANTS")) {
+//		//			db_merchant row = dc.stmt_merchant.read(key_value);
+//		//			/*if (!row.is_indb())
+//		//				return;*/
+//		//			for (int i = 0, len = fields.size(); i < len; i++) {
+//		//				db_fd fd = mFd.get(fields.get(i));
+//		//				db_fd_ref dfr = fd.ref;
+//		//				if (dfr.src != null && (dfr.cond == null || //
+//		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
+//		//					if (!need_update)
+//		//						need_update = true;
+//		//					Object o = dfr.src.exec(this.m_env);
+//		//					if (o == null) {
+//		//						row.put(dfr.ref_fd_name, null);
+//		//						continue;
+//		//					}
+//		//
+//		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
+//		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
+//		//				}
+//		//			}
+//		//			if (need_update)
+//		//				rdc.add_merchant(row);
+//		//		}
+//		//		//新增商户信息结束
+//		//		//新增pos商户信息
+//		//		else if (tab_name.equals("TMS_RUN_MERCHANT_POS")) {
+//		//			db_pos_merchant row = (db_pos_merchant) dc.stmt_pos_merchant.read(new Object[] { key_value });
+//		//
+//		//			int i = 0;
+//		//			for (int len = fields.size(); i < len; i++) {
+//		//				db_fd fd = (db_fd) mFd.get(((Integer) fields.get(i)).intValue());
+//		//				db_fd_ref dfr = fd.ref;
+//		//				if ((dfr.src != null) && ((dfr.cond == null) || ((dfr.cond != null) && (func_map.is_true(dfr.cond.exec(this.m_env)))))) {
+//		//					if (!need_update) {
+//		//						need_update = true;
+//		//					}
+//		//					Object o = dfr.src.exec(this.m_env);
+//		//					if (o == null) {
+//		//						row.put(dfr.ref_fd_name, null);
+//		//					} else {
+//		//						o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
+//		//						row.put(dfr.ref_fd_name, str_tool.to_str(o));
+//		//					}
+//		//				}
+//		//			}
+//		//			if (need_update) {
+//		//				rdc.add_pos_merchant(row);
+//		//			}
+//		//		}
+//		//		//新增pos商户信息结束
+//		//		else if (tab_name.equals("TMS_RUN_SESSION")) {
+//		//			db_session row = rdc.get_session();
+//		//			for (int i = 0, len = fields.size(); i < len; i++) {
+//		//				db_fd fd = mFd.get(fields.get(i));
+//		//				db_fd_ref dfr = fd.ref;
+//		//				if (dfr.src != null && (dfr.cond == null || //
+//		//						dfr.cond != null && func_map.is_true(dfr.cond.exec(this.m_env)))) {
+//		//					Object o = dfr.src.exec(this.m_env);
+//		//					if (o == null) {
+//		//						row.put(dfr.ref_fd_name, null);
+//		//						continue;
+//		//					}
+//		//
+//		//					o = db_fd.convert_out(fd.type, fd.ref.ref_fd.dbtype, o);
+//		//					row.put(dfr.ref_fd_name, str_tool.to_str(o));
+//		//				}
+//		//			}
+//		//		}
+//	}
 
 	private void init_ref_data(dao_combin dc) throws Exception {
 		for (db_tab_ref ref : m_env.get_txn().m_ref_tabs) {

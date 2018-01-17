@@ -24,16 +24,32 @@ import org.springframework.context.annotation.Configuration;
 import cn.com.higinet.rapid.base.dao.SqlMap;
 import cn.com.higinet.tms.common.cache.CacheManager;
 import cn.com.higinet.tms.common.cache.EnvInitializer;
-import cn.com.higinet.tms.common.cache.initializer.ConfigInitializer;
+import cn.com.higinet.tms.common.event.EventBus;
+import cn.com.higinet.tms.common.event.impl.SimpleEventBus;
 import cn.com.higinet.tms35.core.persist.Stat;
 import cn.com.higinet.tms35.core.persist.impl.CacheStatImpl;
 
+/**
+ * 公共的bean定义类
+ *
+ * @ClassName:  PublicBeans
+ * @author: 王兴
+ * @date:   2018-1-16 15:41:47
+ * @since:  v4.4
+ */
 @Configuration
 public class PublicBeans {
 
+	/** dbtype. */
 	@Value("${tms.dbtype:oracle}")
 	private String dbtype;
 
+	/**
+	 * Cache manager.
+	 *
+	 * @param initializer the initializer
+	 * @return the cache manager
+	 */
 	@Bean
 	public CacheManager cacheManager(@Qualifier("EnvInitializer") EnvInitializer initializer) {
 		CacheManager cm = new CacheManager();
@@ -64,5 +80,16 @@ public class PublicBeans {
 		map.setBasenames(new String[] { "classpath:/tms-sql" });
 		return map;
 	}
-	
+
+	/**
+	 * Event bus.
+	 *
+	 * @return the event bus
+	 */
+	@Bean(name = "eventBus")
+	public EventBus eventBus() {
+		EventBus bus = new SimpleEventBus();
+		((SimpleEventBus) bus).setName("simple-message-bus");
+		return bus;
+	};
 }

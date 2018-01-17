@@ -18,7 +18,9 @@ package cn.com.higinet.tms35.core.persist.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -30,9 +32,19 @@ import cn.com.higinet.tms.common.cache.Cache;
 import cn.com.higinet.tms.common.cache.CacheManager;
 import cn.com.higinet.tms.common.cache.CacheProvider;
 import cn.com.higinet.tms.common.cache.KV;
+import cn.com.higinet.tms.common.event.EventBus;
+import cn.com.higinet.tms.common.event.EventContext;
 import cn.com.higinet.tms.common.util.ByteUtils;
+import cn.com.higinet.tms.event.Params;
+import cn.com.higinet.tms.event.Topics;
+import cn.com.higinet.tms.event.modules.kafka.KafkaTopics;
+import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.core.bean;
 import cn.com.higinet.tms35.core.cache.db_cache;
+import cn.com.higinet.tms35.core.cache.db_fd;
+import cn.com.higinet.tms35.core.cache.db_tab;
+import cn.com.higinet.tms35.core.cache.linear;
+import cn.com.higinet.tms35.core.cache.str_id;
 import cn.com.higinet.tms35.core.dao.dao_trafficdata_read;
 import cn.com.higinet.tms35.core.dao.stmt.data_source;
 import cn.com.higinet.tms35.core.persist.Filter;
@@ -68,13 +80,17 @@ public class CacheTrafficImpl implements Traffic {
 
 	@Autowired
 	private CacheManager cacheManager;
-	
+
+	@Autowired
+	private EventBus eventBus;
+
+	private linear<db_fd> trafficFields;
+
 	@Override
 	public void initialize() {
 		trafficProvider = cacheManager.getProvider(CACHE_ID);
 		ds = new data_source((DataSource) bean.get("tmsDataSource"));
 		reader = new dao_trafficdata_read(db_cache.get().table(), db_cache.get().field(), ds);
-		TrafficdCommit.commit_pool().start(); //启动提交队列
 	}
 
 	/**
@@ -116,14 +132,54 @@ public class CacheTrafficImpl implements Traffic {
 			existsValues.m_txn_data.addAll(value.m_txn_data);
 			cache.set(new KV(TRANSACTION_GROUP, value.get_txn_code(), valuesToBytes(existsValues)));//这里是应答客户端之前的同步写库，让流水先进缓存
 			//***************************************************************************************************
-			//最后持久化数据
-			TrafficdCommit.commit_pool().request(value); //这块还是批量的方式持久化
+			EventContext event = new EventContext(Topics.TO_KAFKA);
+			event.setData(Params.KAFKA_TOPIC, KafkaTopics.TRAFFIC);
+			event.setData(Params.KAFKA_DATA, list2map(value));
+			event.setData(Params.KAFKA_USE_PARTITION, true);
+			event.setData(Params.KAFKA_PARTITION_KEY, value.m_env.get_dispatch());
+			eventBus.publish(event);
 		} finally {
 			if (cache != null) {
 				cache.close();
 			}
 		}
 		return existsValues;
+	}
+
+	private Map<String, Object> list2map(run_txn_values rf) {
+		if (trafficFields == null) {
+			synchronized (CacheTrafficImpl.class) {
+				db_tab.cache tabCache = db_cache.get().table();
+				db_tab tab = tabCache.get("T");
+				db_tab base_tab = tabCache.get(tab.base_tab);
+				trafficFields = db_cache.get().field().get_tab_fields(base_tab.tab_name);
+			}
+		}
+		Map<String, Object> res = new HashMap<>();
+		db_fd.cache dfc = rf.m_env.get_txn().g_dc.field();
+		linear<str_id> fdid_list = dfc.get_fdname_localid(rf.id());
+		db_fd bd;
+		str_id si;
+		si = fdid_list.get_uncheck(0);
+
+		for (int b = 0, f = 0, flen = fdid_list.size(); b < trafficFields.size(); b++)
+		{
+			bd = trafficFields.get_uncheck(b);
+			while (str_tool.is_empty(si.s))
+			{
+				if (++f >= flen)
+					break;
+				si = fdid_list.get_uncheck(f);
+			}
+			if (si.s.equals(bd.fd_name))
+			{
+				 res.put(bd.fd_name, rf.get_fd(si.id));
+				if (++f >= flen)
+					break;
+				si = fdid_list.get_uncheck(f);
+			}
+		}
+		return res;
 	}
 
 	/**
@@ -181,7 +237,6 @@ public class CacheTrafficImpl implements Traffic {
 		if (reader != null)
 			reader.close();
 		ds = null;
-		TrafficdCommit.commit_pool().shutdown(true);
 	}
 
 	/**

@@ -8,7 +8,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.tms35.evalTest;
 import cn.com.higinet.tms35.core.cache.cache_init;
 import cn.com.higinet.tms35.core.cache.db_cache;
 import cn.com.higinet.tms35.core.cache.db_fd;
@@ -408,7 +407,6 @@ public class web_tool
 	public static void main(String[] args)
 	{
 		System.out.print(date_tool.format(new java.util.Date(-1812096352000L)));
-		evalTest.init();
 		cache_init.init(new data_source());
 		List<db_stat> ref_stat = new ArrayList<db_stat>();
 		List<db_rule> ref_rule = new ArrayList<db_rule>();

@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.ClassPathResource;
@@ -31,7 +32,11 @@ import org.springframework.core.io.Resource;
 
 import cn.com.higinet.rapid.server.core.Server;
 import cn.com.higinet.tms.common.cache.CacheManager;
+import cn.com.higinet.tms.common.event.EventBus;
+import cn.com.higinet.tms.common.event.impl.ConcurrentEventChannel;
 import cn.com.higinet.tms.common.lifecycle.Service;
+import cn.com.higinet.tms.event.Topics;
+import cn.com.higinet.tms.event.modules.kafka.KafkaMessageHandler;
 import cn.com.higinet.tms35.comm.monitor.mon_thread;
 import cn.com.higinet.tms35.comm.roster_refresh_worker;
 import cn.com.higinet.tms35.comm.tmsapp;
@@ -40,7 +45,6 @@ import cn.com.higinet.tms35.core.cache.cache_init;
 import cn.com.higinet.tms35.core.cache.db_roster;
 import cn.com.higinet.tms35.core.cache.ip_cache;
 import cn.com.higinet.tms35.core.dao.stmt.data_source;
-import cn.com.higinet.tms35.run.serv.risk_commit;
 import cn.com.higinet.tms35.run.serv.risk_mntstat;
 import cn.com.higinet.tms35.run.serv.risk_serv_eval;
 import cn.com.higinet.tms35.run.serv.risk_serv_init;
@@ -55,10 +59,10 @@ import cn.com.higinet.tms4.model.RiskModelService;
  * @ClassName:  RiskBootstrap
  * @author: 王兴
  * @date:   2018-1-11 17:17:34
- * @since:  v4.3
+ * @since:  v4.4
  */
 public class RiskBootstrap extends Service implements ApplicationContextAware {
-	
+
 	/** context. */
 	private ApplicationContext context;
 
@@ -75,6 +79,16 @@ public class RiskBootstrap extends Service implements ApplicationContextAware {
 	/** cache manager. */
 	@Autowired
 	private CacheManager cacheManager;
+
+	@Autowired
+	private EventBus eventBus;
+
+	@Autowired
+	private KafkaMessageHandler kafkaHandler;
+
+	/** kafka 生产者的线程数. */
+	@Value("${tms.kafka.producer.threads:0}")
+	private int kafkaProducerThreads;
 
 	/* (non-Javadoc)
 	 * @see cn.com.higinet.tms.common.lifecycle.Service#doStart()
@@ -104,12 +118,14 @@ public class RiskBootstrap extends Service implements ApplicationContextAware {
 		stat_serv.query_inst().start();
 		risk_union_stat.worker().start();
 		roster_refresh_worker.worker().start();
-		risk_commit.commit_pool().start();
 		translog_worker.worker().start();// 监控每个交易各个时间点统计
 		risk_serv_eval.eval_pool().start();
 		risk_serv_init.init_pool().start();
 		tmsapp.start_live_deamon(false);
 		risk_mntstat.commit_worker().start();
+
+		//初始化内部事件总线
+		initEventBus();
 
 		//启动服务
 		Map<String, Server> servers = context.getBeansOfType(Server.class);
@@ -126,7 +142,20 @@ public class RiskBootstrap extends Service implements ApplicationContextAware {
 	@Override
 	protected void doStop() throws Throwable {
 		// TODO Auto-generated method stub
+		//老版本都不是按正常stop的方式搞的，停止进程都是通过kill pid的方式，因此新版本暂时不动这块
+	}
 
+	/**
+	 * 初始化事件总线，用于发布事件
+	 */
+	private void initEventBus() {
+		ConcurrentEventChannel _channel = new ConcurrentEventChannel(Topics.TO_KAFKA);
+		kafkaProducerThreads = kafkaProducerThreads == 0 ? Runtime.getRuntime().availableProcessors() * 2 : kafkaProducerThreads;
+		_channel.setThreadCount(kafkaProducerThreads);
+		_channel.setName("Data Output Channel");
+		_channel.setEventHandler(kafkaHandler);
+		eventBus.registerChannel(_channel);
+		eventBus.start();
 	}
 
 }

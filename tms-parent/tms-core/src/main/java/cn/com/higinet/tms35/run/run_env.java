@@ -9,6 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.rapid.server.message.Message;
+import cn.com.higinet.tms.common.event.EventBus;
+import cn.com.higinet.tms.common.event.EventContext;
+import cn.com.higinet.tms.event.Params;
+import cn.com.higinet.tms.event.Topics;
+import cn.com.higinet.tms.event.modules.kafka.KafkaTopics;
 import cn.com.higinet.tms35.comm.MapUtil;
 import cn.com.higinet.tms35.comm.NotErrorException;
 import cn.com.higinet.tms35.comm.StaticParameters;
@@ -38,7 +43,6 @@ import cn.com.higinet.tms35.core.cond.node;
 import cn.com.higinet.tms35.core.dao.dao_combin;
 import cn.com.higinet.tms35.core.persist.Filter;
 import cn.com.higinet.tms35.core.persist.Traffic;
-import cn.com.higinet.tms35.run.serv.risk_commit;
 import cn.com.higinet.tms35.service.io_env;
 import cn.com.higinet.tms4.model.common.StringUtil;
 
@@ -65,7 +69,7 @@ public final class run_env extends run_time {
 
 	public db_strategy m_strategy;
 
-//	private db_session m_session;
+	//	private db_session m_session;
 
 	//	private db_user m_user;
 
@@ -102,6 +106,8 @@ public final class run_env extends run_time {
 	public boolean isHealth = false;// 是否健康检查的交易
 
 	private static final Traffic trafficdata = bean.get(Traffic.class); //持久化接口由外部注入
+
+	private static final EventBus eventBus = bean.get(EventBus.class); //消息总线由外部注入
 
 	public static run_env identification(io_env ie, boolean is_confirm) {
 		TreeMap<String, String> m = ie.getParameterMap();
@@ -309,7 +315,7 @@ public final class run_env extends run_time {
 					m_ie.pin_time(io_env.INDEX_TRANS_LOAD_SESSION_END);
 					if (m_session != null && str_tool.is_empty(m_session.sessionid))
 						init_session_info();
-
+				
 					if (m_session.is_indb()) {
 						log.info("session in db,then load traffic data.");
 						m_last_rf = rf;
@@ -444,7 +450,7 @@ public final class run_env extends run_time {
 
 				m_ie.setData("actionInfo", actionInfo.toString());
 			}
-//			update_session_info();
+			//			update_session_info();
 			m_rf.init_stat_data();
 			m_ie.setData("hitRuleNum", m_rf.get_fd(m_txn.g_dc.field().INDEX_HITRULENUM));
 			m_ie.setData("trigRuleNum", m_rf.get_fd(m_txn.g_dc.field().INDEX_TRIGRULENUM));
@@ -471,16 +477,16 @@ public final class run_env extends run_time {
 	/*private void init_session_info() {
 		if (m_session == null)
 			return;
-
+	
 		m_session.sessionid = str_tool.to_str(this.get_fd_value(field_cache().INDEX_SESSIONID));
 		m_session.userid = str_tool.to_str(this.get_fd_value(field_cache().INDEX_USERID));
 		m_session.starttime = ((Number) this.get_fd_value(field_cache().INDEX_TXNTIME)).longValue();
 	}
-
+	
 	private void update_session_info() {
 		if (m_session == null)
 			return;
-
+	
 		m_session.deviceid = str_tool.to_str(this.get_fd_value(field_cache().INDEX_DEVID));
 		m_session.citycode = str_tool.to_str(this.get_fd_value(field_cache().INDEX_CITY));
 		m_session.regioncode = str_tool.to_str(this.get_fd_value(field_cache().INDEX_REGION));
@@ -628,26 +634,11 @@ public final class run_env extends run_time {
 	//	}
 
 	public void save_txn_data_ansync(dao_combin dc2) throws Exception {
-		/*
-		 * 说明：
-		 * 1、只有注册交易时, 需要由tms创建用户信息, 而用户信息的修改则是通过数据同步或者引用表更新, 所以就不用将m_user对象传递到risk_commit中了
-		 * 2、用户注册和个人绑卡时, 都要通过引用表的设置进行插入新数据, 所以引用表更新时将indb的判断注释掉
-		 * */
-		run_db_commit dc = new run_db_commit(this);
-
+		m_rf.m_env = this;
 		m_rf.set_fd(field_cache().INDEX_FINISHTIME, tm_tool.lctm_ms());
-		if (StaticParameters.TXN_STATUS_SUCCESS.equals(this.get_txn_status())) {
-			m_rf.update_ref_tabdata(dc, dc2);
-
-			// 更新用户禁用状态或本金账户状态 add by zlq 20160109
-			/*String disposal = str_tool.to_str(m_rf.get_fd(field_cache().INDEX_DISPOSAL));
-			if ("PS06".equals(disposal) || "PS07".equals(disposal)) {
-				dcSetUser(dc, disposal);
-			}*/
-		}
-		/***************************************************************************/
-		//	dc.set_txn_data(m_rf);  //4.3版本中已经迁移至交易流水持久化接口中实现
-		/***************************************************************************/
+		//		if (StaticParameters.TXN_STATUS_SUCCESS.equals(this.get_txn_status())) {
+		//			m_rf.update_ref_tabdata(dc, dc2); //更新签约数据移到引擎外部
+		//		}
 		if (this.is_confirm()) {
 			//added by wujw,20160108,挂起交易重新发送确认时更新处置/PSTATUS start
 			String disposal = m_channel_data.get("DISPOSAL");
@@ -660,17 +651,22 @@ public final class run_env extends run_time {
 			} //added by wujw,20160108,挂起交易重新发送确认时更新处置/PSTATUS end
 		} else {
 			alarm_assing_by_disposal();//评估才走分派,确认无需再分派
-
-			/*if (m_user != null)
-				dc.add_user(m_user);*/
-			/*if (m_session != null)
-				dc.set_session(m_session);*/
-			if (m_hit_rules != null && !m_hit_rules.isEmpty())
-				dc.set_rule_hit(m_hit_rules);
+			//			if (m_hit_rules != null && !m_hit_rules.isEmpty())
+			//				dc.set_rule_hit(m_hit_rules);
+			/*********规则触发信息发送到kafka**********/
+			EventContext event = new EventContext(Topics.TO_KAFKA);
+			event.setData(Params.KAFKA_TOPIC, KafkaTopics.RULE_HIT);
+			event.setData(Params.KAFKA_DATA, m_hit_rules);
+			eventBus.publish(event);
+			//			if (m_hit_rule_acts != null && !m_hit_rule_acts.isEmpty())
+			//				dc.set_rule_action_hit(m_hit_rule_acts);
+			/*********规则Action触发信息发送到kafka**********/
+			event = new EventContext(Topics.TO_KAFKA);
+			event.setData(Params.KAFKA_TOPIC, KafkaTopics.RULE_ACTION_HIT);
+			event.setData(Params.KAFKA_DATA, m_hit_rule_acts);
+			eventBus.publish(event);
 		}
-		if (m_hit_rule_acts != null && !m_hit_rule_acts.isEmpty())
-			dc.set_rule_action_hit(m_hit_rule_acts);
-		m_rf.m_env = this;
+
 		//*******************************tms V4.3保存交易流水*********************************
 		trafficdata.save(m_rf, new Filter<run_txn_values>() {
 			@Override
@@ -684,40 +680,9 @@ public final class run_env extends run_time {
 
 		});
 		//*************************************************************************************
-		m_ie.pin_time(io_env.INDEX_TRANS_TO_COMMIT);
-		risk_commit.commit_pool().request(dc);
+		//		m_ie.pin_time(io_env.INDEX_TRANS_TO_COMMIT);
+		//		risk_commit.commit_pool().request(dc);
 	}
-
-	/* 
-	 * 处置方式为“阻断并禁用会员”时，修改用户的forbit_status="FORBIT"，禁用状态:FORBIT禁用,UNFORBIT启用
-	 * 处置方式为“阻断并冻结账户”时，修改用户的freeze_state="111"，·冻结用户的本金账户
-	 */
-	/*private void dcSetUser(run_db_commit dc, String disposal) {
-		if (m_user != null) {
-			List<db_user> db_user_list = dc.get_user();
-			boolean dc_user_exist = false;
-			if (db_user_list != null && db_user_list.size() > 0) {
-				for (db_user db_user2 : db_user_list) {
-					if (db_user2.userid.equals(m_user.userid)) {
-	//						updateUserStatus(disposal, db_user2);
-						dc_user_exist = true;
-						break;
-					}
-				}
-			}
-			if (!dc_user_exist) {
-	//				updateUserStatus(disposal, m_user);
-				dc.add_user(m_user);
-			}
-		}
-	}*/
-
-	//	private void updateUserStatus(String disposal, db_user db_user2) {
-	//		if ("PS07".equals(disposal))
-	//			db_user2.forbit_status = "FORBIT";
-	//		if ("PS06".equals(disposal))
-	//			db_user2.freeze_state = "111";
-	//	}
 
 	public String eval_strategy() {
 		// 0 失败 1成功 -1未知

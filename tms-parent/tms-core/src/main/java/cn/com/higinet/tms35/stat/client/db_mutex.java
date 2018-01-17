@@ -7,7 +7,6 @@ import java.sql.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.com.higinet.tms35.evalTest;
 import cn.com.higinet.tms35.comm.clock;
 import cn.com.higinet.tms35.comm.delay_tool;
 import cn.com.higinet.tms35.comm.tm_tool;
@@ -146,30 +145,6 @@ public class db_mutex
 		{
 			reset();
 			update.close();
-		}
-	}
-
-	/**
-	 * @param args
-	 * @throws InterruptedException
-	 */
-	public static void main(String[] args)
-	{
-		evalTest.init();
-		db_mutex m = new db_mutex();
-		for (;;)
-		{
-			if (m.lock(2000))
-			{
-				delay_tool.delay(1000);
-				log.info(Thread.currentThread().getId() + " locked.");
-				m.unlock(-m.status + 1);
-			}
-			else
-			{
-				System.out.println(Thread.currentThread().getId() + "..........");
-			}
-			delay_tool.delay(1000);
 		}
 	}
 }
