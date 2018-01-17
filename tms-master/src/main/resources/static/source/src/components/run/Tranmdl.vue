@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="12">
             <span>交易模型</span>
-            <el-button type="text" icon="el-icon-circle-plus" @click="tmAddFunc" title="新建交易模型" :disabled="readonly"></el-button>
+            <el-button type="text" icon="el-icon-plus" @click="tmAddFunc" title="新建交易模型" :disabled="readonly"></el-button>
           </el-col>
         </el-row>
       </el-header>
@@ -20,7 +20,7 @@
             <template slot-scope="scope">
               <el-button type="text" icon="el-icon-edit" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="编辑" @click="tmEditFunc(scope.$index, scope.row)"></el-button>
               <el-button type="text" icon="el-icon-delete" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="删除" @click="tmDelFunc(scope.$index, scope.row)"></el-button>
-              <el-button type="text" icon="el-icon-search" title="查看" @click="tmInfoFunc(scope.$index, scope.row)"></el-button>
+              <el-button type="text" icon="el-icon-zoom-in" title="查看" @click="tmInfoFunc(scope.$index, scope.row)"></el-button>
             </template>
           </el-table-column>
           <el-table-column align="left"  label="属性名称" prop="name">
@@ -153,7 +153,7 @@
         <el-row>
           <el-col :span="12">
             <span>交易模型引用</span>
-            <el-button type="text" class="el-icon-circle-plus" @click="tableAddFunc" :disabled="readonly"></el-button>
+            <el-button type="text" class="el-icon-plus" @click="tableAddFunc" :disabled="readonly"></el-button>
           </el-col>
         </el-row>
       </el-header>
@@ -168,7 +168,7 @@
             <template slot-scope="scope">
               <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)" :disabled="readonly"></el-button>
               <el-button type="text" icon="el-icon-delete" title="删除" @click="tableDelFunc(scope.row)" :disabled="readonly"></el-button>
-              <el-button type="text" icon="el-icon-search" title="查看" @click="tableInfoFunc(scope.row)"></el-button>
+              <el-button type="text" icon="el-icon-zoom-in" title="查看" @click="tableInfoFunc(scope.row)"></el-button>
               <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click="tableSetFunc(scope.row)" :disabled="readonly"></el-button>
             </template>
           </el-table-column>
@@ -517,7 +517,7 @@
           return callback()
         }
         if (util.trim(value) === '') {
-          return callback(new Error('参数不允许为空'))
+          return callback(new Error('请输入参数'))
         }
         let funcParam = self.funcParam // 所有的参数集合
         let paramsList = [] // 使用的参数列表
@@ -568,7 +568,7 @@
           return callback()
         }
         if (util.trim(value) === '') {
-          return callback(new Error('参数不允许为空'))
+          return callback(new Error('请输入参数'))
         }
         let funcParam = self.funcParam // 所有的参数集合
         let paramsList = [] // 使用的参数列表
@@ -695,47 +695,47 @@
           name: [
             {required: true, message: '请输入属性名称', trigger: 'blur'},
             {validator: check.checkFormZhSpecialCharacter, trigger: 'blur'}, // 输入格式校验：只能包含汉字,字母,数字和下划线
-            {max: 50, message: '属性名称不能超过20个字符', trigger: 'blur'}
+            {max: 50, message: '长度不能超过20个字符', trigger: 'blur'}
           ],
           ref_name: [
             {required: true, message: '请输入属性代码', trigger: 'blur'},
             {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'}, // 输入格式校验：包含字母,数字和下划线
-            {max: 50, message: '属性代码不能超过20个字符', trigger: 'blur'}
+            {max: 50, message: '长度不能超过20个字符', trigger: 'blur'}
           ],
           src_id: [
             {required: true, message: '请输入数据来源', trigger: 'blur'},
             {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'}, // 输入格式校验：包含字母,数字和下划线
-            {max: 20, message: '数据来源不能超过20个字符', trigger: 'blur'}
+            {max: 20, message: '长度不能超过20个字符', trigger: 'blur'}
           ],
           type: [
             {required: true, message: '请选择类型', trigger: 'blur'},
             {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'}, // 输入格式校验：包含字母,数字和下划线
-            {max: 20, message: '类型不能超过20个字符', trigger: 'blur'}
+            {max: 20, message: '长度不能超过20个字符', trigger: 'blur'}
           ],
           fd_name: [
             {required: true, message: '请选择存储字段', trigger: 'blur'},
             {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'}, // 输入格式校验：包含字母,数字和下划线
             {validator: tmFdNameCheck, trigger: 'blur'}, // 判断存储字段是否合法
-            {max: 50, message: '存储字段不能超过20个字符', trigger: 'blur'}
+            {max: 50, message: '长度不能超过20个字符', trigger: 'blur'}
           ],
           code: [
             {validator: check.checkFormSpecialCode, trigger: 'blur'}, // 特殊字符校验
             {validator: codeCheck, trigger: 'blur'}, // 关联代码集合法校验
-            {max: 50, message: '关联代码集不能超过20个字符', trigger: 'blur'}
+            {max: 50, message: '长度不能超过20个字符', trigger: 'blur'}
           ],
           src_default: [
             {validator: check.checkFormSpecialCode, trigger: 'blur'}, // 特殊字符校验,
-            {max: 50, message: '默认值不能超过20个字符', trigger: 'blur'}
+            {max: 50, message: '长度不能超过20个字符', trigger: 'blur'}
           ],
           genesisrul: [
             {validator: genesisrulCheck, trigger: 'blur'} // 判断函数是否存在
           ],
           params1: [
-            {max: 20, message: '处理函数参数不能超过20个字符', trigger: 'blur'},
+            {max: 20, message: '长度不能超过20个字符', trigger: 'blur'},
             {validator: paramsCheck1, trigger: 'blur'}
           ],
           params2: [
-            {max: 20, message: '处理函数参数不能超过20个字符', trigger: 'blur'},
+            {max: 20, message: '长度不能超过20个字符', trigger: 'blur'},
             {validator: paramsCheck2, trigger: 'blur'}
           ]
         },
@@ -747,7 +747,7 @@
           ref_desc: [
             {required: true, message: '请输入引用描述', trigger: 'blur'},
             {validator: check.checkFormZhSpecialCharacter, trigger: 'blur'}, // 中文校验
-            {max: 64, message: '引用描述不能超过64个字符', trigger: 'blur'}
+            {max: 64, message: '长度不能超过64个字符', trigger: 'blur'}
           ],
           src_expr: [
             {required: true, message: '请选择引用字段', trigger: 'blur'},
@@ -762,12 +762,12 @@
           ref_desc: [
             {required: true, message: '请输入属性名称', trigger: 'blur'},
             {validator: check.checkFormZhSpecialCharacter, trigger: 'blur'}, // 中文校验
-            {max: 64, message: '属性名称不能超过64个字符', trigger: 'blur'}
+            {max: 64, message: '长度不能超过64个字符', trigger: 'blur'}
           ],
           ref_name: [
             {required: true, message: '请输入属性代码', trigger: 'blur'},
             {validator: check.checkFormEnSpecialCharacter, trigger: 'blur'}, // 输入格式校验：包含字母,数字和下划线
-            {max: 50, message: '属性代码不能超过50个字符', trigger: 'blur'}
+            {max: 50, message: '长度不能超过50个字符', trigger: 'blur'}
           ],
           src_expr_in: [
             {validator: tableSrcExprCheck, trigger: 'blur'} // 空校验
@@ -1115,7 +1115,7 @@
             let row = {}
             if (op === 'mod') {
               if (rowData.type !== formData.type && rowData.link.length > 0) {
-                this.$confirm('该字段已在自定义查询中引用，确认修改？', '提示', {
+                this.$confirm('该字段已在自定义查询中引用，确认修改', '提示', {
                   confirmButtonText: '确定',
                   cancelButtonText: '取消',
                   type: 'warning'
@@ -1150,7 +1150,11 @@
                 postData: jsonData
               },
               success: function (data) {
-                self.$message.success('操作成功。')
+                if (op === 'mod') {
+                  self.$message.success('编辑成功')
+                } else {
+                  self.$message.success('创建成功')
+                }
                 self.initTmForm()
                 self.tmDialogVisible = false
               },
@@ -1167,7 +1171,7 @@
       },
       tmDelFunc (index, row) { // 删除交易模型定义事件处理
         let self = this
-        this.$confirm('确定删除？', '提示', {
+        this.$confirm('确定删除', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -1450,7 +1454,11 @@
                 postData: jsonData
               },
               success: function (data) {
-                self.$message.success('操作成功。')
+                if (op === 'add') {
+                  self.$message.success('创建成功')
+                } else {
+                  self.$message.success('编辑成功')
+                }
                 self.tableDialogVisible = false
                 self.initTableForm()
               },
@@ -1461,14 +1469,13 @@
               }
             })
           } else {
-            this.$message('请正确填写引用表信息')
             return false
           }
         })
       },
       tableDelFunc (row) {
         let self = this
-        self.$confirm('确定删除？', '提示', {
+        self.$confirm('确定删除', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -1564,7 +1571,11 @@
                 postData: jsonData
               },
               success: function (data) {
-                self.$message.success('操作成功。')
+                if (op === 'add') {
+                  self.$message.success('创建成功。')
+                } else {
+                  self.$message.success('编辑成功。')
+                }
                 self.initTableForm()
                 self.tableInfoDialogVisible = false
               },
@@ -1575,7 +1586,6 @@
               }
             })
           } else {
-            this.$message('请正确填写行字段信息')
             return false
           }
         })
