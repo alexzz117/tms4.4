@@ -1,7 +1,6 @@
 package cn.com.higinet.tms;
 
 import org.elasticsearch.client.transport.TransportClient;
-import org.springframework.context.annotation.Configuration;
 
 //@Configuration
 public interface ElasticsearchService {

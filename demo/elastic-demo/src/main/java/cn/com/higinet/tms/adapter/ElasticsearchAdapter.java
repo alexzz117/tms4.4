@@ -37,7 +37,6 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -58,21 +57,6 @@ public class ElasticsearchAdapter<T> {
 	
 	@Autowired
 	private ElasticsearchConfig elasticsearchConfig;
-
-	//批量大小  默认为1000
-	@Value("${elasticsearch.commit.number}")
-	private int commitNum;
-
-	//批量提交数据量大小，单位为M，默认为5M
-	@Value("${elasticsearch.commit.bytesize}")
-	private int byteSizeValue;
-
-	//并发请求允许同时积累新的批量执行请求   0代表着只有一个单一的请求将被允许执行 默认为1
-	private int concurrentRequests = 1;
-
-	//多少时间刷新为5s
-	@Value("${elasticsearch.flush.second}")
-	private int flushTime;
 	
 	private Map<String,T> dataMap;
 
@@ -279,7 +263,7 @@ public class ElasticsearchAdapter<T> {
 	 * @param mappingName
 	 * @param list
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public FailProcess batchUpdate(String indexName, List<T> dataList, Class<T> entityType ) {
 		FailProcess<T> failData = null;
 		try {
