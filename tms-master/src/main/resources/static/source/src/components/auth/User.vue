@@ -317,7 +317,7 @@
           url: '/operator/mod',
           param: this.userDialogForm,
           success: function (data) {
-            self.$message.success('更新成功。')
+            self.$message.success('编辑成功。')
             self.roleDialogVisible = false
             self.selUser()
           },
@@ -353,7 +353,7 @@
       resetPwd (index, row) {
         var self = this
         var pwd = crypt.md5('123456') // MD5加密
-        this.$confirm('确定重置密码吗？', '提示', {
+        this.$confirm('确定重置密码', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -379,7 +379,7 @@
       },
       resetFlag (index, row) {
         var self = this
-        this.$confirm('确定要解锁吗？', '提示', {
+        this.$confirm('确定解锁？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -391,9 +391,9 @@
             },
             success: function (data) {
               if (data.result) {
-                self.$message.success('用户解锁成功。')
+                self.$message.success('解锁成功。')
               } else {
-                self.$message.success('用户解锁失败。')
+                self.$message.success('解锁失败。')
               }
               self.selUser()
             },
@@ -561,7 +561,7 @@
             {validator: credentialTypeInputCheck, trigger: 'blur'} // 证件类型输入校验
           ],
           credentialnum: [
-            {max: 50, message: '证件号码不能超过32个字符', trigger: 'blur'},
+            {max: 50, message: '长度在32个字符以内', trigger: 'blur'},
             {validator: credentialNumCheck, trigger: 'blur'}, // 证件号码格式校验
             {validator: credentialNumInputCheck, trigger: 'blur'} // 证件号码输入校验
           ],
