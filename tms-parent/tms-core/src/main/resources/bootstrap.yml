@@ -5,14 +5,15 @@ spring:
       connectString: 192.168.10.188:2181
       discovery:
         register: true
-        instancePort: 4000
+        instancePort: ${server.port}
+        instance-host: 192.168.10.93
       config: 
         #启用zookeeper作为配置中心
         enabled: true
         #配置根路径
         root: config/tms
         #配置默认上下文 默认为spring.application.name
-        defaultContext : stat-engine
+        defaultContext : risk-engine
         #配置profile分隔符
         profileSeparator : '-'
         watcher:

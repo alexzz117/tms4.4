@@ -11,7 +11,7 @@
 
 	<bean class="cn.com.higinet.rapid.server.core.Server">
 		<property name="workerCount" value="${tms.server.workerCount}"></property>
-		<property name="port" value="${tms.server.port}"></property>
+		<property name="port" value="${server.port}"></property>
 	</bean>
 	<!-- 连接数控制对象 -->
 	<bean id="connectControl" class="cn.com.higinet.rapid.server.core.ConnectControl">
