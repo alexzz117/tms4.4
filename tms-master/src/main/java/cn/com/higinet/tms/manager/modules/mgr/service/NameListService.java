@@ -98,7 +98,7 @@ public class NameListService {
 		if( !StringUtil.isEmpty( conds.get( "rostertype" ) ) ) {
 			sql.append( " AND ROSTER.ROSTERTYPE=:rostertype" );
 		}
-		Order order = new Order().asc( "datatype, createtime" );
+		Order order = new Order().desc( "datatype, createtime" );
 		Page<Map<String, Object>> rosterPage = getSimpleDao().pageQuery( sql.toString(), conds, order );
 
 		/*for(Map<String,Object> rosterMap: rosterPage.getList()){
@@ -370,8 +370,8 @@ public class NameListService {
 		long time = System.currentTimeMillis();
 		insertMap.put( "CREATETIME", time );
 
-		String enabletime = req.get( "enabletime" ).toString();
-		String disabletime = req.get( "disabletime" ).toString();
+		String enabletime = String.valueOf(req.get( "enabletime" ));
+		String disabletime = String.valueOf(req.get( "disabletime" ));
 		insertMap.put( "ENABLETIME", MgrDateConvertUtil.convert2Millisr( enabletime, MgrDateConvertUtil.FORMATE1 ) );
 		insertMap.put( "DISABLETIME", MgrDateConvertUtil.convert2Millisr( disabletime, MgrDateConvertUtil.FORMATE1 ) );
 
