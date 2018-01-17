@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Id;
 
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -37,7 +38,6 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -45,14 +45,24 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Component
+import cn.com.higinet.tms.base.entity.TrafficData;
+import cn.com.higinet.tms.base.util.Stringz;
+
 public class ElasticSearchAdapter<T> {
 	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchAdapter.class );
-	
+
 	@Autowired
 	private ElasticSearchConfig elasticsearchConfig;
-	
-	private Map<String,T> dataMap;
+
+	@Autowired
+	private EsBulkProcess processor;
+
+	private Class entityType = TrafficData.class;
+
+	@PostConstruct
+	public void init() {
+		//logger.info( entityType.getName() );
+	}
 
 	/**
 	 * @param indexName
@@ -95,8 +105,7 @@ public class ElasticSearchAdapter<T> {
 
 	@SuppressWarnings("rawtypes")
 	private SearchRequestBuilder queryCondition( String indexName, Pagination page, List<QueryConditionEntity> dataList ) {
-		SearchRequestBuilder searchRequestBuilder = elasticsearchConfig.getTransportClient().prepareSearch( indexName ).setTypes( indexName )
-				.setSearchType( SearchType.DFS_QUERY_THEN_FETCH );
+		SearchRequestBuilder searchRequestBuilder = elasticsearchConfig.getTransportClient().prepareSearch( indexName ).setTypes( indexName ).setSearchType( SearchType.DFS_QUERY_THEN_FETCH );
 		searchRequestBuilder.setFrom( (page.getPageNo() - 1) * page.getPageSize() ).setSize( page.getPageSize() ).setExplain( true );
 		for( int i = 0; i < dataList.size(); i++ ) {
 			QueryConditionEntity condition = dataList.get( i );
@@ -155,7 +164,7 @@ public class ElasticSearchAdapter<T> {
 	 * @param obj
 	 * @return
 	 */
-	public Object getById( String indexName, String primaryKeyValue, Class<T> entityType ) {
+	public Object getById( String indexName, String primaryKeyValue ) {
 		GetResponse response = elasticsearchConfig.getTransportClient().prepareGet( indexName, indexName, primaryKeyValue ).get();
 		String json = response.getSourceAsString();
 		Object data = null;
@@ -202,8 +211,7 @@ public class ElasticSearchAdapter<T> {
 				return;
 			}
 			JSONObject jsonObject = (JSONObject) JSONObject.toJSON( t );
-			IndexRequest indexRequest = new IndexRequest( indexName, indexName, primaryKeyValue )
-					.source( XContentFactory.jsonBuilder().startObject().field( primaryKeyName, primaryKeyValue ).endObject() );
+			IndexRequest indexRequest = new IndexRequest( indexName, indexName, primaryKeyValue ).source( XContentFactory.jsonBuilder().startObject().field( primaryKeyName, primaryKeyValue ).endObject() );
 			UpdateRequest updateRequest = new UpdateRequest( indexName, indexName, primaryKeyValue ).doc( jsonObject ).upsert( indexRequest );
 			try {
 				elasticsearchConfig.getTransportClient().update( updateRequest ).get();
@@ -248,7 +256,7 @@ public class ElasticSearchAdapter<T> {
 			logger.error( "update is error", e );
 		}
 	}
-	
+
 	/**
 	 * 批量添加数据
 	 * @param <T>
@@ -257,71 +265,51 @@ public class ElasticSearchAdapter<T> {
 	 * @param mappingName
 	 * @param list
 	 */
-	@SuppressWarnings({ "rawtypes" })
-	public FailProcess batchUpdate(String indexName, List<T> dataList, Class<T> entityType ) {
-		FailProcess<T> failData = null;
+	public void batchUpdate( String indexName, List<T> dataList ) {
 		try {
-			dataMap = new HashMap<String,T>();
-			String primaryKeyName = getPrimaryKeyName(entityType);
+			logger.info( "batchUpdate : " + Stringz.valueOf( dataList.size() ) );
+			Map<String, T> dataMap = new HashMap<String, T>();
+			String primaryKeyName = getPrimaryKeyName();
 			if( StringUtils.isEmpty( primaryKeyName ) ) {
 				logger.warn( "primaryKeyName is empty" );
-				return failData;
+				return;
 			}
-			EsBulkProcess processor = new EsBulkProcess();
-			BulkProcessor bulkProcessor = processor.getBulkProcessor(elasticsearchConfig,indexName,entityType,dataList);
-			long s = System.currentTimeMillis();
+
+			BulkProcessor bulkProcessor = processor.getBulkProcessor( elasticsearchConfig, dataMap, new Listener<T>() {
+				@Override
+				public void onSuccess( List<T> sucList ) {
+					logger.info( "success list size is:" + sucList.size() );
+				}
+
+				@Override
+				public void onError( List<T> failIdList ) {
+					logger.info( "error list size is:" + failIdList.size() );
+				}
+
+			} );
 			for( int i = 0; i < dataList.size(); i++ ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
-				dataMap.put(jsonObject.get(primaryKeyName).toString(),dataList.get( i ));
+				dataMap.put( jsonObject.get( primaryKeyName ).toString(), dataList.get( i ) );
+				//logger.info( "id value :" + jsonObject.get( primaryKeyName ).toString() );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
 			}
-			System.out.println( System.currentTimeMillis() - s );
 			bulkProcessor.close();
+
+			logger.info( "bulkProcessor.close() : " + Stringz.valueOf( dataMap.size() ) );
 		}
 		catch( Exception e ) {
 			logger.error( "batchUpdate is error", e );
 		}
-		return failData;
 	}
-	
-	/**
-	 * 保存完毕后做一些事情
-	 * @param map
-	 * @param dataList
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void callback(String indexName,Class<T> classType,Map<MarkerEnum,List<String>> map,List<T> dataList){
-		SuccProcess succ = new SuccProcess();
-		FailProcess fail = new FailProcess();
-		for (MarkerEnum key : map.keySet()) {
-			 if(MarkerEnum.ALL_SUCCESS.equals(key)){
-				 succ.callback(indexName,classType,dataList);
-			 }else if(MarkerEnum.ALL_FAIL.equals(key)){
-				 fail.callback(indexName,classType,dataList);
-			 }else{
-				 if(dataMap.isEmpty()){
-					 logger.error("adpter中Map为空");
-				 }else{
-					 List<String> failIdList = map.get(key);
-					 List<T> failObjectList = new ArrayList<T>();
-					 for (String failId : failIdList) {
-						 failObjectList.add(dataMap.get(failId));
-						 dataMap.remove(failId);
-					}
-					fail.callback(indexName,classType,dataList);
-					succ.callback(indexName,classType,(List<T>)map.values());
-				 }
-			 }
-		 }
-	}
-	
+
 	/**
 	 * 获取主键名称
 	 * @param clazz
 	 * @param obj
 	 * @return
 	 */
-	private String getPrimaryKeyName( Class<T> entityType ) {
+	private String getPrimaryKeyName() {
+
 		String primaryKeyName = "";
 		if( entityType == null ) {
 			return primaryKeyName;
@@ -415,7 +403,7 @@ public class ElasticSearchAdapter<T> {
 	 */
 	private String getElasticSearchMappingType( String varType ) {
 		String es = "String";
-		switch ( varType ) {
+		switch( varType ) {
 			case "String" :
 				es = "keyword";
 				break;

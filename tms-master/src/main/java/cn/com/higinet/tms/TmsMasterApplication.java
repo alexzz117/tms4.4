@@ -5,11 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
+import cn.com.higinet.tms.common.elasticsearch.EnableElasticSearch;
+
 @SpringBootApplication
 //@EnableJdbcHttpSession(maxInactiveIntervalInSeconds = 1800)
 @EnableDiscoveryClient
 @EnableZuulProxy
-//@EnableElasticSearch
+@EnableElasticSearch
 //@EnableKafka
 public class TmsMasterApplication {
 

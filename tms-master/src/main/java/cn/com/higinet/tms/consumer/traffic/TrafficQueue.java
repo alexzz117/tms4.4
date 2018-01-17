@@ -44,8 +44,9 @@ public class TrafficQueue {
 	@Qualifier("commitTaskExecutor")
 	private ThreadPoolTaskExecutor executor;
 
-	private ElasticSearchAdapter elasticsearchAdapter;
+	private ElasticSearchAdapter<TrafficData> elasticsearchAdapter;
 
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		//初始化traffic数据队列
@@ -101,7 +102,7 @@ public class TrafficQueue {
 					}
 				}
 				if( list.size() > 0 ) {
-					elasticsearchAdapter.batchUpdate( trafficDataIndexName, list, TrafficData.class );
+					elasticsearchAdapter.batchUpdate( trafficDataIndexName, list );
 					logger.info( list.size() + "条数据已提交，耗时：" + Clockz.stop() );
 				}
 			}

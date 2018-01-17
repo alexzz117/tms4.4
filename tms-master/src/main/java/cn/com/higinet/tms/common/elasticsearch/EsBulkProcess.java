@@ -1,7 +1,6 @@
 package cn.com.higinet.tms.common.elasticsearch;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +15,15 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import cn.com.higinet.tms.base.util.Stringz;
 
+@Component
 public class EsBulkProcess {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger( EsBulkProcess.class );
-	
+
 	//批量大小  默认为1000
 	@Value("${elasticsearch.commit.number}")
 	private int commitNum;
@@ -36,45 +38,59 @@ public class EsBulkProcess {
 	//多少时间刷新为5s
 	@Value("${elasticsearch.flush.second}")
 	private int flushTime;
-	
+
 	@SuppressWarnings("rawtypes")
-	public <T> BulkProcessor getBulkProcessor(ElasticSearchConfig elasticsearchConfig,String indexName,Class<T> classType,List<T> dataList){
-		ElasticSearchAdapter adapter = new ElasticSearchAdapter();
-		Map<MarkerEnum,List<String>> result = new HashMap<MarkerEnum,List<String>>();
-		List<String> failList = new ArrayList<String>();
-		BulkProcessor bulkProcessor = BulkProcessor.builder(elasticsearchConfig.getTransportClient(), new BulkProcessor.Listener() {
+	public <T> BulkProcessor getBulkProcessor( ElasticSearchConfig elasticsearchConfig, Map<String, T> dataMap, Listener listener ) {
+		List<T> failList = new ArrayList<T>();
+		List<T> sucList = new ArrayList<T>();
+		logger.info( "getBulkProcessor : " + Stringz.valueOf( dataMap.size() ) );
+
+		BulkProcessor bulkProcessor = BulkProcessor.builder( elasticsearchConfig.getTransportClient(), new BulkProcessor.Listener() {
+
+			/**
+			 * 提交前调用
+			 * */
 			@Override
 			public void beforeBulk( long executionId, BulkRequest request ) {
-				logger.info( "executionId:" + executionId + ",numberOfActions:" + request.numberOfActions() );
+				logger.info( "待提交数据：" + request.numberOfActions() );
 			}
+
+			/**
+			 * 提交成功时调用，但有可能部分失败
+			 * */
 			@SuppressWarnings("unchecked")
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
-				if(response.hasFailures()){
-					int i = 0;
-					for (BulkItemResponse bulkItemResponse : response) {
-					    if (bulkItemResponse.isFailed()) { 
-					    	failList.add(bulkItemResponse.getId());
-					    	i++;
-					    }
+				//部分提交成功
+				if( response.hasFailures() ) {
+					for( BulkItemResponse bulkItemResponse : response ) {
+						if( bulkItemResponse.isFailed() ) failList.add( dataMap.get( bulkItemResponse.getId() ) );
+						else sucList.add( dataMap.get( bulkItemResponse.getId() ) );
 					}
-					result.put(MarkerEnum.PARTIAL_SUCCESS, failList);
-					logger.info("总共请求为："+request.numberOfActions()+",异常为："+i);
-				}else{
-					result.put(MarkerEnum.ALL_SUCCESS, null);
+					if( sucList.size() > 0 ) listener.onSuccess( sucList );
+					if( failList.size() > 0 ) listener.onError( failList );
 				}
-				adapter.callback(indexName,classType,result,dataList);
+				//全部成功
+				else {
+					sucList.addAll( dataMap.values() );
+					listener.onSuccess( sucList );
+				}
 			}
+
+			/**
+			 * 所有提交失败时调用
+			 * */
 			@SuppressWarnings("unchecked")
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
-				result.put(MarkerEnum.ALL_FAIL, null);
-				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() +",afterBulk2 numberOfActions:" + request.numberOfActions());
-				adapter.callback(indexName,classType,result,dataList);
+				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() + ",afterBulk2 numberOfActions:" + request.numberOfActions() );
+				failList.addAll( dataMap.values() );
+				listener.onError( failList );
 			}
+
 		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
 				//设置回退策略，当请求执行错误时，可进行回退操作,执行错误后延迟100MS，重试三次后执行回退
-		.setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)).setConcurrentRequests( concurrentRequests ).build();
+				.setBackoffPolicy( BackoffPolicy.exponentialBackoff( TimeValue.timeValueMillis( 100 ), 3 ) ).setConcurrentRequests( concurrentRequests ).build();
 		return bulkProcessor;
 	}
 
