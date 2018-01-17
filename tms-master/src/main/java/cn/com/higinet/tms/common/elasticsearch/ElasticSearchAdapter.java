@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.Id;
 
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -46,7 +45,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.com.higinet.tms.base.entity.TrafficData;
+import cn.com.higinet.tms.base.util.Stringz;
 
 public class ElasticSearchAdapter<T> implements DisposableBean {
 	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchAdapter.class );
@@ -56,13 +55,6 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 
 	@Autowired
 	private EsBulkProcess processor;
-
-	private Class entityType = TrafficData.class;
-
-	@PostConstruct
-	public void init() {
-		//logger.info( entityType.getName() );
-	}
 
 	/**
 	 * @param indexName
@@ -164,14 +156,14 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * @param obj
 	 * @return
 	 */
-	public Object getById( String indexName, String primaryKeyValue ) {
+	public Object getById( String indexName, String primaryKeyValue, Class<T> entityClass ) {
 		GetResponse response = elasticsearchConfig.getTransportClient().prepareGet( indexName, indexName, primaryKeyValue ).get();
 		String json = response.getSourceAsString();
 		Object data = null;
 		if( !response.getSourceAsMap().isEmpty() ) {
 			ObjectMapper mapper = new ObjectMapper();
 			try {
-				data = mapper.readValue( json, entityType );
+				data = mapper.readValue( json, entityClass );
 			}
 			catch( JsonParseException e ) {
 				logger.error( "convert json to entity is error", e );
@@ -202,6 +194,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * @param obj
 	 */
 	public void upsertData( String indexName, T t ) {
+		if( Stringz.isEmpty( indexName ) || t == null ) return;
 		try {
 			Map<String, String> map = getPrimaryKeyValue( t );
 			String primaryKeyName = map.get( "primaryKeyName" );
@@ -266,9 +259,11 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * @param list
 	 */
 	public void batchUpdate( String indexName, List<T> dataList, Listener<T> listener ) {
+		if( Stringz.isEmpty( indexName ) || dataList == null || dataList.isEmpty() || listener == null ) return;
+
 		try {
 			Map<String, T> dataMap = new HashMap<String, T>();
-			String primaryKeyName = getPrimaryKeyName();
+			String primaryKeyName = getPrimaryKeyName( dataList.get( 0 ) );
 			if( StringUtils.isEmpty( primaryKeyName ) ) {
 				logger.warn( "primaryKeyName is empty" );
 				return;
@@ -289,17 +284,13 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 
 	/**
 	 * 获取主键名称
-	 * @param clazz
-	 * @param obj
-	 * @return
 	 */
-	private String getPrimaryKeyName() {
-
+	public String getPrimaryKeyName( T t ) {
 		String primaryKeyName = "";
-		if( entityType == null ) {
+		if( t.getClass() == null ) {
 			return primaryKeyName;
 		}
-		Field[] field = entityType.getDeclaredFields();
+		Field[] field = t.getClass().getDeclaredFields();
 		for( int i = 0; i < field.length; i++ ) {
 			if( field[i].isAnnotationPresent( Id.class ) ) {
 				primaryKeyName = field[i].getName();

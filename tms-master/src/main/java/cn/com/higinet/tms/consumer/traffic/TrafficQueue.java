@@ -60,7 +60,6 @@ public class TrafficQueue implements DisposableBean {
 	public void init() {
 		//初始化traffic数据队列
 		queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
-
 		try {
 			elasticsearchAdapter = ApplicationContextUtil.getBean( ElasticSearchAdapter.class );
 			logger.info( "elasticsearchAdapter is not null" );

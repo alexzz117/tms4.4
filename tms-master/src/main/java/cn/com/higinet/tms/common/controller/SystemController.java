@@ -16,7 +16,7 @@ import cn.com.higinet.tms.base.entity.common.Model;
 public class SystemController {
 
 	//private static final Logger log = LoggerFactory.getLogger( SystemController.class );
-	
+
 	@Autowired
 	Environment env;
 
