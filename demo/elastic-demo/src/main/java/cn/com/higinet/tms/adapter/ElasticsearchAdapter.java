@@ -14,16 +14,11 @@ import java.util.concurrent.ExecutionException;
 
 import javax.persistence.Id;
 
-import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
-import org.elasticsearch.action.bulk.BackoffPolicy;
-import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -32,9 +27,6 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -54,12 +46,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.com.higinet.tms.FailData;
+import cn.com.higinet.tms.EsBulkProcess;
+import cn.com.higinet.tms.FailProcess;
 import cn.com.higinet.tms.Pagination;
+import cn.com.higinet.tms.SuccProcess;
 import cn.com.higinet.tms.provider.ElasticsearchConfig;
 
 @Component
-public class ElasticsearchAdapter {
+public class ElasticsearchAdapter<T> {
 	private static final Logger logger = LoggerFactory.getLogger( ElasticsearchAdapter.class );
 	
 	@Autowired
@@ -79,6 +73,8 @@ public class ElasticsearchAdapter {
 	//多少时间刷新为5s
 	@Value("${elasticsearch.flush.second}")
 	private int flushTime;
+	
+	private Map<String,T> dataMap;
 
 	/**
 	 * @param indexName
@@ -88,7 +84,7 @@ public class ElasticsearchAdapter {
 	 * @param entityType
 	 * @return
 	 */
-	public <T> Pagination<T> search( String indexName, Integer pageSize, Integer pageNo, List<QueryConditionEntity> dataList, Class<T> entityType ) {
+	public Pagination<T> search( String indexName, Integer pageSize, Integer pageNo, List<QueryConditionEntity> dataList, Class<T> entityType ) {
 		Pagination<T> page = new Pagination<T>();
 		pageNo = null == pageNo ? 1 : pageNo;
 		page.setPageNo( pageNo );
@@ -181,7 +177,7 @@ public class ElasticsearchAdapter {
 	 * @param obj
 	 * @return
 	 */
-	public <T> Object getById( String indexName, String primaryKeyValue, Class<T> entityType ) {
+	public Object getById( String indexName, String primaryKeyValue, Class<T> entityType ) {
 		GetResponse response = elasticsearchConfig.getTransportClient().prepareGet( indexName, indexName, primaryKeyValue ).get();
 		String json = response.getSourceAsString();
 		Object data = null;
@@ -218,7 +214,7 @@ public class ElasticsearchAdapter {
 	 * @param indexName
 	 * @param obj
 	 */
-	public <T> void upsertData( String indexName, T t ) {
+	public void upsertData( String indexName, T t ) {
 		try {
 			Map<String, String> map = getPrimaryKeyValue( t );
 			String primaryKeyName = map.get( "primaryKeyName" );
@@ -251,7 +247,7 @@ public class ElasticsearchAdapter {
 	 * @param indexName
 	 * @param obj
 	 */
-	public <T> void updateData( String indexName, T t ) {
+	public void updateData( String indexName, T t ) {
 		Map<String, String> map = getPrimaryKeyValue( t );
 		if( map.isEmpty() ) {
 			return;
@@ -283,99 +279,71 @@ public class ElasticsearchAdapter {
 	 * @param mappingName
 	 * @param list
 	 */
-	@SuppressWarnings("rawtypes")
-	public <T> FailData batchUpdate( String indexName, List<T> dataList, Class<T> entityType ) {
-		FailData<T> failData = null;
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public FailProcess batchUpdate(String indexName, List<T> dataList, Class<T> entityType ) {
+		FailProcess<T> failData = null;
 		try {
-			Map<String,T> map = new HashMap<String,T>();
-			String primaryKeyName = getPrimaryKeyName( entityType );
+			dataMap = new HashMap<String,T>();
+			String primaryKeyName = getPrimaryKeyName(entityType);
 			if( StringUtils.isEmpty( primaryKeyName ) ) {
 				logger.warn( "primaryKeyName is empty" );
 				return failData;
 			}
-			Map<BulkProcessor,List<String>> mapProcessor = getBulkProcessor();
-			BulkProcessor bulkProcessor = mapProcessor.keySet().iterator().next();
-			List<String> failIdList = mapProcessor.values().iterator().next();
+			EsBulkProcess processor = new EsBulkProcess();
+			BulkProcessor bulkProcessor = processor.getBulkProcessor(elasticsearchConfig,indexName,entityType,dataList);
 			long s = System.currentTimeMillis();
 			for( int i = 0; i < dataList.size(); i++ ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
-				map.put(jsonObject.get(primaryKeyName).toString(),dataList.get( i ));
+				dataMap.put(jsonObject.get(primaryKeyName).toString(),dataList.get( i ));
 				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
 			}
 			System.out.println( System.currentTimeMillis() - s );
 			bulkProcessor.close();
-			if(!failIdList.isEmpty()){
-				logger.info("异常数据处理----"+failIdList.size());
-				List<T> failObjectList = new ArrayList<T>();
-				for (String id : failIdList) {
-					failObjectList.add(map.get(id));
-				}
-				failData = new FailData<T>();
-				failData.setDataList(failObjectList);
-				failData.setEntityType(entityType);
-				failData.setIndexName(indexName);
-				logger.info("异常数据存储完毕----"+failObjectList.size());
-			}
 		}
 		catch( Exception e ) {
 			logger.error( "batchUpdate is error", e );
 		}
 		return failData;
 	}
-
-	private <T> Map<BulkProcessor,List<String>> getBulkProcessor() {
-		Map<BulkProcessor,List<String>> returnMap = new HashMap<BulkProcessor,List<String>>();
-		List<String> failIdList = new ArrayList<String>();
-		BulkProcessor bulkProcessor = BulkProcessor.builder( elasticsearchConfig.getTransportClient(), new BulkProcessor.Listener() {
-			@Override
-			public void beforeBulk( long executionId, BulkRequest request ) {
-				logger.info( "executionId:" + executionId + ",numberOfActions:" + request.numberOfActions() );
-			}
-
-			@Override
-			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
-				if(response.hasFailures()){
-					int i = 0;
-					for (BulkItemResponse bulkItemResponse : response) {
-					    if (bulkItemResponse.isFailed()) { 
-					    	failIdList.add(bulkItemResponse.getId());
-					    	i++;
-					    }
+	
+	/**
+	 * 保存完毕后做一些事情
+	 * @param map
+	 * @param dataList
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void callback(String indexName,Class<T> classType,Map<MarkerEnum,List<String>> map,List<T> dataList){
+		SuccProcess succ = new SuccProcess();
+		FailProcess fail = new FailProcess();
+		for (MarkerEnum key : map.keySet()) {
+			 if(MarkerEnum.ALL_SUCCESS.equals(key)){
+				 succ.callback(indexName,classType,dataList);
+			 }else if(MarkerEnum.ALL_FAIL.equals(key)){
+				 fail.callback(indexName,classType,dataList);
+			 }else{
+				 if(dataMap.isEmpty()){
+					 logger.error("adpter中Map为空");
+				 }else{
+					 List<String> failIdList = map.get(key);
+					 List<T> failObjectList = new ArrayList<T>();
+					 for (String failId : failIdList) {
+						 failObjectList.add(dataMap.get(failId));
+						 dataMap.remove(failId);
 					}
-					logger.info("总共请求为："+request.numberOfActions()+",异常为："+i);
-				}
-			}
-			//设置ConcurrentRequest 为0，Throwable不抛错
-			@SuppressWarnings("rawtypes")
-			@Override
-			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
-				StringBuffer error = new StringBuffer();
-				int j = 0;
-				while(request.requests().iterator().hasNext()){
-					DocWriteRequest t = request.requests().iterator().next();
-					error.append("Id:").append(t.id());
-					error.append("Index:").append(t.index());
-					error.append("Type:").append(t.type()).append("-----after2 结束----");
-					j++;
-				}
-				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() +",afterBulk2 numberOfActions:" + request.numberOfActions()+"失败条数为:"+j);
-				logger.info(error.toString());
-				
-			}
-		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
-				//设置回退策略，当请求执行错误时，可进行回退操作,执行错误后延迟100MS，重试三次后执行回退
-				.setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)).setConcurrentRequests( concurrentRequests ).build();
-		returnMap.put(bulkProcessor, failIdList);
-		return returnMap;
+					fail.callback(indexName,classType,dataList);
+					succ.callback(indexName,classType,(List<T>)map.values());
+				 }
+			 }
+		 }
 	}
-
+	
 	/**
 	 * 获取主键名称
 	 * @param clazz
 	 * @param obj
 	 * @return
 	 */
-	private <T> String getPrimaryKeyName( Class<T> entityType ) {
+	private String getPrimaryKeyName( Class<T> entityType ) {
 		String primaryKeyName = "";
 		if( entityType == null ) {
 			return primaryKeyName;
@@ -390,7 +358,7 @@ public class ElasticsearchAdapter {
 		return primaryKeyName;
 	}
 
-	private <T> Map<String, String> getPrimaryKeyValue( T t ) {
+	private Map<String, String> getPrimaryKeyValue( T t ) {
 		Class<?> clazz = t.getClass();
 		Map<String, String> map = new HashMap<String, String>();
 		String value = "";
@@ -426,7 +394,7 @@ public class ElasticsearchAdapter {
 		return map;
 	}
 
-	public <T> boolean createMapping( String indexName, Class<T> entityType ) {
+	public boolean createMapping( String indexName, Class<T> entityType ) {
 		if( !exists( elasticsearchConfig.getTransportClient(), indexName ) ) {
 			logger.warn( "index is not exist" );
 			return false;
@@ -446,7 +414,7 @@ public class ElasticsearchAdapter {
 		return false;
 	}
 
-	private <T> XContentBuilder getClassMapping( String mappingName, Class<T> entityType ) {
+	private XContentBuilder getClassMapping( String mappingName, Class<T> entityType ) {
 		Field[] fields = entityType.getDeclaredFields();
 		XContentBuilder builder = null;
 		try {
