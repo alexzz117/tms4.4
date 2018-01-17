@@ -4,7 +4,11 @@ import java.util.List;
 
 public interface Listener<T> {
 
-	void onSuccess( List<T> idList );
+	void before( List<T> allList );
 
-	void onError( List<T> idList );
+	void onSuccess( List<T> successList );
+
+	void onError( List<T> errorList );
+
+	void after( List<T> allList );
 }

@@ -37,6 +37,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -46,9 +47,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
-import cn.com.higinet.tms.base.util.Stringz;
 
-public class ElasticSearchAdapter<T> {
+public class ElasticSearchAdapter<T> implements DisposableBean {
 	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchAdapter.class );
 
 	@Autowired
@@ -265,9 +265,8 @@ public class ElasticSearchAdapter<T> {
 	 * @param mappingName
 	 * @param list
 	 */
-	public void batchUpdate( String indexName, List<T> dataList ) {
+	public void batchUpdate( String indexName, List<T> dataList, Listener<T> listener ) {
 		try {
-			logger.info( "batchUpdate : " + Stringz.valueOf( dataList.size() ) );
 			Map<String, T> dataMap = new HashMap<String, T>();
 			String primaryKeyName = getPrimaryKeyName();
 			if( StringUtils.isEmpty( primaryKeyName ) ) {
@@ -275,27 +274,13 @@ public class ElasticSearchAdapter<T> {
 				return;
 			}
 
-			BulkProcessor bulkProcessor = processor.getBulkProcessor( elasticsearchConfig, dataMap, new Listener<T>() {
-				@Override
-				public void onSuccess( List<T> sucList ) {
-					logger.info( "success list size is:" + sucList.size() );
-				}
-
-				@Override
-				public void onError( List<T> failIdList ) {
-					logger.info( "error list size is:" + failIdList.size() );
-				}
-
-			} );
+			BulkProcessor bulkProcessor = processor.getBulkProcessor( elasticsearchConfig, dataMap, listener );
 			for( int i = 0; i < dataList.size(); i++ ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
 				dataMap.put( jsonObject.get( primaryKeyName ).toString(), dataList.get( i ) );
-				//logger.info( "id value :" + jsonObject.get( primaryKeyName ).toString() );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
 			}
 			bulkProcessor.close();
-
-			logger.info( "bulkProcessor.close() : " + Stringz.valueOf( dataMap.size() ) );
 		}
 		catch( Exception e ) {
 			logger.error( "batchUpdate is error", e );
@@ -422,4 +407,10 @@ public class ElasticSearchAdapter<T> {
 		}
 		return es;
 	}
+
+	/**
+	 * 应用关闭时调用
+	 * */
+	@Override
+	public void destroy() throws Exception {}
 }

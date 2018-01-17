@@ -33,14 +33,14 @@
 			<version>4.4.0-SNAPSHOT</version>
 		</dependency>
 		<!-- tms-base End -->
-		
+
 		<!-- log4j2 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
 		<!-- log4j2 End -->
-		
+
 		<!-- Log4j2 异步支持 -->
 		<dependency>
 			<groupId>com.lmax</groupId>
@@ -48,21 +48,21 @@
 			<version>3.3.7</version>
 		</dependency>
 		<!-- Log4j2 异步支持 End -->
-		
+
 		<!-- 代码简化Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-		<!-- 代码简化Lombok End-->
-		
+		<!-- 代码简化Lombok End -->
+
 		<!-- spring热部署 -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>springloaded</artifactId>
 		</dependency>
 		<!-- spring热部署 End -->
-		
+
 		<!-- 序列化 -->
 		<dependency>
 			<groupId>com.esotericsoftware</groupId>
@@ -129,6 +129,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<!-- <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency> -->
 		<!-- <dependency> <groupId>org.springframework.cloud</groupId> <artifactId>spring-cloud-starter-zuul</artifactId> 
 			</dependency> -->
 		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-elasticsearch</artifactId> 

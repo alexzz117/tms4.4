@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import cn.com.higinet.tms.base.util.Stringz;
-
 @Component
 public class EsBulkProcess {
 
@@ -39,26 +37,24 @@ public class EsBulkProcess {
 	@Value("${elasticsearch.flush.second}")
 	private int flushTime;
 
-	@SuppressWarnings("rawtypes")
-	public <T> BulkProcessor getBulkProcessor( ElasticSearchConfig elasticsearchConfig, Map<String, T> dataMap, Listener listener ) {
+	public <T> BulkProcessor getBulkProcessor( ElasticSearchConfig elasticsearchConfig, Map<String, T> dataMap, Listener<T> listener ) {
 		List<T> failList = new ArrayList<T>();
 		List<T> sucList = new ArrayList<T>();
-		logger.info( "getBulkProcessor : " + Stringz.valueOf( dataMap.size() ) );
+		List<T> allList = new ArrayList<T>();
+		allList.addAll( dataMap.values() );
 
 		BulkProcessor bulkProcessor = BulkProcessor.builder( elasticsearchConfig.getTransportClient(), new BulkProcessor.Listener() {
-
 			/**
 			 * 提交前调用
 			 * */
 			@Override
 			public void beforeBulk( long executionId, BulkRequest request ) {
-				logger.info( "待提交数据：" + request.numberOfActions() );
+				listener.before( allList );
 			}
 
 			/**
 			 * 提交成功时调用，但有可能部分失败
 			 * */
-			@SuppressWarnings("unchecked")
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
 				//部分提交成功
@@ -72,20 +68,22 @@ public class EsBulkProcess {
 				}
 				//全部成功
 				else {
-					sucList.addAll( dataMap.values() );
-					listener.onSuccess( sucList );
+					listener.onSuccess( allList );
 				}
+
+				//完毕时
+				listener.after( allList );
 			}
 
 			/**
 			 * 所有提交失败时调用
 			 * */
-			@SuppressWarnings("unchecked")
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
 				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() + ",afterBulk2 numberOfActions:" + request.numberOfActions() );
-				failList.addAll( dataMap.values() );
-				listener.onError( failList );
+				listener.onError( allList );
+				//完毕时
+				listener.after( allList );
 			}
 
 		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
