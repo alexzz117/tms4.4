@@ -1052,7 +1052,7 @@ public class AlarmEventService {
 			sb.append("TRAFFIC.DISPOSAL =:disposal  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("iscorrect"))) {
-			sb.append("TRAFFIC.ISCORRECT =:iscorrect  AND ");
+			sb.append("IFNULL(TRAFFIC.ISCORRECT, '2') =:iscorrect  AND ");
 		}
 		if (!StringUtil.isEmpty(conds.get("txnstatus"))) {
 			sb.append("TRAFFIC.TXNSTATUS =:txnstatus  AND ");
