@@ -1057,11 +1057,6 @@ public class AlarmEventService {
 		if (!StringUtil.isEmpty(conds.get("txnstatus"))) {
 			sb.append("TRAFFIC.TXNSTATUS =:txnstatus  AND ");
 		}
-		if (!StringUtil.isEmpty(conds.get("psstatus"))) {
-			sb.append("TRAFFIC.PSSTATUS =:psstatus  AND ");
-		} else {
-			sb.append("TRAFFIC.PSSTATUS = '03' AND ");
-		}
 		if (!StringUtil.isEmpty(conds.get("operate_time"))) {
 			conds.put("operate_time", String.valueOf(getMillisTime(conds.get("operate_time"))));
 			sb.append("TRAFFIC.TXNTIME >=:operate_time  AND ");
@@ -1079,15 +1074,10 @@ public class AlarmEventService {
 		if (!StringUtil.isEmpty(conds.get("citycode"))) {
 			sb.append("TRAFFIC.CITYCODE =:citycode  AND ");
 		}
-		String sqlStr = sb.toString().trim();
-		if (sqlStr.endsWith("WHERE")) {
-			sqlStr = StringUtils.removeEnd(sqlStr, "WHERE");
-		}else{
-			sqlStr = StringUtils.removeEnd(sqlStr, "AND");
-		}
+		sb.append("TRAFFIC.PSSTATUS = '03'");
 		Order order = new Order().desc("TXNTIME");
 		System.out.println(sb.toString());
-		Page<Map<String, Object>> listPage = offlineSimpleDao.pageQuery(sqlStr.trim(), conds, order);
+		Page<Map<String, Object>> listPage = offlineSimpleDao.pageQuery(sb.toString(), conds, order);
 		return listPage;
 	}
 	
