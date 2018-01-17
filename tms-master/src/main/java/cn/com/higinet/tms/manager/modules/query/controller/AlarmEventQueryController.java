@@ -29,6 +29,8 @@ public class AlarmEventQueryController {
     public Model showQueryResultAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
 
+        String loginOperatorId = "5E21165E21F442BE9D6B772AA25502E2"; // TODO 先写死一个调试
+        reqs.put("loginOperatorId", loginOperatorId);
         model.setPage(alarmEventQueryService.queryAlarmEventData(reqs));
 
         return model;

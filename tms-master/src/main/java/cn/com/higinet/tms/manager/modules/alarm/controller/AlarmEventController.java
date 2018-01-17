@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -251,6 +252,7 @@ public class AlarmEventController {
 	public Model alarmAssignAction(@RequestBody RequestModel modelMap) {
 		Model model = new Model();
 		Map<String, Object> cond = new HashMap<String, Object>();
+		cond.put("OPERID", modelMap.getString("oper_id"));
 		//报警事件处理人员工作量
 		List<Map<String, Object>> operCapacityList = alarmEventService.getAlarmAssignOperCapacity(cond);
 		//有报警事件处理权限的操作员
@@ -285,17 +287,20 @@ public class AlarmEventController {
 	 * @return
 	 */
 	@RequestMapping(value = "/onsaveAssign", method = RequestMethod.POST)
-	public Model onsaveAlarmAssignAction(@RequestBody List<Map<String, List<Map<String, String>>>>reqs, HttpServletRequest request) {
-		List<Map<String, String>> txncodeList = reqs.get(0).get( "TXNCODES" );//流水信息
-		List<Map<String, String>> operater = reqs.get(0).get("OPERATER"); //选择的分派操作员信息
-		String rosterIds = "";
-		for( Map<String, String> map : txncodeList) {
-			String rosterId = MapUtil.getString( map, "txncode" );
-			rosterIds += ",'" + rosterId + "'";
-		}
-		rosterIds = rosterIds.substring( 1 );
-		if(null != txncodeList && txncodeList.size()>0 && null!= operater) {
-			alarmEventService.alarmAssign(rosterIds,operater, request);
+	public Model onsaveAlarmAssignAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
+		String txncodeList = reqs.getString( "TXNCODES" );//流水信息
+		String operater = reqs.getString("OPERATER"); //选择的分派操作员信息
+//		String rosterIds = "";
+//		for( Map<String, String> map : txncodeList) {
+//			String rosterId = MapUtil.getString( map, "txncode" );
+//			rosterIds += ",'" + rosterId + "'";
+//		}
+//		rosterIds = rosterIds.substring( 1 );
+//		if(null != txncodeList && txncodeList.size()>0 && null!= operater) {
+//			alarmEventService.alarmAssign(rosterIds,operater, request);
+//		}
+		if(StringUtils.isNotEmpty(txncodeList) && StringUtils.isNotEmpty(operater)) {
+			alarmEventService.alarmAssign(txncodeList,operater, request);
 		}
 		return  new Model();
 	}

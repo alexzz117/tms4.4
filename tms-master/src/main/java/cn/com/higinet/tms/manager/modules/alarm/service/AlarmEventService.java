@@ -635,14 +635,14 @@ public class AlarmEventService {
 	 */
 	@SuppressWarnings("unchecked")
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void alarmAssign(String rosterIds, List<Map<String, String>> operater, HttpServletRequest request) {
+	public void alarmAssign(String rosterIds, String operaterId, HttpServletRequest request) {
 		long currTime = System.currentTimeMillis();
 		Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute("OPERATOR"); // 获取当前登录操作员
 		// 通过查询交易流水, 获取其中报警处理相关信息
 		List<Map<String, Object>> transMap = getTrafficDataForAlarmProcessList(rosterIds);
 		// 查询系统参数
 		//Map<String, Object> sysParamMap = getSystemParam(ALARM_PS_TIMEOUT);
-		Map<String, String> operaterInfo = operater.get(0);
+//		Map<String, String> operaterInfo = operater.get(0);
 		
 		for (Map<String, Object> tms_run_trafficdata : transMap) {
 			String psStatus = MapUtil.getString(tms_run_trafficdata, "PSSTATUS");
@@ -656,7 +656,7 @@ public class AlarmEventService {
 			tms_mgr_alarm_process.put("PS_RESULT", "1");
 			tms_mgr_alarm_process.put("PS_INFO", "报警事件分派");
 			tms_mgr_alarm_process.put("TXN_CODE", String.valueOf(tms_run_trafficdata.get("TXNCODE"))); // 交易流水号
-			tms_mgr_alarm_process.put("PS_OPERID", String.valueOf(operaterInfo.get("operator_id"))); // 报警处理操作员
+			tms_mgr_alarm_process.put("PS_OPERID", operaterId); // 报警处理操作员
 			Map<String, Object> infoMap = addAlarmProcessInfo(tms_mgr_alarm_process, request);
 
 			// 报警事件分派，更新工作量统计数据-----TMS_MGR_ALARM_OPERATOR_STAT;
@@ -664,7 +664,7 @@ public class AlarmEventService {
 			tms_mgr_alarm_operator_stat.put("ASSIGNID", operator.get("OPERATOR_ID"));// ASSIGNID分派人员
 //			tms_mgr_alarm_operator_stat.put("ASSIGNID", "1");// ASSIGNID分派人员
 			tms_mgr_alarm_operator_stat.put("ASSIGNTIME", infoMap.get("PS_TIME")); // ASSIGNTIME分派时间
-			tms_mgr_alarm_operator_stat.put("OPERID", String.valueOf(operaterInfo.get("operator_id"))); // OPERID报警处理操作员
+			tms_mgr_alarm_operator_stat.put("OPERID", String.valueOf(operaterId)); // OPERID报警处理操作员
 			boolean status = "00".equals(psStatus) ? false : true;
 			monitorStatService.updateAlarmAssignOperatorStat(MapUtil.getString(tms_run_trafficdata, "OPERID"),
 					MapUtil.getLong(tms_run_trafficdata, "ASSIGNTIME"), status, MapUtil.getString(tms_mgr_alarm_operator_stat, "OPERID"), currTime);
@@ -673,7 +673,7 @@ public class AlarmEventService {
 			tms_run_trafficdata.put("PSSTATUS", "02"); // 处理状态改成待处理
 			tms_run_trafficdata.put("ASSIGNID", operator.get("OPERATOR_ID"));//分派人员
 			tms_run_trafficdata.put("ASSIGNTIME", infoMap.get("PS_TIME"));//分派时间
-			tms_run_trafficdata.put("OPERID",  String.valueOf(operaterInfo.get("operator_id")));//报警处理操作员
+			tms_run_trafficdata.put("OPERID",  String.valueOf(operaterId));//报警处理操作员
 			updateTransProcessInfo(tms_run_trafficdata);
 
 		}
