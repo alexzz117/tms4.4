@@ -195,7 +195,7 @@
           ],
           show_order: [
             {required: true, message: '请输入顺序', trigger: 'blur'},
-            {pattern: /^[1-9]\d{0,3}$/, message: '顺序必须为小于5位数的正整数', trigger: 'blur'}
+            {pattern: /^(0|[1-9]\d{0,3})$/, message: '顺序必须为小于5位数的正整数', trigger: 'blur'}
           ]
         }
       }
