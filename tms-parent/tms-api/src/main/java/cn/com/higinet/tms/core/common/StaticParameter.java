@@ -157,6 +157,7 @@ public class StaticParameter {
 	public static final String PRO_SERVER_FOUND_NUM = "tms.server.found.num";
 	public static final String PRO_SERVER_SUCC_F_NUM = "tms.server.succ.f.num";
 	public static final String PRO_SERVER_SUCC_F_ON = "tms.server.succ.f.isON";
+	
 	public static final int TIMEOUT_VALUE = 100;
 	// xml解析器类型名称在properties文件中的配置项
 	public static final String XML_PARSER_NAME = "xml.parser.name";
@@ -275,4 +276,11 @@ public class StaticParameter {
 	public static final int RESULT_FLAG_NOTXN = 9;// 没有找到交易数据
 	public static final int RESULT_FLAG_READTIMEOUT = 10;// 读超时
 	public static final int RESULT_FLAG_WRITETIMEOUT = 11;// 写超时
+	
+	
+	/** 常量 zookeeper地址,example[192.168.1.100:2181,xxxx]. */
+	public static final String PRO_ZK_ADDRRR = "tms.zk.addr";
+	
+	/** 常量 zookeeper中注册的risk引擎服务. */
+	public static final String PRO_ZK_RISK_SERVICE = "/services/risk-engine";
 }

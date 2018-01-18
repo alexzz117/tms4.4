@@ -9,14 +9,18 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.RetryNTimes;
+import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSON;
 import cn.com.higinet.tms.core.model.Server;
 import cn.com.higinet.tms.core.model.TmsConfigVo;
 import cn.com.higinet.tms.core.service.TransApiMessage;
 import cn.com.higinet.tms.core.service.impl.TransApiMessageImpl;
-import cn.com.higinet.tms.core.util.StringUtil;
 
 public class ServerMonitor {
 	private static Logger logger = LoggerFactory.getLogger(ServerMonitor.class);
@@ -39,6 +43,8 @@ public class ServerMonitor {
 	private static String ipsCache = "";
 
 	private static boolean updateServerList = Boolean.valueOf(TmsConfigVo.getProperty("servermonitor.updateServerList", "true"));
+
+	private static CuratorFramework zk;
 	static {
 		init();
 		//初始化等待，第一次初始化完成后才可以连接交易
@@ -50,6 +56,7 @@ public class ServerMonitor {
 		monitor.setDaemon(true);
 		monitor.setName("ServerMonitor");
 		monitor.start();
+
 	}
 	//	public static ServerMonitor getInstance(){
 	//		
@@ -76,6 +83,8 @@ public class ServerMonitor {
 			servers.add(null);
 			serv_err_count.set(i, server_fail);
 		}
+		zk = CuratorFrameworkFactory.newClient(TmsConfigVo.getZkAddr(), new RetryNTimes(2, 5000));
+		zk.start();
 	}
 	//	@SuppressWarnings("unchecked")
 	//	private List<Server> getServerList() {
@@ -277,13 +286,13 @@ public class ServerMonitor {
 			final Server tmp = it.next();
 			try {
 				if (null == tmp) {
-					return ischange;
+					break;
 				}
 				//测试用报文 信息完整程度决定测试深入程度
 				Map<String, Object> extinfo = new HashMap<String, Object>();
 				if (isGetIpList) {
-					extinfo.put(StaticParameter.MONITOR_TMS_SERVER_LIST, "1");
-				} else {
+					//					extinfo.put(StaticParameter.MONITOR_TMS_SERVER_LIST, "1");
+					//				} else {
 					extinfo.put(StaticParameter.MONITOR_TMS_SERVER_LIST, "0");
 				}
 				String body = transMessage.composeBody("11111", extinfo, true);
@@ -293,20 +302,20 @@ public class ServerMonitor {
 				logger.info("Monitor send message[" + index + "](" + tmp + "):" + head + body);
 				int ret = SocketLoadBalance.send(null, sb, head + body, TmsConfigVo.getTimeOut(), tmp);
 				if (ret == 0) {
-					String retInfo = sb.toString();
-					logger.info("Monitor receive message[" + index + "](" + tmp + "):" + retInfo);
-					ServerMonitor.clearServError(index);
-					if (isGetIpList) {
-						String ipStr = StringUtil.getNodeText(retInfo, StaticParameter.MONITOR_TMS_SERVERS);
-						if (updateServerList)
-							ischange = changeServerList(ipStr);
-						//						ischange = changeServerList("218.17.23.12:8090,218.17.23.12:8090",isinit);
-						isGetIpList = false;
-						isInit.compareAndSet(true, false);
-						if (ischange) {
-							return ischange;
-						}
-					}
+					//					String retInfo = sb.toString();
+					//					logger.info("Monitor receive message[" + index + "](" + tmp + "):" + retInfo);
+					//					ServerMonitor.clearServError(index);
+					//					if (isGetIpList) {
+					//						String ipStr = StringUtil.getNodeText(retInfo, StaticParameter.MONITOR_TMS_SERVERS);
+					//						if (updateServerList)
+					//							ischange = changeServerList(ipStr);
+					//						//						ischange = changeServerList("218.17.23.12:8090,218.17.23.12:8090",isinit);
+					//						isGetIpList = false;
+					//						isInit.compareAndSet(true, false);
+					//						if (ischange) {
+					//							return ischange;
+					//						}
+					//					}
 				} else {
 					logger.info("Monitor receive message:" + ret + "(" + SocketLoadBalance.getErrorInfo(ret) + ")");
 					ServerMonitor.incServError(index);
@@ -316,6 +325,31 @@ public class ServerMonitor {
 				logger.error("服务器[" + tmp + "]监测方法调用异常!", e);
 			} finally {
 				index++;
+			}
+		}
+		if (isGetIpList && updateServerList) {
+			try {
+				List<String> servers = zk.getChildren().forPath(StaticParameter.PRO_ZK_RISK_SERVICE);
+				StringBuilder sb = new StringBuilder();
+				if (servers != null && !servers.isEmpty()) {
+					for (String server : servers) {
+						String json = new String(zk.getData().forPath(StaticParameter.PRO_ZK_RISK_SERVICE + "/" + server));
+						HashMap<String, String> attrs = JSON.parseObject(json, HashMap.class);
+						String ip = attrs.get("address");
+						String port = String.valueOf(attrs.get("port"));
+						if(sb.length()>0){
+							sb.append(",");
+						}
+						sb.append(ip).append(":").append(port);
+					}
+					ischange = changeServerList(sb.toString());
+				}
+			} catch (KeeperException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return ischange;
