@@ -87,11 +87,11 @@ public class AlarmEventController {
 	public Model alarmProcessAction(@RequestBody Map<String, String> reqs) {
 		Model model = new Model();
 		Map<String, Object> txnMap = alarmEventService.getTrafficDataForAlarmProcessInfo(reqs);
-		reqs.put("AC_TYPE", "1");// 普通动作
+//		reqs.put("AC_TYPE", "1");// 普通动作
 		List<Map<String, Object>> actList = alarmEventService.getAlarmProcessActions(reqs);
 		model.set("txnMap", txnMap);
 		model.setList(actList);
-		//model.set("actList", actList);
+//		model.set("actList", actList);
 		return model;
 	}
 
@@ -192,13 +192,15 @@ public class AlarmEventController {
 	 * @return
 	 */
 	@RequestMapping(value = "/delPsAct", method = RequestMethod.POST)
-	public Model delAlarmPsActAction(@RequestBody Map<String, List<Map<String, Object>>> modelMap) {
+	public Model delAlarmPsActAction(@RequestBody RequestModel modelMap) {
 		Model model = new Model();
-		List<Map<String, Object>> condList = modelMap.get("del");
-		List<Map<String, ?>> reqslist = new ArrayList<Map<String, ?>>();
-		for(Map<String, Object> map :condList) {
+		String delIds = modelMap.getString("psActs");
+
+		String[] reqIds = delIds.split(",");
+		List<Map<String, ?>> reqslist = new ArrayList<>();
+		for(String str : reqIds) {
 			Map<String, Object> temp =new HashMap<String, Object>();
-			temp.put("AC_ID", map.get("ac_id"));
+			temp.put("AC_ID", str);
 			reqslist.add(temp);
 		}
 		alarmEventService.delsAlarmProcessAction(reqslist);

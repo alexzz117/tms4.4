@@ -185,7 +185,7 @@ public class AlarmEventService {
 
 	public List<Map<String, Object>> getAlarmProcessActions(Map<String, String> cond) {
 		String sql = "select AC_ID, TXN_CODE, AC_NAME, AC_COND, AC_COND_IN, AC_EXPR, AC_EXPR_IN,AC_TYPE, CREATE_TIME, "
-				+ "EXECUE_TIME, EXECUE_RESULT, EXECUE_INFO from TMS_MGR_ALARM_ACTION where TXN_CODE = :TXN_CODE AND AC_TYPE =  :AC_TYPE";
+				+ "EXECUE_TIME, EXECUE_RESULT, EXECUE_INFO from TMS_MGR_ALARM_ACTION where TXN_CODE = :TXN_CODE";
 		List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, cond);
 		if (list == null || list.isEmpty())
 			return null;
