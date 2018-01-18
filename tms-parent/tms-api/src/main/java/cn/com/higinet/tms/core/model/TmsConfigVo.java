@@ -103,6 +103,8 @@ public class TmsConfigVo {
 
 	private static int maxServerNum;
 
+	private static String zkAddr;
+
 	private static Properties prop = new Properties();
 	//	private static boolean isServFailed(int i) {
 	//		return serv_err_count.get(i) >= maxServerErrorCount;
@@ -177,6 +179,8 @@ public class TmsConfigVo {
 				timeOut = 1000;
 			}
 
+			zkAddr = getProperty(StaticParameter.PRO_ZK_ADDRRR);
+
 			String connTimeOut = getProperty(StaticParameter.PRO_SERVER_CONNECT_TIMEOUT);
 			if (connTimeOut != null && !"".equals(connTimeOut)) {
 				connectTimeOut = Integer.valueOf(connTimeOut);
@@ -221,7 +225,7 @@ public class TmsConfigVo {
 				servSuccFoundNum = 1;
 			}
 
-			String tResendTimes = getProperty(StaticParameter.PRO_SERVER_RESEND_TIMES,"3");
+			String tResendTimes = getProperty(StaticParameter.PRO_SERVER_RESEND_TIMES, "3");
 			if (tResendTimes != null && !"".equals(tResendTimes)) {
 				resendTimes = Integer.valueOf(tResendTimes);
 			}
@@ -522,6 +526,10 @@ public class TmsConfigVo {
 	public synchronized static void closeAllFlag() {
 		TmsConfigVo.apiFlag = false;
 		TmsConfigVo.filterFlag = false;
+	}
+
+	public static String getZkAddr() {
+		return zkAddr;
 	}
 
 	/**
