@@ -13,7 +13,7 @@ spring:
         #配置根路径
         root: config/tms
         #配置默认上下文 默认为spring.application.name
-        defaultContext : risk-engine
+        defaultContext : engine
         #配置profile分隔符
         profileSeparator : '-'
         watcher:
