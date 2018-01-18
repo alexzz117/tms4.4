@@ -103,7 +103,7 @@
       <el-col :span="6">{{detailData.location}}&nbsp</el-col>
     </el-row>
 
-    <el-dialog title="报警操作用户信息" :visible.sync="userDialogVisible" width="900px" :modal="false">
+    <el-dialog title="报警操作用户信息" :visible.sync="userDialogVisible" width="900px" :modal="false" :close-on-click-modal="false">
 
       <AlarmEventQueryUserDetail ref="userDetail"></AlarmEventQueryUserDetail>
 

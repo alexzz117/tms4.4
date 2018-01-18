@@ -34,7 +34,7 @@
                    :total="total">
     </el-pagination>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false">
       <el-form :model="dictDialogForm" :rules="rules" ref="dictDialogForm">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
           <el-input v-model="dictDialogForm.category_id" auto-complete="off" :disabled="true" :maxlength=50></el-input>

@@ -159,9 +159,9 @@
       <el-table
         :data="tableData"
         style="width: 100%" tooltip-effect="dark" :cell-style="tableRowClass">
-        <el-table-column fixed="left" label="操作" width="65" alert="center">
+        <el-table-column label="操作" width="65">
           <template slot-scope="scope">
-            <el-button type="text" @click="openDialog(scope.$index, scope.row)" title="处理" icon="el-icon-edit-outline"/>
+            <el-button type="text" @click="openDialog(scope.row)" title="处理" icon="el-icon-edit-outline"/>
           </template>
         </el-table-column>
         <el-table-column prop="txncode" label="流水号" align="left">
@@ -192,7 +192,7 @@
       </el-pagination>
     </section>
 
-    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px">
+    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px" :close-on-click-modal="false">
       <el-tree :data="treeData" node-key="id" ref="tree"
                show-checkbox
                :props="defaultTreeProps"
@@ -212,7 +212,7 @@
     <txn-detail ref="txnDetail" :txn="selectedRow"></txn-detail>
 
     <!-- 报警事件处理弹窗 -->
-    <el-dialog title="报警事件处理" :visible.sync="listDialogVisible" width="600">
+    <el-dialog title="报警事件处理" :visible.sync="listDialogVisible" width="600" :close-on-click-modal="false">
       <div>
         <el-form :model="executeForm" ref="executeForm" style="text-align: left" :inline="true">
           <el-form-item label="欺诈类型:" :label-width="formLabelWidth" prop="fraud_type" :style="formItemStyle">
@@ -238,7 +238,7 @@
         <div style="text-align: left;">
           <div>
             <el-button plain class="el-icon-plus" @click="addPsAct('add')">新建</el-button>
-            <el-button plain icon="el-icon-delete" @click="delPsAct(scope.row)">删除</el-button>
+            <el-button plain icon="el-icon-delete" @click="delPsAct">删除</el-button>
           </div>
         </div>
 
@@ -246,81 +246,65 @@
         <el-table
           :data="actionData" height="200" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="45"/>
-          <el-table-column fixed="left" label="操 作" width="55" alert="center">
+          <el-table-column label="操 作" width="55">
             <template slot-scope="scope">
               <el-button type="text" @click="editPsAct(scope.$index, scope.row,'edit')" icon="el-icon-edit"/>
             </template>
           </el-table-column>
-          <el-table-column prop="ac_name" label="动作名称"/>
-          <el-table-column prop="ac_cond_in" label="条件" width="200"/>
-          <el-table-column prop="ac_expr_in" label="表达式" width="200"/>
+          <el-table-column prop="ac_name" label="动作名称" align="left"/>
+          <el-table-column prop="ac_cond_in" label="条件" align="left" width="200"/>
+          <el-table-column prop="ac_expr_in" label="表达式" align="left" width="200"/>
 
         </el-table>
 
-        <!-- 添加动作FROM -->
-        <!--<div>-->
-          <!--<transition name="fade">-->
-            <!--<el-form label-position="right" :model="actionForm" ref="actionForm" :inline="true">-->
-              <!--<el-row>-->
-                <!--<el-col :span="3">-->
-                  <!--<div>-->
-                    <!--<el-form-item label="动作名称"/>-->
-                  <!--</div>-->
-                <!--</el-col>-->
-                <!--<el-col :span="9">-->
-                  <!--<div>-->
-                    <!--<el-form-item prop="ac_name" clearable>-->
-                      <!--<el-input v-model="actionForm.ac_name"/>-->
-                    <!--</el-form-item>-->
-                  <!--</div>-->
-                <!--</el-col>-->
-                <!--<el-col :span="2">-->
-                  <!--<div>-->
-                    <!--<el-form-item label="条件"/>-->
-                  <!--</div>-->
-                <!--</el-col>-->
-                <!--<el-col :span="10">-->
-                  <!--<div>-->
-                    <!--<el-form-item prop="ac_cond" clearable>-->
-                      <!--<div @dblclick="acCondInPopup">-->
-                        <!--<el-input v-model="actionForm.ac_cond" auto-complete="off" :style="formItemContentStyle"-->
-                                  <!--v-show="false" readonly/>-->
-                        <!--<el-input v-model="actionForm.ac_cond_in" auto-complete="off" :style="formItemContentStyle"-->
-                                  <!--readonly/>-->
-                      <!--</div>-->
-                    <!--</el-form-item>-->
-                  <!--</div>-->
-                <!--</el-col>-->
-              <!--</el-row>-->
-              <!--<el-row>-->
-                <!--<el-col :span="3">-->
-                  <!--<div>-->
-                    <!--<el-form-item label="表达式"/>-->
-                  <!--</div>-->
-                <!--</el-col>-->
-                <!--<el-col :span="10">-->
-                  <!--<div>-->
-                    <!--<el-form-item prop="ac_expr" clearable>-->
-                      <!--<div @dblclick="ruleCondInPopup">-->
-                        <!--<el-input v-model="actionForm.ac_expr" :style="formItemContentStyle" v-show="false" readonly/>-->
-                        <!--<el-input v-model="actionForm.ac_expr_in" auto-complete="off" :style="formItemContentStyle"-->
-                                  <!--readonly/>-->
-                      <!--</div>-->
-                    <!--</el-form-item>-->
-                  <!--</div>-->
-                <!--</el-col>-->
-              <!--</el-row>-->
-            <!--</el-form>-->
-          <!--</transition>-->
-        <!--</div>-->
+
+
         <!-- 添加动作FROM结束 -->
         <div class="dialog-footer" align="center" slot="footer">
-          <el-button type="primary" icon="el-icon-success" @click="savePsAct('actionForm')">保存动作</el-button>
-          <el-button data="cancelBtn" icon="el-icon-success" type="primary" @click="saveProcess('executeForm')">提交审核
-          </el-button>
-          <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="closeDialog()">取消</el-button>
+          <el-button type="primary" icon="el-icon-success" @click="saveProcess('executeForm')">保存动作</el-button>
+          <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false">取消</el-button>
         </div>
       </div>
+    </el-dialog>
+
+    <!-- 添加动作FROM -->
+    <el-dialog :title="actionDialogTitle" :visible.sync="actionDialogVisible" width="450px" :modal="false" :close-on-click-modal="false">
+      <el-form :model="actionDialogForm" ref="actionDialogForm" style="text-align: left" :rules="actionRules" :inline="true">
+        <el-form-item label="动作名称:" :label-width="formLabelWidth" prop="ac_desc" :style="actionFormItemStyle">
+          <el-input v-model="actionDialogForm.ac_desc" auto-complete="off" :style="actionFormItemContentStyle" :maxlength="128"></el-input>
+        </el-form-item>
+        <el-form-item label="动作条件:" :label-width="formLabelWidth" prop="ac_cond_in" :style="actionFormItemStyle">
+          <div @dblclick="acCondInPopup">
+            <el-input v-show="false" v-model="actionDialogForm.ac_cond" auto-complete="off" :style="actionFormItemContentStyle" readonly></el-input>
+            <el-input v-model="actionDialogForm.ac_cond_in" auto-complete="off" :style="actionFormItemContentStyle" readonly></el-input>
+          </div>
+        </el-form-item>
+        <el-form-item class="is-required" label="表达式:" :label-width="formLabelWidth" prop="ac_expr_in" :style="actionFormItemStyle">
+          <div @dblclick="acExprInPopup">
+            <el-input v-show="false" v-model="actionDialogForm.ac_expr" auto-complete="off" :style="actionFormItemContentStyle" readonly ></el-input>
+            <el-input v-model="actionDialogForm.ac_expr_in" auto-complete="off" :style="actionFormItemContentStyle" readonly ></el-input>
+          </div>
+        </el-form-item>
+
+        <div>
+          <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+            <el-button type="primary" @click="submitActionForm('actionDialogForm')" :disabled="actionFormSureBtnDisabled" size="large">保 存</el-button>
+            <el-button @click="actionDialogVisible = false" size="large">取 消</el-button>
+          </el-form-item>
+        </div>
+
+      </el-form>
+      <StatCondPicker ref="acCondDialog" @valueCallback="acCondInValueCallBack"
+                      :statCond="actionDialogForm.ac_cond" :statCondIn="actionDialogForm.ac_cond_in" :txnId="txnIdParent"
+                      :hideItems="['stat_fn','rule_func','ac_func']" >
+
+      </StatCondPicker>
+
+      <StatCondPicker ref="acExprDialog" @valueCallback="acExprValueCallBack"
+                      :statCond="actionDialogForm.ac_expr" :statCondIn="actionDialogForm.ac_expr_in" :txnId="txnIdParent"
+                      :hideItems="['stat_fn','rule_func']" >
+
+      </StatCondPicker>
     </el-dialog>
   </div>
 </template>
@@ -332,6 +316,7 @@
   import check from "../../common/check";
 
   import TxnDetail from '@/components/synquery/TxnDetail'
+  import StatCondPicker from '@/components/common/StatCondPicker'
 
   let iscorrectList = [{'label': '未认证', 'value': '2'}, {'label': '认证通过', 'value': '1'}, {
     'label': '认证未通过',
@@ -358,6 +343,34 @@
         },
         actionForm:{
 
+        },
+        txnIdParent: '',
+        actionDialogTitle: '',
+        actionDialogVisible: false,
+        actionFormSureBtnDisabled: false,
+        actionDialogType: '',
+        actionDialogForm: {
+          ac_desc: '',
+          ac_cond: '',
+          ac_cond_in: '',
+          ac_expr: '',
+          ac_expr_in: ''
+        },
+        actionRules: {
+          ac_desc: [
+            { required: true, message: '请输入动作名称', trigger: 'blur' },
+            { max: 128, message: '长度在128个字符以内', trigger: 'blur' },
+            { validator: check.checkFormZhSpecialCharacter, trigger: 'blur' }
+          ],
+          ac_cond_in: [
+            { validator: this.checkAcCond, trigger: 'blur' }
+          ],
+          ac_expr_in: [
+            { validator: this.checkAcRxpr, trigger: 'blur' }
+          ],
+          ac_enable: [
+            { required: true, message: '请输入有效性', trigger: 'change' }
+          ]
         },
         datatypeOptions: [],
         queryShowForm: {
@@ -404,6 +417,12 @@
         formLabelWidth: '130px',
         formItemStyle: {
           width: '600px'
+        },
+        actionFormItemStyle:{
+          width: '400px'
+        },
+        actionFormItemContentStyle: {
+          width: '250px'
         },
         textareaFormItemStyle: {
           width: '600px'
@@ -706,32 +725,40 @@
         this.queryShowForm = queryShowForm
       },
       //报警事件处理事件
-      openDialog(index, row) {
-        var self = this
-        this.listDialogVisible = true
-        var TXN_CODE = row.txncode
+      openDialog(row) {
+        let self = this
+        this.selectedRow = row
+        let TXN_CODE = row.txncode
         this.vTxncode = TXN_CODE
+        this.getActionData(TXN_CODE)
+      },
+      getActionData (TXN_CODE) {
+        this.actionData = []
+        let self = this
         ajax.post({
           url: '/alarmevent/process',
           param: {TXN_CODE: TXN_CODE},
           success: function (data) {
-            this.listDialogVisible = true
+            self.listDialogVisible = true
             if (data.list) {
               self.actionData = data.list
             }
-            if (data.row) {
-              self.txnMap = data.row
-              Object.assign(this.executeForm)
-            }
+            self.txnIdParent = data.txnmap.txntype
+            // if (data.row) {
+            //   self.txnMap = data.row
+            // Object.assign(this.executeForm)
+            // }
           }
         })
       },
       //新增动作信息
       addPsAct(flag){
         var self = this
-        this.flag = flag
-        this.actionForm= {
-          ac_name: "",
+        this.actionDialogVisible = true
+        this.actionDialogType = 'add'
+        // this.flag = flag
+        this.actionDialogForm= {
+          ac_desc: "",
           ac_cond: "",
           ac_cond_in: "",
           ac_expr: "",
@@ -740,36 +767,113 @@
       },
       //编辑动作信息
       editPsAct(index, row,flag) {
+        console.log(row)
         var self = this
-        this.flag = flag
-        this.actionForm = Object.assign({}, row)
+        this.actionDialogType = 'edit'
+        this.actionDialogVisible = true
+        // this.flag = flag
+        this.actionDialogForm = Object.assign({}, row)
+        this.actionDialogForm.ac_desc = row.ac_name
       },
       delPsAct(){
-
-      },
-      ruleCondInPopup () {
-        // if (this.readonlyParent) {
-        //   return
-        // }
-        // this.$refs.RuleCondDialog.open()
-        // this.$refs.RuleCondDialog.setValue({
-        //   stat_cond_value: this.dialogForm.rule_cond,
-        //   stat_cond_in: this.dialogForm.rule_cond_in
+        console.log(this.selectedRows)
+        // this.$confirm('确定删除?', '提示', {
+        //   confirmButtonText: '确定',
+        //   cancelButtonText: '取消',
+        //   type: 'warning'
+        // }).then(() => {
+        //   let jsonData = {}
+        //   jsonData.del = [row]
+        //   let finalJsonData = {}
+        //   finalJsonData.postData = jsonData
+        //   finalJsonData.txnId = this.txnIdParent
+        //   let self = this
+        //
+        //   ajax.post({
+        //     url: '/stat/save',
+        //     param: finalJsonData,
+        //     success: function (data) {
+        //       self.getData()
+        //       self.$message.success('删除成功')
+        //     }
+        //   })
         // })
       },
       acCondInPopup () {
-        // if (this.readonlyParent) {
-        //   return
-        // }
-        // this.$refs.acCondDialog.open()
-        // this.$refs.acCondDialog.setValue({
-        //   stat_cond_value: this.actionDialogForm.ac_cond,
-        //   stat_cond_in: this.actionDialogForm.ac_cond_in
-        // })
+        this.$refs.acCondDialog.open()
+        this.$refs.acCondDialog.setValue({
+          stat_cond_value: this.actionDialogForm.ac_cond,
+          stat_cond_in: this.actionDialogForm.ac_cond_in
+        })
       },
+      acExprInPopup () {
+        this.$refs.acExprDialog.open()
+        this.$refs.acExprDialog.setValue({
+          stat_cond_value: this.actionDialogForm.ac_expr,
+          stat_cond_in: this.actionDialogForm.ac_expr_in
+        })
+      },
+      acCondInValueCallBack (value) {
+        this.actionDialogForm.ac_cond = value.stat_cond_value
+        this.actionDialogForm.ac_cond_in = value.stat_cond_in
+      },
+      acExprValueCallBack (value) {
+        this.actionDialogForm.ac_expr = value.stat_cond_value
+        this.actionDialogForm.ac_expr_in = value.stat_cond_in
+        this.$refs.actionDialogForm.validateField('ac_expr_in', (valid) => {
+        })
+      },
+      submitActionForm (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.actionFormSureBtnDisabled = true
+            let self = this
+            let submitParam = {}
+            Object.assign(submitParam, this.actionDialogForm)
+            console.log(this.selectedRow)
+            submitParam.TXN_CODE = this.selectedRow.txncode
+            submitParam.ac_name = submitParam.ac_desc
+            // submitParam = util.toggleObjKey(submitParam, 'upper')
+            let message = '提交成功'
+            let url = ''
+            if (this.actionDialogType === 'add') {
+              // jsonData.add = [submitParam]
+              url = '/alarmevent/addPsAct'
+              message = '新建成功'
+            } else {
+              // jsonData.mod = [submitParam]
+              url = '/alarmevent/updPsAct'
+              message = '编辑成功'
+            }
+
+            ajax.post({
+              url: url,
+              param: submitParam,
+              success: function (data) {
+                self.getActionData(self.selectedRow.txncode)
+                self.$message.success(message)
+                self.actionDialogVisible = false
+                self.actionFormSureBtnDisabled = false
+              },
+              error: function (data) {
+                if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+                  self.$message.error(data.error.join('|'))
+                } else {
+                  self.$message.error(data.error)
+                }
+                self.actionFormSureBtnDisabled = false
+              },
+              fail: function () {
+                self.actionFormSureBtnDisabled = false
+              }
+            })
+          }
+        })
+      }
     },
     components: {
-      'txn-detail': TxnDetail
+      'txn-detail': TxnDetail,
+      StatCondPicker
     }
   }
 </script>

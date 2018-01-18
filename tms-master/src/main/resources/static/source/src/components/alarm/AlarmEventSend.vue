@@ -186,7 +186,7 @@
 
     </section>
 
-    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px">
+    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px" :close-on-click-modal="false">
       <el-tree :data="treeData" node-key="id" ref="tree"
                show-checkbox
                :props="defaultTreeProps"
@@ -206,7 +206,7 @@
     <txn-detail ref="txnDetail" :txn="selectedRow"></txn-detail>
 
     <!-- 选择人员弹窗 -->
-    <el-dialog title="报警事件分派" :visible.sync="listDialogVisible">
+    <el-dialog title="报警事件分派" :visible.sync="listDialogVisible" :close-on-click-modal="false">
       <div>
         <el-table
           :data="userData" height="280">

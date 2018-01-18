@@ -383,6 +383,10 @@
             { required: true, message: '请输入规则条件', trigger: 'blur' },
             { max: 1024, message: '长度在1024个字符以内', trigger: 'blur' }
           ],
+          rule_cond_in: [
+            { required: true, message: '请输入规则条件', trigger: 'blur' },
+            { max: 1024, message: '长度在1024个字符以内', trigger: 'blur' }
+          ],
           eval_type: [
             { required: true, message: '请输入评估类型', trigger: 'change' }
           ],

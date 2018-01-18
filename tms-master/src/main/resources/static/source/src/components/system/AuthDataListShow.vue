@@ -107,7 +107,7 @@
       </el-pagination>
     </section>
 
-    <el-dialog title="所属交易" :visible.sync="txntypeDialogVisible" width="400px">
+    <el-dialog title="所属交易" :visible.sync="txntypeDialogVisible" width="400px" :close-on-click-modal="false">
       <el-tree :data="treeData" node-key="id" ref="tree"
                show-checkbox
                :props="defaultTreeProps"
