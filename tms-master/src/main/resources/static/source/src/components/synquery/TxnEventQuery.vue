@@ -191,7 +191,7 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
-    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px">
+    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px" :close-on-click-modal="false">
       <el-tree :data="treeData" node-key="id" ref="tree"
                show-checkbox
                :props="defaultTreeProps"

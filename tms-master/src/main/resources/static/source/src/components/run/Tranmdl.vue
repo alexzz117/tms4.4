@@ -39,7 +39,7 @@
         </el-table>
       </el-main>
     </el-container>
-    <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible" @open="openTmDialog">
+    <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible" @open="openTmDialog" :close-on-click-modal="false">
       <el-form :model="tmForm"  :label-width="formLabelWidth" :rules="tmRules" ref="tmForm">
         <el-form-item label="交易名称" prop="tab_name" class="hidden">
           <el-input v-model="tmForm.tab_name" auto-complete="off"></el-input>
@@ -188,7 +188,7 @@
         </el-table>
       </el-main>
     </el-container>
-    <el-dialog :title="tableTitle" :visible.sync="tableDialogVisible" @open="tableOpenFunc">
+    <el-dialog :title="tableTitle" :visible.sync="tableDialogVisible" @open="tableOpenFunc" :close-on-click-modal="false">
       <el-form :model="tableForm"  :label-width="formLabelWidth" :rules="tableRules" ref="tableForm">
         <el-form-item label="引用ID" prop="ref_id" class="hidden">
           <el-input v-model="tableForm.ref_id" auto-complete="off"></el-input>
@@ -247,7 +247,7 @@
         </el-row>
       </el-form>
     </el-dialog>
-    <el-dialog :title="tableInfoTitle" :visible.sync="tableInfoDialogVisible" @open="tableOpenFunc">
+    <el-dialog :title="tableInfoTitle" :visible.sync="tableInfoDialogVisible" @open="tableOpenFunc" :close-on-click-modal="false">
       <el-form :model="tableInfoForm"  :label-width="formLabelWidth" :rules="tableInfoRules" ref="tableInfoForm">
         <el-form-item label="引用ID" prop="ref_id" class="hidden">
           <el-input v-model="tableInfoForm.ref_id" auto-complete="off"></el-input>

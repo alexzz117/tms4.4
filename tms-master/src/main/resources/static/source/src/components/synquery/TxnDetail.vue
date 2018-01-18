@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="交易流水详细信息" :visible.sync="infoDialogVisible" width="900px">
+    <el-dialog title="交易流水详细信息" :visible.sync="infoDialogVisible" width="900px" :close-on-click-modal="false">
 
       <el-tabs v-model="tabActiveName" @tab-click="handleTabClick">
         <el-tab-pane label="交易信息" name="operate" v-if="getTabItemShow('operate')">

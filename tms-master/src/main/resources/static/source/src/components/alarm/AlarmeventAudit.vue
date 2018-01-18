@@ -150,7 +150,7 @@
       </el-pagination>
     </section>
     <!--报警事件审核ExecuteData -->
-    <el-dialog title="报警事件审核" :visible.sync="listDialogVisible" append-to-body  >
+    <el-dialog title="报警事件审核" :visible.sync="listDialogVisible" append-to-body :close-on-click-modal="false">
       <div>
         <el-form label-position="right" :model="actionForm" :inline="inline" >
           <el-row>

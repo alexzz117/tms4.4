@@ -61,11 +61,11 @@
         <el-table-column prop="real_name" label="姓名" align="left"></el-table-column>
         <el-table-column prop="role_name" label="角色" align="left"></el-table-column>
         <el-table-column prop="flag" label="状态" align="left" :formatter=renderFlag></el-table-column>
-        <el-table-column prop="failed_login_attempts" label="登录失败次数" align="left" :formatter="emptyCheck"></el-table-column>
-        <el-table-column prop="lockout" label="锁定次数" align="left" :formatter="emptyCheck"></el-table-column>
+        <!--<el-table-column prop="failed_login_attempts" label="登录失败次数" align="left" :formatter="emptyCheck" min-width="85"></el-table-column>
+        <el-table-column prop="lockout" label="锁定次数" align="left" :formatter="emptyCheck"></el-table-column>-->
         <el-table-column prop="lockout_date" label="锁定时间" align="left"></el-table-column>
-        <el-table-column prop="email" label="电子邮件" align="left"></el-table-column>
-        <el-table-column prop="mobile" label="移动电话" align="left"></el-table-column>
+        <el-table-column prop="email" label="电子邮件" align="left" min-width="170"></el-table-column>
+        <el-table-column prop="mobile" label="移动电话" align="left" min-width="85"></el-table-column>
       </el-table>
       <el-pagination style="margin-top: 10px; text-align: right;"
                      @size-change="handleSizeChange"
@@ -77,7 +77,7 @@
                      :total="total">
       </el-pagination>
     </section>
-    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="900px">
+    <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="900px" :close-on-click-modal="false">
       <el-form :model="userDialogForm" :rules="rules" ref="userDialogForm" :inline="true">
         <el-form-item label="用户名" :label-width="formLabelWidth" prop="login_name" :style="formItemStyle">
           <el-input v-model="userDialogForm.login_name" auto-complete="off" :style="formItemContentStyle"></el-input>
@@ -123,6 +123,12 @@
         </el-form-item>
         <el-form-item label="通讯地址" :label-width="formLabelWidth" prop="address" :style="formItemStyle">
           <el-input v-model="userDialogForm.address" auto-complete="off" :style="formItemContentStyle"></el-input>
+        </el-form-item>
+        <el-form-item label="登录失败次数" :label-width="formLabelWidth" prop="failed_login_attempts" :style="formItemStyle" v-if="userDialogForm.operator_id !==''">
+          <el-input v-model="userDialogForm.failed_login_attempts" auto-complete="off" :style="formItemContentStyle" :readonly="true"></el-input>
+        </el-form-item>
+        <el-form-item label="锁定次数" :label-width="formLabelWidth" prop="lockout" :style="formItemStyle" v-if="userDialogForm.operator_id !==''">
+          <el-input v-model="userDialogForm.lockout" auto-complete="off" :style="formItemContentStyle" :readonly="true"></el-input>
         </el-form-item>
         <el-form-item label="备注信息" :label-width="formLabelWidth" prop="memo" :style="formItemStyle">
           <el-input type="textarea" v-model="userDialogForm.memo" :style="formItemContentStyle"></el-input>
@@ -261,7 +267,9 @@
                 address: info.address,
                 memo: info.memo,
                 repwd: info.password,
-                password: info.password
+                password: info.password,
+                failed_login_attempts: info.failed_login_attempts || 0,
+                lockout: info.lockout || 0
               }
             },
             fail: function (e) {
