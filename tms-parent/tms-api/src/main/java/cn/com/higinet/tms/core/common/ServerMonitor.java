@@ -6,17 +6,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
+
 import cn.com.higinet.tms.core.model.Server;
 import cn.com.higinet.tms.core.model.TmsConfigVo;
 import cn.com.higinet.tms.core.service.TransApiMessage;
@@ -51,11 +58,11 @@ public class ServerMonitor {
 		logger.info("正在初始化IP列表,请稍候...");
 		checkServers();
 		logger.info("第一次连接服务器初始化列表完成...");
-		CheckTask ct = new CheckTask();
-		Thread monitor = new Thread(ct);
-		monitor.setDaemon(true);
-		monitor.setName("ServerMonitor");
-		monitor.start();
+//		CheckTask ct = new CheckTask();
+//		Thread monitor = new Thread(ct);
+//		monitor.setDaemon(true);
+//		monitor.setName("ServerMonitor");
+//		monitor.start();
 
 	}
 	//	public static ServerMonitor getInstance(){
@@ -85,6 +92,51 @@ public class ServerMonitor {
 		}
 		zk = CuratorFrameworkFactory.newClient(TmsConfigVo.getZkAddr(), new RetryNTimes(2, 5000));
 		zk.start();
+		ExecutorService pool = Executors.newCachedThreadPool();
+		TreeCache treeCache = new TreeCache(zk, StaticParameter.PRO_ZK_RISK_SERVICE);
+		treeCache.getListenable().addListener(new TreeCacheListener() {
+			@Override
+			public void childEvent(CuratorFramework client, TreeCacheEvent event) throws Exception {
+				ChildData data = event.getData();
+				if (data != null) {
+					switch (event.getType()) {
+						case NODE_ADDED:
+							updateServerList();
+							break;
+						case NODE_REMOVED:
+							updateServerList();
+							break;
+						case NODE_UPDATED:
+							updateServerList();
+							break;
+
+						default:
+							break;
+					}
+				} else {
+					logger.info("Zookeeper data is null : " + event.getType());
+				}
+			}
+		});
+		//开始监听  
+		try {
+			treeCache.start();
+		} catch (Exception e) {
+			logger.error("Exception occurred when start tree cache.", e);
+		}
+	}
+
+	private static void updateServerList() {
+		if (updateServerList) {
+			try {
+				String ipPorts = extractIpPortsFromZK();
+				if (ipPorts.length() > 0) {
+					changeServerList(ipPorts.toString());
+				}
+			} catch (Exception e) {
+				logger.error("Exception occurred when update server list", e);
+			}
+		}
 	}
 	//	@SuppressWarnings("unchecked")
 	//	private List<Server> getServerList() {
@@ -329,30 +381,33 @@ public class ServerMonitor {
 		}
 		if (isGetIpList && updateServerList) {
 			try {
-				List<String> servers = zk.getChildren().forPath(StaticParameter.PRO_ZK_RISK_SERVICE);
-				StringBuilder sb = new StringBuilder();
-				if (servers != null && !servers.isEmpty()) {
-					for (String server : servers) {
-						String json = new String(zk.getData().forPath(StaticParameter.PRO_ZK_RISK_SERVICE + "/" + server));
-						HashMap<String, String> attrs = JSON.parseObject(json, HashMap.class);
-						String ip = attrs.get("address");
-						String port = String.valueOf(attrs.get("port"));
-						if(sb.length()>0){
-							sb.append(",");
-						}
-						sb.append(ip).append(":").append(port);
-					}
-					ischange = changeServerList(sb.toString());
+				String ipPorts = extractIpPortsFromZK();
+				if (ipPorts.length() > 0) {
+					ischange = changeServerList(ipPorts.toString());
 				}
-			} catch (KeeperException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Exception occurred when update server list", e);
 			}
 		}
 		return ischange;
+	}
+
+	private static String extractIpPortsFromZK() throws Exception {
+		List<String> servers = zk.getChildren().forPath(StaticParameter.PRO_ZK_RISK_SERVICE);
+		StringBuilder sb = new StringBuilder();
+		if (servers != null && !servers.isEmpty()) {
+			for (String server : servers) {
+				String json = new String(zk.getData().forPath(StaticParameter.PRO_ZK_RISK_SERVICE + "/" + server));
+				HashMap<String, String> attrs = JSON.parseObject(json, HashMap.class);
+				String ip = attrs.get("address");
+				String port = String.valueOf(attrs.get("port"));
+				if (sb.length() > 0) {
+					sb.append(",");
+				}
+				sb.append(ip).append(":").append(port);
+			}
+		}
+		return sb.toString();
 	}
 
 	static void checkServers() {
