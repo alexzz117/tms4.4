@@ -101,11 +101,24 @@ public class EventContext implements Copyable<EventContext>, Serializable {
 	 * @param t the t
 	 * @return data 属性
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T getData(Class<T> t, String key) {
+		return getData(t, key, null);
+	}
+
+	/**
+	 * 根据指定的类型，返回转换过后的data对象
+	 *
+	 * @param <T> the generic type
+	 * @param t the t
+	 * @param key the key
+	 * @param defaultValue the default value
+	 * @return data 属性
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getData(Class<T> t, String key, T defaultValue) {
 		Object res = data.get(key);
 		if (res == null) {
-			return null;
+			return defaultValue;
 		}
 		return (T) res;
 	}
