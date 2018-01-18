@@ -48,7 +48,7 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="处置策略:" :label-width="formLabelWidth" prop="tab_disposal">
+          <el-form-item label="处置策略" :label-width="formLabelWidth" prop="tab_disposal">
             <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly"></AllPickSelect>
           </el-form-item>
         </el-col>
