@@ -31,6 +31,12 @@
 			<groupId>cn.com.higinet.tms</groupId>
 			<artifactId>tms-base</artifactId>
 			<version>4.4.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.kafka</groupId>
+					<artifactId>kafka-clients</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- tms-base End -->
 

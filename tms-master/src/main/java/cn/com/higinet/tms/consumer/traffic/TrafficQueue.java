@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -49,9 +48,7 @@ public class TrafficQueue implements DisposableBean {
 	@Value("${elasticsearch.trafficdata.saveWhenSize}")
 	private int saveWhenSize; //当queue达到一定数量时提交
 
-	@Autowired
-	@Qualifier("commitTaskExecutor")
-	private ThreadPoolTaskExecutor executor;
+	private ThreadPoolTaskExecutor commitExecutor; //commit提交任务线程池
 
 	private ElasticSearchAdapter<TrafficData> elasticsearchAdapter;
 
@@ -68,6 +65,14 @@ public class TrafficQueue implements DisposableBean {
 			logger.info( "elasticsearchAdapter is null" );
 			return;
 		}
+
+		commitExecutor = new ThreadPoolTaskExecutor();
+		commitExecutor.setCorePoolSize( 4 ); //线程池维护线程的最小数量
+		commitExecutor.setMaxPoolSize( 16 ); //线程池维护线程的最大数量
+		commitExecutor.setQueueCapacity( 8 ); //持有等待执行的任务队列
+		commitExecutor.setKeepAliveSeconds( 300 ); //空闲线程的存活时间
+		commitExecutor.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() ); //DiscardPolicys模式，不能执行的任务将被删除
+		commitExecutor.initialize();
 	}
 
 	/**
@@ -82,8 +87,8 @@ public class TrafficQueue implements DisposableBean {
 		}
 	}
 
-	public void put( TrafficData tarffic ) throws Exception {
-		queue.put( tarffic );
+	public void put( TrafficData tarfficData ) throws Exception {
+		queue.put( tarfficData );
 
 		//当queue数量达到一定数量，将进行数据提交
 		//当并发量较大时，主要是按量提交起作用
@@ -96,7 +101,7 @@ public class TrafficQueue implements DisposableBean {
 		if( elasticsearchAdapter == null ) return;
 		preSaveTime = System.currentTimeMillis(); //无论成功与否，记录本次提交时间
 
-		executor.execute( new Runnable() {
+		commitExecutor.execute( new Runnable() {
 			@Override
 			public void run() {
 				Clockz.start();
