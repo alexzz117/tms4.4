@@ -1,5 +1,5 @@
 <template>
-  <el-container style="height: 100%; border: 1px solid #eee">
+  <el-container style="border: 1px solid #eee">
     <el-aside width="200px" style="min-height: 400px;border:0;border-right: 1px solid #eee;background-color: white">
       <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee;" v-show="!readonly">
         <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建

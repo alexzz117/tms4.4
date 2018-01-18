@@ -11,8 +11,8 @@
                     :span-method="groupHandle"
                     :row-class-name="groupClassName"
                     @row-click="toggleListHandle"
-                    max-height="430"
-                    style="width: 100%">
+                    max-height="335"
+                    class="collapse-table-style">
             <el-table-column align="left" width="100px" label="操作">
               <template slot-scope="scope">
                 <el-button type="text" icon="el-icon-edit" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="编辑" @click="tmEditFunc(scope.$index, scope.row)"></el-button>
@@ -46,8 +46,8 @@
                     :span-method="tableGroupHandle"
                     :row-class-name="groupClassName"
                     @row-click="toggleTableHandle"
-                    max-height="430"
-                    style="width: 100%">
+                    max-height="335"
+                    class="collapse-table-style">
             <el-table-column align="left" width="125px" label="操作">
               <template slot-scope="scope">
                 <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)" :disabled="readonly"></el-button>
@@ -1676,5 +1676,8 @@
     text-align: left;
     line-height: 2em;
     margin-bottom: 0px;
+  }
+  .collapse-table-style{
+    width: 100%;margin-bottom: -35px;
   }
 </style>
