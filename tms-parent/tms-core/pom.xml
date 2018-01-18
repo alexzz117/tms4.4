@@ -7,7 +7,6 @@
 		<version>4.4.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>tms-core</artifactId>
-    <version>4.4.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>cn.com.higinet</groupId>
@@ -35,6 +34,11 @@
 		<dependency>
 			<groupId>cn.com.higinet</groupId>
 			<artifactId>tms-common</artifactId>
+			<version>4.4.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.com.higinet.tms</groupId>
+			<artifactId>tms-base</artifactId>
 			<version>4.4.0-SNAPSHOT</version>
 		</dependency>
 		<!-- 以下是第三方包，在maven仓库没有找到的，手动提交到私有仓库的包 -->
@@ -93,55 +97,31 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-            <version>1.5.9.RELEASE</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-            <version>4.3.13.RELEASE</version>
-		</dependency>
-		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
             <version>1.5.9.RELEASE</version>
          </dependency>
-          <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
-          </dependency>
+         
+         <!-- ***************************************引入zookeeper注册和配置 ***************************************-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-zookeeper-config</artifactId>
+			<artifactId>spring-cloud-starter-zookeeper-all</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-            <version>1.5.9.RELEASE</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-            <version>1.5.9.RELEASE</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.3</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-feign</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-ribbon</artifactId>
-		</dependency>
+		<!-- ***************************************************************************************************** -->
 		
+		<!-- ******************************************引入kafka********************************************** -->
+		<dependency>
+		    <groupId>org.springframework.kafka</groupId>
+		    <artifactId>spring-kafka</artifactId>
+		    <version>1.2.2.RELEASE</version>
+		</dependency>
+		<!-- ***************************************************************************************************** -->
 		
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
@@ -193,11 +173,6 @@
             <groupId>org.slf4j</groupId>
 		    <artifactId>log4j-over-slf4j</artifactId>
 			<version>1.7.5</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-mapper-asl</artifactId>
-		    <version>1.9.13</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
