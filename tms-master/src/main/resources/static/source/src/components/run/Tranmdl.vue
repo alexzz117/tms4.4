@@ -1,44 +1,78 @@
 <template>
-  <div>
-    <el-container>
-      <el-header height="30px" class="table-header">
-        <el-row>
-          <el-col :span="12">
-            <span>交易模型</span>
-            <el-button type="text" icon="el-icon-plus" @click="tmAddFunc" title="新建交易模型" :disabled="readonly"></el-button>
-          </el-col>
-        </el-row>
-      </el-header>
-      <el-main style="padding: 0px;">
-        <el-table :data="tmTableData" ref="tmTable"
-                  :span-method="groupHandle"
-                  :row-class-name="groupClassName"
-                  @row-click="toggleListHandle"
-                  max-height="430"
-                  style="width: 100%">
-          <el-table-column align="left" width="100px" label="操作">
-            <template slot-scope="scope">
-              <el-button type="text" icon="el-icon-edit" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="编辑" @click="tmEditFunc(scope.$index, scope.row)"></el-button>
-              <el-button type="text" icon="el-icon-delete" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="删除" @click="tmDelFunc(scope.$index, scope.row)"></el-button>
-              <el-button type="text" icon="el-icon-zoom-in" title="查看" @click="tmInfoFunc(scope.$index, scope.row)"></el-button>
-            </template>
-          </el-table-column>
-          <el-table-column align="left"  label="属性名称" prop="name">
-            <template slot-scope="scope">
-              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row,expendNodeKey)></i>
-              <span>{{scope.row.name}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="left" label="属性代码" prop="ref_name"></el-table-column>
-          <el-table-column align="left" label="数据来源" prop="src_id"></el-table-column>
-          <el-table-column align="left" label="类型" prop="type"></el-table-column>
-          <el-table-column align="left" label="存储字段" prop="fd_name"></el-table-column>
-          <el-table-column align="left" label="关联代码集" prop="code" :formatter="formatterCode"></el-table-column>
-          <el-table-column align="left" label="默认值" prop="src_default"></el-table-column>
-          <el-table-column align="left" label="处理函数" prop="genesisrul"></el-table-column>
-        </el-table>
-      </el-main>
-    </el-container>
+  <div style="margin-top: -15px;">
+    <el-collapse v-model="activeName" accordion>
+      <el-collapse-item name="1">
+        <template slot="title">
+          <span>交易模型</span>
+          <el-button type="text" icon="el-icon-plus" @click.stop="tmAddFunc" title="新建交易模型" :disabled="readonly"></el-button>
+        </template>
+        <div>
+          <el-table :data="tmTableData" ref="tmTable"
+                    :span-method="groupHandle"
+                    :row-class-name="groupClassName"
+                    @row-click="toggleListHandle"
+                    max-height="430"
+                    style="width: 100%">
+            <el-table-column align="left" width="100px" label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" icon="el-icon-edit" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="编辑" @click="tmEditFunc(scope.$index, scope.row)"></el-button>
+                <el-button type="text" icon="el-icon-delete" :disabled="getToolBtnVisible(scope.$index, scope.row)" title="删除" @click="tmDelFunc(scope.$index, scope.row)"></el-button>
+                <el-button type="text" icon="el-icon-zoom-in" title="查看" @click="tmInfoFunc(scope.$index, scope.row)"></el-button>
+              </template>
+            </el-table-column>
+            <el-table-column align="left"  label="属性名称" prop="name">
+              <template slot-scope="scope">
+                <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row,expendNodeKey)></i>
+                <span>{{scope.row.name}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column align="left" label="属性代码" prop="ref_name"></el-table-column>
+            <el-table-column align="left" label="数据来源" prop="src_id"></el-table-column>
+            <el-table-column align="left" label="类型" prop="type"></el-table-column>
+            <el-table-column align="left" label="存储字段" prop="fd_name"></el-table-column>
+            <el-table-column align="left" label="关联代码集" prop="code" :formatter="formatterCode"></el-table-column>
+            <el-table-column align="left" label="默认值" prop="src_default"></el-table-column>
+            <el-table-column align="left" label="处理函数" prop="genesisrul"></el-table-column>
+          </el-table>
+        </div>
+      </el-collapse-item>
+      <el-collapse-item name="2">
+        <template slot="title">
+          <span>交易模型引用</span>
+          <el-button type="text" class="el-icon-plus" @click.stop="tableAddFunc" :disabled="readonly"></el-button>
+        </template>
+        <div>
+          <el-table :data="tableData" ref="refTable"
+                    :span-method="tableGroupHandle"
+                    :row-class-name="groupClassName"
+                    @row-click="toggleTableHandle"
+                    max-height="430"
+                    style="width: 100%">
+            <el-table-column align="left" width="125px" label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)" :disabled="readonly"></el-button>
+                <el-button type="text" icon="el-icon-delete" title="删除" @click="tableDelFunc(scope.row)" :disabled="readonly"></el-button>
+                <el-button type="text" icon="el-icon-zoom-in" title="查看" @click="tableInfoFunc(scope.row)"></el-button>
+                <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click="tableSetFunc(scope.row)" :disabled="readonly"></el-button>
+              </template>
+            </el-table-column>
+            <el-table-column align="left" label="属性名称" prop="ref_desc">
+              <template slot-scope="scope">
+                <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row,expendTableKey)></i>
+                <span v-if="scope.row.group_type==='group'">{{scope.row.group_name}}</span>
+                <span v-else>{{scope.row.ref_desc}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="属性代码" prop="ref_name" align="left"></el-table-column>
+            <el-table-column label="数据来源" prop="ref_fd_name" align="left"></el-table-column>
+            <el-table-column label="条件" prop="src_cond_in" align="left"></el-table-column>
+            <el-table-column label="表达式" prop="src_expr_in" align="left"></el-table-column>
+            <el-table-column label="存储字段" prop="storecolumn" align="left"></el-table-column>
+            <el-table-column label="所属节点" prop="tab_desc" align="left"></el-table-column>
+          </el-table>
+        </div>
+      </el-collapse-item>
+    </el-collapse>
     <el-dialog :title="tmTitle" :visible.sync="tmDialogVisible" @open="openTmDialog" :close-on-click-modal="false">
       <el-form :model="tmForm"  :label-width="formLabelWidth" :rules="tmRules" ref="tmForm">
         <el-form-item label="交易名称" prop="tab_name" class="hidden">
@@ -148,46 +182,6 @@
         </el-row>
       </el-form>
     </el-dialog>
-    <el-container style="border: 1px solid #eee;">
-      <el-header height="30px" class="table-header">
-        <el-row>
-          <el-col :span="12">
-            <span>交易模型引用</span>
-            <el-button type="text" class="el-icon-plus" @click="tableAddFunc" :disabled="readonly"></el-button>
-          </el-col>
-        </el-row>
-      </el-header>
-      <el-main style="padding: 0px;">
-        <el-table :data="tableData" ref="refTable"
-                  :span-method="tableGroupHandle"
-                  :row-class-name="groupClassName"
-                  @row-click="toggleTableHandle"
-                  max-height="430"
-                  style="width: 100%">
-          <el-table-column align="left" width="125px" label="操作">
-            <template slot-scope="scope">
-              <el-button type="text" icon="el-icon-edit" title="编辑" @click="tableEditFunc(scope.row)" :disabled="readonly"></el-button>
-              <el-button type="text" icon="el-icon-delete" title="删除" @click="tableDelFunc(scope.row)" :disabled="readonly"></el-button>
-              <el-button type="text" icon="el-icon-zoom-in" title="查看" @click="tableInfoFunc(scope.row)"></el-button>
-              <el-button v-if="scope.row.group_type==='group'" type="text" icon="el-icon-plus" title="新建行字段" @click="tableSetFunc(scope.row)" :disabled="readonly"></el-button>
-            </template>
-          </el-table-column>
-          <el-table-column align="left" label="属性名称" prop="ref_desc">
-            <template slot-scope="scope">
-              <i v-if="scope.row.group_type==='group'" :class=groupIcon(scope.row,expendTableKey)></i>
-              <span v-if="scope.row.group_type==='group'">{{scope.row.group_name}}</span>
-              <span v-else>{{scope.row.ref_desc}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="属性代码" prop="ref_name" align="left"></el-table-column>
-          <el-table-column label="数据来源" prop="ref_fd_name" align="left"></el-table-column>
-          <el-table-column label="条件" prop="src_cond_in" align="left"></el-table-column>
-          <el-table-column label="表达式" prop="src_expr_in" align="left"></el-table-column>
-          <el-table-column label="存储字段" prop="storecolumn" align="left"></el-table-column>
-          <el-table-column label="所属节点" prop="tab_desc" align="left"></el-table-column>
-        </el-table>
-      </el-main>
-    </el-container>
     <el-dialog :title="tableTitle" :visible.sync="tableDialogVisible" @open="tableOpenFunc" :close-on-click-modal="false">
       <el-form :model="tableForm"  :label-width="formLabelWidth" :rules="tableRules" ref="tableForm">
         <el-form-item label="引用ID" prop="ref_id" class="hidden">
@@ -621,6 +615,7 @@
         return callback()
       }
       return {
+        activeName: '1',
         op: '',
         toggleIcon: ['el-icon-caret-bottom', 'el-icon-caret-right'], // 交易模型Table中分类[分组]中：展开与收起的Icon
         tranModelList: [],      // 交易模型列表
@@ -799,6 +794,7 @@
     methods: {
       initForm () { // 初始化当前功能页面
         var self = this
+        self.activeName = '1'
         ajax.post({
           url: '/tranmdl/query', // 临时库
           param: {
@@ -1041,6 +1037,7 @@
       },
       tmAddFunc () {  // 添加交易模型定义事件处理
         let self = this
+        self.activeName = '1'
         self.tmTitle = '新建交易模型'
         self.tmDialogVisible = true
         self.tmFormReadOnly = false
@@ -1347,6 +1344,7 @@
         self.tableForm.ref_desc = refDesc
       },
       tableAddFunc () {
+        this.activeName = '2'
         this.tableDialogVisible = true
         this.tableFormReadOnly = false
         this.tableTitle = '新建引用表'
