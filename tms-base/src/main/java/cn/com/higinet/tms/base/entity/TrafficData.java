@@ -47,7 +47,7 @@ public class TrafficData implements EntityBase<TrafficData> {
 	private Double score;
 
 	@Text("ssss")
-	@JSONField(name = "txnCode")
+	@JSONField(name = "ipAddress")
 	private String ipAddress;
 
 	@Text("counTryCode")
@@ -95,7 +95,7 @@ public class TrafficData implements EntityBase<TrafficData> {
 	private String disposal;
 
 	@Text("ssss")
-	@JSONField(name = "txnCode")
+	@JSONField(name = "isCorrect")
 	private String isCorrect;
 
 	@Text("isMain")
