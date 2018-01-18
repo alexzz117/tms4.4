@@ -2,7 +2,7 @@
   <div>
     <transition name="fade">
       <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
-               :inline="true" style="text-align: center" v-show="queryFormShow" >
+               :inline="true" v-show="queryFormShow" >
         <el-form-item label="流水号:" prop="txncode">
           <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
@@ -124,9 +124,6 @@
       <el-col :span="24">
         <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
                  :inline="true" style="text-align: right">
-          <el-form-item label="流水号:" prop="txncode" v-show="!queryFormShow">
-            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-          </el-form-item>
           <el-form-item label="时间范围:" prop="txntime" v-show="!queryFormShow">
             <el-date-picker
               v-model="queryShowForm.txntime"
@@ -135,6 +132,9 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期">
             </el-date-picker>
+          </el-form-item>
+          <el-form-item label="流水号:" prop="txncode" v-show="!queryFormShow">
+            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
@@ -191,7 +191,7 @@
                    layout="total, sizes, prev, pager, next, jumper"
                    :total="total">
     </el-pagination>
-    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px" :close-on-click-modal="false">
+    <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px" >
       <el-tree :data="treeData" node-key="id" ref="tree"
                show-checkbox
                :props="defaultTreeProps"
