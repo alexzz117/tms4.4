@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.rapid.server.message.Message;
+import cn.com.higinet.tms.base.constant.Constants;
 import cn.com.higinet.tms.base.entity.online.tms_run_rule_action_hit;
 import cn.com.higinet.tms.base.entity.online.tms_run_ruletrig;
 import cn.com.higinet.tms.common.event.EventBus;
@@ -677,11 +678,11 @@ public final class run_env extends run_time {
 					tms_run_rule_action_hit ruleActionHit = new tms_run_rule_action_hit();
 					ruleActionHit.setAcCond(r.ac_cond);
 					ruleActionHit.setCreateTime(System.currentTimeMillis());
-					ruleActionHit.setAcId((long)r.acid);
+					ruleActionHit.setAcId((long) r.acid);
 					ruleActionHit.setLoacExpr(r.ac_expr);
 					ruleActionHit.setTxnCode(r.txncode);
 					ruleActionHit.setTxnType(r.txntype);
-					ruleActionHit.setRuleId((long)r.ruleid);
+					ruleActionHit.setRuleId((long) r.ruleid);
 					rs.add(ruleActionHit);
 				});
 				traffic.setRuleActionHit(rs);
@@ -690,7 +691,7 @@ public final class run_env extends run_time {
 		traffic.setTarffic(trafficdata.list2map(m_rf));
 		//***************************************************************************************************
 		EventContext event = new EventContext(Topics.TO_KAFKA);
-		event.setData(Params.KAFKA_TOPIC, KafkaTopics.TRAFFIC);
+		event.setData(Params.KAFKA_TOPIC, Constants.Kafka.Topic.TRAFFIC);
 		event.setData(Params.KAFKA_DATA, traffic);
 		event.setData(Params.KAFKA_USE_PARTITION, true);
 		event.setData(Params.KAFKA_PARTITION_KEY, get_dispatch());
