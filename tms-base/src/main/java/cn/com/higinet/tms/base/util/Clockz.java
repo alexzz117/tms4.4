@@ -10,16 +10,8 @@ import java.util.Map;
  * */
 public class Clockz {
 
-	private static Map<Object, Long> timezs = new LinkedHashMap<Object, Long>() {
-		private static final long serialVersionUID = 1L;
+	private static Map<Object, Long> timezs = new LinkedHashMap<Object, Long>( 2000 );
 
-		//map超过一定数量删除，避免未调用stop造成map无限扩大
-		@Override
-		protected boolean removeEldestEntry( Map.Entry<Object, Long> eldest ) {
-			return size() > 1000;
-		}
-	};
-	
 	public static Long now() {
 		return System.currentTimeMillis();
 	}

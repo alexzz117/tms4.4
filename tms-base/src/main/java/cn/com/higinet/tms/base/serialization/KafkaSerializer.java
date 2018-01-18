@@ -20,7 +20,7 @@ public class KafkaSerializer implements Serializer<Object> {
 		byte[] bytes = null;
 		switch( topic ) {
 			case Constants.Kafka.Topic.TRAFFIC :
-				bytes = Kryoz.toBytes( data );
+				bytes = Kryoz.toBytes( data, true );
 				break;
 			case Constants.Kafka.Topic.RULE_HIT :
 				bytes = Kryoz.toBytes( data );
