@@ -144,35 +144,35 @@
       </el-col>
     </el-row>
     <el-table :data="tnxEventTableData">
-      <el-table-column prop="txncode" label="流水号" align="left" fixed class-name="link-item" min-width="120px" :show-overflow-tooltip="true">
+      <el-table-column prop="txncode" label="流水号" align="left" fixed min-width="120px" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'operate')">{{ scope.row.txncode }}</a>
+          <a @click="queryTxnInfo(scope.row, 'operate')" href="javascript:void(0)">{{ scope.row.txncode }}</a>
         </template>
       </el-table-column>
-      <el-table-column prop="userid" label="客户号" align="left" fixed class-name="link-item" min-width="115px" :show-overflow-tooltip="true">
+      <el-table-column prop="userid" label="客户号" align="left" fixed min-width="115px" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'user')">{{ scope.row.userid }}</a>
+          <a @click="queryTxnInfo(scope.row, 'user')" href="javascript:void(0)">{{ scope.row.userid }}</a>
         </template>
       </el-table-column>
-      <el-table-column prop="sessionid" label="会话标识" align="left" class-name="link-item" min-width="100px" :show-overflow-tooltip="true">
+      <el-table-column prop="sessionid" label="会话标识" align="left" min-width="100px" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'session')">{{ scope.row.sessionid }}</a>
+          <a @click="queryTxnInfo(scope.row, 'session')" href="javascript:void(0)">{{ scope.row.sessionid }}</a>
         </template>
       </el-table-column>
       <el-table-column prop="txnname" label="监控操作" align="left" min-width="100px"></el-table-column>
       <el-table-column prop="txntime" label="操作时间" align="left" :formatter="renderDateTime" min-width="100px" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="location" label="地理信息" align="left"  min-width="100px"></el-table-column>
-      <el-table-column prop="deviceid" label="设备信息" align="left" class-name="link-item">
+      <el-table-column prop="deviceid" label="设备信息" align="left">
         <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'device')">{{ scope.row.deviceid }}</a>
+          <a @click="queryTxnInfo(scope.row, 'device')" href="javascript:void(0)">{{ scope.row.deviceid }}</a>
         </template>
       </el-table-column>
       <el-table-column prop="ipaddr" label="IP地址" align="left" min-width="112px"></el-table-column>
       <el-table-column prop="iseval" label="是否评估" align="left" :formatter="renderIsEval"></el-table-column>
       <el-table-column prop="ismodelrisk" label="风险类型" align="left" :formatter="renderIsModelRisk"></el-table-column>
-      <el-table-column prop="hitrulenum" label="规则命中数" align="left" class-name="link-item">
+      <el-table-column prop="hitrulenum" label="规则命中数" align="left">
         <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'strategy')">{{ scope.row.hitrulenum }}</a>
+          <a @click="queryTxnInfo(scope.row, 'strategy')" href="javascript:void(0)">{{ scope.row.hitrulenum }}</a>
         </template>
       </el-table-column>
       <el-table-column prop="score" label="风险分值" align="left"></el-table-column>
@@ -304,7 +304,7 @@
         pageSize: 10,         // 分页显示条目
         total: 0,             // 表格记录总条数
         selectedRow: {},      // 表选中的行
-        showItem: ['operate', 'strategy', 'count', 'user', 'handle', 'device', 'deviceFinger', 'session'],
+        showItem: ['operate', 'strategy', 'count', 'user', 'device', 'deviceFinger', 'session'],
         defaultTab: '',
         queryRules: {         // 查询条件表单校验
           txncode: [
@@ -599,9 +599,5 @@
 <style>
   .alarm-event-query-form-item{
     width: 200px;
-  }
-  tbody .link-item:hover {
-    color: #FFA000;
-    cursor: pointer;
   }
 </style>
