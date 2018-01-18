@@ -18,11 +18,11 @@
       </el-tree>
     </el-aside>
     <el-container style="height: 100%; border-top: 1px solid #eee" class="wrapper">
-      <el-header height="38px" class="header-breadcrumb">
+      <!--<el-header height="38px" class="header-breadcrumb">
         <el-breadcrumb separator-class="el-icon-arrow-right" style="padding: 13px 0px;">
           <el-breadcrumb-item v-for="item in breadcrumbData" :key = "item.text">{{ item.text }}</el-breadcrumb-item>
         </el-breadcrumb>
-      </el-header>
+      </el-header>-->
       <el-main style="padding: 5px; background-color: white">
         <!--&lt;!&ndash;用router-view渲染视图&ndash;&gt;-->
         <!--<router-view/>-->
@@ -70,7 +70,7 @@
           children: 'children',
           label: 'text'
         },
-        breadcrumbData: [''], // 地址路径数组
+        // breadcrumbData: [''], // 地址路径数组
         activeName: 'trandef'
       }
     },
@@ -97,7 +97,7 @@
               // 模拟选中第一个节点（根节点）
               self.txnId = treeJson[0].id
               self.txnName = treeJson[0].text
-              self.breadcrumbData = [{text: '交易模型：' + treeJson[0].text}]
+              // self.breadcrumbData = [{text: '交易模型：' + treeJson[0].text}]
               self.toolBtn.addBtn = false
               // self.expendNodesByLevel(1)
             }
@@ -140,7 +140,7 @@
 //          this.$router.push(data.name);
 //        }
         // 同步面包屑导航地址
-        self.syncBreadcrumb(node)
+        // self.syncBreadcrumb(node)
       },
       showToolBtn (tabName) {
         var self = this
@@ -159,16 +159,16 @@
         }
       },
       // 同步地址栏显示
-      syncBreadcrumb (node) {
-        var self = this
-        var nodePath = []
-        while (node.parent !== null) {
-          nodePath.unshift({text: node.data.text})
-          node = node.parent
-        }
-        nodePath[0].text = '交易模型：' + nodePath[0].text
-        self.breadcrumbData = nodePath
-      },
+      // syncBreadcrumb (node) {
+      //   var self = this
+      //   var nodePath = []
+      //   while (node.parent !== null) {
+      //     nodePath.unshift({text: node.data.text})
+      //     node = node.parent
+      //   }
+      //   nodePath[0].text = '交易模型：' + nodePath[0].text
+      //   self.breadcrumbData = nodePath
+      // },
       handleClick (tab, event) {
         this.tabVisibility.trandefVisibility = false
         this.tabVisibility.tranmdlVisibility = false
