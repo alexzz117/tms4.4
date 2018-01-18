@@ -212,9 +212,9 @@
     <txn-detail ref="txnDetail" :txn="selectedRow"></txn-detail>
 
     <!-- 报警事件处理弹窗 -->
-    <el-dialog title="报警事件处理" :visible.sync="listDialogVisible" width="600" :close-on-click-modal="false">
+    <el-dialog title="报警事件处理" :visible.sync="listDialogVisible" width="600px" :close-on-click-modal="false">
       <div>
-        <el-form :model="executeForm" ref="executeForm" style="text-align: left" :inline="true">
+        <el-form :model="executeForm" ref="executeForm" style="text-align: left" :inline="true" :rules="executeRules">
           <el-form-item label="欺诈类型:" :label-width="formLabelWidth" prop="fraud_type" :style="formItemStyle">
 
             <el-select v-model="executeForm.fraud_type" class="stat-query-form-item" placeholder="请选择"
@@ -233,37 +233,41 @@
             <el-input type="textarea" v-model="executeForm.ps_info" :style="textareaContentStyle" :maxlength=200></el-input>
           </el-form-item>
 
-        </el-form>
-        <h5>动作信息</h5>
-        <div style="text-align: left;">
           <div>
-            <el-button plain class="el-icon-plus" @click="addPsAct('add')">新建</el-button>
-            <el-button plain icon="el-icon-delete" @click="delPsAct">删除</el-button>
+            <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+              <el-button type="primary" @click="saveProcess('executeForm')">保 存</el-button>
+              <el-button data="cancelBtn" type="primary" @click="listDialogVisible = false">取消</el-button>
+            </el-form-item>
           </div>
-        </div>
 
-        <!-- GRID -->
-        <el-table
-          :data="actionData" height="200" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="45"/>
-          <el-table-column label="操 作" width="55">
-            <template slot-scope="scope">
-              <el-button type="text" @click="editPsAct(scope.$index, scope.row,'edit')" icon="el-icon-edit"/>
-            </template>
-          </el-table-column>
-          <el-table-column prop="ac_name" label="动作名称" align="left"/>
-          <el-table-column prop="ac_cond_in" label="条件" align="left" width="200"/>
-          <el-table-column prop="ac_expr_in" label="表达式" align="left" width="200"/>
+        </el-form>
 
-        </el-table>
+        <el-collapse v-model="collapseActiveNames">
+          <el-collapse-item title="动作信息" name="1">
+            <div style="text-align: left;">
+              <div>
+                <el-button plain class="el-icon-plus" @click="addPsAct('add')">新建</el-button>
+                <el-button plain icon="el-icon-delete" @click="delPsAct" :disabled="!actionSelect">删除</el-button>
+              </div>
+            </div>
 
+            <!-- GRID -->
+            <el-table
+              :data="actionData" height="200" @selection-change="handleSelectionChange">
+              <el-table-column type="selection" width="45"/>
+              <el-table-column label="操 作" width="55">
+                <template slot-scope="scope">
+                  <el-button type="text" @click="editPsAct(scope.$index, scope.row,'edit')" icon="el-icon-edit"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="ac_name" label="动作名称" align="left"/>
+              <el-table-column prop="ac_cond_in" label="条件" align="left" width="150"/>
+              <el-table-column prop="ac_expr_in" label="表达式" align="left" width="150"/>
 
+            </el-table>
+          </el-collapse-item>
+        </el-collapse>
 
-        <!-- 添加动作FROM结束 -->
-        <div class="dialog-footer" align="center" slot="footer">
-          <el-button type="primary" icon="el-icon-success" @click="saveProcess('executeForm')">保存动作</el-button>
-          <el-button data="cancelBtn" icon="el-icon-arrow-left" type="primary" @click="listDialogVisible = false">取消</el-button>
-        </div>
       </div>
     </el-dialog>
 
@@ -325,8 +329,14 @@
 
   export default {
     name: 'alarmEventQuery',
+    computed: {
+      actionSelect () {
+        return this.selectedRows.length > 0
+      }
+    },
     data() {
       return {
+        collapseActiveNames:[],
         txntypeDialogVisible: false,
         infoDialogVisible: false,
         defaultTreeProps: {
@@ -370,6 +380,15 @@
           ],
           ac_enable: [
             { required: true, message: '请输入有效性', trigger: 'change' }
+          ]
+        },
+        executeRules: {
+          fraud_type: [
+            { required: true, message: '请输入欺诈类型', trigger: 'blur' }
+          ],
+          ps_info: [
+            { required: true, message: '请输入处理信息', trigger: 'blur' },
+            { max: 255, message: '长度在255个字符以内', trigger: 'blur' }
           ]
         },
         datatypeOptions: [],
@@ -730,6 +749,10 @@
         this.selectedRow = row
         let TXN_CODE = row.txncode
         this.vTxncode = TXN_CODE
+        this.executeForm = {
+          fraud_type: '',
+          ps_info: ''
+        }
         this.getActionData(TXN_CODE)
       },
       getActionData (TXN_CODE) {
@@ -776,28 +799,28 @@
         this.actionDialogForm.ac_desc = row.ac_name
       },
       delPsAct(){
-        console.log(this.selectedRows)
-        // this.$confirm('确定删除?', '提示', {
-        //   confirmButtonText: '确定',
-        //   cancelButtonText: '取消',
-        //   type: 'warning'
-        // }).then(() => {
-        //   let jsonData = {}
-        //   jsonData.del = [row]
-        //   let finalJsonData = {}
-        //   finalJsonData.postData = jsonData
-        //   finalJsonData.txnId = this.txnIdParent
-        //   let self = this
-        //
-        //   ajax.post({
-        //     url: '/stat/save',
-        //     param: finalJsonData,
-        //     success: function (data) {
-        //       self.getData()
-        //       self.$message.success('删除成功')
-        //     }
-        //   })
-        // })
+        let self = this
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+
+          let jsonData = {}
+          let acIds = []
+          for (let item of this.selectedRows) {
+            acIds.push(item.ac_id)
+          }
+          jsonData.psActs = acIds.join(',')
+          ajax.post({
+            url: '/alarmevent/delPsAct',
+            param: jsonData,
+            success: function (data) {
+              self.getActionData(self.selectedRow.txncode)
+              self.$message.success('删除成功')
+            }
+          })
+        })
       },
       acCondInPopup () {
         this.$refs.acCondDialog.open()
@@ -867,6 +890,36 @@
                 self.actionFormSureBtnDisabled = false
               }
             })
+          }
+        })
+      },
+      saveProcess (formName) {
+        var self = this
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            console.log(self.selectedRow)
+            var param = util.extend({
+              TXN_CODE: self.selectedRow.txncode,
+              TXNCODE: self.selectedRow.txncode,
+              PS_TYPE: '1',
+              PSSTATUS: '03',
+              PS_RESULT: '1'
+            }, this.executeForm)
+            param = util.toggleObjKey(param, 'upper')
+            ajax.post({
+              url: '/alarmevent/saveProcess',
+              param: param,
+              success: function (data) {
+                self.$message({
+                  message: '处理成功',
+                  type: 'success'
+                })
+                self.listDialogVisible = false
+                self.getData()
+              }
+            })
+          } else {
+            return false
           }
         })
       }
