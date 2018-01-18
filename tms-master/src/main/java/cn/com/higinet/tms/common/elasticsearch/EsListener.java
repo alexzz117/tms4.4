@@ -2,7 +2,12 @@ package cn.com.higinet.tms.common.elasticsearch;
 
 import java.util.List;
 
-public interface Listener<T> {
+import cn.com.higinet.tms.base.util.Stringz;
+
+public interface EsListener<T> {
+
+	String listenerId = Stringz.randomUUID();
+	StringBuffer logBuffer = new StringBuffer();
 
 	/**
 	 * 提交前调用

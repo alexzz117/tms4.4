@@ -8,17 +8,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Id;
 
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.bulk.BackoffPolicy;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkProcessor.Listener;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -27,6 +34,9 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -38,6 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -45,15 +57,100 @@ import com.alibaba.fastjson.JSONObject;
 
 import cn.com.higinet.tms.base.util.Stringz;
 
+@Scope("prototype") //使用多实例模式
 public class ElasticSearchAdapter<T> implements DisposableBean {
 
 	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchAdapter.class );
 
-	@Autowired
-	private ElasticSearchConfig elasticsearchConfig;
+	//实体T的主键名称
+	private String primaryKeyName;
+
+	//批量大小
+	@Value("${elasticsearch.commit.number}")
+	private int commitNum;
+
+	//批量提交数据量大小，单位为M
+	@Value("${elasticsearch.commit.bytesize}")
+	private int byteSizeValue;
+
+	//并发请求允许同时积累新的批量执行请求,0代表着只有一个单一的请求将被允许执行 默认为1
+	private int concurrentRequests = 1;
+
+	//数据刷新时间
+	@Value("${elasticsearch.flush.second}")
+	private int flushTime;
 
 	@Autowired
-	private EsBulkProcess processor;
+	private ElasticSearchConfig esConfig;
+
+	//用于存储近期时间内的提交数据
+	private Map<String, T> dataMap = new LinkedHashMap<String, T>( 50000 );
+
+	//批量处理器
+	private BulkProcessor bulkProcessor;
+
+	//执行侦听器
+	private EsListener<T> listener;
+
+	public void setListener( EsListener<T> listener ) {
+		this.listener = listener;
+	}
+
+	@PostConstruct
+	private void init() {
+
+		//初始化执行侦听器
+		bulkProcessor = BulkProcessor.builder( esConfig.getTransportClient(), new Listener() {
+			@Override
+			public void beforeBulk( long executionId, BulkRequest request ) {
+				List<T> list = new ArrayList<T>();
+				list.addAll( dataMap.values() );
+				listener.before( executionId, list );
+			}
+
+			/**
+			 * 提交成功时调用，但有可能部分失败
+			 * */
+			@Override
+			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
+				List<T> sucList = new ArrayList<T>();
+				List<T> failList = new ArrayList<T>();
+				List<T> allList = new ArrayList<T>();
+				allList.addAll( dataMap.values() );
+				//部分提交成功
+				if( response.hasFailures() ) {
+					for( BulkItemResponse bulkItemResponse : response ) {
+						if( bulkItemResponse.isFailed() ) failList.add( dataMap.get( bulkItemResponse.getId() ) );
+						else sucList.add( dataMap.get( bulkItemResponse.getId() ) );
+					}
+				}
+				//全部成功
+				else {
+					sucList = allList;
+				}
+
+				if( sucList.size() > 0 ) listener.onSuccess( executionId, sucList );
+				if( failList.size() > 0 ) listener.onError( executionId, failList );
+				listener.after( executionId, allList );//完毕时
+			}
+
+			/**
+			 * 所有提交失败时调用
+			 * */
+			@Override
+			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
+				List<T> allList = new ArrayList<T>();
+				allList.addAll( dataMap.values() );
+				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() + ",afterBulk2 numberOfActions:" + request.numberOfActions() );
+				listener.onError( executionId, allList );
+				//完毕时
+				listener.after( executionId, allList );
+			}
+
+		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
+				//设置回退策略，当请求执行错误时，可进行回退操作,执行错误后延迟100MS，重试三次后执行回退
+				.setBackoffPolicy( BackoffPolicy.exponentialBackoff( TimeValue.timeValueMillis( 100 ), 3 ) ).setConcurrentRequests( concurrentRequests ).build();
+	}
 
 	/**
 	 * @param indexName
@@ -84,7 +181,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 
 	@SuppressWarnings("rawtypes")
 	private SearchRequestBuilder queryCondition( String indexName, Pagination page, List<QueryConditionEntity> dataList ) {
-		SearchRequestBuilder searchRequestBuilder = elasticsearchConfig.getTransportClient().prepareSearch( indexName ).setTypes( indexName ).setSearchType( SearchType.DFS_QUERY_THEN_FETCH );
+		SearchRequestBuilder searchRequestBuilder = esConfig.getTransportClient().prepareSearch( indexName ).setTypes( indexName ).setSearchType( SearchType.DFS_QUERY_THEN_FETCH );
 		searchRequestBuilder.setFrom( (page.getPageNo() - 1) * page.getPageSize() ).setSize( page.getPageSize() ).setExplain( true );
 		for( int i = 0; i < dataList.size(); i++ ) {
 			QueryConditionEntity condition = dataList.get( i );
@@ -144,7 +241,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * @return
 	 */
 	public T getById( String indexName, String primaryKeyValue, Class<T> classz ) {
-		GetResponse response = elasticsearchConfig.getTransportClient().prepareGet( indexName, indexName, primaryKeyValue ).get();
+		GetResponse response = esConfig.getTransportClient().prepareGet( indexName, indexName, primaryKeyValue ).get();
 		T data = null;
 		if( !response.getSourceAsMap().isEmpty() ) {
 			String json = response.getSourceAsString();
@@ -159,7 +256,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * @param primaryKeyValue
 	 */
 	public void deleteById( String indexName, String primaryKeyValue ) {
-		elasticsearchConfig.getTransportClient().prepareDelete( indexName, indexName, primaryKeyValue ).get();
+		esConfig.getTransportClient().prepareDelete( indexName, indexName, primaryKeyValue ).get();
 	}
 
 	/**
@@ -182,7 +279,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 			IndexRequest indexRequest = new IndexRequest( indexName, indexName, primaryKeyValue ).source( XContentFactory.jsonBuilder().startObject().field( primaryKeyName, primaryKeyValue ).endObject() );
 			UpdateRequest updateRequest = new UpdateRequest( indexName, indexName, primaryKeyValue ).doc( jsonObject ).upsert( indexRequest );
 			try {
-				elasticsearchConfig.getTransportClient().update( updateRequest ).get();
+				esConfig.getTransportClient().update( updateRequest ).get();
 			}
 			catch( InterruptedException e ) {
 				logger.error( "upsert is error", e );
@@ -215,7 +312,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 		UpdateRequest updateRequest = new UpdateRequest().index( indexName ).type( indexName ).id( primaryKeyValue );
 		try {
 			updateRequest.doc( jsonObject );
-			elasticsearchConfig.getTransportClient().update( updateRequest ).get();
+			esConfig.getTransportClient().update( updateRequest ).get();
 		}
 		catch( InterruptedException e ) {
 			logger.error( "update is error", e );
@@ -227,33 +324,44 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 
 	/**
 	 * 批量添加数据
-	 * @param <T>
-	 * @param <T>
 	 * @param indexName
-	 * @param mappingName
 	 * @param list
 	 */
-	public void batchUpdate( String indexName, List<T> dataList, Listener<T> listener ) {
-		if( Stringz.isEmpty( indexName ) || dataList == null || dataList.isEmpty() || listener == null ) return;
+	public void batchSubmit( String indexName, List<T> dataList ) {
+		if( Stringz.isEmpty( indexName ) || dataList == null || dataList.isEmpty() ) return;
 
 		try {
-			Map<String, T> dataMap = new HashMap<String, T>();
 			String primaryKeyName = getPrimaryKeyName( dataList.get( 0 ) );
 			if( StringUtils.isEmpty( primaryKeyName ) ) {
 				logger.warn( "primaryKeyName is empty" );
 				return;
 			}
 
-			BulkProcessor bulkProcessor = processor.getBulkProcessor( elasticsearchConfig, dataMap, listener );
-			for( int i = 0; i < dataList.size(); i++ ) {
-				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( dataList.get( i ) );
-				dataMap.put( jsonObject.get( primaryKeyName ).toString(), dataList.get( i ) );
+			for( T data : dataList ) {
+				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( data );
+				dataMap.put( jsonObject.getString( primaryKeyName ), data );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
 			}
-			bulkProcessor.close();
 		}
 		catch( Exception e ) {
 			logger.error( "batchUpdate is error", e );
+		}
+	}
+
+	public void batchSubmit( String indexName, T data ) {
+		if( Stringz.isEmpty( indexName ) || data == null ) return;
+		try {
+			String primaryKeyName = getPrimaryKeyName( data );
+			if( StringUtils.isEmpty( primaryKeyName ) ) {
+				logger.warn( "primaryKeyName is empty" );
+				return;
+			}
+			JSONObject jsonObject = (JSONObject) JSONObject.toJSON( data );
+			dataMap.put( jsonObject.getString( primaryKeyName ), data );
+			bulkProcessor.add( new IndexRequest( indexName, indexName, jsonObject.getString( primaryKeyName ) ).source( jsonObject ) );
+		}
+		catch( Exception e ) {
+			logger.error( "batchSubmit is error", e );
 		}
 	}
 
@@ -261,10 +369,9 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	 * 获取主键名称
 	 */
 	public String getPrimaryKeyName( T t ) {
-		String primaryKeyName = "";
-		if( t.getClass() == null ) {
-			return primaryKeyName;
-		}
+		if( Stringz.isNotEmpty( primaryKeyName ) ) return primaryKeyName;
+
+		if( t.getClass() == null ) return null;
 		Field[] field = t.getClass().getDeclaredFields();
 		for( int i = 0; i < field.length; i++ ) {
 			if( field[i].isAnnotationPresent( Id.class ) ) {
@@ -312,12 +419,12 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	}
 
 	public boolean createMapping( String indexName, Class<T> entityType ) {
-		if( !exists( elasticsearchConfig.getTransportClient(), indexName ) ) {
+		if( !exists( esConfig.getTransportClient(), indexName ) ) {
 			logger.warn( "index is not exist" );
 			return false;
 		}
 		PutMappingRequest mapping = Requests.putMappingRequest( indexName ).type( indexName ).source( getClassMapping( indexName, entityType ) );
-		PutMappingResponse response = elasticsearchConfig.getTransportClient().admin().indices().putMapping( mapping ).actionGet();
+		PutMappingResponse response = esConfig.getTransportClient().admin().indices().putMapping( mapping ).actionGet();
 		return response.isAcknowledged();
 	}
 

@@ -1,11 +1,9 @@
 package cn.com.higinet.tms.consumer.traffic;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -13,18 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-
-import com.google.common.collect.Maps;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
 import cn.com.higinet.tms.base.util.Clockz;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.common.config.ApplicationContextUtil;
 import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
-import cn.com.higinet.tms.common.elasticsearch.Listener;
+import cn.com.higinet.tms.common.elasticsearch.EsListener;
 
 @Service
 public class TrafficQueue implements DisposableBean {
@@ -32,24 +26,13 @@ public class TrafficQueue implements DisposableBean {
 	public String sss = Stringz.randomUUID();
 
 	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
-	private Long preSaveTime = System.currentTimeMillis();
 	private BlockingQueue<TrafficData> queue;
-	private Map<String, Object> commitMap = Maps.newConcurrentMap();
-	private Long consumerCount = 0L;
 
 	@Value("${elasticsearch.trafficdata.indexName}")
-	private String trafficDataIndexName; //trafficdata es索引名
+	private String trafficDataIndexName; //TrafficData ES索引名
 
 	@Value("${elasticsearch.trafficdata.queueCapacity}")
 	private int queueCapacity; //队列最大堆积数量，当超过时，put操作将堵塞
-
-	@Value("${elasticsearch.trafficdata.saveMaxSize}")
-	private int saveMaxSize; //单次提交的数量
-
-	@Value("${elasticsearch.trafficdata.saveWhenSize}")
-	private int saveWhenSize; //当queue达到一定数量时提交
-
-	private ThreadPoolTaskExecutor commitExecutor; //commit提交任务线程池
 
 	private ElasticSearchAdapter<TrafficData> elasticsearchAdapter;
 
@@ -58,111 +41,65 @@ public class TrafficQueue implements DisposableBean {
 	public void init() {
 		//初始化traffic数据队列
 		queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
+
 		try {
 			elasticsearchAdapter = ApplicationContextUtil.getBean( ElasticSearchAdapter.class );
 			logger.info( "elasticsearchAdapter is not null" );
+
+			elasticsearchAdapter.setListener( new EsListener<TrafficData>() {
+				@Override
+				public void before( Long executionId, List<TrafficData> allList ) {
+					Clockz.start( listenerId );
+					logBuffer.append( "数据开始提交：" + allList.size() );
+				}
+
+				@Override
+				public void onSuccess( Long executionId, List<TrafficData> sucList ) {
+					logBuffer.append( "; 成功提交ES数据：" + sucList.size() );
+				}
+
+				@Override
+				public void onError( Long executionId, List<TrafficData> failIdList ) {
+					logBuffer.append( "; 失败提交ES数据：" + failIdList.size() );
+					logger.error( "失败提交ES数据：" + failIdList.size() );
+				}
+
+				@Override
+				public void after( Long executionId, List<TrafficData> allList ) {
+					logBuffer.append( "; 数据提交完毕，耗时：" + Clockz.stop( listenerId ) );
+					logger.info( logBuffer.toString() );
+				}
+			} );
+
+			Thread thread = new Thread( new Runnable() {
+				@Override
+				public void run() {
+					try {
+						take();
+					}
+					catch( Exception e ) {
+						logger.error( e.getMessage(), e );
+					}
+				}
+			} );
+			thread.setDaemon( true );
+			thread.start();
 		}
 		catch( Exception e ) {
 			logger.info( "elasticsearchAdapter is null" );
 			return;
 		}
-
-		commitExecutor = new ThreadPoolTaskExecutor();
-		commitExecutor.setCorePoolSize( 4 ); //线程池维护线程的最小数量
-		commitExecutor.setMaxPoolSize( 16 ); //线程池维护线程的最大数量
-		commitExecutor.setQueueCapacity( 32 ); //持有等待执行的任务队列
-		commitExecutor.setKeepAliveSeconds( 120 ); //空闲线程的存活时间
-		commitExecutor.setDaemon( true );
-		commitExecutor.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() ); //DiscardPolicys模式，不能执行的任务将被删除
-		commitExecutor.initialize();
-	}
-
-	/**
-	 * 定时进行一次ES写入
-	 * 当并发量较小时，主要是定时提交起作用
-	 * fixedRate 并发执行模式
-	 * */
-	@Scheduled(fixedRate = 2000)
-	private void executeTask() {
-		int size = queue.size();
-		logger.info( "queue size is " + size );
-		if( (System.currentTimeMillis() - preSaveTime) > 1900 && size > 0 ) {
-			logger.info( "timer save" );
-			this.save( saveMaxSize );
-		}
 	}
 
 	public void put( TrafficData tarfficData ) throws Exception {
 		queue.put( tarfficData );
-
-		//当queue数量达到一定数量，将进行数据提交
-		//当并发量较大时，主要是按量提交起作用
-		if( queue.size() >= saveWhenSize ) {
-			this.save( saveMaxSize );
-		}
 	}
 
-	private void save( int size ) {
-		if( elasticsearchAdapter == null ) return;
-		preSaveTime = System.currentTimeMillis(); //无论成功与否，记录本次提交时间
-
-		commitExecutor.execute( new Runnable() {
-			@Override
-			public void run() {
-				try {
-					List<TrafficData> list = new ArrayList<TrafficData>();
-					synchronized( queue ) {
-						if( size > 0 ) { //按量提交
-							queue.drainTo( list, size );
-						}
-						else { //获取提交
-							queue.drainTo( list );
-						}
-					}
-					if( list.size() > 0 ) {
-						String clockId = Stringz.randomUUID();
-						Map<String, StringBuffer> logMap = Maps.newHashMap();
-
-						elasticsearchAdapter.batchUpdate( trafficDataIndexName, list, new Listener<TrafficData>() {
-							@Override
-							public void before( Long executionId, List<TrafficData> allList ) {
-								Clockz.start( clockId + "-" + Stringz.valueOf( executionId ) );
-								consumerCount = consumerCount + allList.size();
-								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
-								if( logs == null ) {
-									logs = new StringBuffer();
-									logMap.put( clockId + "-" + Stringz.valueOf( executionId ), logs );
-								}
-								logs.append( "数据提交总量：" + consumerCount );
-							}
-
-							@Override
-							public void onSuccess( Long executionId, List<TrafficData> sucList ) {
-								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
-								logs.append( "; 成功提交ES数据：" + sucList.size() );
-							}
-
-							@Override
-							public void onError( Long executionId, List<TrafficData> failIdList ) {
-								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
-								logs.append( "; 失败提交ES数据：" + failIdList.size() );
-							}
-
-							@Override
-							public void after( Long executionId, List<TrafficData> allList ) {
-								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
-								logs.append( "; 耗时：" + Clockz.stop( clockId + "-" + Stringz.valueOf( executionId ) ) );
-								logger.info( logs.toString() );
-							}
-						} );
-					}
-				}
-				catch( Exception e ) {
-					logger.error( e.getMessage(), e );
-				}
-
-			}
-		} );
+	public void take() throws Exception {
+		while( true ) {
+			TrafficData data = queue.poll( 200, TimeUnit.MILLISECONDS );
+			if( data != null ) elasticsearchAdapter.batchSubmit( trafficDataIndexName, data );
+		}
 	}
 
 	/**
@@ -172,10 +109,6 @@ public class TrafficQueue implements DisposableBean {
 	public void destroy() throws Exception {
 		while( queue.size() > 0 ) {
 			logger.info( "TrafficQueue is not empty, can't shutdown, waiting 1s" );
-			Thread.sleep( 1000 );
-		}
-		while( commitMap.size() > 0 ) {
-			logger.info( "Commit Task is not empty, can't shutdown, waiting 1s" );
 			Thread.sleep( 1000 );
 		}
 		logger.info( "TrafficQueue Shutdown" );
