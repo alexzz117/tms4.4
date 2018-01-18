@@ -35,6 +35,7 @@ public class TrafficQueue implements DisposableBean {
 	private Long preSaveTime = System.currentTimeMillis();
 	private BlockingQueue<TrafficData> queue;
 	private Map<String, Object> commitMap = Maps.newConcurrentMap();
+	private Long consumerCount = 0L;
 
 	@Value("${elasticsearch.trafficdata.indexName}")
 	private String trafficDataIndexName; //trafficdata es索引名
@@ -69,8 +70,9 @@ public class TrafficQueue implements DisposableBean {
 		commitExecutor = new ThreadPoolTaskExecutor();
 		commitExecutor.setCorePoolSize( 4 ); //线程池维护线程的最小数量
 		commitExecutor.setMaxPoolSize( 16 ); //线程池维护线程的最大数量
-		commitExecutor.setQueueCapacity( 8 ); //持有等待执行的任务队列
-		commitExecutor.setKeepAliveSeconds( 300 ); //空闲线程的存活时间
+		commitExecutor.setQueueCapacity( 32 ); //持有等待执行的任务队列
+		commitExecutor.setKeepAliveSeconds( 120 ); //空闲线程的存活时间
+		commitExecutor.setDaemon( true );
 		commitExecutor.setRejectedExecutionHandler( new ThreadPoolExecutor.DiscardPolicy() ); //DiscardPolicys模式，不能执行的任务将被删除
 		commitExecutor.initialize();
 	}
@@ -82,8 +84,11 @@ public class TrafficQueue implements DisposableBean {
 	 * */
 	@Scheduled(fixedRate = 2000)
 	private void executeTask() {
-		if( (System.currentTimeMillis() - preSaveTime) >= 2000 && queue.size() > 0 ) {
-			this.save( null );
+		int size = queue.size();
+		logger.info( "queue size is " + size );
+		if( (System.currentTimeMillis() - preSaveTime) > 1900 && size > 0 ) {
+			logger.info( "timer save" );
+			this.save( saveMaxSize );
 		}
 	}
 
@@ -97,47 +102,57 @@ public class TrafficQueue implements DisposableBean {
 		}
 	}
 
-	private void save( Integer size ) {
+	private void save( int size ) {
 		if( elasticsearchAdapter == null ) return;
 		preSaveTime = System.currentTimeMillis(); //无论成功与否，记录本次提交时间
 
 		commitExecutor.execute( new Runnable() {
 			@Override
 			public void run() {
-				Clockz.start();
-				String commitId = Stringz.randomUUID();
-				commitMap.put( commitId, commitId ); //将提交任务ID存入Map中，用于销毁Bean时判断是否存在还在进行中的任务
 				try {
 					List<TrafficData> list = new ArrayList<TrafficData>();
 					synchronized( queue ) {
-						if( size != null && size > 0 ) { //按量提交
-							if( queue.size() < size ) return;
-							else queue.drainTo( list, size );
+						if( size > 0 ) { //按量提交
+							queue.drainTo( list, size );
 						}
 						else { //获取提交
 							queue.drainTo( list );
 						}
 					}
 					if( list.size() > 0 ) {
+						String clockId = Stringz.randomUUID();
+						Map<String, StringBuffer> logMap = Maps.newHashMap();
+
 						elasticsearchAdapter.batchUpdate( trafficDataIndexName, list, new Listener<TrafficData>() {
 							@Override
-							public void before( List<TrafficData> allList ) {
-								logger.info( "开始提交ES数据：" + allList.size() );
+							public void before( Long executionId, List<TrafficData> allList ) {
+								Clockz.start( clockId + "-" + Stringz.valueOf( executionId ) );
+								consumerCount = consumerCount + allList.size();
+								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
+								if( logs == null ) {
+									logs = new StringBuffer();
+									logMap.put( clockId + "-" + Stringz.valueOf( executionId ), logs );
+								}
+								logs.append( "数据提交总量：" + consumerCount );
 							}
 
 							@Override
-							public void onSuccess( List<TrafficData> sucList ) {
-								logger.info( "成功提交ES数据：" + sucList.size() );
+							public void onSuccess( Long executionId, List<TrafficData> sucList ) {
+								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
+								logs.append( "; 成功提交ES数据：" + sucList.size() );
 							}
 
 							@Override
-							public void onError( List<TrafficData> failIdList ) {
-								logger.info( "失败提交ES数据：" + failIdList.size() );
+							public void onError( Long executionId, List<TrafficData> failIdList ) {
+								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
+								logs.append( "; 失败提交ES数据：" + failIdList.size() );
 							}
 
 							@Override
-							public void after( List<TrafficData> allList ) {
-								//logger.info( "结束提交ES数据：" + allList.size() );
+							public void after( Long executionId, List<TrafficData> allList ) {
+								StringBuffer logs = logMap.get( clockId + "-" + Stringz.valueOf( executionId ) );
+								logs.append( "; 耗时：" + Clockz.stop( clockId + "-" + Stringz.valueOf( executionId ) ) );
+								logger.info( logs.toString() );
 							}
 						} );
 					}
@@ -145,11 +160,7 @@ public class TrafficQueue implements DisposableBean {
 				catch( Exception e ) {
 					logger.error( e.getMessage(), e );
 				}
-				finally {
-					//提交任务完成后从Map中删除
-					commitMap.remove( commitId );
-					logger.info( "数据提交结束，耗时：" + Clockz.stop() );
-				}
+
 			}
 		} );
 	}

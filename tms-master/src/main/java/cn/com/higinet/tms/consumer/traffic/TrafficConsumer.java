@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
-
 import cn.com.higinet.tms.base.constant.Constants;
 import cn.com.higinet.tms.base.entity.Traffic;
 import cn.com.higinet.tms.base.entity.TrafficData;
@@ -25,11 +23,8 @@ public class TrafficConsumer {
 
 	@KafkaListener(topics = { Constants.Kafka.Topic.TRAFFIC })
 	public void listen( ConsumerRecord<String, Traffic> record ) throws Exception {
-
-		logger.info( JSON.toJSONString( record.value().getTarffic() ) );
-
-		TrafficData trafficData = record.value().getTrafficData();
-		if( trafficData == null ) trafficData = this.createData();
+		//logger.info( JSON.toJSONString( record.value().getTarffic() ) );
+		TrafficData trafficData = this.createData();
 		trafficQueue.put( trafficData );
 	}
 

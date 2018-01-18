@@ -40,8 +40,6 @@ public class EsBulkProcess {
 	public <T> BulkProcessor getBulkProcessor( ElasticSearchConfig elasticsearchConfig, Map<String, T> dataMap, Listener<T> listener ) {
 		List<T> failList = new ArrayList<T>();
 		List<T> sucList = new ArrayList<T>();
-		List<T> allList = new ArrayList<T>();
-		allList.addAll( dataMap.values() );
 
 		BulkProcessor bulkProcessor = BulkProcessor.builder( elasticsearchConfig.getTransportClient(), new BulkProcessor.Listener() {
 			/**
@@ -49,7 +47,9 @@ public class EsBulkProcess {
 			 * */
 			@Override
 			public void beforeBulk( long executionId, BulkRequest request ) {
-				listener.before( allList );
+				List<T> list = new ArrayList<T>();
+				list.addAll( dataMap.values() );
+				listener.before( executionId, list );
 			}
 
 			/**
@@ -57,22 +57,25 @@ public class EsBulkProcess {
 			 * */
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, BulkResponse response ) {
+				List<T> allList = new ArrayList<T>();
+				allList.addAll( dataMap.values() );
+
 				//部分提交成功
 				if( response.hasFailures() ) {
 					for( BulkItemResponse bulkItemResponse : response ) {
 						if( bulkItemResponse.isFailed() ) failList.add( dataMap.get( bulkItemResponse.getId() ) );
 						else sucList.add( dataMap.get( bulkItemResponse.getId() ) );
 					}
-					if( sucList.size() > 0 ) listener.onSuccess( sucList );
-					if( failList.size() > 0 ) listener.onError( failList );
+					if( sucList.size() > 0 ) listener.onSuccess( executionId, sucList );
+					if( failList.size() > 0 ) listener.onError( executionId, failList );
 				}
 				//全部成功
 				else {
-					listener.onSuccess( allList );
+					listener.onSuccess( executionId, allList );
 				}
 
 				//完毕时
-				listener.after( allList );
+				listener.after( executionId, allList );
 			}
 
 			/**
@@ -80,10 +83,12 @@ public class EsBulkProcess {
 			 * */
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
+				List<T> allList = new ArrayList<T>();
+				allList.addAll( dataMap.values() );
 				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() + ",afterBulk2 numberOfActions:" + request.numberOfActions() );
-				listener.onError( allList );
+				listener.onError( executionId, allList );
 				//完毕时
-				listener.after( allList );
+				listener.after( executionId, allList );
 			}
 
 		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )

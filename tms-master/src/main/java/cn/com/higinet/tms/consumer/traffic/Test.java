@@ -20,12 +20,9 @@ public class Test {
 
 	@RequestMapping(value = "testBatchUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String testBatchUpdate() {
-		try {
+	public String testBatchUpdate() throws Exception {
+		for( int i = 0; i < 20; i++ ) {
 			trafficQueue.put( createData() );
-		}
-		catch( Exception e ) {
-			e.printStackTrace();
 		}
 		return "aaa";
 	}
