@@ -16,6 +16,8 @@
  */
 package cn.com.higinet.tms35.core.persist;
 
+import java.util.Map;
+
 import cn.com.higinet.tms.common.lang.Initializable;
 import cn.com.higinet.tms35.run.run_env;
 import cn.com.higinet.tms35.run.run_txn_values;
@@ -68,4 +70,11 @@ public interface Traffic extends Initializable {
 	 */
 	public void setInDB(run_txn_values newValue) throws Exception;
 
+	/**
+	 * 将run_txn_values转换成map
+	 *
+	 * @param rf the rf
+	 * @return the map
+	 */
+	public Map<String, Object> list2map(run_txn_values rf);
 }

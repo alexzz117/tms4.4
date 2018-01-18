@@ -32,12 +32,7 @@ import cn.com.higinet.tms.common.cache.Cache;
 import cn.com.higinet.tms.common.cache.CacheManager;
 import cn.com.higinet.tms.common.cache.CacheProvider;
 import cn.com.higinet.tms.common.cache.KV;
-import cn.com.higinet.tms.common.event.EventBus;
-import cn.com.higinet.tms.common.event.EventContext;
 import cn.com.higinet.tms.common.util.ByteUtils;
-import cn.com.higinet.tms.event.Params;
-import cn.com.higinet.tms.event.Topics;
-import cn.com.higinet.tms.event.modules.kafka.KafkaTopics;
 import cn.com.higinet.tms35.comm.str_tool;
 import cn.com.higinet.tms35.core.bean;
 import cn.com.higinet.tms35.core.cache.db_cache;
@@ -80,9 +75,6 @@ public class CacheTrafficImpl implements Traffic {
 
 	@Autowired
 	private CacheManager cacheManager;
-
-	@Autowired
-	private EventBus eventBus;
 
 	private linear<db_fd> trafficFields;
 
@@ -131,13 +123,6 @@ public class CacheTrafficImpl implements Traffic {
 			existsValues.m_txn_data.clear();
 			existsValues.m_txn_data.addAll(value.m_txn_data);
 			cache.set(new KV(TRANSACTION_GROUP, value.get_txn_code(), valuesToBytes(existsValues)));//这里是应答客户端之前的同步写库，让流水先进缓存
-			//***************************************************************************************************
-			EventContext event = new EventContext(Topics.TO_KAFKA);
-			event.setData(Params.KAFKA_TOPIC, KafkaTopics.TRAFFIC);
-			event.setData(Params.KAFKA_DATA, list2map(value));
-			event.setData(Params.KAFKA_USE_PARTITION, true);
-			event.setData(Params.KAFKA_PARTITION_KEY, value.m_env.get_dispatch());
-			eventBus.publish(event);
 		} finally {
 			if (cache != null) {
 				cache.close();
@@ -146,7 +131,7 @@ public class CacheTrafficImpl implements Traffic {
 		return existsValues;
 	}
 
-	private Map<String, Object> list2map(run_txn_values rf) {
+	public Map<String, Object> list2map(run_txn_values rf) {
 		if (trafficFields == null) {
 			synchronized (CacheTrafficImpl.class) {
 				db_tab.cache tabCache = db_cache.get().table();

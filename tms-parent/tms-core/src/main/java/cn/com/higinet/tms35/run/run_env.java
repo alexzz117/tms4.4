@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.com.higinet.rapid.server.message.Message;
+import cn.com.higinet.tms.base.entity.online.tms_run_rule_action_hit;
+import cn.com.higinet.tms.base.entity.online.tms_run_ruletrig;
 import cn.com.higinet.tms.common.event.EventBus;
 import cn.com.higinet.tms.common.event.EventContext;
 import cn.com.higinet.tms.event.Params;
@@ -41,7 +43,6 @@ import cn.com.higinet.tms35.core.concurrent.counter;
 import cn.com.higinet.tms35.core.cond.func_map;
 import cn.com.higinet.tms35.core.cond.node;
 import cn.com.higinet.tms35.core.dao.dao_combin;
-import cn.com.higinet.tms35.core.persist.Filter;
 import cn.com.higinet.tms35.core.persist.Traffic;
 import cn.com.higinet.tms35.service.io_env;
 import cn.com.higinet.tms4.model.common.StringUtil;
@@ -634,7 +635,9 @@ public final class run_env extends run_time {
 	//	}
 
 	public void save_txn_data_ansync(dao_combin dc2) throws Exception {
+
 		m_rf.m_env = this;
+		cn.com.higinet.tms.base.entity.Traffic traffic = new cn.com.higinet.tms.base.entity.Traffic();
 		m_rf.set_fd(field_cache().INDEX_FINISHTIME, tm_tool.lctm_ms());
 		//		if (StaticParameters.TXN_STATUS_SUCCESS.equals(this.get_txn_status())) {
 		//			m_rf.update_ref_tabdata(dc, dc2); //更新签约数据移到引擎外部
@@ -651,37 +654,48 @@ public final class run_env extends run_time {
 			} //added by wujw,20160108,挂起交易重新发送确认时更新处置/PSTATUS end
 		} else {
 			alarm_assing_by_disposal();//评估才走分派,确认无需再分派
-			//			if (m_hit_rules != null && !m_hit_rules.isEmpty())
-			//				dc.set_rule_hit(m_hit_rules);
-			/*********规则触发信息发送到kafka**********/
-			EventContext event = new EventContext(Topics.TO_KAFKA);
-			event.setData(Params.KAFKA_TOPIC, KafkaTopics.RULE_HIT);
-			event.setData(Params.KAFKA_DATA, m_hit_rules);
-			eventBus.publish(event);
-			//			if (m_hit_rule_acts != null && !m_hit_rule_acts.isEmpty())
-			//				dc.set_rule_action_hit(m_hit_rule_acts);
-			/*********规则Action触发信息发送到kafka**********/
-			event = new EventContext(Topics.TO_KAFKA);
-			event.setData(Params.KAFKA_TOPIC, KafkaTopics.RULE_ACTION_HIT);
-			event.setData(Params.KAFKA_DATA, m_hit_rule_acts);
-			eventBus.publish(event);
-		}
-
-		//*******************************tms V4.3保存交易流水*********************************
-		trafficdata.save(m_rf, new Filter<run_txn_values>() {
-			@Override
-			public boolean filter(run_txn_values existsValues) {
-				if (existsValues == null) {
-					return true;
-				}
-				Object status = existsValues.get_fd(m_txn.g_dc.field().INDEX_TXNSTATUS);
-				return status == null; //不存在状态时候才可以更新
+			if (m_hit_rules != null && !m_hit_rules.isEmpty()) {
+				/*********规则触发信息发送到kafka**********/
+				List<tms_run_ruletrig> rs = new ArrayList<>();
+				m_hit_rules.stream().forEach(r -> {
+					tms_run_ruletrig ruleTrig = new tms_run_ruletrig();
+					ruleTrig.setCreateTime(System.currentTimeMillis());
+					ruleTrig.setMessage(r.message);
+					ruleTrig.setNumTimes((long) r.numtimes);
+					ruleTrig.setRuleScore(Double.valueOf(r.rule_score).longValue());
+					ruleTrig.setTxnCode(r.txncode);
+					ruleTrig.setTxnType(r.txntype);
+					ruleTrig.setRuleId((long) r.ruleid);
+					rs.add(ruleTrig);
+				});
+				traffic.setRuletrigs(rs);
 			}
-
-		});
-		//*************************************************************************************
-		//		m_ie.pin_time(io_env.INDEX_TRANS_TO_COMMIT);
-		//		risk_commit.commit_pool().request(dc);
+			if (m_hit_rule_acts != null && !m_hit_rule_acts.isEmpty()) {
+				/*********规则Action触发信息发送到kafka**********/
+				List<tms_run_rule_action_hit> rs = new ArrayList<>();
+				m_hit_rule_acts.stream().forEach(r -> {
+					tms_run_rule_action_hit ruleActionHit = new tms_run_rule_action_hit();
+					ruleActionHit.setAcCond(r.ac_cond);
+					ruleActionHit.setCreateTime(System.currentTimeMillis());
+					ruleActionHit.setAcId((long)r.acid);
+					ruleActionHit.setLoacExpr(r.ac_expr);
+					ruleActionHit.setTxnCode(r.txncode);
+					ruleActionHit.setTxnType(r.txntype);
+					ruleActionHit.setRuleId((long)r.ruleid);
+					rs.add(ruleActionHit);
+				});
+				traffic.setRuleActionHit(rs);
+			}
+		}
+		traffic.setTarffic(trafficdata.list2map(m_rf));
+		//***************************************************************************************************
+		EventContext event = new EventContext(Topics.TO_KAFKA);
+		event.setData(Params.KAFKA_TOPIC, KafkaTopics.TRAFFIC);
+		event.setData(Params.KAFKA_DATA, traffic);
+		event.setData(Params.KAFKA_USE_PARTITION, true);
+		event.setData(Params.KAFKA_PARTITION_KEY, get_dispatch());
+		eventBus.publish(event);
+		trafficdata.save(m_rf, null);
 	}
 
 	public String eval_strategy() {
