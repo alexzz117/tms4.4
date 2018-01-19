@@ -157,7 +157,7 @@
                   <el-input v-model="dialogForm.rule_score" auto-complete="off" :style="formItemContentStyle" :disabled="readonlyParent"></el-input>
                 </el-form-item>
 
-                <el-form-item label="是否测试:" class="is-required" :label-width="formLabelWidth" prop="rule_istest" :style="formItemStyle">
+                <el-form-item label="是否测试:" :label-width="formLabelWidth" prop="rule_istest" :style="formItemStyle">
                   <el-switch
                     :disabled="readonlyParent"
                     v-model="dialogForm.rule_istest"
@@ -167,7 +167,7 @@
                   </el-switch>
                 </el-form-item>
 
-                <el-form-item label="有效性:" class="is-required" :label-width="formLabelWidth" prop="rule_enable" :style="formItemStyle" >
+                <el-form-item label="有效性:" :label-width="formLabelWidth" prop="rule_enable" :style="formItemStyle" >
                   <el-switch
                     :disabled="readonlyParent"
                     v-model="dialogForm.rule_enable"
