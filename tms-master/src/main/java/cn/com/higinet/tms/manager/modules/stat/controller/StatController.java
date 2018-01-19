@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,8 +83,8 @@ public class StatController {
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
 	public Model listStatAction( @RequestBody Map<String, Object> reqs ) {
 		Model model = new Model();
-		List<Map<String, Object>> statList = statService.statList( reqs );
-		model.setRow( statList );
+		Page<Map<String, Object>> statList = statService.statList( reqs );
+		model.setPage( statList );
 		model.set( "enableStoreFd", transModelService.getAvailableStoreFd( MapUtil.getString( reqs, "txnId" ) ) );
 		model.set( "allStoreFd", transModelService.getAllStoreFd() );
 		return model;

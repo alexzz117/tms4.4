@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.manager.dao.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,10 +97,10 @@ public class StatService {
 	* @param conds查询条件
 	* @return 统计配置列表
 	 */
-	public List<Map<String, Object>> statList( Map<String, Object> conds ) {
-		return offlineSimpleDao.queryForList(
+	public Page<Map<String, Object>> statList(Map<String, Object> conds ) {
+		return offlineSimpleDao.pageQuery(
 				"SELECT STAT_ID,STAT_NAME,STAT_DESC,STAT_TXN,STAT_PARAM,STAT_COND, STAT_COND_IN, RESULT_COND,STAT_DATAFD,STAT_FN,COUNUNIT,COUNTROUND,STAT_UNRESULT,DATATYPE,CONTINUES,STAT_VALID,FN_PARAM,'' MARK ,STORECOLUMN FROM TMS_COM_STAT WHERE STAT_TXN=:txnId ORDER BY STAT_NAME",
-				conds );
+				conds , new Order());
 	}
 
 	/**
