@@ -1,52 +1,52 @@
 <template>
   <div>
-        <transition name="fade">
-          <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
-                   :inline="true" style="text-align: left" v-show="queryFormShow" >
-            <el-form-item label="规则名称:" prop="stat_name">
-              <el-input v-model="queryShowForm.rule_shortdesc" class="rule-query-form-item" auto-complete="off" clearable></el-input>
-            </el-form-item>
+        <!--<transition name="fade">-->
+          <!--<el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"-->
+                   <!--:inline="true" style="text-align: left" v-show="queryFormShow" >-->
+            <!--<el-form-item label="规则名称:" prop="stat_name">-->
+              <!--<el-input v-model="queryShowForm.rule_shortdesc" class="rule-query-form-item" auto-complete="off" clearable></el-input>-->
+            <!--</el-form-item>-->
 
-            <el-form-item label="评估类型:" prop="eval_type">
-              <el-select v-model="queryShowForm.eval_type" class="rule-query-form-item" placeholder="请选择"
-                         clearable>
-                <el-option
-                  v-for="item in evalTypeList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
+            <!--<el-form-item label="评估类型:" prop="eval_type">-->
+              <!--<el-select v-model="queryShowForm.eval_type" class="rule-query-form-item" placeholder="请选择"-->
+                         <!--clearable>-->
+                <!--<el-option-->
+                  <!--v-for="item in evalTypeList"-->
+                  <!--:key="item.value"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.value">-->
+                <!--</el-option>-->
 
-              </el-select>
+              <!--</el-select>-->
 
-            </el-form-item>
-            <el-form-item label="处置方式:" prop="disposal">
-              <el-select v-model="queryShowForm.disposal" class="rule-query-form-item" placeholder="请选择"
-                         clearable>
-                <el-option
-                  v-for="item in disposalList"
-                  :key="item.dp_code"
-                  :label="item.dp_name"
-                  :value="item.dp_code">
-                </el-option>
+            <!--</el-form-item>-->
+            <!--<el-form-item label="处置方式:" prop="disposal">-->
+              <!--<el-select v-model="queryShowForm.disposal" class="rule-query-form-item" placeholder="请选择"-->
+                         <!--clearable>-->
+                <!--<el-option-->
+                  <!--v-for="item in disposalList"-->
+                  <!--:key="item.dp_code"-->
+                  <!--:label="item.dp_name"-->
+                  <!--:value="item.dp_code">-->
+                <!--</el-option>-->
 
-              </el-select>
-            </el-form-item>
-            <el-form-item label="有效性:" prop="rule_enable">
-              <el-select v-model="queryShowForm.rule_enable" class="rule-query-form-item" placeholder="请选择"
-                         clearable>
-                <el-option
-                  v-for="item in ruleEnableList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
+              <!--</el-select>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="有效性:" prop="rule_enable">-->
+              <!--<el-select v-model="queryShowForm.rule_enable" class="rule-query-form-item" placeholder="请选择"-->
+                         <!--clearable>-->
+                <!--<el-option-->
+                  <!--v-for="item in ruleEnableList"-->
+                  <!--:key="item.value"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.value">-->
+                <!--</el-option>-->
 
-              </el-select>
-            </el-form-item>
-          </el-form>
+              <!--</el-select>-->
+            <!--</el-form-item>-->
+          <!--</el-form>-->
 
-        </transition>
+        <!--</transition>-->
 
         <div style="margin-bottom: 10px;text-align: left ">
 
@@ -55,7 +55,7 @@
             <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off" clearable>
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
-            <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+            <!--<el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>-->
           </div>
         </div>
     <section class="table">
@@ -66,7 +66,7 @@
 
           <el-table-column
             label="操作"
-            width="150">
+            width="120">
             <template slot-scope="scope">
 
               <el-button v-if="readonlyParent" type="text" size="small" icon="el-icon-view" title="查看"  @click="openDialog('edit', scope.row)"></el-button>
@@ -74,7 +74,7 @@
 
               <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copy(scope.row)" :disabled="readonlyParent"></el-button>
               <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)" :disabled="readonlyParent"></el-button>
-              <el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>
+              <!--<el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>-->
 
             </template>
           </el-table-column>
@@ -157,7 +157,7 @@
                   <el-input v-model="dialogForm.rule_score" auto-complete="off" :style="formItemContentStyle" :disabled="readonlyParent"></el-input>
                 </el-form-item>
 
-                <el-form-item label="是否测试:" class="is-required" :label-width="formLabelWidth" prop="rule_istest" :style="formItemStyle">
+                <el-form-item label="是否测试:" :label-width="formLabelWidth" prop="rule_istest" :style="formItemStyle">
                   <el-switch
                     :disabled="readonlyParent"
                     v-model="dialogForm.rule_istest"
@@ -167,7 +167,7 @@
                   </el-switch>
                 </el-form-item>
 
-                <el-form-item label="有效性:" class="is-required" :label-width="formLabelWidth" prop="rule_enable" :style="formItemStyle" >
+                <el-form-item label="有效性:" :label-width="formLabelWidth" prop="rule_enable" :style="formItemStyle" >
                   <el-switch
                     :disabled="readonlyParent"
                     v-model="dialogForm.rule_enable"

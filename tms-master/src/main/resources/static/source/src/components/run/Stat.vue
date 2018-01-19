@@ -4,55 +4,55 @@
 
       <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
                :inline="true" style="text-align: left" v-show="queryFormShow" >
-        <el-form-item label="统计名称:" prop="stat_name">
-          <el-input v-model="queryShowForm.stat_name" class="stat-query-form-item" auto-complete="off" clearable></el-input>
-        </el-form-item>
-        <el-form-item label="统计描述:" prop="stat_desc">
-          <el-input v-model="queryShowForm.stat_desc" class="stat-query-form-item" auto-complete="off" clearable></el-input>
-        </el-form-item>
-        <el-form-item label="统计引用对象:" prop="stat_param">
+        <!--<el-form-item label="统计名称:" prop="stat_name">-->
+          <!--<el-input v-model="queryShowForm.stat_name" class="stat-query-form-item" auto-complete="off" clearable></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="统计描述:" prop="stat_desc">-->
+          <!--<el-input v-model="queryShowForm.stat_desc" class="stat-query-form-item" auto-complete="off" clearable></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="统计引用对象:" prop="stat_param">-->
 
-          <AllPickSelect :dataList="statParamList" @dataChange="statParamDataChange" class="stat-query-form-item"></AllPickSelect>
+          <!--<AllPickSelect :dataList="statParamList" @dataChange="statParamDataChange" class="stat-query-form-item"></AllPickSelect>-->
 
-        </el-form-item>
-        <el-form-item label="统计目标:" prop="stat_datafd">
+        <!--</el-form-item>-->
+        <!--<el-form-item label="统计目标:" prop="stat_datafd">-->
 
-          <el-select v-model="queryShowForm.stat_datafd" class="stat-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in statDataFdList"
-              :key="item.code_key"
-              :label="item.code_value"
-              :value="item.code_key">
-            </el-option>
+          <!--<el-select v-model="queryShowForm.stat_datafd" class="stat-query-form-item" placeholder="请选择"-->
+                     <!--clearable>-->
+            <!--<el-option-->
+              <!--v-for="item in statDataFdList"-->
+              <!--:key="item.code_key"-->
+              <!--:label="item.code_value"-->
+              <!--:value="item.code_key">-->
+            <!--</el-option>-->
 
-          </el-select>
+          <!--</el-select>-->
 
-        </el-form-item>
-        <el-form-item label="统计函数:" prop="stat_fn">
-          <el-select v-model="queryShowForm.stat_fn" class="stat-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in statFnList"
-              :key="item.code_key"
-              :label="item.code_value"
-              :value="item.code_key">
-            </el-option>
+        <!--</el-form-item>-->
+        <!--<el-form-item label="统计函数:" prop="stat_fn">-->
+          <!--<el-select v-model="queryShowForm.stat_fn" class="stat-query-form-item" placeholder="请选择"-->
+                     <!--clearable>-->
+            <!--<el-option-->
+              <!--v-for="item in statFnList"-->
+              <!--:key="item.code_key"-->
+              <!--:label="item.code_value"-->
+              <!--:value="item.code_key">-->
+            <!--</el-option>-->
 
-          </el-select>
-        </el-form-item>
-        <el-form-item label="有效性:" prop="stat_valid">
-          <el-select v-model="queryShowForm.stat_valid" class="stat-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in statValidList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+          <!--</el-select>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="有效性:" prop="stat_valid">-->
+          <!--<el-select v-model="queryShowForm.stat_valid" class="stat-query-form-item" placeholder="请选择"-->
+                     <!--clearable>-->
+            <!--<el-option-->
+              <!--v-for="item in statValidList"-->
+              <!--:key="item.value"-->
+              <!--:label="item.label"-->
+              <!--:value="item.value">-->
+            <!--</el-option>-->
 
-          </el-select>
-        </el-form-item>
+          <!--</el-select>-->
+        <!--</el-form-item>-->
       </el-form>
 
     </transition>
@@ -67,10 +67,14 @@
       <!--<el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>-->
       <!--<el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>-->
       <div class="stat-query-box">
+        <el-input v-model="queryShowForm.stat_name" placeholder="统计名称" class="stat-query-form-item" auto-complete="off" clearable>
+          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+        </el-input>
+
         <el-input v-model="queryShowForm.stat_desc" placeholder="统计描述" class="stat-query-form-item" auto-complete="off" clearable>
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
-        <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+        <!--<el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>-->
       </div>
     </div>
     <section class="table">
@@ -127,7 +131,19 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     :current-page="currentPage"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pageSize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total"
+      >
+      </el-pagination>
     </section>
+
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px" :close-on-click-modal="false">
       <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true" :rules="dialogFormRules">
@@ -455,7 +471,7 @@
           stat_desc: [
             { required: true, message: '请输入统计描述', trigger: 'blur' },
             { max: 200, message: '长度在200个字符以内', trigger: 'blur' },
-            { validator: check.checkFormZhSpecialCharacter, trigger: 'blur' }
+            { validator: check.checkFormZhSpecialCharacterHasPunctuation, trigger: 'blur' }
           ],
           stat_cond: [
             { validator: this.checkStatCond, trigger: 'blur' }
@@ -611,6 +627,16 @@
           stat_valid: '1'
         }
       },
+      handleSizeChange (val) {
+        // console.log(`每页 ${val} 条`)
+        this.currentPage = 1
+        this.pageSize = val
+        this.getData()
+      },
+      handleCurrentChange (val) {
+        this.currentPage = val
+        this.getData()
+      },
       // 选中列 现在没用了
       handleSelectionChange(rows) {
         this.selectedRows = rows
@@ -627,19 +653,29 @@
       getData () {
         let self = this
         let paramsObj = {
+          pageindex: this.currentPage,
+          pagesize: this.pageSize,
           txnId: this.txnIdParent
         }
         ajax.post({
           url: '/stat/list',
           param: paramsObj,
           success: function (data) {
-            if (data.row) {
-              self.tableData = data.row
+            // if (data.row) {
+              self.bindGridData(data)
+              // self.tableData = data.row
               self.allStoreFd = data.allstorefd
               self.enableStoreFd = data.enablestorefd
-            }
+            // }
           }
         })
+      },
+      bindGridData (data) {
+        this.tableData = data.page.list
+        // 加上这个会出现页码之间来回跳的问题
+        // this.currentPage = data.page.index
+        this.pageSize = data.page.size
+        this.total = data.page.total
       },
       // 获取统计引用对象，统计目标 统计函数 的下拉值
       getStatParamSelectData() {
@@ -816,6 +852,7 @@
         }, 100)
       },
       openRefsDialog(row) {
+
         this.selTree(row)
         this.refsDialogVisible = true
       },
@@ -1269,7 +1306,7 @@
         let countround = this.dialogForm.countround
         let isCaExFunc = this.dialogForm.stat_fn === 'calculat_expressions'
         if (!isCaExFunc) {
-          if (coununit !== '7' || coununit !== '9') { // 永久，会话不需要周期
+          if (coununit !== '7' && coununit !== '9') { // 永久，会话不需要周期
             if (util.trim(countround) === '') {
               return callback(new Error(`请输入周期`))
             } else {
@@ -1315,6 +1352,8 @@
       // 查询树结构
       selTree(selectRow) {
         var self = this
+        this.treeList = []
+        this.refsTreeData = []
         let params = {
           txnId: this.txnIdParent,
           statName: selectRow.stat_name

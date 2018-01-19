@@ -173,18 +173,18 @@
         </template>
       </el-table-column>
       <el-table-column prop="disposal" label="处置方式" align="left"></el-table-column>
-      <el-table-column label="处置结果" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.iscorrect | renderIscorrect}}</span>
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="处置结果" align="left">-->
+        <!--<template slot-scope="scope">-->
+          <!--<span>{{scope.row.iscorrect | renderIscorrect}}</span>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
 
-      <el-table-column prop="assign_name" label="分派人员" align="left"></el-table-column>
-      <el-table-column label="分派时间" align="left">
-        <template slot-scope="scope">
-          <span>{{scope.row.assigntime | renderDateTime}}</span>
-        </template>
-      </el-table-column>
+      <!--<el-table-column prop="assign_name" label="分派人员" align="left"></el-table-column>-->
+      <!--<el-table-column label="分派时间" align="left">-->
+        <!--<template slot-scope="scope">-->
+          <!--<span>{{scope.row.assigntime | renderDateTime}}</span>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column prop="oper_name" label="处理人员" align="left"></el-table-column>
       <el-table-column label="处理时间" align="left">
         <template slot-scope="scope">

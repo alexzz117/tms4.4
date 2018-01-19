@@ -226,9 +226,9 @@
       'statCondInDictDialogForm.stat_cond_value': function (val) {
         this.searchCondName(val, 1)
       },
-      'statCondInDictDialogForm.stat_cond_in': function (val) {
-        this.searchCondName(val, 2)
-      }
+      // 'statCondInDictDialogForm.stat_cond_in': function (val) {
+      //   this.searchCondName(val, 2)
+      // }
     },
     mounted: function () {
       this.$nextTick(function () {
@@ -369,6 +369,10 @@
                 value.code_value = `${value.code_value}(${value.code_key})`
                 self.statDatafdList.push(value)
               }
+
+              self.statDatafdList.sort(function compareFunction (param1, param2) {
+                return param1.code_value.localeCompare(param2.code_value, 'zh')
+              })
             }
           }
         })
