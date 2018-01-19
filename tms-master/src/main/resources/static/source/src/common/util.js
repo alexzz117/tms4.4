@@ -408,7 +408,7 @@ var util = {
     if (rootNodes === undefined || rootNodes.length === 0) {
       rootNodes = []
       for (var i in list) {
-        if (list[i].fid === undefined || list[i].fid === null || list[i].fid === '') {
+        if (list[i].fid === undefined || list[i].fid === null || list[i].fid === '' || list[i].fid === '-1') {
           if (list[i].id !== undefined && list[i].id !== null && list[i].id !== '') {
             rootNodes.push(list[i])
           }

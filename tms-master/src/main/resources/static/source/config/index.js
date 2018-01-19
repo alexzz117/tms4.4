@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/context': {
-        target: 'http://localhost:3000/',//设置你调用的接口域名和端口号 别忘了加http
+        target: 'http://localhost:8070/',//设置你调用的接口域名和端口号 别忘了加http
         changeOrigin: true
         // pathRewrite: {
         //   '^/tms-web': '/'//这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://40.00.100.100:3002/user/add'，直接写‘/api/user/add’即可
@@ -66,10 +66,13 @@ module.exports = {
 
   build: {
     // Template for index.html
-    index: path.resolve(__dirname, '../dist/index.html'),
+    // index: path.resolve(__dirname, '../dist/index.html'),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../dist'),
+    // assetsRoot: path.resolve(__dirname, '../dist'),
+
+    index: path.resolve(__dirname, '../../index.html'),
+    assetsRoot: path.resolve(__dirname, '../../'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
 

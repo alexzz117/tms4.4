@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>名单值管理 -> {{ title }}</h1>
+    <!--<h1>名单值管理 -> {{ title }}</h1>-->
     <div class="toolbar">
       <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
       <!--<el-button plain class="el-icon-edit" @click="openDialog('edit')" :disabled="btnStatus">编辑</el-button>-->
@@ -204,7 +204,9 @@
           param: param,
           success: function (data) {
             self.listData = data.row
-            self.title = data.row.rosterdesc
+//            self.title = data.row.rosterdesc
+            let title = `名单值管理->${data.row.rosterdesc}`
+            self.Hub.$emit('changeModeName', title); //Hub触发事件
             if (cb) {
               cb()
             }
@@ -345,6 +347,7 @@
         this.valuecurrentRow = val;
       },
       backList() {
+        self.Hub.$emit('changeModeName', '名单管理'); //Hub触发事件
         this.$router.push({ name: 'list' })
       },
       handleRow(index, row, oper) {
@@ -451,7 +454,6 @@
           remark: ""
         },
         dialogTitle: "",
-        title: "",
         formLabelWidth: '100px',
         rules: {
           rostervalue: [

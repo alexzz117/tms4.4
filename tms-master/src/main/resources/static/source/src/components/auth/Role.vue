@@ -80,7 +80,7 @@
           <el-input type="textarea" v-model="roleDialogform.info"></el-input>
         </el-form-item>
         <el-form-item label="" :label-width="formLabelWidth">
-          <el-button type="primary" @click="submitForm('roleDialogform')" :disabled="savebtnStatus">保 存</el-button>
+          <el-button type="primary" @click="submitForm('roleDialogform')">保 存</el-button>
           <el-button @click="roleDialogVisible = false">取 消</el-button>
         </el-form-item>
       </el-form>
@@ -99,7 +99,7 @@
           :props="defaultProps">
         </el-tree>
         <div style="text-align: left; margin: 20px">
-          <el-button type="primary" @click="saveGrant" :disabled="savebtnStatus">保 存</el-button>
+          <el-button type="primary" @click="saveGrant">保 存</el-button>
           <el-button @click="grantDialogVisible = false">取 消</el-button>
         </div>
       </div>
@@ -132,7 +132,6 @@
         })
       },
       openDialog(flag) {
-        this.savebtnStatus = false
         this.flag = flag
         if (flag === 'edit') {
           this.dialogTitle = '编辑角色'
@@ -191,7 +190,6 @@
       },
       add() {
         var self = this
-        this.savebtnStatus = true
         ajax.post({
           url: '/role/add',
           param: this.roleDialogform,
@@ -200,7 +198,6 @@
               type: 'success',
               message: '创建成功'
             })
-            this.savebtnStatus = false
             self.roleDialogVisible = false
             self.sel()
           }
@@ -257,7 +254,6 @@
       },
       update() {
         var self = this;
-        this.savebtnStatus = true
         ajax.post({
           url: '/role/mod',
           param: this.roleDialogform,
@@ -266,7 +262,6 @@
               type: 'success',
               message: '编辑成功'
             })
-            this.savebtnStatus = false
             self.roleDialogVisible = false
             self.sel()
           }
@@ -305,7 +300,6 @@
       },
       saveGrant () {
         var self = this
-        this.savebtnStatus = true
         ajax.post({
           url: '/role/grant/mod',
           param: {
@@ -317,7 +311,6 @@
               type: 'success',
               message: '编辑成功'
             })
-            self.savebtnStatus = false
             self.grantDialogVisible = false
             self.sel()
           }
@@ -395,7 +388,6 @@
         dialogTitle: '',
         formLabelWidth: '100px',
         btnStatus: true,
-        savebtnStatus: false,
         rules: {
           role_name: [
             { required: true, message: '请输入角色名称', trigger: 'blur' },

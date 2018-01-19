@@ -13,7 +13,7 @@ import axios from 'axios';
 import echarts from 'echarts'
 import 'babel-polyfill'
 
-Vue.prototype.$axios=axios;
+Vue.prototype.$axios = axios;
 Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
@@ -24,18 +24,18 @@ Vue.config.productionTip = false
 // Vue.component('alarmEventQuery', AlarmEventQuery)
 import dictCode from '@/common/dictCode'
 
-let vue = null
+let Hub = new Vue(); //创建事件中心
+Vue.prototype.Hub = Hub;
 
-vue = /* eslint-disable no-new */
-  new Vue({
-    el: '#app',
-    router,
-    beforeCreate: function () {
-      dictCode.getCodeData()
-    },
-    template: '<App/>',
-    components: { App }
-  })
+new Vue({
+  el: '#app',
+  router,
+  beforeCreate: function () {
+    dictCode.getCodeData()
+  },
+  template: '<App/>',
+  components: { App }
+})
 
 
 

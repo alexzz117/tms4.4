@@ -259,6 +259,7 @@
         var self = this
         ajax.post({
           url: '/func/tree',
+          param: {},
           success: function (data) {
             if (data.list) {
               var rootNodes = { // 根节点
@@ -271,10 +272,10 @@
                 icon: 'ticon-root',
                 onum: 0
               }
-              var treeList = [rootNodes]
-              treeList = treeList.concat(data.list)
-              self.treeList = treeList
-              self.treeData = util.formatTreeData(treeList)
+//              var treeList = [rootNodes]
+//              treeList = treeList.concat(data.list)
+//              self.treeList = treeList
+              self.treeData = util.formatTreeData(data.list, [rootNodes])
               self.expendNodesByLevel(2)
             }
           },

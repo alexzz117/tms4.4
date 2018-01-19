@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>名单值管理 -> {{ title }}</h1>
+    <!--<h1>名单值管理 -> {{ title }}</h1>-->
     <div class="toolbar">
       <el-button @click="backList" data="cancelBtn" icon="el-icon-arrow-left">返 回</el-button>
 
@@ -72,7 +72,8 @@
           param: param,
           success: function (data) {
             self.listData = data.row
-            self.title = data.row.rosterdesc
+            let title = `名单值查看->${data.row.rosterdesc}`
+            self.Hub.$emit('changeModeName', title); //Hub触发事件
             if (cb) {
               cb()
             }
@@ -80,8 +81,8 @@
         })
       },
       backList() {
+        self.Hub.$emit('changeModeName', '名单查看'); //Hub触发事件
         this.$router.push({ name: 'namelist' })
-//        this.$router.push('list');
       },
       sel(pageinfo) {
         var self = this;
@@ -129,7 +130,6 @@
           remark: ""
         },
         dialogTitle: "",
-        title: "",
         multipleSelection: [],
         flag: '',
         valuecurrentRow: {},

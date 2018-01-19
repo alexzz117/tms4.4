@@ -2,11 +2,12 @@ import axios from 'axios'
 import util from '@/common/util'
 
 import Vue from 'vue'
-import { Message } from 'element-ui'
+import { Loading,Message } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.prototype.$ELEMENT = { size: 'small' }
 Vue.use(Message)
+Vue.use(Loading)
 let vue = new Vue({})
 
 var config = {
@@ -51,6 +52,12 @@ let defaultOption = {
 }
 
 function post (opt) {
+  let loading = vue.$loading({
+    lock: true,
+    text: 'Loading',
+    spinner: 'el-icon-loading',
+    background: 'rgba(0, 0, 0, 0.7)'
+  });
   let option = {}
   Object.assign(option, defaultOption, opt)
   var sendUrl = config.prefix + option.model + option.url
@@ -69,13 +76,21 @@ function post (opt) {
           option.error(response.data)
         }
       }
+      loading.close()
     })
     .catch(function (error) {
       option.fail(error)
+      loading.close()
     })
 }
 
 function get (opt) {
+  let loading = vue.$loading({
+    lock: true,
+    text: 'Loading',
+    spinner: 'el-icon-loading',
+    background: 'rgba(0, 0, 0, 0.7)'
+  });
   let option = {}
   Object.assign(option, defaultOption, opt)
   var sendUrl = config.prefix + option.model + option.url
@@ -95,9 +110,11 @@ function get (opt) {
           option.error(response.data)
         }
       }
+      loading.close()
     })
     .catch(function (error) {
       option.fail(error)
+      loading.close()
     })
 }
 
