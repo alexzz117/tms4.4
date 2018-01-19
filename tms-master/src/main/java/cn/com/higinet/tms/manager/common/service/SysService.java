@@ -66,13 +66,13 @@ public class SysService {
 		String sql = "";
 		List<Map<String, Object>> funclist;
 		if( ADMIN_ID.equals( operatorId ) ) {
-			sql = "select f.func_id, func_name, func_type, parent_id, onum, conf from cmc_func f " + " where f.flag = '1' and f.menu = '1' and f.func_type = '2' "
+			sql = "select f.func_id, func_name, func_type, parent_id, onum, conf from cmc_func f " + " where f.flag = '1' and f.menu = '1' and f.func_type = '1' "
 					+ " order by f.onum asc";
 			funclist = cmcSimpleDao.queryForList( sql );
 		}
 		else {
 			sql = "select distinct f.func_id, func_name, func_type, parent_id, onum, conf from cmc_func f " + " left join cmc_role_func_rel r " + " on f.func_id = r.func_id "
-					+ " where f.flag = '1' and f.menu = '1' and f.func_type = '2' and role_id in ( " + " select role_id from cmc_operator_role_rel where operator_id = ? ) "
+					+ " where f.flag = '1' and f.menu = '1' and f.func_type = '1' and role_id in ( " + " select role_id from cmc_operator_role_rel where operator_id = ? ) "
 					+ " order by f.onum asc";
 			funclist = cmcSimpleDao.queryForList( sql, operatorId );
 		}
