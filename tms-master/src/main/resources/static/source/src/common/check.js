@@ -89,9 +89,7 @@ var check = {
     return legal;
   },
   /* 用途：校验ip地址的格式
-
    输入：strIP：ip地址
-
    返回：如果通过验证返回true,否则返回false；
    */
 
@@ -101,6 +99,29 @@ var check = {
       if( RegExp.$1 <256 && RegExp.$2<256 && RegExp.$3<256 && RegExp.$4<256) return true;
     }
     return false;
+  },
+  /**
+   * @description 密码检测密码强度
+   * @param String pwd 密码
+   */
+  checkStrength: function(pwd) {
+    var modes = 0;
+    //正则表达式验证符合要求的
+    if (pwd.length < 1)
+      return modes;
+    if (/\d/.test(pwd))
+      modes++; //数字
+    if (/[a-z]/.test(pwd))
+      modes++; //小写
+    if (/[A-Z]/.test(pwd))
+      modes++; //大写
+    if (/\W/.test(pwd))
+      modes++; //特殊字符
+
+    if (modes >= 3 && pwd.length > 10) {
+      modes = 4;
+    }
+    return modes;
   }
 }
 export default check

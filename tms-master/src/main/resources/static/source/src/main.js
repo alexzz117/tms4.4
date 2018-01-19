@@ -15,13 +15,8 @@ import 'babel-polyfill'
 
 Vue.prototype.$axios = axios;
 Vue.prototype.$echarts = echarts
-
 Vue.config.productionTip = false
-// import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
-//
-// console.log('111111')
-// console.log(AlarmEventQuery)
-// Vue.component('alarmEventQuery', AlarmEventQuery)
+
 import dictCode from '@/common/dictCode'
 
 let Hub = new Vue(); //创建事件中心

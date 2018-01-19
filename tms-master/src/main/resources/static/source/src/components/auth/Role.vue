@@ -287,10 +287,10 @@
                 icon: 'ticon-root',
                 onum: 0
               }
-              var treeList = [rootNodes]
-              treeList = treeList.concat(data.list)
-              self.treeList = treeList
-              self.grantData = util.formatTreeData(treeList)
+//              var treeList = [rootNodes]
+//              treeList = treeList.concat(data.list)
+//              self.treeList = data.list
+              self.grantData = util.formatTreeData(data.list, [rootNodes])
               self.expendKey = util.expendNodesByLevel(self.grantData, 2)
               self.checkedKeys = util.checkKeys(self.grantData, 'grant', '1')
               self.grantDialogVisible = true
@@ -320,7 +320,7 @@
         this.flagOptions = dictCode.getCodeItems('cmc.cmc_role.flag')
       },
       formatter(row, column, cellValue) {
-        switch(column.property )
+        switch(column.property)
         {
           case 'flag':
             return dictCode.rendCode('cmc.cmc_role.flag', cellValue)

@@ -1,9 +1,10 @@
 <template>
   <div class="login-bg">
-    <header class="sso-header">
-      <a href="http://www.lagou.com" class="logo ">
-      </a>
-    </header>
+    <!--<header class="sso-header">-->
+    <!--<a href="http://www.lagou.com" class="logo ">-->
+    <!--</a>-->
+    <!--</header>-->
+
     <section class="content-box">
       <div class="form-head">登录</div>
       <el-form ref="loginForm" :model="loginForm" :rules="rules" size="large">
@@ -28,7 +29,7 @@
 <script>
   import ajax from '@/common/ajax'
   import util from '@/common/util'
-//  import '../assets/css/login.css';
+  //  import '../assets/css/login.css';
 
   export default {
     data() {
@@ -72,7 +73,8 @@
           url: '/login',
           param: param,
           success: function (data) {
-            self.$router.push({ name: 'dashboard'})
+            sessionStorage.setItem('userName', self.loginForm.username)
+            self.$router.push({ name: 'main'})
           }
         })
       },
@@ -86,28 +88,15 @@
 </script>
 
 <style>
-  .sso-header {
-    position: relative;
-    width: 100%;
-    height: 60%;
-    background-color: #67a8e4;
-  }
-
   .content-box {
-    width: 290px;
-    height: 274px;
-    margin: -205px auto 60px;
+    width: 400px;
+    height: 330px;
     padding: 62px 70px 38px 78px;
     background-color: #fff;
-    /*background-color: silver;*/
-    display: table;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
     border-radius: 2px;
     border: 1px solid #dce1e6;
-    position: relative;
-    z-index: 1;
-    color: #67a8e4;
+    color: #519CE0;
+    border-radius: .25rem;
   }
 
   .form-head{
@@ -117,6 +106,10 @@
   .login-bg{
     width: 100%;
     height: 100%;
+    background-color: #FAFAFA;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     /*background-repeat: no-repeat;*/
     /*background-image: url("../assets/images/login_bg.jpg");*/
     /*background-position: center;*/

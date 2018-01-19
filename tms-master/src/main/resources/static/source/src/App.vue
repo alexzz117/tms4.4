@@ -10,29 +10,7 @@
   import util from '@/common/util'
 
   export default {
-    name: 'app',
-    //监听路由检查登录
-    watch:{
-      "$route" : 'checkLogin'
-    },
-    created() {
-      this.checkLogin();
-    },
-    methods: {
-      checkLogin(){
-        //检查是否存在session
-        //cookie操作方法在源码里有或者参考网上的即可
-//        debugger
-//        if(!util.getCookie('SESSION')){
-//          console.log(util.getCookie('SESSION'))
-//          //如果没有登录状态则跳转到登录页
-//          this.$router.push({ name: 'login'})
-//        }else {
-//          //否则跳转到登录后的页面
-//          this.$router.push({name: 'user'})
-//        }
-      }
-    }
+    name: 'app'
   }
 </script>
 
