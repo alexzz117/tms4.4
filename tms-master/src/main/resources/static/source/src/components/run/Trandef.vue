@@ -182,7 +182,7 @@
             success: function (data) {
               if (data.success) {
                 self.$message.success('删除成功')
-                self.reloadPage()
+                self.reloadPage('del')
               }
             },
             fail: function (e) {
@@ -191,8 +191,8 @@
           })
         }).catch(() => {})
       },
-      reloadPage () {
-        window.location.reload()
+      reloadPage (op) {
+        this.$emit('listenToReloadTree', op)
       }
     },
     components: {

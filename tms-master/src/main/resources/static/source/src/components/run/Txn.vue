@@ -27,7 +27,10 @@
         <!--&lt;!&ndash;用router-view渲染视图&ndash;&gt;-->
         <!--<router-view/>-->
         <el-tabs v-model="activeName" @tab-click="handleClick" ref="tab">
-          <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;"><trandef :txnId='txnId' :isVisibility="tabVisibility.trandefVisibility" ref="trandef" :readonly="readonly"></trandef></el-tab-pane>
+          <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;">
+            <trandef :txnId='txnId' :isVisibility="tabVisibility.trandefVisibility" ref="trandef" :readonly="readonly"
+                     v-on:listenToReloadTree="selTree"/>
+          </el-tab-pane>
           <el-tab-pane label="交易模型定义" name="tranmdl"><tranmdl :txnId='txnId' :isVisibility="tabVisibility.tranmdlVisibility" :txnName="txnName" :readonly="readonly"></tranmdl></el-tab-pane>
           <el-tab-pane label="交易统计" name="stat"><stat :txnId='txnId' :isVisibility="tabVisibility.statVisibility" :readonly="readonly"></stat></el-tab-pane>
           <el-tab-pane label="交易规则" name="rule"><rule :txnId='txnId' :isVisibility="tabVisibility.ruleVisibility" :readonly="readonly"></rule></el-tab-pane>
@@ -85,8 +88,14 @@
         }
       },
       // 查询树结构
-      selTree () {
-        var self = this
+      selTree (op) {
+        let self = this
+        let currentKey = null       // 选中的节点Key：ID
+        let selectNodeLast = null   // 上次选中的节点
+        if (self.$refs.tree) {      // 如果不是第一次加载树，读取树的节点和Key
+          selectNodeLast = self.$refs.tree.getCurrentNode()
+          currentKey = selectNodeLast.id
+        }
         ajax.post({
           url: '/trandef/query',
           success: function (data) {
@@ -95,11 +104,72 @@
               let treeJson = util.formatTreeData(data.list)
               self.treeData = treeJson
               // 模拟选中第一个节点（根节点）
-              self.txnId = treeJson[0].id
-              self.txnName = treeJson[0].text
+              if (self.txnId === '') {
+                self.txnId = treeJson[0].id
+                self.txnName = treeJson[0].text
+                currentKey = treeJson[0].id
+              }
               // self.breadcrumbData = [{text: '交易模型：' + treeJson[0].text}]
-              self.toolBtn.addBtn = false
               // self.expendNodesByLevel(1)
+              /**
+               * 定时器，在树加载完数据后,对树进行展开与选中处理
+               * 每100毫秒校验一次
+               * @type {number}
+               */
+              let timer = window.setInterval(function () {
+                self.$refs.tree.setCurrentKey(currentKey)
+                if (self.$refs.tree.getCurrentKey() === currentKey) {
+                  let selectNode = self.$refs.tree.getCurrentNode()
+                  /**
+                   *判断树选中的节点的数据变化，通过它的子节点数量做判断。
+                   * 0.如果没有上次选中节点，是第一次加载，展开的是根节点
+                   * 1.子节点的数量多了：新增操作，展开当前选中的节点，并选中新的节点
+                   * 2.自己诶单的数量没有变化：编辑操作，展开父节点
+                   * 3.其他：删除操作，展开
+                   */
+                  switch (op) {
+                    case 'add':
+                      let newNode = null
+                      for (let i in selectNode.children) { // 循环校验，获取新的节点
+                        let check = true
+                        let node = selectNode.children[i]
+                        for (let j in selectNodeLast.children) {
+                          let item = selectNodeLast.children[j]
+                          if (item.id === node.id) {
+                            check = false
+                            break
+                          }
+                        }
+                        if (check) {
+                          newNode = node
+                          break
+                        }
+                      }
+                      if (newNode) {    // 新的节点存在，选中新的节点
+                        self.txnId = newNode.id
+                        self.$refs.tree.setCurrentKey(newNode.id)
+                      }
+                      self.expendKey = [selectNode.id]
+                      break
+                    case 'mod':
+                      self.expendKey = [selectNode.fid]
+                      break
+                    case 'del':
+                      let data = self.$refs.tree.data
+                      if (data.length > 0) {
+                        let rootId = data[0].id
+                        self.expendKey = [selectNodeLast.fid]
+                        self.txnId = rootId
+                        self.$refs.tree.setCurrentKey(rootId)
+                      }
+                      break
+                    default :
+                      self.expendKey = [selectNode.id]
+                  }
+                  self.showToolBtn()
+                  window.clearInterval(timer)
+                }
+              }, 100)
             }
           },
           fail: function (e) {
@@ -110,22 +180,19 @@
         })
       },
       // 展开前几层功能树
-      expendNodesByLevel (deep) {
-        var expendNodeIds = []
-        var treeNode = this.treeData[0]
-        var level = 1
-        while (level <= deep) {
-          expendNodeIds.push(treeNode.id)
-          treeNode = treeNode.children[0]
-          level++
-        }
-        this.expendKey = expendNodeIds
-      },
+      // expendNodesByLevel (deep) {
+      //   var expendNodeIds = []
+      //   var treeNode = this.treeData[0]
+      //   var level = 1
+      //   while (level <= deep) {
+      //     expendNodeIds.push(treeNode.id)
+      //     treeNode = treeNode.children[0]
+      //     level++
+      //   }
+      //   this.expendKey = expendNodeIds
+      // },
       handleNodeClick (data, node) {
         var self = this
-        if (self.txnId === data.id) {
-          return
-        }
         self.showToolBtn()
         self.txnId = data.id
         self.txnName = data.text

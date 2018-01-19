@@ -227,8 +227,8 @@
       closeAddDialog () {
         this.$emit('listenToCloseDialog', false)
       },
-      reloadPage () {
-        this.$emit('listenToReloadPage')
+      reloadPage (op) {
+        this.$emit('listenToReloadPage', op)
       },
       resetForm () {
         this.$refs['tranDefForm'].resetFields()
@@ -250,7 +250,7 @@
                   } else {
                     self.$message.success('编辑成功')
                   }
-                  self.reloadPage()
+                  self.reloadPage(op)
                 }
               },
               fail: function (e) {
