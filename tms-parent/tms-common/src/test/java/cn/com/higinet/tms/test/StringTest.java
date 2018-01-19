@@ -70,17 +70,8 @@ public class StringTest {
 		Date d = DateUtils.parseDate("2015-01-01 00:00:00");
 		for (int i = 0; i < 40; i++) {
 			s.append("partition TMS").append(DateUtils.format(d, "yyyyMMdd")).append(" values less than ('").append(DateUtils.addMonths(d, 1).getTime()).append("')").append(System.lineSeparator());
-			s.append("  tablespace TMS_DATA").append(System.lineSeparator())
-			.append("  pctfree 10").append(System.lineSeparator())
-			.append("  initrans 1").append(System.lineSeparator())
-			.append("  maxtrans 255").append(System.lineSeparator())
-			.append("  storage").append(System.lineSeparator())
-			.append("  (").append(System.lineSeparator())
-			.append("  initial 64K").append(System.lineSeparator())
-			.append("  next 1M").append(System.lineSeparator())
-			.append("  minextents 1").append(System.lineSeparator())
-			.append("  maxextents unlimited").append(System.lineSeparator())
-			.append("  ),").append(System.lineSeparator());
+			s.append("  tablespace TMS_DATA").append(System.lineSeparator()).append("  pctfree 10").append(System.lineSeparator()).append("  initrans 1").append(System.lineSeparator()).append("  maxtrans 255").append(System.lineSeparator()).append("  storage").append(System.lineSeparator()).append("  (").append(System.lineSeparator()).append("  initial 64K").append(System.lineSeparator())
+					.append("  next 1M").append(System.lineSeparator()).append("  minextents 1").append(System.lineSeparator()).append("  maxextents unlimited").append(System.lineSeparator()).append("  ),").append(System.lineSeparator());
 			d = DateUtils.addMonths(d, 1);
 		}
 		File f = new File("I:\\date.txt");
@@ -92,7 +83,7 @@ public class StringTest {
 			fo.flush();
 		}
 	}
-	
+
 	@Test
 	public void write3() throws FileNotFoundException, IOException {
 		StringBuilder s = new StringBuilder();
@@ -110,9 +101,15 @@ public class StringTest {
 			fo.flush();
 		}
 	}
-	
+
 	@Test
-	public void write4() throws FileNotFoundException, IOException {
-		System.out.println(DateUtils.parseDate("2016-01-07 00:00:00").getTime());
+	public void date() throws FileNotFoundException, IOException {
+		System.out.println(DateUtils.parseDate("2015-12-01 00:00:00").getTime());
 	}
+
+	@Test
+	public void date2() throws FileNotFoundException, IOException {
+		System.out.println(DateUtils.formatDate(1451000059000l));
+	}
+
 }

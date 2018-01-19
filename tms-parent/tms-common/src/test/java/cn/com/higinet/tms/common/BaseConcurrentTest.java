@@ -7,7 +7,7 @@ public class BaseConcurrentTest {
 	private static final String RANDOM_STR = "1qaz2wsx3edc4rfv5tgb6yhn7ujm8ik,9ol.0p;/!@#$%^&*()";
 
 	/** 常量 DEFAULT_TIMES. */
-	protected static final int DEFAULT_TIMES = 5000000;
+	protected static final int DEFAULT_TIMES = 100000;
 
 	protected static final int DEFAULT_DATA_SIZE = 100;
 
