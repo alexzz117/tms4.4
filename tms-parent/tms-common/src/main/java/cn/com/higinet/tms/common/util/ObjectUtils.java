@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.google.common.base.Objects;
 
 import cn.com.higinet.tms.common.exception.UnsupportedParameterException;
 import cn.com.higinet.tms.common.lang.Copyable;
@@ -188,7 +189,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Long[]) {
@@ -198,7 +199,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Integer[]) {
@@ -208,7 +209,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Short[]) {
@@ -218,7 +219,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Character[]) {
@@ -228,7 +229,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Byte[]) {
@@ -238,7 +239,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Boolean[]) {
@@ -248,7 +249,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Double[]) {
@@ -258,7 +259,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Float[]) {
@@ -268,7 +269,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof BigDecimal[]) {
@@ -278,7 +279,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Date[]) {
@@ -288,7 +289,7 @@ public class ObjectUtils {
 				value[i] = source[i];
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Object[]) {
@@ -298,7 +299,7 @@ public class ObjectUtils {
 				value[i] = clone(source[i]);
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof List) {
@@ -308,7 +309,7 @@ public class ObjectUtils {
 				value.add(clone(source.get(i)));
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Map) {
@@ -320,11 +321,11 @@ public class ObjectUtils {
 				value.put(key, clone(source.get(key)));
 			}
 
-			return (T)value;
+			return (T) value;
 		}
 
 		if (object instanceof Copyable) {
-			return (T)((Copyable) object).deepCopy();
+			return (T) ((Copyable) object).deepCopy();
 		} else {
 			Kryo k = ByteUtils.KRYOPOOL.borrow();
 			try {
@@ -539,6 +540,10 @@ public class ObjectUtils {
 		}
 		sb.append("}");
 		return sb.toString();
+	}
+
+	public static int hash(Object o) {
+		return Objects.hashCode(o);
 	}
 
 }

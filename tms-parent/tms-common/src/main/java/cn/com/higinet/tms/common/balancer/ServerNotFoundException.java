@@ -14,51 +14,63 @@
  *     文件版本：         修改人：             修改原因：
  ***************************************************************************************
  */
-package cn.com.higinet.tms.common.exception;
+package cn.com.higinet.tms.common.balancer;
+
+import cn.com.higinet.tms.common.exception.BaseRuntimeException;
 
 /**
- * 不支持的参数.
+ * 没有找到可用的服务器
  *
  * @author: 王兴
  * @date:   2017-5-7 17:32:52
  * @since:  v4.3
  */
-public class NullParamterException extends BaseRuntimeException {
+public class ServerNotFoundException extends BaseRuntimeException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -2143051854631661844L;
+	private static final long serialVersionUID = 5362519994576363996L;
 
-	public NullParamterException() {
+	/**
+	 * @see BaseRuntimeException#BaseRuntimeException()
+	 */
+	public ServerNotFoundException() {
 		super("");
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String)
 	 */
-	public NullParamterException(String msg) {
+	public ServerNotFoundException(String msg) {
 		super(msg);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(Throwable)
 	 */
-	public NullParamterException(Throwable ex) {
+	public ServerNotFoundException(Throwable ex) {
 		super(ex);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String,Throwable)
 	 */
-	public NullParamterException(String msg, Throwable ex) {
+	public ServerNotFoundException(String msg, Throwable ex) {
 		super(msg, ex);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String,Object...)
 	 */
-	public NullParamterException(String msg, Object... args) {
+	public ServerNotFoundException(String msg, Object... args) {
 		super(msg, args);
+	}
+
+	/**
+	 *  @see BaseRuntimeException#BaseRuntimeException(String,Exception,Object...)
+	 */
+	public ServerNotFoundException(String msg, Exception e, Object... args) {
+		super(msg, e, args);
 	}
 }

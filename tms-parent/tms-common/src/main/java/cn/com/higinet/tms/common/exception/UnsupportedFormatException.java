@@ -17,48 +17,58 @@
 package cn.com.higinet.tms.common.exception;
 
 /**
- * 不支持的参数.
+ * 不支持的格式.
  *
  * @author: 王兴
  * @date:   2017-5-7 17:32:52
  * @since:  v4.3
  */
-public class NullParamterException extends BaseRuntimeException {
+public class UnsupportedFormatException extends BaseRuntimeException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -2143051854631661844L;
+	private static final long serialVersionUID = 5362519994576363996L;
 
-	public NullParamterException() {
+	/**
+	 * @see BaseRuntimeException#BaseRuntimeException()
+	 */
+	public UnsupportedFormatException() {
 		super("");
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String)
 	 */
-	public NullParamterException(String msg) {
+	public UnsupportedFormatException(String msg) {
 		super(msg);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(Throwable)
 	 */
-	public NullParamterException(Throwable ex) {
+	public UnsupportedFormatException(Throwable ex) {
 		super(ex);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String,Throwable)
 	 */
-	public NullParamterException(String msg, Throwable ex) {
+	public UnsupportedFormatException(String msg, Throwable ex) {
 		super(msg, ex);
 	}
 
 	/**
 	 * @see BaseRuntimeException#BaseRuntimeException(String,Object...)
 	 */
-	public NullParamterException(String msg, Object... args) {
+	public UnsupportedFormatException(String msg, Object... args) {
 		super(msg, args);
+	}
+
+	/**
+	 *  @see BaseRuntimeException#BaseRuntimeException(String,Exception,Object...)
+	 */
+	public UnsupportedFormatException(String msg, Exception e, Object... args) {
+		super(msg, e, args);
 	}
 }
