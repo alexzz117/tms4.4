@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 /**
  * ES配置类
  * */
-public class ElasticSearchConfig {
+public class EsConfig {
 
-	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchConfig.class );
+	private static final Logger logger = LoggerFactory.getLogger( EsConfig.class );
 
 	@Value("${elasticsearch.cluster-nodes}")
 	private String clusterNodes;
@@ -67,7 +67,7 @@ public class ElasticSearchConfig {
 	}
 
 	public static void main( String[] args ) {
-		ElasticSearchConfig config = new ElasticSearchConfig();
+		EsConfig config = new EsConfig();
 		config.init();
 
 	}

@@ -58,9 +58,9 @@ import com.alibaba.fastjson.JSONObject;
 import cn.com.higinet.tms.base.util.Stringz;
 
 @Scope("prototype") //使用多实例模式
-public class ElasticSearchAdapter<T> implements DisposableBean {
+public class EsAdapter<T> implements DisposableBean {
 
-	private static final Logger logger = LoggerFactory.getLogger( ElasticSearchAdapter.class );
+	private static final Logger logger = LoggerFactory.getLogger( EsAdapter.class );
 
 	//实体T的主键名称
 	private String primaryKeyName;
@@ -81,7 +81,7 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 	private int flushTime;
 
 	@Autowired
-	private ElasticSearchConfig esConfig;
+	private EsConfig esConfig;
 
 	//用于存储近期时间内的提交数据
 	private Map<String, T> dataMap = new LinkedHashMap<String, T>( 50000 );
@@ -98,7 +98,6 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 
 	@PostConstruct
 	private void init() {
-
 		//初始化执行侦听器
 		bulkProcessor = BulkProcessor.builder( esConfig.getTransportClient(), new Listener() {
 			@Override
@@ -107,7 +106,6 @@ public class ElasticSearchAdapter<T> implements DisposableBean {
 				list.addAll( dataMap.values() );
 				listener.before( executionId, list );
 			}
-
 			/**
 			 * 提交成功时调用，但有可能部分失败
 			 * */

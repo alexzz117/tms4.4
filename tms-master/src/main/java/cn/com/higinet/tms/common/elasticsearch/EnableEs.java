@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import({ ElasticSearchConfig.class, ElasticSearchAdapter.class })
-public @interface EnableElasticSearch {
+@Import({ EsConfig.class, EsAdapter.class })
+public @interface EnableEs {
 
 }
