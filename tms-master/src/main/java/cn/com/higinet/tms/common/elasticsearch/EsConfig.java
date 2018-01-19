@@ -31,6 +31,9 @@ public class EsConfig {
 	@Value("${elasticsearch.password}")
 	private String password;
 
+	@Value("${elasticsearch.client.transport.sniff}")
+	private boolean sniff;
+
 	private TransportClient transportClient = null;
 
 	private PreBuiltXPackTransportClient preBuiltXPackTransportClient;
@@ -42,7 +45,7 @@ public class EsConfig {
 		}
 		try {
 			Settings esSetting = Settings.builder().put( "cluster.name", clusterName ).put( "xpack.security.user", username + ":" + password )//用户名：密码
-					.put( "client.transport.sniff", true )//增加嗅探机制，找到ES集群
+					.put( "client.transport.sniff", sniff )//增加嗅探机制，找到ES集群
 					.build();
 			String[] cluster = clusterNodes.split( "," );
 			TransportAddress[] address = new TransportAddress[cluster.length];

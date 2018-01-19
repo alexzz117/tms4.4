@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
-import cn.com.higinet.tms.base.util.Clockz;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.common.config.ApplicationContextUtil;
 import cn.com.higinet.tms.common.elasticsearch.EsAdapter;
@@ -48,33 +47,22 @@ public class TrafficQueue implements DisposableBean {
 			esAdapter.setListener( new EsListener<TrafficData>() {
 				@Override
 				public void before( Long executionId, List<TrafficData> allList ) {
-					Clockz.start( listenerId + "-" + executionId );
-					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
-					if( logs == null ) {
-						logs = new StringBuffer();
-						logMap.put( listenerId + "-" + executionId, logs );
-					}
-					logs.append( "数据开始提交：" + allList.size() );
+
 				}
 
 				@Override
 				public void onSuccess( Long executionId, List<TrafficData> sucList ) {
-					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
-					logs.append( "; 成功提交ES数据：" + sucList.size() );
-					
-					logger.info( "成功提交ES数据：" + sucList.size() );
+
 				}
 
 				@Override
 				public void onError( Long executionId, List<TrafficData> failIdList ) {
-					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
-					logs.append( "; 失败提交ES数据：" + failIdList.size() );
+
 				}
 
 				@Override
 				public void after( Long executionId, List<TrafficData> allList ) {
-					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
-					logs.append( "; 数据提交完毕，耗时：" + Clockz.stop( listenerId + "-" + executionId ) );
+
 				}
 			} );
 

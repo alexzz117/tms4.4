@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
 import javax.persistence.Id;
 
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -55,6 +56,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.com.higinet.tms.base.util.Clockz;
 import cn.com.higinet.tms.base.util.Stringz;
 
 @Scope("prototype") //使用多实例模式
@@ -86,6 +88,8 @@ public class EsAdapter<T> implements DisposableBean {
 	//用于存储近期时间内的提交数据
 	private Map<String, T> dataMap = new LinkedHashMap<String, T>( 50000 );
 
+	Map<Long, StringBuffer> logMap = new LinkedHashMap<Long, StringBuffer>();
+
 	//批量处理器
 	private BulkProcessor bulkProcessor;
 
@@ -103,7 +107,18 @@ public class EsAdapter<T> implements DisposableBean {
 			@Override
 			public void beforeBulk( long executionId, BulkRequest request ) {
 				List<T> list = new ArrayList<T>();
-				list.addAll( dataMap.values() );
+				for( DocWriteRequest<?> docWriteRequest : request.requests() ) {
+					list.add( dataMap.get( docWriteRequest.id() ) );
+				}
+
+				Clockz.start( "Listener-" + executionId );
+				StringBuffer logs = logMap.get( executionId );
+				if( logs == null ) {
+					logs = new StringBuffer();
+					logMap.put( executionId, logs );
+				}
+				logs.append( "数据开始提交：" + list.size() );
+
 				listener.before( executionId, list );
 			}
 
@@ -115,24 +130,37 @@ public class EsAdapter<T> implements DisposableBean {
 				List<T> sucList = new ArrayList<T>();
 				List<T> failList = new ArrayList<T>();
 				List<T> allList = new ArrayList<T>();
-				allList.addAll( dataMap.values() );
 				//部分提交成功
 				if( response.hasFailures() ) {
 					for( BulkItemResponse bulkItemResponse : response ) {
-						if( bulkItemResponse.isFailed() ) failList.add( dataMap.get( bulkItemResponse.getId() ) );
-						else sucList.add( dataMap.get( bulkItemResponse.getId() ) );
+						T t = dataMap.get( bulkItemResponse.getId() );
+						if( bulkItemResponse.isFailed() ) failList.add( t );
+						else sucList.add( t );
+						allList.add( t );
 					}
 				}
 				//全部成功
 				else {
 					for( BulkItemResponse bulkItemResponse : response ) {
-						sucList.add( dataMap.get( bulkItemResponse.getId() ) );
+						T t = dataMap.get( bulkItemResponse.getId() );
+						sucList.add( t );
+						allList.add( t );
 					}
 				}
 
-				if( sucList.size() > 0 ) listener.onSuccess( executionId, sucList );
-				if( failList.size() > 0 ) listener.onError( executionId, failList );
+				StringBuffer logs = logMap.get( executionId );
+				if( sucList.size() > 0 ) {
+					logs.append( "，成功：" + sucList.size() );
+					listener.onSuccess( executionId, sucList );
+				}
+				if( failList.size() > 0 ) {
+					logs.append( "，失败：" + failList.size() );
+					listener.onError( executionId, failList );
+				}
+
 				listener.after( executionId, allList );//完毕时
+				logs.append( "，耗时：" + Clockz.stop( "Listener-" + executionId ) );
+				logger.info( logs.toString() );
 			}
 
 			/**
@@ -141,11 +169,17 @@ public class EsAdapter<T> implements DisposableBean {
 			@Override
 			public void afterBulk( long executionId, BulkRequest request, Throwable failure ) {
 				List<T> allList = new ArrayList<T>();
-				allList.addAll( dataMap.values() );
-				logger.info( "happen fail = " + failure.getMessage() + " cause = " + failure.getCause() + ",afterBulk2 numberOfActions:" + request.numberOfActions() );
-				listener.onError( executionId, allList );
-				//完毕时
-				listener.after( executionId, allList );
+				for( DocWriteRequest<?> docWriteRequest : request.requests() ) {
+					allList.add( dataMap.get( docWriteRequest.id() ) );
+				}
+				listener.onError( executionId, allList ); //错误时
+				listener.after( executionId, allList );//完毕时
+
+				StringBuffer logs = logMap.get( executionId );
+				logs.append( "，失败：" + allList.size() );
+				logs.append( "，耗时：" + Clockz.stop( "Listener-" + executionId ) );
+				logger.info( logs.toString() );
+
 			}
 
 		} ).setBulkActions( commitNum ).setBulkSize( new ByteSizeValue( byteSizeValue, ByteSizeUnit.MB ) ).setFlushInterval( TimeValue.timeValueSeconds( flushTime ) )
