@@ -3,7 +3,6 @@ package cn.com.higinet.tms.consumer.traffic;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -17,7 +16,7 @@ import cn.com.higinet.tms.base.entity.TrafficData;
 import cn.com.higinet.tms.base.util.Clockz;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.common.config.ApplicationContextUtil;
-import cn.com.higinet.tms.common.elasticsearch.ElasticSearchAdapter;
+import cn.com.higinet.tms.common.elasticsearch.EsAdapter;
 import cn.com.higinet.tms.common.elasticsearch.EsListener;
 
 @Service
@@ -34,7 +33,7 @@ public class TrafficQueue implements DisposableBean {
 	@Value("${elasticsearch.trafficdata.queueCapacity}")
 	private int queueCapacity; //队列最大堆积数量，当超过时，put操作将堵塞
 
-	private ElasticSearchAdapter<TrafficData> elasticsearchAdapter;
+	private EsAdapter<TrafficData> esAdapter;
 
 	@SuppressWarnings("unchecked")
 	@PostConstruct
@@ -43,31 +42,39 @@ public class TrafficQueue implements DisposableBean {
 		queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
 
 		try {
-			elasticsearchAdapter = ApplicationContextUtil.getBean( ElasticSearchAdapter.class );
+			esAdapter = ApplicationContextUtil.getBean( EsAdapter.class );
 			logger.info( "elasticsearchAdapter is not null" );
 
-			elasticsearchAdapter.setListener( new EsListener<TrafficData>() {
+			esAdapter.setListener( new EsListener<TrafficData>() {
 				@Override
 				public void before( Long executionId, List<TrafficData> allList ) {
-					Clockz.start( listenerId );
-					logBuffer.append( "数据开始提交：" + allList.size() );
+					Clockz.start( listenerId + "-" + executionId );
+					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
+					if( logs == null ) {
+						logs = new StringBuffer();
+						logMap.put( listenerId + "-" + executionId, logs );
+					}
+					logs.append( "数据开始提交：" + allList.size() );
 				}
 
 				@Override
 				public void onSuccess( Long executionId, List<TrafficData> sucList ) {
-					logBuffer.append( "; 成功提交ES数据：" + sucList.size() );
+					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
+					logs.append( "; 成功提交ES数据：" + sucList.size() );
+					
+					logger.info( "成功提交ES数据：" + sucList.size() );
 				}
 
 				@Override
 				public void onError( Long executionId, List<TrafficData> failIdList ) {
-					logBuffer.append( "; 失败提交ES数据：" + failIdList.size() );
-					logger.error( "失败提交ES数据：" + failIdList.size() );
+					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
+					logs.append( "; 失败提交ES数据：" + failIdList.size() );
 				}
 
 				@Override
 				public void after( Long executionId, List<TrafficData> allList ) {
-					logBuffer.append( "; 数据提交完毕，耗时：" + Clockz.stop( listenerId ) );
-					logger.info( logBuffer.toString() );
+					StringBuffer logs = logMap.get( listenerId + "-" + executionId );
+					logs.append( "; 数据提交完毕，耗时：" + Clockz.stop( listenerId + "-" + executionId ) );
 				}
 			} );
 
@@ -97,8 +104,9 @@ public class TrafficQueue implements DisposableBean {
 
 	public void take() throws Exception {
 		while( true ) {
-			TrafficData data = queue.poll( 200, TimeUnit.MILLISECONDS );
-			if( data != null ) elasticsearchAdapter.batchSubmit( trafficDataIndexName, data );
+			//TrafficData data = queue.poll( 200, TimeUnit.MILLISECONDS );
+			TrafficData data = queue.take();
+			if( data != null ) esAdapter.batchSubmit( trafficDataIndexName, data );
 		}
 	}
 

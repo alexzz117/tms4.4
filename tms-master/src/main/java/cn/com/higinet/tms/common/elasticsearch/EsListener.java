@@ -1,13 +1,16 @@
 package cn.com.higinet.tms.common.elasticsearch;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.com.higinet.tms.base.util.Stringz;
 
 public interface EsListener<T> {
 
 	String listenerId = Stringz.randomUUID();
-	StringBuffer logBuffer = new StringBuffer();
+
+	Map<String, StringBuffer> logMap = new HashMap<String, StringBuffer>();
 
 	/**
 	 * 提交前调用

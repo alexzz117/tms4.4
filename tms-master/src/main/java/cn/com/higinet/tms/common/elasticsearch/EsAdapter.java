@@ -106,6 +106,7 @@ public class EsAdapter<T> implements DisposableBean {
 				list.addAll( dataMap.values() );
 				listener.before( executionId, list );
 			}
+
 			/**
 			 * 提交成功时调用，但有可能部分失败
 			 * */
@@ -124,7 +125,9 @@ public class EsAdapter<T> implements DisposableBean {
 				}
 				//全部成功
 				else {
-					sucList = allList;
+					for( BulkItemResponse bulkItemResponse : response ) {
+						sucList.add( dataMap.get( bulkItemResponse.getId() ) );
+					}
 				}
 
 				if( sucList.size() > 0 ) listener.onSuccess( executionId, sucList );
