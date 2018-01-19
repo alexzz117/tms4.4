@@ -83,8 +83,16 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="有效性">
-            <el-radio v-model="tranDefForm.is_enable" label="1" :disabled="formReadonly">启用</el-radio>
-            <el-radio v-model="tranDefForm.is_enable" label="0" :disabled="formReadonly">停用</el-radio>
+            <el-switch
+              v-model="tranDefForm.is_enable"
+              active-text="启用"
+              inactive-text="停用"
+              active-value="1"
+              inactive-value="0"
+              :disabled="formReadonly">
+            </el-switch>
+            <!--<el-radio v-model="tranDefForm.is_enable" label="1" :disabled="formReadonly">启用</el-radio>
+            <el-radio v-model="tranDefForm.is_enable" label="0" :disabled="formReadonly">停用</el-radio>-->
           </el-form-item>
         </el-col>
         <el-col :span="24">
