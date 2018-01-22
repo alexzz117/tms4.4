@@ -76,7 +76,6 @@ public class StatBootstrap extends ThreadService {
 		}
 		tmsapp.set_config(serverProps);
 		cacheManager.start();
-		int port = serverPort;
 		tmsapp.set_config("tms.stat.port", serverPort);
 		cache_init.init_for_stat(new data_source());
 		stat_serv.eval_inst().start();
@@ -84,9 +83,9 @@ public class StatBootstrap extends ThreadService {
 		g_ss = new ServerSocket();
 		g_ss.setReuseAddress(true);
 		g_ss.setPerformancePreferences(2, 0, 1);
-		g_ss.bind(new InetSocketAddress(port));
+		g_ss.bind(new InetSocketAddress(serverPort));
 		tmsapp.start_live_deamon(true);
-		logger.info("stat server listen in:" + port);
+		logger.info("stat server listen in:" + serverPort);
 	}
 
 	@Override
