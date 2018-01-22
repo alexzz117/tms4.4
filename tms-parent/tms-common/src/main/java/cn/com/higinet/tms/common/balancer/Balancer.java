@@ -80,9 +80,6 @@ public class Balancer<T> extends Service {
 
 	@Override
 	protected void doStop() throws Throwable {
-		targetKeeper.clear();
-		targetKeeper = null;
-
 	}
 
 }
