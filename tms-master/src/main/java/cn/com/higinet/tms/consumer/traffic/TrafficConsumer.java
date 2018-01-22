@@ -23,7 +23,7 @@ public class TrafficConsumer {
 
 	@KafkaListener(topics = { Constants.Kafka.Topic.TRAFFIC })
 	public void listen( ConsumerRecord<String, Traffic> record ) throws Exception {
-		//logger.info( JSON.toJSONString( record.value().getTarffic() ) );
+		//TrafficData trafficData = record.value().getTrafficData();
 		TrafficData trafficData = this.createData();
 		trafficQueue.put( trafficData );
 	}
