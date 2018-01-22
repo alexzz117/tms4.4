@@ -52,10 +52,10 @@ public final class x_socket_pool implements Runnable
 	public void load_cluster_config()
 	{
 		String t = "tms_run_stat";
-		String db = tmsapp.get_config("tms.jdbc.url", null);
-		String drv = tmsapp.get_config("tms.jdbc.driverClassName", null);
-		String u = tmsapp.get_config("tms.jdbc.username", null);
-//		String p = Base64Util.base64Decode(tmsapp.get_config("tms.jdbc.password", null));
+		String db = tmsapp.get_config("tms.jdbc.url", "n");
+		String drv = tmsapp.get_config("tms.jdbc.driverClassName", "n");
+		String u = tmsapp.get_config("tms.jdbc.username", "n");
+		String p = Base64Util.base64Decode(tmsapp.get_config("tms.jdbc.password", "n"));
 
 		for (int i = 0; i < 32; i++)
 		{
@@ -70,7 +70,7 @@ public final class x_socket_pool implements Runnable
 					tmsapp.get_config("tms.stat.server." + i + ".db.driver", drv), //
 					tmsapp.get_config("tms.stat.server." + i + ".db.tabname", t), //
 					tmsapp.get_config("tms.stat.server." + i + ".db.username", u), //
-					tmsapp.get_config("tms.stat.server." + i + ".db.password", null) //
+					tmsapp.get_config("tms.stat.server." + i + ".db.password", p) //
 			);
 		}
 
