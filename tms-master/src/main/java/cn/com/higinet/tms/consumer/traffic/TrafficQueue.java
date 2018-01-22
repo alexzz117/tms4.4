@@ -9,21 +9,19 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
-import cn.com.higinet.tms.base.util.Stringz;
-import cn.com.higinet.tms.common.config.ApplicationContextUtil;
 import cn.com.higinet.tms.common.elasticsearch.EsAdapter;
 import cn.com.higinet.tms.common.elasticsearch.EsListener;
 
 @Service
 public class TrafficQueue implements DisposableBean {
 
-	public String sss = Stringz.randomUUID();
-
 	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
+
 	private BlockingQueue<TrafficData> queue;
 
 	@Value("${elasticsearch.trafficdata.indexName}")
@@ -32,58 +30,49 @@ public class TrafficQueue implements DisposableBean {
 	@Value("${elasticsearch.trafficdata.queueCapacity}")
 	private int queueCapacity; //队列最大堆积数量，当超过时，put操作将堵塞
 
+	@Autowired
 	private EsAdapter<TrafficData> esAdapter;
 
-	@SuppressWarnings("unchecked")
 	@PostConstruct
-	public void init() {
+	private void init() {
 		//初始化traffic数据队列
 		queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
 
-		try {
-			esAdapter = ApplicationContextUtil.getBean( EsAdapter.class );
-			logger.info( "elasticsearchAdapter is not null" );
+		esAdapter.setListener( new EsListener<TrafficData>() {
+			@Override
+			public void before( Long executionId, List<TrafficData> allList ) {
 
-			esAdapter.setListener( new EsListener<TrafficData>() {
-				@Override
-				public void before( Long executionId, List<TrafficData> allList ) {
+			}
 
+			@Override
+			public void onSuccess( Long executionId, List<TrafficData> sucList ) {
+
+			}
+
+			@Override
+			public void onError( Long executionId, List<TrafficData> failIdList ) {
+
+			}
+
+			@Override
+			public void after( Long executionId, List<TrafficData> allList ) {
+
+			}
+		} );
+
+		Thread thread = new Thread( new Runnable() {
+			@Override
+			public void run() {
+				try {
+					take();
 				}
-
-				@Override
-				public void onSuccess( Long executionId, List<TrafficData> sucList ) {
-
+				catch( Exception e ) {
+					logger.error( e.getMessage(), e );
 				}
-
-				@Override
-				public void onError( Long executionId, List<TrafficData> failIdList ) {
-
-				}
-
-				@Override
-				public void after( Long executionId, List<TrafficData> allList ) {
-
-				}
-			} );
-
-			Thread thread = new Thread( new Runnable() {
-				@Override
-				public void run() {
-					try {
-						take();
-					}
-					catch( Exception e ) {
-						logger.error( e.getMessage(), e );
-					}
-				}
-			} );
-			thread.setDaemon( true );
-			thread.start();
-		}
-		catch( Exception e ) {
-			logger.info( "elasticsearchAdapter is null" );
-			return;
-		}
+			}
+		} );
+		thread.setDaemon( true );
+		thread.start();
 	}
 
 	public void put( TrafficData tarfficData ) throws Exception {
