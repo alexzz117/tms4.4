@@ -76,7 +76,7 @@ public class StatBootstrap extends ThreadService {
 		}
 		tmsapp.set_config(serverProps);
 		cacheManager.start();
-		int port = 0;
+		int port = serverPort;
 		tmsapp.set_config("tms.stat.port", serverPort);
 		cache_init.init_for_stat(new data_source());
 		stat_serv.eval_inst().start();
