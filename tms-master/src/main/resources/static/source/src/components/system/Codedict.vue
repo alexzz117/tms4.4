@@ -1,137 +1,129 @@
 <template>
   <div>
 
-    <el-row style="height: 100%;border: 1px solid #eee">
-      <el-col :span="12" style="border-right: 1px solid #eee">
-        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee; margin-left: 10px;">
-          <el-row>
-            <el-col :span="16">
-                <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
-            </el-col>
-            <el-col :span="8">
-                <div style="margin-right: 10px">
-                  <el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50
-                            @keyup.enter.native="searchData('queryShowForm')"   placeholder="请输入搜索内容" clearable>
-                    <i slot="prefix" class="el-input__icon el-icon-search"></i>
-                  </el-input>
-
-                </div>
-            </el-col>
-          </el-row>
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <div class="toolbar">
+          <div style="float: left ">
+            <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
+          </div>
+          <div style="float: right; margin-right: 10px">
+            <el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50
+                      @keyup.enter.native="searchData('queryShowForm')"   placeholder="请输入搜索内容" clearable>
+              <i slot="prefix" class="el-input__icon el-icon-search"></i>
+            </el-input>
+          </div>
         </div>
 
-        <section class="table">
-        <el-table
-        :data="dictData"
-        highlight-current-row
-        style="width: 100%"
-        @current-change="handleSelectionChange">
+        <section class="section">
+          <el-table
+            :data="dictData"
+            highlight-current-row
+            style="width: 100%"
+            @current-change="handleSelectionChange">
 
-        <el-table-column
-        label="操作"
-        width="80">
-        <template slot-scope="scope">
-        <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="openDialog('edit', scope.row)"></el-button>
-        <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)"></el-button>
-        <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
-        </template>
-        </el-table-column>
+            <el-table-column
+              label="操作"
+              width="80">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="openDialog('edit', scope.row)"></el-button>
+                <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)"></el-button>
+                <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
+              </template>
+            </el-table-column>
 
-        <el-table-column prop="category_id" label="代码类别key" align="left"></el-table-column>
-        <el-table-column prop="category_name" label="代码类别value" align="left"></el-table-column>
-        <!--<el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>-->
-        </el-table>
+            <el-table-column prop="category_id" label="代码类别key" align="left"></el-table-column>
+            <el-table-column prop="category_name" label="代码类别value" align="left"></el-table-column>
+            <!--<el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>-->
+          </el-table>
 
-        <el-pagination style="margin-top: 10px; text-align: right;"
-        :current-page="currentPage"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :page-sizes="[10, 25, 50, 100]"
-        :page-size="pageSize"
-        layout="total, sizes, prev, next, jumper"
-        :total="total">
-        </el-pagination>
+          <el-pagination style="margin-top: 10px; text-align: right;"
+                         :current-page="currentPage"
+                         @size-change="handleSizeChange"
+                         @current-change="handleCurrentChange"
+                         :page-sizes="[10, 25, 50, 100]"
+                         :page-size="pageSize"
+                         layout="total, sizes, prev, next, jumper"
+                         :total="total">
+          </el-pagination>
 
         </section>
       </el-col>
 
       <el-col :span="12" style="border-right: 1px solid #eee">
-        <div style="height:38px;margin-top: 5px;text-align: left;border-bottom: 1px solid #eee; margin-left: 10px;">
-          <el-row v-show="dictInfoShow">
+        <div class="toolbar">
+          <div style="float: left ">
             <el-button plain class="el-icon-plus" @click="openInfoDialog('add')">新建</el-button>
-          </el-row>
+          </div>
         </div>
+        <section class="section">
+          <el-table
+            :data="dictInfoData"
+            style="width: 100%"
+            v-show="dictInfoShow">
+            <el-table-column
+              label="操作"
+              width="80">
+              <template slot-scope="scope">
+                <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="openInfoDialog('edit', scope.row)"></el-button>
+                <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delInfoData(scope.row)"></el-button>
+                <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
+              </template>
+            </el-table-column>
 
-        <section class="table">
-        <el-table
-          :data="dictInfoData"
-          style="width: 100%"
-          v-show="dictInfoShow"
-          >
-
-          <el-table-column
-            label="操作"
-            width="80">
-            <template slot-scope="scope">
-              <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="openInfoDialog('edit', scope.row)"></el-button>
-              <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delInfoData(scope.row)"></el-button>
-              <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="code_key" label="代码key" align="left"></el-table-column>
-          <el-table-column prop="code_value" label="代码value" align="left"></el-table-column>
-        </el-table>
+            <el-table-column prop="code_key" label="代码key" align="left"></el-table-column>
+            <el-table-column prop="code_value" label="代码value" align="left"></el-table-column>
+          </el-table>
         </section>
       </el-col>
     </el-row>
 
     <!--<el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"-->
-             <!--:inline="inline" style="text-align: left">-->
-      <!--<el-form-item label="代码类别key:" prop="category_id">-->
-        <!--<el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50></el-input>-->
-      <!--</el-form-item>-->
-      <!--<el-form-item label="代码类别value:" prop="category_name">-->
-        <!--<el-input v-model="queryShowForm.category_name" auto-complete="off" :maxlength=50></el-input>-->
-      <!--</el-form-item>-->
+    <!--:inline="inline" style="text-align: left">-->
+    <!--<el-form-item label="代码类别key:" prop="category_id">-->
+    <!--<el-input v-model="queryShowForm.category_id" auto-complete="off" :maxlength=50></el-input>-->
+    <!--</el-form-item>-->
+    <!--<el-form-item label="代码类别value:" prop="category_name">-->
+    <!--<el-input v-model="queryShowForm.category_name" auto-complete="off" :maxlength=50></el-input>-->
+    <!--</el-form-item>-->
     <!--</el-form>-->
 
     <!--<div style="margin-bottom: 10px;text-align: left ">-->
-      <!--<el-button class="el-icon-search" type="primary" @click="searchData('queryShowForm')">查询</el-button>-->
-      <!--<el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>-->
+    <!--<el-button class="el-icon-search" type="primary" @click="searchData('queryShowForm')">查询</el-button>-->
+    <!--<el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>-->
     <!--</div>-->
 
     <!--<el-table-->
-      <!--:data="dictData"-->
-      <!--style="width: 100%"-->
-      <!--@selection-change="handleSelectionChange">-->
+    <!--:data="dictData"-->
+    <!--style="width: 100%"-->
+    <!--@selection-change="handleSelectionChange">-->
 
-      <!--<el-table-column-->
-        <!--fixed="left"-->
-        <!--label="操作"-->
-        <!--width="150">-->
-        <!--<template slot-scope="scope">-->
-          <!--<el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>-->
-          <!--<el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>-->
-          <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
+    <!--<el-table-column-->
+    <!--fixed="left"-->
+    <!--label="操作"-->
+    <!--width="150">-->
+    <!--<template slot-scope="scope">-->
+    <!--<el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>-->
+    <!--<el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>-->
+    <!--<el-button type="text" size="small" @click="showData(scope.row)">查看</el-button>-->
+    <!--</template>-->
+    <!--</el-table-column>-->
 
-      <!--<el-table-column prop="category_id" label="代码类别key" align="left" width="180"></el-table-column>-->
-      <!--<el-table-column prop="category_name" label="代码类别value" align="left" width="180"></el-table-column>-->
-      <!--<el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>-->
+    <!--<el-table-column prop="category_id" label="代码类别key" align="left" width="180"></el-table-column>-->
+    <!--<el-table-column prop="category_name" label="代码类别value" align="left" width="180"></el-table-column>-->
+    <!--<el-table-column prop="category_sql" label="代码类别sql" align="left"></el-table-column>-->
     <!--</el-table>-->
     <!--<el-pagination style="margin-top: 10px; text-align: right;"-->
-                   <!--:current-page="currentPage"-->
-                   <!--@size-change="handleSizeChange"-->
-                   <!--@current-change="handleCurrentChange"-->
-                   <!--:page-sizes="[10, 25, 50, 100]"-->
-                   <!--:page-size="pageSize"-->
-                   <!--layout="total, sizes, prev, pager, next, jumper"-->
-                   <!--:total="total">-->
+    <!--:current-page="currentPage"-->
+    <!--@size-change="handleSizeChange"-->
+    <!--@current-change="handleCurrentChange"-->
+    <!--:page-sizes="[10, 25, 50, 100]"-->
+    <!--:page-size="pageSize"-->
+    <!--layout="total, sizes, prev, pager, next, jumper"-->
+    <!--:total="total">-->
     <!--</el-pagination>-->
 
-    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false" width="40%">
       <el-form :model="dictDialogForm" :rules="rules" ref="dictDialogForm" style="text-align: left">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
           <el-input v-model="dictDialogForm.category_id" auto-complete="off" :disabled="categoryIdReadonly" :maxlength="50"></el-input>
@@ -155,7 +147,7 @@
       </el-form>
     </el-dialog>
 
-    <el-dialog :title="infoDialogTitle" :visible.sync="infoDialogVisible" style="text-align: left" :close-on-click-modal="false">
+    <el-dialog :title="infoDialogTitle" :visible.sync="infoDialogVisible" style="text-align: left" :close-on-click-modal="false" width="40%">
       <el-form :model="dictInfoDialogForm" :rules="infoRules" ref="dictInfoDialogForm">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
           <el-input v-model="dictInfoDialogForm.category_id" auto-complete="off" :disabled="true" :maxlength=50></el-input>
