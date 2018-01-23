@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <el-row :gutter="20">
       <el-col :span="12">
         <div class="toolbar">
@@ -14,7 +13,6 @@
             </el-input>
           </div>
         </div>
-
         <section class="section">
           <el-table
             :data="dictData"
@@ -49,7 +47,6 @@
 
         </section>
       </el-col>
-
       <el-col :span="12" style="border-right: 1px solid #eee">
         <div class="toolbar">
           <div style="float: left ">
@@ -146,7 +143,6 @@
 
       </el-form>
     </el-dialog>
-
     <el-dialog :title="infoDialogTitle" :visible.sync="infoDialogVisible" style="text-align: left" :close-on-click-modal="false" width="40%">
       <el-form :model="dictInfoDialogForm" :rules="infoRules" ref="dictInfoDialogForm">
         <el-form-item label="代码类别key:" :label-width="formLabelWidth" prop="category_id">
@@ -170,7 +166,6 @@
             <el-button @click="infoDialogVisible = false" size="large">取 消</el-button>
           </el-form-item>
         </div>
-
       </el-form>
     </el-dialog>
   </div>
