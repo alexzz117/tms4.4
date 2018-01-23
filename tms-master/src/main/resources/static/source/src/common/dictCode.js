@@ -15,6 +15,7 @@ function getCodeData(type) {
   if (util.isEmptyObject(dictCode) || type === 'reload') {
     ajax.get({
       url: '/common/dict',
+      loading: false,
       success: function (data) {
         dictCode = data.codes ? data.codes : {}
         if (typeof window.localStorage !== 'undefined') {

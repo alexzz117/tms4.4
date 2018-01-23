@@ -27,6 +27,7 @@ let defaultOption = {
   param: {},
   model: modelDef.manager,
   toLowerCase: true,
+  loading: true,
   success: function (data) {},
   error: function (data) {
     vue.$message({
@@ -52,14 +53,16 @@ let defaultOption = {
 }
 
 function post (opt) {
-  let loading = vue.$loading({
-    lock: true,
-    text: 'Loading',
-    spinner: 'el-icon-loading',
-    background: 'rgba(0, 0, 0, 0.7)'
-  });
   let option = {}
   Object.assign(option, defaultOption, opt)
+  if (option.loading) {
+    var loading = vue.$loading({
+      lock: true,
+      text: 'Loading',
+      spinner: 'el-icon-loading',
+      background: 'rgba(0, 0, 0, 0.7)'
+    });
+  }
   var sendUrl = config.prefix + option.model + option.url
   axios.post(sendUrl, option.param)
     .then(function (response) {
@@ -76,23 +79,29 @@ function post (opt) {
           option.error(response.data)
         }
       }
-      loading.close()
+      if (loading) {
+        loading.close()
+      }
     })
     .catch(function (error) {
       option.fail(error)
-      loading.close()
+      if (loading) {
+        loading.close()
+      }
     })
 }
 
 function get (opt) {
-  let loading = vue.$loading({
-    lock: true,
-    text: 'Loading',
-    spinner: 'el-icon-loading',
-    background: 'rgba(0, 0, 0, 0.7)'
-  });
   let option = {}
   Object.assign(option, defaultOption, opt)
+  if (option.loading) {
+    var loading = vue.$loading({
+      lock: true,
+      text: 'Loading',
+      spinner: 'el-icon-loading',
+      background: 'rgba(0, 0, 0, 0.7)'
+    });
+  }
   var sendUrl = config.prefix + option.model + option.url
 
   axios.get(sendUrl)
@@ -110,11 +119,15 @@ function get (opt) {
           option.error(response.data)
         }
       }
-      loading.close()
+      if (loading) {
+        loading.close()
+      }
     })
     .catch(function (error) {
       option.fail(error)
-      loading.close()
+      if (loading) {
+        loading.close()
+      }
     })
 }
 
