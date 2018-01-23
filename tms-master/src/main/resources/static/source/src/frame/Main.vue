@@ -296,4 +296,11 @@
     height:100%;
     overflow: auto
   }
+
+  .more-query {
+    background-color: #F0F1F4;
+    border-radius: 7px;
+    padding-top: 20px;
+    margin-bottom: 20px;
+  }
 </style>
