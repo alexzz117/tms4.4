@@ -297,6 +297,16 @@
     overflow: auto
   }
 
+  .section-toolbar {
+    margin-bottom: 20px;
+    text-align: left;
+    background-color: #FFFFFF;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 20px;
+    border-radius: 7px;
+  }
+
   .more-query {
     background-color: #F0F1F4;
     border-radius: 7px;
