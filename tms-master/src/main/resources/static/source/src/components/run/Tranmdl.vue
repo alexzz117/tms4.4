@@ -3,15 +3,17 @@
     <el-collapse v-model="activeName" accordion>
       <el-collapse-item name="1">
         <template slot="title">
-          <span>交易模型</span>
-          <el-button type="text" icon="el-icon-plus" @click.stop="tmAddFunc" title="新建交易模型" :disabled="readonly"></el-button>
+          <div style="margin:10px;text-align: left ">
+            <span style="margin-right: 10px">交易模型</span>
+            <el-button plain class="el-icon-plus" @click.stop="tmAddFunc" :disabled="readonly">新建</el-button>
+          </div>
         </template>
         <div>
           <el-table :data="tmTableData" ref="tmTable"
                     :span-method="groupHandle"
                     :row-class-name="groupClassName"
                     @row-click="toggleListHandle"
-                    max-height="335"
+                    max-height="550"
                     class="collapse-table-style">
             <el-table-column align="left" width="100px" label="操作">
               <template slot-scope="scope">
@@ -38,8 +40,10 @@
       </el-collapse-item>
       <el-collapse-item name="2">
         <template slot="title">
-          <span>交易模型引用</span>
-          <el-button type="text" class="el-icon-plus" @click.stop="tableAddFunc" :disabled="readonly"></el-button>
+          <div style="float: left">
+            <span style="margin-right: 10px">交易模型引用</span>
+            <el-button class="el-icon-plus" @click.stop="tableAddFunc" :disabled="readonly">新建</el-button>
+          </div>
         </template>
         <div>
           <el-table :data="tableData" ref="refTable"

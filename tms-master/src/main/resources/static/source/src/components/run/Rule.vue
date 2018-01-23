@@ -1,329 +1,329 @@
 <template>
   <div>
-        <!--<transition name="fade">-->
-          <!--<el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"-->
-                   <!--:inline="true" style="text-align: left" v-show="queryFormShow" >-->
-            <!--<el-form-item label="规则名称:" prop="stat_name">-->
-              <!--<el-input v-model="queryShowForm.rule_shortdesc" class="rule-query-form-item" auto-complete="off" clearable></el-input>-->
-            <!--</el-form-item>-->
+    <!--<transition name="fade">-->
+    <!--<el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"-->
+    <!--:inline="true" style="text-align: left" v-show="queryFormShow" >-->
+    <!--<el-form-item label="规则名称:" prop="stat_name">-->
+    <!--<el-input v-model="queryShowForm.rule_shortdesc" class="rule-query-form-item" auto-complete="off" clearable></el-input>-->
+    <!--</el-form-item>-->
 
-            <!--<el-form-item label="评估类型:" prop="eval_type">-->
-              <!--<el-select v-model="queryShowForm.eval_type" class="rule-query-form-item" placeholder="请选择"-->
-                         <!--clearable>-->
-                <!--<el-option-->
-                  <!--v-for="item in evalTypeList"-->
-                  <!--:key="item.value"-->
-                  <!--:label="item.label"-->
-                  <!--:value="item.value">-->
-                <!--</el-option>-->
+    <!--<el-form-item label="评估类型:" prop="eval_type">-->
+    <!--<el-select v-model="queryShowForm.eval_type" class="rule-query-form-item" placeholder="请选择"-->
+    <!--clearable>-->
+    <!--<el-option-->
+    <!--v-for="item in evalTypeList"-->
+    <!--:key="item.value"-->
+    <!--:label="item.label"-->
+    <!--:value="item.value">-->
+    <!--</el-option>-->
 
-              <!--</el-select>-->
+    <!--</el-select>-->
 
-            <!--</el-form-item>-->
-            <!--<el-form-item label="处置方式:" prop="disposal">-->
-              <!--<el-select v-model="queryShowForm.disposal" class="rule-query-form-item" placeholder="请选择"-->
-                         <!--clearable>-->
-                <!--<el-option-->
-                  <!--v-for="item in disposalList"-->
-                  <!--:key="item.dp_code"-->
-                  <!--:label="item.dp_name"-->
-                  <!--:value="item.dp_code">-->
-                <!--</el-option>-->
+    <!--</el-form-item>-->
+    <!--<el-form-item label="处置方式:" prop="disposal">-->
+    <!--<el-select v-model="queryShowForm.disposal" class="rule-query-form-item" placeholder="请选择"-->
+    <!--clearable>-->
+    <!--<el-option-->
+    <!--v-for="item in disposalList"-->
+    <!--:key="item.dp_code"-->
+    <!--:label="item.dp_name"-->
+    <!--:value="item.dp_code">-->
+    <!--</el-option>-->
 
-              <!--</el-select>-->
-            <!--</el-form-item>-->
-            <!--<el-form-item label="有效性:" prop="rule_enable">-->
-              <!--<el-select v-model="queryShowForm.rule_enable" class="rule-query-form-item" placeholder="请选择"-->
-                         <!--clearable>-->
-                <!--<el-option-->
-                  <!--v-for="item in ruleEnableList"-->
-                  <!--:key="item.value"-->
-                  <!--:label="item.label"-->
-                  <!--:value="item.value">-->
-                <!--</el-option>-->
+    <!--</el-select>-->
+    <!--</el-form-item>-->
+    <!--<el-form-item label="有效性:" prop="rule_enable">-->
+    <!--<el-select v-model="queryShowForm.rule_enable" class="rule-query-form-item" placeholder="请选择"-->
+    <!--clearable>-->
+    <!--<el-option-->
+    <!--v-for="item in ruleEnableList"-->
+    <!--:key="item.value"-->
+    <!--:label="item.label"-->
+    <!--:value="item.value">-->
+    <!--</el-option>-->
 
-              <!--</el-select>-->
-            <!--</el-form-item>-->
-          <!--</el-form>-->
+    <!--</el-select>-->
+    <!--</el-form-item>-->
+    <!--</el-form>-->
 
-        <!--</transition>-->
+    <!--</transition>-->
 
-        <div style="margin-bottom: 10px;text-align: left ">
+    <div style="margin-bottom: 10px;text-align: left ">
 
-          <el-button plain class="el-icon-plus" @click="openDialog('add')" :disabled="readonlyParent">新建</el-button>
-          <div style="float:right">
-            <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off" clearable>
-              <i slot="prefix" class="el-input__icon el-icon-search"></i>
-            </el-input>
-            <!--<el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>-->
-          </div>
-        </div>
-    <section class="table">
-        <el-table
-          ref="dataTable"
-          :data="tableDataShow"
-          style="width: 100%">
+      <el-button plain class="el-icon-plus" @click="openDialog('add')" :disabled="readonlyParent">新建</el-button>
+      <div style="float:right">
+        <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off" clearable>
+          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+        </el-input>
+        <!--<el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>-->
+      </div>
+    </div>
+    <section class="section">
+      <el-table
+        ref="dataTable"
+        :data="tableDataShow"
+        style="width: 100%">
 
-          <el-table-column
-            label="操作"
-            width="120">
-            <template slot-scope="scope">
+        <el-table-column
+          label="操作"
+          width="120">
+          <template slot-scope="scope">
 
-              <el-button v-if="readonlyParent" type="text" size="small" icon="el-icon-view" title="查看"  @click="openDialog('edit', scope.row)"></el-button>
-              <el-button v-if="!readonlyParent" type="text" size="small" icon="el-icon-edit" title="编辑"  @click="openDialog('edit', scope.row)"></el-button>
+            <el-button v-if="readonlyParent" type="text" size="small" icon="el-icon-view" title="查看"  @click="openDialog('edit', scope.row)"></el-button>
+            <el-button v-if="!readonlyParent" type="text" size="small" icon="el-icon-edit" title="编辑"  @click="openDialog('edit', scope.row)"></el-button>
 
-              <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copy(scope.row)" :disabled="readonlyParent"></el-button>
-              <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)" :disabled="readonlyParent"></el-button>
-              <!--<el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>-->
+            <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copy(scope.row)" :disabled="readonlyParent"></el-button>
+            <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)" :disabled="readonlyParent"></el-button>
+            <!--<el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>-->
 
-            </template>
-          </el-table-column>
-          <el-table-column prop="rule_shortdesc" label="规则名称" align="left" ></el-table-column>
-          <el-table-column label="评估类型" align="left" width="80">
-            <template slot-scope="scope">
-              <span>{{scope.row.eval_type | evalTypeFilter}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="处置方式" align="left" width="80">
-            <template slot-scope="scope">
-              <span>{{scope.row.disposal | disposalFilter}}</span>
-            </template>
-          </el-table-column>
+          </template>
+        </el-table-column>
+        <el-table-column prop="rule_shortdesc" label="规则名称" align="left" ></el-table-column>
+        <el-table-column label="评估类型" align="left" width="80">
+          <template slot-scope="scope">
+            <span>{{scope.row.eval_type | evalTypeFilter}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="处置方式" align="left" width="80">
+          <template slot-scope="scope">
+            <span>{{scope.row.disposal | disposalFilter}}</span>
+          </template>
+        </el-table-column>
 
-          <el-table-column prop="action_count" label="动作数量" align="left" width="80"></el-table-column>
+        <el-table-column prop="action_count" label="动作数量" align="left" width="80"></el-table-column>
 
-          <el-table-column label="是否测试" align="left" width="80">
-            <template slot-scope="scope">
-              <span>{{scope.row.rule_istest | ruleIsTestFilter}}</span>
-            </template>
-          </el-table-column>
+        <el-table-column label="是否测试" align="left" width="80">
+          <template slot-scope="scope">
+            <span>{{scope.row.rule_istest | ruleIsTestFilter}}</span>
+          </template>
+        </el-table-column>
 
-          <el-table-column label="有效性" align="left" width="80">
-            <template slot-scope="scope">
-              <el-switch
-                v-model="scope.row.rule_enable"
-                :active-value=1
-                :inactive-value=0
-                :disabled="ruleEnableBtnDisabled || readonlyParent"
-                @change="ruleEnableChange(scope.row)">
-              </el-switch>
-            </template>
-          </el-table-column>
-        </el-table>
+        <el-table-column label="有效性" align="left" width="80">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.rule_enable"
+              :active-value=1
+              :inactive-value=0
+              :disabled="ruleEnableBtnDisabled || readonlyParent"
+              @change="ruleEnableChange(scope.row)">
+            </el-switch>
+          </template>
+        </el-table-column>
+      </el-table>
     </section>
-        <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px" :close-on-click-modal="false">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px" :close-on-click-modal="false">
 
-          <el-tabs ref="dialogTab" v-model="dialogTabActive" type="card">
-            <el-tab-pane label="数据编辑" name="dataMod">
-              <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true" :rules="dialogFormRules">
-                <el-form-item label="规则名称:" :label-width="formLabelWidth" prop="rule_shortdesc" :style="formItemStyle">
-                  <el-input v-model="dialogForm.rule_shortdesc" auto-complete="off" :style="formItemContentStyle" :maxlength="128" :disabled="readonlyParent"></el-input>
-                </el-form-item>
+      <el-tabs ref="dialogTab" v-model="dialogTabActive" type="card">
+        <el-tab-pane label="数据编辑" name="dataMod">
+          <el-form :model="dialogForm" ref="dialogForm" style="text-align: left" :inline="true" :rules="dialogFormRules">
+            <el-form-item label="规则名称:" :label-width="formLabelWidth" prop="rule_shortdesc" :style="formItemStyle">
+              <el-input v-model="dialogForm.rule_shortdesc" auto-complete="off" :style="formItemContentStyle" :maxlength="128" :disabled="readonlyParent"></el-input>
+            </el-form-item>
 
-                <el-form-item label="规则条件:" class="is-required" :label-width="formLabelWidth" prop="rule_cond_in" :style="formItemStyle">
-                  <div @dblclick="ruleCondInPopup">
-                    <el-input v-model="dialogForm.rule_cond_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
-                    <el-input v-model="dialogForm.rule_cond" v-show="false" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
-                  </div>
-                </el-form-item>
-
-                <el-form-item label="评估类型:" :label-width="formLabelWidth" prop="eval_type" :style="formItemStyle">
-                  <el-select v-model="dialogForm.eval_type" placeholder="请选择" :style="formItemContentStyle" :disabled="readonlyParent"
-                             clearable>
-                    <el-option
-                      v-for="item in evalTypeList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-
-                  </el-select>
-                </el-form-item>
-
-                <el-form-item label="处置方式:" :label-width="formLabelWidth" prop="disposal" :style="formItemStyle">
-                  <el-select v-model="dialogForm.disposal" placeholder="请选择" :style="formItemContentStyle" :disabled="readonlyParent"
-                             clearable>
-                    <el-option
-                      v-for="item in disposalList"
-                      :key="item.dp_code"
-                      :label="item.dp_name"
-                      :value="item.dp_code">
-                    </el-option>
-
-                  </el-select>
-                </el-form-item>
-
-                <el-form-item label="分值:" :label-width="formLabelWidth" prop="rule_score" :style="formItemStyle">
-                  <el-input v-model="dialogForm.rule_score" auto-complete="off" :style="formItemContentStyle" :disabled="readonlyParent"></el-input>
-                </el-form-item>
-
-                <el-form-item label="是否测试:" :label-width="formLabelWidth" prop="rule_istest" :style="formItemStyle">
-                  <el-switch
-                    :disabled="readonlyParent"
-                    v-model="dialogForm.rule_istest"
-                    active-value="1"
-                    inactive-value="0"
-                  >
-                  </el-switch>
-                </el-form-item>
-
-                <el-form-item label="有效性:" :label-width="formLabelWidth" prop="rule_enable" :style="formItemStyle" >
-                  <el-switch
-                    :disabled="readonlyParent"
-                    v-model="dialogForm.rule_enable"
-                    active-value="1"
-                    inactive-value="0"
-                  >
-                  </el-switch>
-                </el-form-item>
-                <div>
-                  <el-form-item label="规则描述:" :label-width="formLabelWidth" prop="rule_desc">
-                    <el-input type="textarea" v-model="dialogForm.rule_desc" :style="textareaContentStyle"  :maxlength="1024" :disabled="readonlyParent"></el-input>
-                  </el-form-item>
-                </div>
-
-                <div>
-                  <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
-                    <el-button v-if="!readonlyParent" type="primary" @click="submitForm('dialogForm')" :disabled="dialogFormSureBtnDisabled" size="large">保 存</el-button>
-                    <el-button @click="dialogVisible = false" size="large">取 消</el-button>
-                  </el-form-item>
-                </div>
-
-
-              </el-form>
-            </el-tab-pane>
-            <el-tab-pane label="动作列表" name="actionList" v-if="dialogType === 'edit'">
-              <div style="margin-bottom: 10px;text-align: left ">
-                <el-button plain class="el-icon-plus" @click="openActionDialog('add')" :disabled="readonlyParent">新建</el-button>
+            <el-form-item label="规则条件:" class="is-required" :label-width="formLabelWidth" prop="rule_cond_in" :style="formItemStyle">
+              <div @dblclick="ruleCondInPopup">
+                <el-input v-model="dialogForm.rule_cond_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
+                <el-input v-model="dialogForm.rule_cond" v-show="false" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
               </div>
+            </el-form-item>
 
-              <el-table
-                ref="actionDataTable"
-                :data="actionTableDataShow"
-                style="width: 100%">
+            <el-form-item label="评估类型:" :label-width="formLabelWidth" prop="eval_type" :style="formItemStyle">
+              <el-select v-model="dialogForm.eval_type" placeholder="请选择" :style="formItemContentStyle" :disabled="readonlyParent"
+                         clearable>
+                <el-option
+                  v-for="item in evalTypeList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
 
-                <el-table-column
-                  label="操作"
-                  width="150">
-                  <template slot-scope="scope">
+              </el-select>
+            </el-form-item>
 
-                    <el-button v-if="readonlyParent" type="text" size="small" icon="el-icon-view" title="查看"  @click="openActionDialog('edit', scope.row)"></el-button>
-                    <el-button v-if="!readonlyParent" type="text" size="small" icon="el-icon-edit" title="编辑"  @click="openActionDialog('edit', scope.row)"></el-button>
+            <el-form-item label="处置方式:" :label-width="formLabelWidth" prop="disposal" :style="formItemStyle">
+              <el-select v-model="dialogForm.disposal" placeholder="请选择" :style="formItemContentStyle" :disabled="readonlyParent"
+                         clearable>
+                <el-option
+                  v-for="item in disposalList"
+                  :key="item.dp_code"
+                  :label="item.dp_name"
+                  :value="item.dp_code">
+                </el-option>
 
-                    <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copyAction(scope.row)" :disabled="readonlyParent"></el-button>
-                    <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delActionData(scope.row)" :disabled="readonlyParent"></el-button>
+              </el-select>
+            </el-form-item>
 
-                  </template>
-                </el-table-column>
-                <el-table-column prop="ac_desc" label="动作名称" align="left" width="160"></el-table-column>
-                <el-table-column prop="ac_cond_in" label="动作条件" align="left" width="230"></el-table-column>
-                <el-table-column prop="ac_expr_in" label="处理函数" align="left" width="230"></el-table-column>
-                <el-table-column label="有效性" align="left" width="80">
-                  <template slot-scope="scope">
-                    <el-switch
-                      v-model="scope.row.ac_enable"
-                      :active-value=1
-                      :inactive-value=0
-                      :disabled="acEnableBtnDisabled || readonlyParent"
-                      @change="acEnableChange(scope.row)">
-                    </el-switch>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </el-tab-pane>
-          </el-tabs>
+            <el-form-item label="分值:" :label-width="formLabelWidth" prop="rule_score" :style="formItemStyle">
+              <el-input v-model="dialogForm.rule_score" auto-complete="off" :style="formItemContentStyle" :disabled="readonlyParent"></el-input>
+            </el-form-item>
 
-          <el-dialog :title="actionDialogTitle" :visible.sync="actionDialogVisible" width="450px" :modal="false" :close-on-click-modal="false">
-            <el-form :model="actionDialogForm" ref="actionDialogForm" style="text-align: left" :rules="actionRules" :inline="true">
-              <el-form-item label="动作名称:" :label-width="formLabelWidth" prop="ac_desc" :style="formItemStyle">
-                <el-input v-model="actionDialogForm.ac_desc" auto-complete="off" :style="formItemContentStyle" :maxlength="128" :disabled="readonlyParent"></el-input>
+            <el-form-item label="是否测试:" :label-width="formLabelWidth" prop="rule_istest" :style="formItemStyle">
+              <el-switch
+                :disabled="readonlyParent"
+                v-model="dialogForm.rule_istest"
+                active-value="1"
+                inactive-value="0"
+              >
+              </el-switch>
+            </el-form-item>
+
+            <el-form-item label="有效性:" :label-width="formLabelWidth" prop="rule_enable" :style="formItemStyle" >
+              <el-switch
+                :disabled="readonlyParent"
+                v-model="dialogForm.rule_enable"
+                active-value="1"
+                inactive-value="0"
+              >
+              </el-switch>
+            </el-form-item>
+            <div>
+              <el-form-item label="规则描述:" :label-width="formLabelWidth" prop="rule_desc">
+                <el-input type="textarea" v-model="dialogForm.rule_desc" :style="textareaContentStyle"  :maxlength="1024" :disabled="readonlyParent"></el-input>
               </el-form-item>
-              <el-form-item label="动作条件:" :label-width="formLabelWidth" prop="ac_cond_in" :style="formItemStyle">
-                <div @dblclick="acCondInPopup">
-                  <el-input v-show="false" v-model="actionDialogForm.ac_cond" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
-                  <el-input v-model="actionDialogForm.ac_cond_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
-                </div>
+            </div>
+
+            <div>
+              <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+                <el-button v-if="!readonlyParent" type="primary" @click="submitForm('dialogForm')" :disabled="dialogFormSureBtnDisabled" size="large">保 存</el-button>
+                <el-button @click="dialogVisible = false" size="large">取 消</el-button>
               </el-form-item>
-              <el-form-item class="is-required" label="处理函数:" :label-width="formLabelWidth" prop="ac_expr_in" :style="formItemStyle">
-                <div @dblclick="acExprInPopup">
-                <el-input v-show="false" v-model="actionDialogForm.ac_expr" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
-                <el-input v-model="actionDialogForm.ac_expr_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
-                </div>
-              </el-form-item>
-              <el-form-item label="有效性:" :label-width="formLabelWidth" prop="ac_enable" :style="formItemStyle">
-                <el-switch
-                  :disabled="readonlyParent"
-                  v-model="actionDialogForm.ac_enable"
-                  active-value="1"
-                  inactive-value="0"
-                >
-                </el-switch>
-              </el-form-item>
+            </div>
 
-              <div>
-                <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
-                  <el-button v-if="!readonlyParent" type="primary" @click="submitActionForm('actionDialogForm')" :disabled="actionFormSureBtnDisabled" size="large">保 存</el-button>
-                  <el-button @click="actionDialogVisible = false" size="large">取 消</el-button>
-                </el-form-item>
-              </div>
 
-            </el-form>
-            <StatCondPicker ref="acCondDialog" @valueCallback="acCondInValueCallBack"
-                            :statCond="actionDialogForm.ac_cond" :statCondIn="actionDialogForm.ac_cond_in" :txnId="txnIdParent"
-                            :hideItems="['rule_func', 'ac_func']" >
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="动作列表" name="actionList" v-if="dialogType === 'edit'">
+          <div style="margin-bottom: 10px;text-align: left ">
+            <el-button plain class="el-icon-plus" @click="openActionDialog('add')" :disabled="readonlyParent">新建</el-button>
+          </div>
 
-            </StatCondPicker>
-
-            <StatCondPicker ref="acExprDialog" @valueCallback="acExprValueCallBack"
-                            :statCond="actionDialogForm.ac_expr" :statCondIn="actionDialogForm.ac_expr_in" :txnId="txnIdParent"
-                            :hideItems="['rule_func']" >
-
-            </StatCondPicker>
-          </el-dialog>
-
-        </el-dialog>
-
-        <StatCondPicker ref="RuleCondDialog" @valueCallback="ruleCondInValueCallBack"
-                        :statCond="dialogForm.rule_cond" :statCondIn="dialogForm.rule_cond_in" :txnId="txnIdParent"
-                        :hideItems="['rule_func']" >
-
-        </StatCondPicker>
-
-        <el-dialog :title="refsDialogTitle" :visible.sync="refsDialogVisible" width="1000px" :close-on-click-modal="false">
           <el-table
-            :data="refsTableData"
+            ref="actionDataTable"
+            :data="actionTableDataShow"
             style="width: 100%">
-            <el-table-column prop="st_name" label="策略名称"></el-table-column>
-            <el-table-column prop="tab_desc" label="所属交易"></el-table-column>
-            <el-table-column label="评估方式">
+
+            <el-table-column
+              label="操作"
+              width="150">
               <template slot-scope="scope">
-                <span>{{scope.row.eval_mode | evalModeFilter}}</span>
+
+                <el-button v-if="readonlyParent" type="text" size="small" icon="el-icon-view" title="查看"  @click="openActionDialog('edit', scope.row)"></el-button>
+                <el-button v-if="!readonlyParent" type="text" size="small" icon="el-icon-edit" title="编辑"  @click="openActionDialog('edit', scope.row)"></el-button>
+
+                <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copyAction(scope.row)" :disabled="readonlyParent"></el-button>
+                <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delActionData(scope.row)" :disabled="readonlyParent"></el-button>
+
               </template>
             </el-table-column>
-            <el-table-column label="规则执行方式">
+            <el-table-column prop="ac_desc" label="动作名称" align="left" width="160"></el-table-column>
+            <el-table-column prop="ac_cond_in" label="动作条件" align="left" width="230"></el-table-column>
+            <el-table-column prop="ac_expr_in" label="处理函数" align="left" width="230"></el-table-column>
+            <el-table-column label="有效性" align="left" width="80">
               <template slot-scope="scope">
-                <span>{{scope.row.rule_exec_mode | ruleExecModeFilter}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="rule_count" label="规则数量"></el-table-column>
-            <el-table-column label="创建时间" width="140">
-              <template slot-scope="scope">
-                <span>{{scope.row.createtime | renderDateTime}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="修改时间" width="140">
-              <template slot-scope="scope">
-                <span>{{scope.row.modifytime | renderDateTime}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="有效性">
-              <template slot-scope="scope">
-                <span>{{scope.row.st_enable | stEnableFilter}}</span>
+                <el-switch
+                  v-model="scope.row.ac_enable"
+                  :active-value=1
+                  :inactive-value=0
+                  :disabled="acEnableBtnDisabled || readonlyParent"
+                  @change="acEnableChange(scope.row)">
+                </el-switch>
               </template>
             </el-table-column>
           </el-table>
+        </el-tab-pane>
+      </el-tabs>
 
-        </el-dialog>
+      <el-dialog :title="actionDialogTitle" :visible.sync="actionDialogVisible" width="450px" :modal="false" :close-on-click-modal="false">
+        <el-form :model="actionDialogForm" ref="actionDialogForm" style="text-align: left" :rules="actionRules" :inline="true">
+          <el-form-item label="动作名称:" :label-width="formLabelWidth" prop="ac_desc" :style="formItemStyle">
+            <el-input v-model="actionDialogForm.ac_desc" auto-complete="off" :style="formItemContentStyle" :maxlength="128" :disabled="readonlyParent"></el-input>
+          </el-form-item>
+          <el-form-item label="动作条件:" :label-width="formLabelWidth" prop="ac_cond_in" :style="formItemStyle">
+            <div @dblclick="acCondInPopup">
+              <el-input v-show="false" v-model="actionDialogForm.ac_cond" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
+              <el-input v-model="actionDialogForm.ac_cond_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
+            </div>
+          </el-form-item>
+          <el-form-item class="is-required" label="处理函数:" :label-width="formLabelWidth" prop="ac_expr_in" :style="formItemStyle">
+            <div @dblclick="acExprInPopup">
+              <el-input v-show="false" v-model="actionDialogForm.ac_expr" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
+              <el-input v-model="actionDialogForm.ac_expr_in" auto-complete="off" :style="formItemContentStyle" readonly :disabled="readonlyParent"></el-input>
+            </div>
+          </el-form-item>
+          <el-form-item label="有效性:" :label-width="formLabelWidth" prop="ac_enable" :style="formItemStyle">
+            <el-switch
+              :disabled="readonlyParent"
+              v-model="actionDialogForm.ac_enable"
+              active-value="1"
+              inactive-value="0"
+            >
+            </el-switch>
+          </el-form-item>
+
+          <div>
+            <el-form-item  label=" " :label-width="formLabelWidth" :style="formItemStyle">
+              <el-button v-if="!readonlyParent" type="primary" @click="submitActionForm('actionDialogForm')" :disabled="actionFormSureBtnDisabled" size="large">保 存</el-button>
+              <el-button @click="actionDialogVisible = false" size="large">取 消</el-button>
+            </el-form-item>
+          </div>
+
+        </el-form>
+        <StatCondPicker ref="acCondDialog" @valueCallback="acCondInValueCallBack"
+                        :statCond="actionDialogForm.ac_cond" :statCondIn="actionDialogForm.ac_cond_in" :txnId="txnIdParent"
+                        :hideItems="['rule_func', 'ac_func']" >
+
+        </StatCondPicker>
+
+        <StatCondPicker ref="acExprDialog" @valueCallback="acExprValueCallBack"
+                        :statCond="actionDialogForm.ac_expr" :statCondIn="actionDialogForm.ac_expr_in" :txnId="txnIdParent"
+                        :hideItems="['rule_func']" >
+
+        </StatCondPicker>
+      </el-dialog>
+
+    </el-dialog>
+
+    <StatCondPicker ref="RuleCondDialog" @valueCallback="ruleCondInValueCallBack"
+                    :statCond="dialogForm.rule_cond" :statCondIn="dialogForm.rule_cond_in" :txnId="txnIdParent"
+                    :hideItems="['rule_func']" >
+
+    </StatCondPicker>
+
+    <el-dialog :title="refsDialogTitle" :visible.sync="refsDialogVisible" width="1000px" :close-on-click-modal="false">
+      <el-table
+        :data="refsTableData"
+        style="width: 100%">
+        <el-table-column prop="st_name" label="策略名称"></el-table-column>
+        <el-table-column prop="tab_desc" label="所属交易"></el-table-column>
+        <el-table-column label="评估方式">
+          <template slot-scope="scope">
+            <span>{{scope.row.eval_mode | evalModeFilter}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="规则执行方式">
+          <template slot-scope="scope">
+            <span>{{scope.row.rule_exec_mode | ruleExecModeFilter}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="rule_count" label="规则数量"></el-table-column>
+        <el-table-column label="创建时间" width="140">
+          <template slot-scope="scope">
+            <span>{{scope.row.createtime | renderDateTime}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="修改时间" width="140">
+          <template slot-scope="scope">
+            <span>{{scope.row.modifytime | renderDateTime}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="有效性">
+          <template slot-scope="scope">
+            <span>{{scope.row.st_enable | stEnableFilter}}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+
+    </el-dialog>
 
   </div>
 </template>
