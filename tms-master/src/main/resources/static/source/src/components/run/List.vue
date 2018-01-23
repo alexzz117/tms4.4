@@ -53,7 +53,7 @@
             <el-button
               icon="el-icon-delete"
               type="text"
-              @click="handleRow(scope.$index, scope.row, 'del')"
+              @click="handleRowhandleRow(scope.$index, scope.row, 'del')"
               title="删除"></el-button>
             <el-button
               icon="el-icon-document"
