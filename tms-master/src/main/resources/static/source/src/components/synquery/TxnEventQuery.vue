@@ -1,130 +1,90 @@
 <template>
   <div>
     <transition name="fade">
-      <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
-               :inline="true" v-show="queryFormShow" >
-        <el-form-item label="流水号:" prop="txncode">
-          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
-        <el-form-item label="客户号:" prop="userid">
-          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
-        <el-form-item label="客户名称:" prop="username">
-          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
-        <el-form-item label="IP地址:" prop="ipaddr">
-          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
-        <el-form-item label="设备信息:" prop="deviceid">
-          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
-        <el-form-item label="会话标识:" prop="sessionid">
-          <el-input v-model="queryShowForm.sessionid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
-        <el-form-item label="监控操作:" prop="txntype">
-          <div @click="openTxnTypedialog" >
-            <el-input v-model="queryShowForm.txntype" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
-          </div>
-        </el-form-item>
-        <el-form-item label="处置方式:" prop="disposal">
-          <el-select v-model="queryShowForm.disposal" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in disposalList"
-              :key="item.dp_code"
-              :label="item.dp_name"
-              :value="item.dp_code">
-            </el-option>
-
-          </el-select>
-        </el-form-item>
-        <el-form-item label="是否评估:" prop="iseval">
-          <el-select v-model="queryShowForm.iseval" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in isAssessmentList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-
-          </el-select>
-        </el-form-item>
-        <el-form-item label="认证状态:" prop="iscorrect">
-          <el-select v-model="queryShowForm.iscorrect" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in isCorrectList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="人工确认风险:" prop="confirmrisk">
-          <el-select v-model="queryShowForm.confirmrisk" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in confirmRiskList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="操作状态:" prop="txnstatus">
-          <el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in txnStatusList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间范围:" prop="txntime">
-          <el-date-picker
-            v-model="queryShowForm.txntime"
-            type="datetimerange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="地理位置:" prop="countrycode">
-          <el-select v-model="queryShowForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择" clearable filterable>
-            <el-option
-              v-for="item in countryCodeList"
-              :key="item.countrycode"
-              :label="item.countryname"
-              :value="item.countrycode">
-            </el-option>
-          </el-select>
-          <el-select v-model="queryShowForm.regioncode" class="alarm-event-query-form-item" placeholder="请选择" clearable filterable>
-            <el-option
-              v-for="item in regionCodeList"
-              :key="item.regioncode"
-              :label="item.regionname"
-              :value="item.regioncode">
-            </el-option>
-          </el-select>
-          <el-select v-model="queryShowForm.citycode" class="alarm-event-query-form-item" placeholder="请选择" clearable filterable>
-            <el-option
-              v-for="item in cityCodeList"
-              :key="item.citycode"
-              :label="item.cityname"
-              :value="item.citycode">
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </transition>
-    <el-row>
-      <el-col :span="24">
+      <div class="more-query" v-show="queryFormShow">
         <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
-                 :inline="true" style="text-align: right">
-          <el-form-item label="时间范围:" prop="txntime" v-show="!queryFormShow">
+                 :inline="true">
+          <el-form-item label="流水号:" prop="txncode">
+            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          </el-form-item>
+          <el-form-item label="客户号:" prop="userid">
+            <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          </el-form-item>
+          <el-form-item label="客户名称:" prop="username">
+            <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          </el-form-item>
+          <el-form-item label="IP地址:" prop="ipaddr">
+            <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          </el-form-item>
+          <el-form-item label="设备信息:" prop="deviceid">
+            <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          </el-form-item>
+          <el-form-item label="会话标识:" prop="sessionid">
+            <el-input v-model="queryShowForm.sessionid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          </el-form-item>
+          <el-form-item label="监控操作:" prop="txntype">
+            <div @click="openTxnTypedialog" >
+              <el-input v-model="queryShowForm.txntype" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
+            </div>
+          </el-form-item>
+          <el-form-item label="处置方式:" prop="disposal">
+            <el-select v-model="queryShowForm.disposal" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in disposalList"
+                :key="item.dp_code"
+                :label="item.dp_name"
+                :value="item.dp_code">
+              </el-option>
+
+            </el-select>
+          </el-form-item>
+          <el-form-item label="是否评估:" prop="iseval">
+            <el-select v-model="queryShowForm.iseval" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in isAssessmentList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+
+            </el-select>
+          </el-form-item>
+          <el-form-item label="认证状态:" prop="iscorrect">
+            <el-select v-model="queryShowForm.iscorrect" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in isCorrectList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="人工确认风险:" prop="confirmrisk">
+            <el-select v-model="queryShowForm.confirmrisk" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in confirmRiskList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="操作状态:" prop="txnstatus">
+            <el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in txnStatusList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="时间范围:" prop="txntime">
             <el-date-picker
               v-model="queryShowForm.txntime"
               type="datetimerange"
@@ -133,64 +93,111 @@
               end-placeholder="结束日期">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="流水号:" prop="txncode" v-show="!queryFormShow">
-            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-form-item label="地理位置:" prop="countrycode">
+            <el-select v-model="queryShowForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择" clearable filterable>
+              <el-option
+                v-for="item in countryCodeList"
+                :key="item.countrycode"
+                :label="item.countryname"
+                :value="item.countrycode">
+              </el-option>
+            </el-select>
+            <el-select v-model="queryShowForm.regioncode" class="alarm-event-query-form-item" placeholder="请选择" clearable filterable>
+              <el-option
+                v-for="item in regionCodeList"
+                :key="item.regioncode"
+                :label="item.regionname"
+                :value="item.regioncode">
+              </el-option>
+            </el-select>
+            <el-select v-model="queryShowForm.citycode" class="alarm-event-query-form-item" placeholder="请选择" clearable filterable>
+              <el-option
+                v-for="item in cityCodeList"
+                :key="item.citycode"
+                :label="item.cityname"
+                :value="item.citycode">
+              </el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item>
+          <el-form-item style="float: right">
             <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
             <el-button type="primary" @click="searchData">搜索</el-button>
           </el-form-item>
         </el-form>
-      </el-col>
-    </el-row>
-    <el-table :data="tnxEventTableData">
-      <el-table-column prop="txncode" label="流水号" align="left" fixed min-width="120px" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'operate')" href="javascript:void(0)">{{ scope.row.txncode }}</a>
-        </template>
-      </el-table-column>
-      <el-table-column prop="userid" label="客户号" align="left" fixed min-width="115px" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'user')" href="javascript:void(0)">{{ scope.row.userid }}</a>
-        </template>
-      </el-table-column>
-      <el-table-column prop="sessionid" label="会话标识" align="left" min-width="100px" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'session')" href="javascript:void(0)">{{ scope.row.sessionid }}</a>
-        </template>
-      </el-table-column>
-      <el-table-column prop="txnname" label="监控操作" align="left" min-width="100px"></el-table-column>
-      <el-table-column prop="txntime" label="操作时间" align="left" :formatter="renderDateTime" min-width="100px" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="location" label="地理信息" align="left"  min-width="100px"></el-table-column>
-      <el-table-column prop="deviceid" label="设备信息" align="left">
-        <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'device')" href="javascript:void(0)">{{ scope.row.deviceid }}</a>
-        </template>
-      </el-table-column>
-      <el-table-column prop="ipaddr" label="IP地址" align="left" min-width="112px"></el-table-column>
-      <el-table-column prop="iseval" label="是否评估" align="left" :formatter="renderIsEval"></el-table-column>
-      <el-table-column prop="ismodelrisk" label="风险类型" align="left" :formatter="renderIsModelRisk"></el-table-column>
-      <el-table-column prop="hitrulenum" label="规则命中数" align="left">
-        <template slot-scope="scope">
-          <a @click="queryTxnInfo(scope.row, 'strategy')" href="javascript:void(0)">{{ scope.row.hitrulenum }}</a>
-        </template>
-      </el-table-column>
-      <el-table-column prop="score" label="风险分值" align="left"></el-table-column>
-      <el-table-column prop="iscorrect" label="认证状态" align="left" :formatter="renderIsCorrect"></el-table-column>
-      <el-table-column prop="disposal" label="处置方式" align="left"></el-table-column>
-      <el-table-column prop="confirmrisk" label="人工确认风险" align="left" :formatter="renderConfirmRisk" min-width="105px"></el-table-column>
-      <el-table-column prop="txnstatus" label="操作状态" align="left" :formatter="renderTxnStatus"></el-table-column>
-    </el-table>
+      </div>
+    </transition>
+    <div class="toolbar" v-show="!queryFormShow">
+      <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
+               :inline="true" class="toolbar-form">
+        <el-form-item label="时间范围:" prop="txntime" >
+          <el-date-picker
+            v-model="queryShowForm.txntime"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="流水号:" prop="txncode">
+          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+          <el-button type="primary" @click="searchData">搜索</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
 
-    <el-pagination style="margin-top: 10px; text-align: right;"
-                   :current-page="currentPage"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   :page-sizes="[10, 25, 50, 100]"
-                   :page-size="pageSize"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="total">
-    </el-pagination>
+    <section class="section">
+      <el-table :data="tnxEventTableData">
+        <el-table-column prop="txncode" label="流水号" align="left" fixed min-width="120px" :show-overflow-tooltip="true">
+          <template slot-scope="scope">
+            <a @click="queryTxnInfo(scope.row, 'operate')" href="javascript:void(0)">{{ scope.row.txncode }}</a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="userid" label="客户号" align="left" fixed min-width="115px" :show-overflow-tooltip="true">
+          <template slot-scope="scope">
+            <a @click="queryTxnInfo(scope.row, 'user')" href="javascript:void(0)">{{ scope.row.userid }}</a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="sessionid" label="会话标识" align="left" min-width="100px" :show-overflow-tooltip="true">
+          <template slot-scope="scope">
+            <a @click="queryTxnInfo(scope.row, 'session')" href="javascript:void(0)">{{ scope.row.sessionid }}</a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="txnname" label="监控操作" align="left" min-width="100px"></el-table-column>
+        <el-table-column prop="txntime" label="操作时间" align="left" :formatter="renderDateTime" min-width="100px" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column prop="location" label="地理信息" align="left"  min-width="100px"></el-table-column>
+        <el-table-column prop="deviceid" label="设备信息" align="left">
+          <template slot-scope="scope">
+            <a @click="queryTxnInfo(scope.row, 'device')" href="javascript:void(0)">{{ scope.row.deviceid }}</a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="ipaddr" label="IP地址" align="left" min-width="112px"></el-table-column>
+        <el-table-column prop="iseval" label="是否评估" align="left" :formatter="renderIsEval"></el-table-column>
+        <el-table-column prop="ismodelrisk" label="风险类型" align="left" :formatter="renderIsModelRisk"></el-table-column>
+        <el-table-column prop="hitrulenum" label="规则命中数" align="left">
+          <template slot-scope="scope">
+            <a @click="queryTxnInfo(scope.row, 'strategy')" href="javascript:void(0)">{{ scope.row.hitrulenum }}</a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="score" label="风险分值" align="left"></el-table-column>
+        <el-table-column prop="iscorrect" label="认证状态" align="left" :formatter="renderIsCorrect"></el-table-column>
+        <el-table-column prop="disposal" label="处置方式" align="left"></el-table-column>
+        <el-table-column prop="confirmrisk" label="人工确认风险" align="left" :formatter="renderConfirmRisk" min-width="105px"></el-table-column>
+        <el-table-column prop="txnstatus" label="操作状态" align="left" :formatter="renderTxnStatus"></el-table-column>
+      </el-table>
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     :current-page="currentPage"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pageSize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total">
+      </el-pagination>
+    </section>
+
     <el-dialog title="监控交易" :visible.sync="txntypeDialogVisible" width="400px" >
       <el-tree :data="treeData" node-key="id" ref="tree"
                show-checkbox

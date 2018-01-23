@@ -1,89 +1,145 @@
 <template>
   <div>
     <transition name="fade">
+      <div class="more-query" v-show="queryFormShow">
+        <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
+                 :inline="true" style="text-align: left">
 
-      <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
-               :inline="true" style="text-align: left" v-show="queryFormShow" >
+          <el-form-item label="流水号:" prop="txncode">
+            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
+          </el-form-item>
 
-        <el-form-item label="流水号:" prop="txncode">
-          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
-        </el-form-item>
+          <el-form-item label="客户号:" prop="userid">
+            <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
+          </el-form-item>
 
-        <el-form-item label="客户号:" prop="userid">
-          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
-        </el-form-item>
+          <el-form-item label="客户名称:" prop="username">
+            <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
+          </el-form-item>
 
-        <el-form-item label="客户名称:" prop="username">
-          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
-        </el-form-item>
+          <el-form-item label="设备标识:" prop="deviceid">
+            <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
+          </el-form-item>
 
-        <el-form-item label="设备标识:" prop="deviceid">
-          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
-        </el-form-item>
+          <el-form-item label="IP地址:" prop="ipaddr">
+            <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
+          </el-form-item>
 
-        <el-form-item label="IP地址:" prop="ipaddr">
-          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
-        </el-form-item>
+          <el-form-item label="监控交易:" prop="txntypeShow">
+            <div @click="openTxnTypedialog" >
+              <el-input v-model="queryShowForm.txntypeShow" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
+            </div>
+          </el-form-item>
 
-        <el-form-item label="监控交易:" prop="txntypeShow">
-          <div @click="openTxnTypedialog" >
-            <el-input v-model="queryShowForm.txntypeShow" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
-          </div>
-        </el-form-item>
+          <el-form-item label="处置方式:" prop="disposal">
+            <el-select v-model="queryShowForm.disposal" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in disposalList"
+                :key="item.dp_code"
+                :label="item.dp_name"
+                :value="item.dp_code">
+              </el-option>
 
-        <el-form-item label="处置方式:" prop="disposal">
-          <el-select v-model="queryShowForm.disposal" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in disposalList"
-              :key="item.dp_code"
-              :label="item.dp_name"
-              :value="item.dp_code">
-            </el-option>
+            </el-select>
+          </el-form-item>
 
-          </el-select>
-        </el-form-item>
+          <el-form-item label="处置结果:" prop="iscorrect">
+            <el-select v-model="queryShowForm.iscorrect" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in iscorrectList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
 
-        <el-form-item label="处置结果:" prop="iscorrect">
-          <el-select v-model="queryShowForm.iscorrect" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in iscorrectList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+          <el-form-item label="操作状态:" prop="txnstatus">
+            <el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in txnstatusList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
 
-          </el-select>
-        </el-form-item>
+            </el-select>
+          </el-form-item>
 
-        <el-form-item label="操作状态:" prop="txnstatus">
-          <el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in txnstatusList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+          <el-form-item label="处理状态:" prop="psstatus">
+            <el-select v-model="queryShowForm.psstatus" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable>
+              <el-option
+                v-for="item in psstatusList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
 
-          </el-select>
-        </el-form-item>
+            </el-select>
+          </el-form-item>
 
-        <el-form-item label="处理状态:" prop="psstatus">
-          <el-select v-model="queryShowForm.psstatus" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in psstatusList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+          <el-form-item label="时间范围:" prop="queryDate">
+            <el-date-picker
+              v-model="queryShowForm.queryDate"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </el-form-item>
 
-          </el-select>
-        </el-form-item>
+          <el-form-item label="地理位置:" prop="countrycode">
+            <el-select v-model="queryShowForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable filterable>
+              <el-option
+                v-for="item in countrycodeList"
+                :key="item.countrycode"
+                :label="item.countryname"
+                :value="item.countrycode">
+              </el-option>
 
-        <el-form-item label="时间范围:" prop="queryDate">
+            </el-select>
+
+            <el-select v-model="queryShowForm.regioncode" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable filterable>
+              <el-option
+                v-for="item in regioncodeList"
+                :key="item.regioncode"
+                :label="item.regionname"
+                :value="item.regioncode">
+              </el-option>
+
+            </el-select>
+
+            <el-select v-model="queryShowForm.citycode" class="alarm-event-query-form-item" placeholder="请选择"
+                       clearable filterable>
+              <el-option
+                v-for="item in citycodeList"
+                :key="item.citycode"
+                :label="item.cityname"
+                :value="item.citycode">
+              </el-option>
+
+            </el-select>
+          </el-form-item>
+
+          <el-form-item style="float: right">
+            <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+            <el-button type="primary" @click="searchData">搜索</el-button>
+          </el-form-item>
+
+        </el-form>
+      </div>
+    </transition>
+
+    <div class="toolbar" v-show="!queryFormShow">
+      <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
+               :inline="true" class="toolbar-form">
+        <el-form-item label="时间范围:" prop="queryDate" >
           <el-date-picker
             v-model="queryShowForm.queryDate"
             type="datetimerange"
@@ -92,64 +148,17 @@
             end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
-
-        <el-form-item label="地理位置:" prop="countrycode">
-          <el-select v-model="queryShowForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in countrycodeList"
-              :key="item.countrycode"
-              :label="item.countryname"
-              :value="item.countrycode">
-            </el-option>
-
-          </el-select>
-
-          <el-select v-model="queryShowForm.regioncode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in regioncodeList"
-              :key="item.regioncode"
-              :label="item.regionname"
-              :value="item.regioncode">
-            </el-option>
-
-          </el-select>
-
-          <el-select v-model="queryShowForm.citycode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in citycodeList"
-              :key="item.citycode"
-              :label="item.cityname"
-              :value="item.citycode">
-            </el-option>
-
-          </el-select>
+        <el-form-item label="流水号:" prop="txncode">
+          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
+          <el-button type="primary" @click="searchData">搜索</el-button>
         </el-form-item>
       </el-form>
-
-    </transition>
-
-    <div style="margin-bottom: 10px; text-align: left; height: 30px;">
-      <div style="float:right">
-        <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
-        <el-button type="primary" @click="searchData">搜索</el-button>
-      </div>
-      <div style="float:right; padding-right: 15px;">
-
-        <el-date-picker
-          v-model="queryShowForm.queryDate"
-          type="datetimerange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期">
-        </el-date-picker>
-      </div>
-
     </div>
 
-    <section class="table">
+    <section class="section">
     <el-table
       :data="tableData"
       style="width: 100%">
