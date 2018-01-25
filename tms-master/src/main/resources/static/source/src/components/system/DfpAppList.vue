@@ -1,68 +1,105 @@
 <template>
   <div>
-    <section class="table">
-      <el-table
-        :data="tableData"
-        style="width: 100%">
 
-        <el-table-column
-          fixed="left"
-          label="操作"
-          width="150">
-          <template slot-scope="scope">
-            <el-button type="text" size="small">编辑</el-button>
-            <el-button type="text" size="small">删除</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column prop="auth_id" label="采集方式代码" align="left">
-        </el-table-column>
-        <el-table-column prop="auth_id" label="采集方式名称" align="left"></el-table-column>
-        <el-table-column prop="txnname" label="最多设备数" align="left"></el-table-column>
-        <el-table-column prop="operatename" label="匹配阀值" align="left"></el-table-column>
-        <el-table-column prop="sub_operate_num" label="Cookie名称" align="left"></el-table-column>
-        <el-table-column prop="real_name" label="设备标识生成方式" align="left" width="140"></el-table-column>
-      </el-table>
+    <div style="margin-bottom: 10px; text-align: left; height: 30px;">
+      <el-button plain class="el-icon-plus" @click="openDialog('add')">新建</el-button>
 
-    </section>
+      <div style="float:right; padding-right: 15px;">
+        <el-input v-model="queryShowForm.app_id" placeholder="采集方式名称" class="dfp-app-list-form-item" auto-complete="off" clearable>
+          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+        </el-input>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false">
-      <el-form :model="dialogForm" :rules="rules" ref="dialogForm" style="text-align: left;">
-        <el-form-item label="是否通过授权:" :label-width="formLabelWidth" prop="auth_status">
-          <!--<el-radio v-model="dialogForm.auth_status" label="1">是</el-radio>-->
-          <!--<el-radio v-model="dialogForm.auth_status" label="2">否</el-radio>-->
-          <el-switch
-            v-model="dialogForm.auth_status"
-            active-value="1"
-            inactive-value="2"
-          >
-          </el-switch>
-        </el-form-item>
-        <el-form-item label="授权说明:" :label-width="formLabelWidth" prop="auth_msg">
-          <el-input type="textarea" v-model="dialogForm.auth_msg" :maxlength="2048"></el-input>
-        </el-form-item>
-        <div>
-          <el-form-item label=" " :label-width="formLabelWidth">
-            <el-button type="primary" @click="submitForm('dialogForm')" size="large">保 存</el-button>
-            <el-button @click="dictDialogVisible = false" size="large">取 消</el-button>
+        <!--<el-button type="primary" @click="searchData">搜索</el-button>-->
+      </div>
+
+    </div>
+
+    <div>
+      <section class="table">
+        <el-table
+          :data="tableDataShow"
+          style="width: 100%">
+
+          <el-table-column
+            fixed="left"
+            label="操作"
+            width="100">
+            <template slot-scope="scope">
+              <el-button type="text" size="small">编辑</el-button>
+              <el-button type="text" size="small">删除</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column prop="app_id" label="采集方式代码" align="left">
+          </el-table-column>
+          <el-table-column prop="app_name" label="采集方式名称" align="left"></el-table-column>
+          <el-table-column prop="max_devices" label="最多设备数" align="left"></el-table-column>
+          <el-table-column prop="threshold" label="匹配阀值" align="left"></el-table-column>
+          <el-table-column prop="cookiename" label="Cookie名称" align="left"></el-table-column>
+          <el-table-column label="设备标识生成方式" align="left" width="140">
+            <template slot-scope="scope">
+              <span>{{scope.row.token_type | tokenRender}}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+
+      </section>
+
+      <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false">
+        <el-form :model="dialogForm" :rules="rules" ref="dialogForm" style="text-align: left;">
+          <el-form-item label="是否通过授权:" :label-width="formLabelWidth" prop="auth_status">
+            <!--<el-radio v-model="dialogForm.auth_status" label="1">是</el-radio>-->
+            <!--<el-radio v-model="dialogForm.auth_status" label="2">否</el-radio>-->
+            <el-switch
+              v-model="dialogForm.auth_status"
+              active-value="1"
+              inactive-value="2"
+            >
+            </el-switch>
           </el-form-item>
-        </div>
-      </el-form>
-    </el-dialog>
+          <el-form-item label="授权说明:" :label-width="formLabelWidth" prop="auth_msg">
+            <el-input type="textarea" v-model="dialogForm.auth_msg" :maxlength="2048"></el-input>
+          </el-form-item>
+          <div>
+            <el-form-item label=" " :label-width="formLabelWidth">
+              <el-button type="primary" @click="submitForm('dialogForm')" size="large">保 存</el-button>
+              <el-button @click="dictDialogVisible = false" size="large">取 消</el-button>
+            </el-form-item>
+          </div>
+        </el-form>
+      </el-dialog>
 
+    </div>
   </div>
+
 </template>
 
 <script>
   import ajax from '@/common/ajax'
   import util from '@/common/util'
   import check from '@/common/check'
+  import dictCode from "../../common/dictCode";
 
   export default {
-    computed: {},
+    computed: {
+      tableDataShow () {
+        let appId = this.queryShowForm.app_id
+
+        let showData = this.tableData.filter((x) => {
+          debugger
+          if (appId !== '' && !x.app_id.includes(appId)) {
+            return false
+          }
+
+          return true
+        })
+        return showData
+      }
+    },
     data() {
       return {
         activeName: 'appList',
         tableData: [],
+        tableDataShow: [],
         dialogTitle: '授权意见',
         dictDialogVisible: false,
         dialogForm: this.initDialogForm(),
@@ -75,6 +112,12 @@
             {max: 2048, message: '长度在2048个字符以内', trigger: 'blur'},
             {validator: check.checkFormSpecialCode, trigger: 'blur'}
           ]
+        },
+        queryShowForm: {
+          app_id: ''
+        },
+        queryForm: {
+          app_id: ''
         },
         formLabelWidth: '130px',
         dialogType: '',
@@ -93,6 +136,12 @@
     filters: {
       renderDateTime: function (value) {
         return util.renderDateTime(value)
+      },
+      tokenRender (value) {
+        if (value === undefined || value === '') {
+          return ''
+        }
+        return dictCode.rendCode('tms.dfp.token_type', value)
       }
     },
     methods: {
@@ -175,8 +224,8 @@
           url: '/dfp/appList',
           param: paramsObj,
           success: function (data) {
-            if (data.appList && data.appList.length > 0) {
-              self.tableData = data.appList
+            if (data.row && data.row.length > 0) {
+              self.tableData = data.row
             }
           }
         })
@@ -203,6 +252,12 @@
       submitForm(formName) {
         this.addData(formName)
       },
+      openDialog (dialogType) {
+
+      },
+      searchData () {
+
+      },
       back() {
         this.$router.go(-1)
       }
@@ -211,5 +266,7 @@
 </script>
 
 <style>
-
+  .dfp-app-list-form-item{
+    width: 200px;
+  }
 </style>
