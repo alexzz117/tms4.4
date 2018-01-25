@@ -1,0 +1,998 @@
+2017-02-24 13:53:10,658 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------现在正使用指定的配置文件-------
+2017-02-24 13:53:10,689 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------配置文件路径:/D:/sf/tms-test/bin/properties/tmsServer.properties
+2017-02-24 13:53:10,736 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000315TMS     0002XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>bdfe3d481893444e941c38dafd581bcf</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:10,767 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 正在初始化IP列表,请稍候...
+2017-02-24 13:53:10,767 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:13,107 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.<clinit>(ServerMonitor.java:38) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:221) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.riskEvaluate(TmsApi.java:143) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:78) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 13:53:13,107 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:13,107 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：1
+2017-02-24 13:53:13,107 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 第一次连接服务器初始化列表完成...
+2017-02-24 13:53:13,107 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:253) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.riskEvaluate(TmsApi.java:143) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:78) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 13:53:13,107 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：2
+2017-02-24 13:53:13,107 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 评估服务器(10.118.244.:8000)出现错误，SocketLoadBalance对象send返回码:7(socket连接错误)
+2017-02-24 13:53:13,107 [main] INFO  cn.com.higinet.tms.core.service.MessageAbstractService - runId:2011912556212,开始循环补发.
+2017-02-24 13:53:13,107 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 交易没有找到可用的服务器,报文如下:
+ head:00000315TMS     0002XML         2011912556212                    
+ body:<?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>bdfe3d481893444e941c38dafd581bcf</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:13,122 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:13,122 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:13,122 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:13,122 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：3
+2017-02-24 13:53:13,311 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000339TMS     0001XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>bdfe3d481893444e941c38dafd581bcf</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:13,311 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:253) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.updateTransaction(TmsApi.java:162) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:84) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 13:53:13,311 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：4
+2017-02-24 13:53:13,311 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 评估服务器(10.118.244.:8000)出现错误，SocketLoadBalance对象send返回码:7(socket连接错误)
+2017-02-24 13:53:13,311 [main] INFO  cn.com.higinet.tms.core.service.MessageAbstractService - runId:2011912556212,开始循环补发.
+2017-02-24 13:53:13,311 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 交易没有找到可用的服务器,报文如下:
+ head:00000339TMS     0001XML         2011912556212                    
+ body:<?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>bdfe3d481893444e941c38dafd581bcf</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:18,135 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:18,135 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:18,135 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:18,135 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：5
+2017-02-24 13:53:23,143 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:25,451 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:25,451 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:25,451 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：6
+2017-02-24 13:53:28,159 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:28,161 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:28,161 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:28,161 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：7
+2017-02-24 13:53:33,160 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:33,162 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:33,162 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:33,162 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：8
+2017-02-24 13:53:34,639 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------现在正使用指定的配置文件-------
+2017-02-24 13:53:34,643 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------配置文件路径:/D:/sf/tms-test/bin/properties/tmsServer.properties
+2017-02-24 13:53:34,651 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000315TMS     0002XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>83bfb6af918f4f56bf830a2c406d682b</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:34,653 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 正在初始化IP列表,请稍候...
+2017-02-24 13:53:34,653 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:36,950 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.<clinit>(ServerMonitor.java:38) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:221) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.riskEvaluate(TmsApi.java:143) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:78) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 13:53:36,952 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:36,952 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：1
+2017-02-24 13:53:36,952 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 第一次连接服务器初始化列表完成...
+2017-02-24 13:53:36,955 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:36,957 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:36,958 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:36,958 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：2
+2017-02-24 13:53:36,959 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:253) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.riskEvaluate(TmsApi.java:143) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:78) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 13:53:36,959 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：3
+2017-02-24 13:53:36,959 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 评估服务器(10.118.244.:8000)出现错误，SocketLoadBalance对象send返回码:7(socket连接错误)
+2017-02-24 13:53:36,959 [main] INFO  cn.com.higinet.tms.core.service.MessageAbstractService - runId:2011912556212,开始循环补发.
+2017-02-24 13:53:36,959 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 交易没有找到可用的服务器,报文如下:
+ head:00000315TMS     0002XML         2011912556212                    
+ body:<?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>83bfb6af918f4f56bf830a2c406d682b</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:37,162 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000339TMS     0001XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>83bfb6af918f4f56bf830a2c406d682b</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:37,165 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:253) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.updateTransaction(TmsApi.java:162) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:84) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 13:53:37,165 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：4
+2017-02-24 13:53:37,166 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 评估服务器(10.118.244.:8000)出现错误，SocketLoadBalance对象send返回码:7(socket连接错误)
+2017-02-24 13:53:37,166 [main] INFO  cn.com.higinet.tms.core.service.MessageAbstractService - runId:2011912556212,开始循环补发.
+2017-02-24 13:53:37,166 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 交易没有找到可用的服务器,报文如下:
+ head:00000339TMS     0001XML         2011912556212                    
+ body:<?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>83bfb6af918f4f56bf830a2c406d682b</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 13:53:38,160 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:40,441 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:40,442 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:40,442 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：9
+2017-02-24 13:53:41,954 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:41,956 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:41,957 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:41,958 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：5
+2017-02-24 13:53:43,161 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 13:53:43,163 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 13:53:43,164 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 13:53:43,164 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，已经标记为不可用！
+2017-02-24 14:03:33,895 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------现在正使用指定的配置文件-------
+2017-02-24 14:03:33,899 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------配置文件路径:/D:/sf/tms-test/bin/properties/tmsServer.properties
+2017-02-24 14:03:33,909 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000315TMS     0002XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>ea61afd3143c4279b828df35b2d0e720</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 14:03:33,911 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 正在初始化IP列表,请稍候...
+2017-02-24 14:03:33,911 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:03:36,208 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.<clinit>(ServerMonitor.java:38) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:221) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.riskEvaluate(TmsApi.java:143) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:78) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 14:03:36,209 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:03:36,210 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：1
+2017-02-24 14:03:36,210 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 第一次连接服务器初始化列表完成...
+2017-02-24 14:03:36,213 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:03:36,216 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:03:36,216 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:253) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.riskEvaluate(TmsApi.java:143) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:78) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 14:03:36,234 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：2
+2017-02-24 14:03:36,235 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 评估服务器(10.118.244.:8000)出现错误，SocketLoadBalance对象send返回码:7(socket连接错误)
+2017-02-24 14:03:36,235 [main] INFO  cn.com.higinet.tms.core.service.MessageAbstractService - runId:2011912556212,开始循环补发.
+2017-02-24 14:03:36,235 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 交易没有找到可用的服务器,报文如下:
+ head:00000315TMS     0002XML         2011912556212                    
+ body:<?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>ea61afd3143c4279b828df35b2d0e720</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 14:03:36,218 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:03:36,239 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：3
+2017-02-24 14:03:36,440 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000339TMS     0001XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>ea61afd3143c4279b828df35b2d0e720</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 14:03:36,443 [main] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.send_request(MessageAbstractService.java:253) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.MessageAbstractService.sendMessage(MessageAbstractService.java:178) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.service.impl.TransApiMessageImpl.singleEvaluate(TransApiMessageImpl.java:84) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.toolEvaluate(TmsApi.java:220) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.api.TmsApi.updateTransaction(TmsApi.java:162) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.Rule01.execute(Rule01.java:84) [bin/:na]
+	at cn.com.higinet.Rule01.main(Rule01.java:95) [bin/:na]
+2017-02-24 14:03:36,444 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：4
+2017-02-24 14:03:36,445 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 评估服务器(10.118.244.:8000)出现错误，SocketLoadBalance对象send返回码:7(socket连接错误)
+2017-02-24 14:03:36,446 [main] INFO  cn.com.higinet.tms.core.service.MessageAbstractService - runId:2011912556212,开始循环补发.
+2017-02-24 14:03:36,446 [main] ERROR cn.com.higinet.tms.core.service.MessageAbstractService - 交易没有找到可用的服务器,报文如下:
+ head:00000339TMS     0001XML         2011912556212                    
+ body:<?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>ea61afd3143c4279b828df35b2d0e720</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 14:03:41,214 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:03:41,216 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:03:41,217 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:03:41,218 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：5
+2017-02-24 14:03:46,214 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:03:48,493 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:03:48,493 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:03:48,494 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：6
+2017-02-24 14:03:51,214 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:03:51,216 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:03:51,217 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:03:51,217 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：7
+2017-02-24 14:03:56,215 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:03:56,217 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:03:56,218 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:03:56,218 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：8
+2017-02-24 14:04:01,215 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:04:03,494 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:04:03,494 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:04:03,495 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，错误计数：9
+2017-02-24 14:04:06,215 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:04:06,219 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:04:06,219 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:04:06,220 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)出现错误，已经标记为不可用！
+2017-02-24 14:04:11,215 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:04:11,217 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:04:11,220 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:04:11,220 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)依旧不可用！
+2017-02-24 14:04:16,216 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:04:18,498 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:04:18,499 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:04:18,500 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)依旧不可用！
+2017-02-24 14:04:21,216 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:04:21,218 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:04:21,219 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:04:21,219 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)依旧不可用！
+2017-02-24 14:04:26,216 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.118.244.:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 14:04:26,217 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.118.244.:8000) error. 10.118.244.
+java.net.UnknownHostException: 10.118.244.
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:195) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 14:04:26,217 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 14:04:26,217 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.118.244.:8000)依旧不可用！
+2017-02-24 17:30:31,054 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------现在正使用指定的配置文件-------
+2017-02-24 17:30:31,058 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------配置文件路径:/D:/sf/tms-test/bin/properties/tmsServer.properties
+2017-02-24 17:30:31,082 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000315TMS     0002XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>9a6a035eecc7418eba3dfda451661ce6</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 17:30:31,084 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 正在初始化IP列表,请稍候...
+2017-02-24 17:30:31,084 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:30:31,096 [main] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:30:31,096 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:30:31,096 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：1
+2017-02-24 17:30:31,096 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 第一次连接服务器初始化列表完成...
+2017-02-24 17:30:31,097 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:30:31,102 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:30:31,102 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:30:31,102 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：2
+2017-02-24 17:30:31,220 [main] WARN  cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)错误次数已重置为0,上次错误次数:2
+2017-02-24 17:30:31,220 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 返回报文:00000679TMS     0002XML 02000000<?xml version="1.0" encoding="UTF-8"?>
+<Message><disposal>PS02</disposal><hitRules>[T0302,R47,cece设备IP短时间登录客户数大于3,,PS01,4,-10.0],[T0302,R53,测试短时间登陆次数大于5,,PS01,4,0.0],[T0302,R31,30秒内操作的次数,{"zh_CN":"中文","en_US":"英文","zh_TW":"中国台湾"},PS02,0,-20.0]</hitRules><hitRuleNum>3</hitRuleNum><trigRuleNum>30</trigRuleNum><score>-30.0</score><txnId>SST002</txnId><txnName>SST登录</txnName><transcode>9a6a035eecc7418eba3dfda451661ce6</transcode><strategyInfo>strategyName:null, strategyTxn:T0302, strategyId:-1, strategyCond:null</strategyInfo><cookieName>higinet_tms_dfp</cookieName><devToken></devToken></Message>
+2017-02-24 17:30:31,454 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000339TMS     0001XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>9a6a035eecc7418eba3dfda451661ce6</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 17:30:31,563 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 返回报文:00000119TMS     0001XML 02000000<?xml version="1.0" encoding="UTF-8"?>
+<Message><cookieName>higinet_tms_dfp</cookieName><devToken></devToken></Message>
+2017-02-24 17:31:01,281 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------现在正使用指定的配置文件-------
+2017-02-24 17:31:01,286 [main] INFO  cn.com.higinet.tms.core.model.TmsConfigVo - -------配置文件路径:/D:/sf/tms-test/bin/properties/tmsServer.properties
+2017-02-24 17:31:01,293 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000315TMS     0002XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>1ee8a22368c84067b4b44997c1f7a82f</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 17:31:01,295 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 正在初始化IP列表,请稍候...
+2017-02-24 17:31:01,295 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:01,312 [main] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:01,312 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:01,312 [main] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：1
+2017-02-24 17:31:01,312 [main] INFO  cn.com.higinet.tms.core.common.ServerMonitor - 第一次连接服务器初始化列表完成...
+2017-02-24 17:31:01,313 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:01,323 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:01,323 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:01,324 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：2
+2017-02-24 17:31:01,433 [main] WARN  cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)错误次数已重置为0,上次错误次数:2
+2017-02-24 17:31:01,433 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 返回报文:00000679TMS     0002XML 02000000<?xml version="1.0" encoding="UTF-8"?>
+<Message><disposal>PS02</disposal><hitRules>[T0302,R47,cece设备IP短时间登录客户数大于3,,PS01,4,-10.0],[T0302,R53,测试短时间登陆次数大于5,,PS01,4,0.0],[T0302,R31,30秒内操作的次数,{"zh_CN":"中文","en_US":"英文","zh_TW":"中国台湾"},PS02,0,-20.0]</hitRules><hitRuleNum>3</hitRuleNum><trigRuleNum>30</trigRuleNum><score>-30.0</score><txnId>SST002</txnId><txnName>SST登录</txnName><transcode>1ee8a22368c84067b4b44997c1f7a82f</transcode><strategyInfo>strategyName:null, strategyTxn:T0302, strategyId:-1, strategyCond:null</strategyInfo><cookieName>higinet_tms_dfp</cookieName><devToken></devToken></Message>
+2017-02-24 17:31:01,649 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 请求报文:00000339TMS     0001XML         2011912556212                   <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>1ee8a22368c84067b4b44997c1f7a82f</TXNCODE><TXNTIME>2012-08-12 08:42:57</TXNTIME><TXNSTATUS>1</TXNSTATUS><TXNID>SST002</TXNID><USERID>2011912556212</USERID><DISPATCH>2011912556212</DISPATCH><src_ip>120.197.101.6</src_ip></Message>
+2017-02-24 17:31:01,764 [main] INFO  cn.com.higinet.tms.core.service.impl.TransApiMessageImpl - 返回报文:00000119TMS     0001XML 02000000<?xml version="1.0" encoding="UTF-8"?>
+<Message><cookieName>higinet_tms_dfp</cookieName><devToken></devToken></Message>
+2017-02-24 17:31:06,313 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:06,320 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:06,320 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:06,321 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：1
+2017-02-24 17:31:11,314 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:11,320 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:11,322 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:11,322 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：2
+2017-02-24 17:31:16,314 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:16,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:16,325 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:16,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：3
+2017-02-24 17:31:21,314 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:21,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:21,326 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:21,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：4
+2017-02-24 17:31:26,314 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:26,320 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:26,321 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:26,321 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：5
+2017-02-24 17:31:31,315 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:31,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:31,327 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:31,327 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：6
+2017-02-24 17:31:36,315 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:36,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:36,326 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:36,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：7
+2017-02-24 17:31:41,315 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:41,321 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:41,321 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:41,321 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：8
+2017-02-24 17:31:46,316 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:46,350 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:46,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:46,352 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，错误计数：9
+2017-02-24 17:31:51,316 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:51,322 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:51,323 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:51,323 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)出现错误，已经标记为不可用！
+2017-02-24 17:31:56,316 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:31:56,321 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:31:56,321 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:31:56,321 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:01,316 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:01,324 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:01,325 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:01,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:06,317 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:06,328 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:06,330 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:06,333 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:11,318 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:11,324 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:11,325 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:11,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:16,318 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:16,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:16,344 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:16,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:21,319 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:21,331 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:21,332 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:21,332 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:26,320 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:26,365 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:26,365 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:26,365 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:31,319 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:31,346 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:31,347 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:31,347 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:36,319 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:36,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:36,326 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:36,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:41,321 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:41,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:41,327 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:41,327 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:46,320 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:46,322 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:46,322 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:46,322 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:51,320 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:51,322 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:51,322 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:51,322 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:32:56,321 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:32:56,323 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:32:56,323 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:32:56,323 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:01,321 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:01,323 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:01,323 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:01,323 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:06,322 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:06,324 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:06,324 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:06,324 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:11,322 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:11,324 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:11,324 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:11,324 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:16,323 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:16,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:16,325 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:16,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:21,323 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:21,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:21,325 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:21,325 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:26,324 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:26,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:26,326 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:26,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:31,324 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:31,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:31,326 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:31,326 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:36,325 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:36,327 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:36,327 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:36,327 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:41,325 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:41,327 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:41,327 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:41,327 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:46,326 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:46,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:46,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:46,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:51,327 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:51,329 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:51,329 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:51,329 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:33:56,327 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:33:56,361 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:33:56,362 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:33:56,362 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:01,328 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:01,336 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:01,337 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:01,338 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:06,328 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:06,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:06,339 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:06,340 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:11,328 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:11,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:11,339 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:11,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:16,328 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:16,333 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:16,333 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:16,333 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:21,329 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:21,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:21,339 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:21,340 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:26,329 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:26,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:26,340 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:26,340 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:31,329 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:31,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:31,339 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:31,340 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:36,330 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:36,335 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:36,335 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:36,335 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:41,330 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:41,338 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:41,339 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:41,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:46,330 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:46,341 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:46,342 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:46,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:51,330 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:51,336 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:51,337 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:51,337 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:34:56,331 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:34:56,342 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:34:56,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:34:56,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:01,332 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:01,342 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:01,342 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:01,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:06,332 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:06,339 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:06,340 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:06,340 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:11,335 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:11,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:11,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:11,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:16,336 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:16,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:16,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:16,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:21,335 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:21,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:21,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:21,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:26,335 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:26,368 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:26,369 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:26,369 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:31,336 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:31,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:31,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:31,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:36,336 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:36,343 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:36,344 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:36,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:41,347 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:41,358 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:41,359 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:41,359 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:46,337 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:46,345 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:46,346 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:46,346 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:51,337 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:51,347 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:51,348 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:51,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:35:56,337 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:35:56,345 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:35:56,346 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:35:56,346 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:01,337 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:01,347 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:01,348 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:01,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:06,338 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:06,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:06,345 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:06,345 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:11,338 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:11,347 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:11,347 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:11,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:16,338 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:16,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:16,348 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:16,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:21,339 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:21,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:21,344 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:21,344 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:26,340 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:26,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:26,348 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:26,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:31,340 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:31,350 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:31,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:31,351 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:36,340 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:36,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:36,348 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:36,348 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:41,341 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:41,370 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:41,370 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:41,371 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:46,341 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:46,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:46,349 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:46,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:51,341 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:51,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:51,349 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:51,350 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:36:56,342 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:36:56,353 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:36:56,354 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:36:56,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:01,342 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:01,352 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:01,352 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:01,353 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:06,342 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:06,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:06,349 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:06,350 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:11,342 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:11,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:11,350 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:11,350 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:16,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:16,349 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:16,350 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:16,350 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:21,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:21,357 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:21,358 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:21,358 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:26,343 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:26,353 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:26,353 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:26,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:31,344 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:31,351 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:31,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:31,351 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:36,345 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:36,352 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:36,353 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:36,353 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:41,345 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:41,356 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:41,356 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:41,357 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:46,345 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:46,352 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:46,352 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:46,352 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:51,346 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:51,359 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:51,359 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:51,360 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:37:56,346 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:37:56,355 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:37:56,356 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:37:56,356 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:01,346 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:01,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:38:01,355 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:38:01,355 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:06,347 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:06,359 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:38:06,359 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:38:06,359 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:11,347 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:11,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:38:11,354 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:38:11,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:16,347 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:16,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:38:16,355 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:38:16,355 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:21,347 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:21,357 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:38:21,358 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:38:21,358 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:26,348 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:26,380 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:38:26,381 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:38:26,381 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:31,348 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:31,357 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:38:31,357 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:38:31,357 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:36,350 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:37,365 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.202.8.174:8000) error. connect timed out
+java.net.SocketTimeoutException: connect timed out
+	at java.net.PlainSocketImpl.socketConnect(Native Method) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.doConnect(PlainSocketImpl.java:351) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connectToAddress(PlainSocketImpl.java:213) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:200) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 17:38:37,366 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 17:38:37,366 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:41,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:42,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.202.8.174:8000) error. connect timed out
+java.net.SocketTimeoutException: connect timed out
+	at java.net.PlainSocketImpl.socketConnect(Native Method) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.doConnect(PlainSocketImpl.java:351) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connectToAddress(PlainSocketImpl.java:213) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:200) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 17:38:42,355 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 17:38:42,355 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:46,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:47,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.202.8.174:8000) error. connect timed out
+java.net.SocketTimeoutException: connect timed out
+	at java.net.PlainSocketImpl.socketConnect(Native Method) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.doConnect(PlainSocketImpl.java:351) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connectToAddress(PlainSocketImpl.java:213) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:200) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 17:38:47,354 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 17:38:47,355 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:51,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:52,353 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.202.8.174:8000) error. connect timed out
+java.net.SocketTimeoutException: connect timed out
+	at java.net.PlainSocketImpl.socketConnect(Native Method) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.doConnect(PlainSocketImpl.java:351) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connectToAddress(PlainSocketImpl.java:213) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:200) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 17:38:52,354 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 17:38:52,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:38:56,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:38:57,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.202.8.174:8000) error. connect timed out
+java.net.SocketTimeoutException: connect timed out
+	at java.net.PlainSocketImpl.socketConnect(Native Method) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.doConnect(PlainSocketImpl.java:351) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connectToAddress(PlainSocketImpl.java:213) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:200) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 17:38:57,355 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 17:38:57,355 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:39:01,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:39:02,354 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketLoadBalance - new SocketClinet(10.202.8.174:8000) error. connect timed out
+java.net.SocketTimeoutException: connect timed out
+	at java.net.PlainSocketImpl.socketConnect(Native Method) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.doConnect(PlainSocketImpl.java:351) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connectToAddress(PlainSocketImpl.java:213) ~[na:1.6.0_43]
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:200) ~[na:1.6.0_43]
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366) ~[na:1.6.0_43]
+	at java.net.Socket.connect(Socket.java:529) ~[na:1.6.0_43]
+	at cn.com.higinet.tms.core.common.SocketClient.<init>(SocketClient.java:34) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.SocketLoadBalance.send(SocketLoadBalance.java:63) ~[tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServerList(ServerMonitor.java:280) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.ServerMonitor.checkServers(ServerMonitor.java:311) [tms-api-4.1.17.jar:na]
+	at cn.com.higinet.tms.core.common.CheckTask.run(ServerMonitor.java:325) [tms-api-4.1.17.jar:na]
+	at java.lang.Thread.run(Thread.java:662) [na:1.6.0_43]
+2017-02-24 17:39:02,354 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:7(socket连接错误)
+2017-02-24 17:39:02,355 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:39:06,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:39:06,419 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:39:06,419 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:39:06,420 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:39:11,351 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:39:11,361 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:39:11,362 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:39:11,362 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:39:16,352 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:39:16,389 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:39:16,389 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:39:16,389 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:39:21,352 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:39:21,358 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:39:21,359 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:39:21,359 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
+2017-02-24 17:39:26,352 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor send message[0](10.202.8.174:8000):00000139TMS     0098XML         <?xml version="1.0" encoding="UTF-8"?><Message><SYNCFLAG>1</SYNCFLAG><TXNCODE>11111</TXNCODE><TMS_SERVER_LIST>1</TMS_SERVER_LIST></Message>
+2017-02-24 17:39:26,382 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.SocketClient - [ip: 10.202.8.174, port: 8000]socket读取报文头数据错误,无法获取报文头前8个字节.获取内容：
+2017-02-24 17:39:26,383 [ServerMonitor] INFO  cn.com.higinet.tms.core.common.ServerMonitor - Monitor receive message:8(socket读取数据异常)
+2017-02-24 17:39:26,383 [ServerMonitor] ERROR cn.com.higinet.tms.core.common.ServerMonitor - 服务器[0](10.202.8.174:8000)依旧不可用！
