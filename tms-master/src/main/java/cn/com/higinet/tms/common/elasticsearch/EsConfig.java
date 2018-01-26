@@ -11,10 +11,12 @@ import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * ES配置类
  * */
+@Component
 public class EsConfig {
 
 	private static final Logger logger = LoggerFactory.getLogger( EsConfig.class );

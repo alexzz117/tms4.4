@@ -51,6 +51,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -60,6 +61,7 @@ import cn.com.higinet.tms.base.util.Clockz;
 import cn.com.higinet.tms.base.util.Stringz;
 
 @Scope("prototype") //使用多实例模式
+@Component
 public class EsAdapter<T> implements DisposableBean {
 
 	private static final Logger logger = LoggerFactory.getLogger( EsAdapter.class );
