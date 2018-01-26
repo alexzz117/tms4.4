@@ -25,8 +25,8 @@
             label="操作"
             width="100">
             <template slot-scope="scope">
-              <el-button type="text" size="small">编辑</el-button>
-              <el-button type="text" size="small">删除</el-button>
+              <el-button type="text" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
+              <el-button type="text" size="small" @click="delData(scope.row)">删除</el-button>
             </template>
           </el-table-column>
           <el-table-column prop="app_id" label="采集方式代码" align="left">
@@ -44,25 +44,37 @@
 
       </section>
 
-      <el-dialog :title="dialogTitle" :visible.sync="dictDialogVisible" :close-on-click-modal="false">
+      <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" width="600px">
         <el-form :model="dialogForm" :rules="rules" ref="dialogForm" style="text-align: left;">
-          <el-form-item label="是否通过授权:" :label-width="formLabelWidth" prop="auth_status">
-            <!--<el-radio v-model="dialogForm.auth_status" label="1">是</el-radio>-->
-            <!--<el-radio v-model="dialogForm.auth_status" label="2">否</el-radio>-->
-            <el-switch
-              v-model="dialogForm.auth_status"
-              active-value="1"
-              inactive-value="2"
-            >
-            </el-switch>
+          <el-form-item label="采集方式代码:" :label-width="formLabelWidth" prop="app_id" v-show="dialogType == 'add'">
+            <el-input v-model="dialogForm.app_id" ></el-input>
           </el-form-item>
-          <el-form-item label="授权说明:" :label-width="formLabelWidth" prop="auth_msg">
-            <el-input type="textarea" v-model="dialogForm.auth_msg" :maxlength="2048"></el-input>
+          <el-form-item label="采集方式名称:" :label-width="formLabelWidth" prop="app_name">
+            <el-input v-model="dialogForm.app_name" ></el-input>
+          </el-form-item>
+          <el-form-item label="最多设备数:" :label-width="formLabelWidth" prop="max_devices">
+            <el-input v-model="dialogForm.max_devices" ></el-input>
+          </el-form-item>
+          <el-form-item label="匹配阀值:" :label-width="formLabelWidth" prop="threshold">
+            <el-input v-model="dialogForm.threshold" ></el-input>
+          </el-form-item>
+          <el-form-item label="Cookie名称:" :label-width="formLabelWidth" prop="cookiename">
+            <el-input v-model="dialogForm.cookiename" ></el-input>
+          </el-form-item>
+          <el-form-item label="设备标识生成方式:" :label-width="formLabelWidth" prop="token_type">
+            <el-select v-model="dialogForm.token_type" placeholder="请选择" clearable>
+              <el-option
+                v-for="item in tokenList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
           <div>
             <el-form-item label=" " :label-width="formLabelWidth">
-              <el-button type="primary" @click="submitForm('dialogForm')" size="large">保 存</el-button>
-              <el-button @click="dictDialogVisible = false" size="large">取 消</el-button>
+              <el-button type="primary" @click="submitForm('dialogForm')" size="large" :disabled="dialogFormSureBtnDisabled">保 存</el-button>
+              <el-button @click="dialogVisible = false" size="large">取 消</el-button>
             </el-form-item>
           </div>
         </el-form>
@@ -85,7 +97,6 @@
         let appId = this.queryShowForm.app_id
 
         let showData = this.tableData.filter((x) => {
-          debugger
           if (appId !== '' && !x.app_id.includes(appId)) {
             return false
           }
@@ -99,18 +110,36 @@
       return {
         activeName: 'appList',
         tableData: [],
-        tableDataShow: [],
         dialogTitle: '授权意见',
-        dictDialogVisible: false,
+        dialogVisible: false,
         dialogForm: this.initDialogForm(),
+        dialogFormSureBtnDisabled:false,
         rules: {
-          auth_status: [
-            {required: true, message: '请选择是否通过授权', trigger: 'blur'}
+          app_id: [
+            {required: true, message: '请输入采集方式代码', trigger: 'blur'},
+            { pattern: /^(0|[1-9]\d{0,9})$/, message: '采集方式代码最多只能输入10位数字' }
           ],
-          auth_msg: [
-            {required: true, message: '请输入授权说明', trigger: 'blur'},
-            {max: 2048, message: '长度在2048个字符以内', trigger: 'blur'},
+          app_name: [
+            {required: true, message: '请输入采集方式名称', trigger: 'blur'},
+            {max: 50, message: '长度在50个字符以内', trigger: 'blur'},
             {validator: check.checkFormSpecialCode, trigger: 'blur'}
+          ],
+          max_devices: [
+            { required: true, message: '请输入最多设备数', trigger: 'blur'},
+            { pattern: /^(0|[1-9]\d{0,2})$/, message: '最多设备数只能为1~100间的整数', trigger: 'blur'},
+            { validator: this.maxDevicesValid, trigger: 'blur'}
+          ],
+          threshold: [
+            { required: true, message: '请输入匹配阀值', trigger: 'blur'},
+            { validator: this.thresholdValid, trigger: 'blur'}
+          ],
+          cookiename: [
+            { required: true, message: '请输入Cookie名称', trigger: 'blur'},
+            { max: 50, message: '长度在50个字符以内', trigger: 'blur'},
+            { validator: check.checkFormSpecialCode, trigger: 'blur'}
+          ],
+          token_type: [
+            { required: true, message: '请输入设备标识生成方式', trigger: 'blur'}
           ]
         },
         queryShowForm: {
@@ -119,17 +148,19 @@
         queryForm: {
           app_id: ''
         },
-        formLabelWidth: '130px',
+        formLabelWidth: '150px',
         dialogType: '',
         currentPage: 1,
         pageSize: 10,
         total: 0,
         selectRow: {},
-        selectedRows: []
+        selectedRows: [],
+        tokenList: []
       }
     },
     mounted: function () {
       this.$nextTick(function () {
+        this.tokenList = dictCode.getCodeItems('tms.dfp.token_type')
         this.getData()
       })
     },
@@ -148,10 +179,26 @@
       handleTabClick(tab, event) {
 
       },
+      maxDevicesValid (rule, value, callback) {
+        if (parseInt(value) > 100 || parseInt(value) < 1) {
+          return callback(new Error('最多设备数只能为1~100间的整数'))
+        }
+        callback()
+      },
+      thresholdValid (rule, value, callback) {
+        if (!util.isNumber(value, '+', '2') || parseFloat(value) > 1 || parseFloat(value) <= 0) {
+          return callback(new Error('匹配阀值需是0-1之间的两位小数'))
+        }
+        callback()
+      },
       initDialogForm() {
         return {
-          auth_status: '1',
-          auth_msg: ''
+          app_id: '',
+          app_name: '',
+          max_devices: '',
+          threshold: '',
+          cookiename: '',
+          token_type: ''
         }
       },
       handleSizeChange(val) {
@@ -166,50 +213,48 @@
       handleSelectionChange(rows) {
         this.selectedRows = rows
       },
-      addData(formName) {
+      submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            this.dialogFormSureBtnDisabled = true
             let self = this
+            let submitParam = {}
+            Object.assign(submitParam, this.dialogForm)
+            // submitParam.TOKEN_TYPE = submitParam.is_token
+            submitParam = util.toggleObjKey(submitParam, 'upper')
 
-            let authIds = []
-            let funcName = []
-            let operatedataValue = []
-            let txnnameTemp = []
-            let txnname = ''
-            var operatenameTemp = []
-            let operatename = ''
-
-            let selectedRow = this.selectRow
-            for (let loop of this.selectedRows) {
-              authIds.push(loop.auth_id)
-              funcName.push(loop.funcname)
-              operatedataValue.push(loop.operatedata_value)
-              if (loop.txnname !== undefined && loop.txnname !== '') {
-                txnnameTemp.push(loop.txnname)
-              }
-              if (loop.operatename !== undefined && loop.operatename !== '') {
-                operatenameTemp.push(loop.operatename)
-              }
+            let jsonData = {}
+            let message = '提交成功'
+            if (this.dialogType === 'add') {
+              jsonData.add = [submitParam]
+              message = '创建成功'
+            } else {
+              jsonData.mod = [submitParam]
+              message = '编辑成功'
             }
-
-
-            let paramsObj = {
-              AUTH_IDS: authIds.join(','),
-              FUNCNAME: funcName.join(','),
-              TXNNAME: txnnameTemp.join(','),
-              OPERATENAME: operatenameTemp.join(','),
-              OPERATEDATA_VALUE: operatedataValue.join('~'),
-              AUTH_STATUS: this.dialogForm.auth_status,
-              AUTH_MSG: this.dialogForm.auth_msg
-            }
+            let finalJsonData = {}
+            finalJsonData.postData = jsonData
+            // finalJsonData.txnId = this.txnIdParent
 
             ajax.post({
-              url: '/auth/modAuth',
-              param: paramsObj,
+              url: '/dfp/appSave',
+              param: finalJsonData,
               success: function (data) {
                 self.getData()
-                self.$message.success('授权成功')
-                self.dictDialogVisible = false
+                self.$message.success(message)
+                self.dialogVisible = false
+                self.dialogFormSureBtnDisabled = false
+              },
+              error: function (data) {
+                if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+                  self.$message.error(data.error.join('|'))
+                } else {
+                  self.$message.error(data.error)
+                }
+                self.dialogFormSureBtnDisabled = false
+              },
+              fail: function () {
+                self.dialogFormSureBtnDisabled = false
               }
             })
           } else {
@@ -230,6 +275,29 @@
           }
         })
       },
+      delData (row) {
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let jsonData = {}
+          let rowData = util.toggleObjKey(row, 'upper')
+          jsonData.del = [rowData]
+          let finalJsonData = {}
+
+          finalJsonData.postData = jsonData
+          let self = this
+          ajax.post({
+            url: '/dfp/appSave',
+            param: finalJsonData,
+            success: function (data) {
+              self.getData()
+              self.$message.success('删除成功')
+            }
+          })
+        })
+      },
       showSub(row) {
         let params = {
           authId: row.auth_id,
@@ -237,23 +305,22 @@
         }
         this.$router.push({name: 'authSubDataList', query: params})
       },
-      showLog(row) {
-        let params = {
-          authId: row.auth_id,
-          modelName: this.modelName
+      openDialog (dialogType, row) {
+        this.dialogType = dialogType
+        let self = this
+        if(dialogType === 'add') {
+          this.dialogForm = this.initDialogForm()
         }
-        this.$router.push({name: 'authLogList', query: params})
-      },
-      auth(row) {
-        this.selectRow = row
-        this.dialogForm = this.initDialogForm()
-        this.dictDialogVisible = true
-      },
-      submitForm(formName) {
-        this.addData(formName)
-      },
-      openDialog (dialogType) {
-
+        else if (dialogType === 'edit') {
+          this.dialogForm = this.initDialogForm()
+          Object.assign(this.dialogForm, row)
+        }
+        this.dialogVisible = true
+        setTimeout(function () {
+          if (self.$refs['dialogForm']) {
+            self.$refs['dialogForm'].clearValidate()
+          }
+        }, 100)
       },
       searchData () {
 
