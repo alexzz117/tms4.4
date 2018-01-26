@@ -38,7 +38,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <section class="table">
+    <section class="section">
       <el-table
         :data="gridData"
         @selection-change="handleSelectionChange"
