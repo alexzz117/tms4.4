@@ -20,27 +20,26 @@ public class Traffic {
 
 	public TrafficData getTrafficData() {
 		if( trafficData == null && tarffic != null ) {
-			
-			trafficData = new TrafficData();
+			try {
+				trafficData = new TrafficData();
 
-			Map<String, Object> _tarffic = new HashMap<String, Object>();
-			for( Map.Entry<String, Object> entry : tarffic.entrySet() ) {
-				_tarffic.put( entry.getKey().toUpperCase(), entry.getValue() );
-			}
+				Map<String, Object> _tarffic = new HashMap<String, Object>();
+				for( Map.Entry<String, Object> entry : tarffic.entrySet() ) {
+					_tarffic.put( entry.getKey().toUpperCase(), entry.getValue() );
+				}
 
-			for( Field field : TrafficData.class.getDeclaredFields() ) {
-				try {
+				for( Field field : TrafficData.class.getDeclaredFields() ) {
 					if( field.getModifiers() >= 16 ) continue;
 					field.setAccessible( true );
 					String key = field.getName();
 					Object value = _tarffic.get( key.toUpperCase() );
 					field.set( trafficData, value );
-				}
-				catch( Exception e ) {
-					e.printStackTrace();
-					trafficData = null;
-				}
 
+				}
+			}
+			catch( Exception e ) {
+				e.printStackTrace();
+				trafficData = null;
 			}
 
 		}
