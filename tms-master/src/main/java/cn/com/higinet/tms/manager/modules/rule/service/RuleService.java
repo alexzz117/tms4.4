@@ -2,7 +2,7 @@
  * Copyright © 2000 Shanghai XXX Co. Ltd.
  * All right reserved.
  */
-package cn.com.higinet.tms.manager.modules.rule;
+package cn.com.higinet.tms.manager.modules.rule.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
