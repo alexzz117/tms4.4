@@ -2,7 +2,7 @@
  * Copyright © 2000 Shanghai XXX Co. Ltd.
  * All right reserved.
  */
-package cn.com.higinet.tms.manager.modules.rule.service.impl;
+package cn.com.higinet.tms.manager.modules.rule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +32,6 @@ import cn.com.higinet.tms.manager.modules.common.SequenceService;
 import cn.com.higinet.tms.manager.modules.common.exception.TmsMgrServiceException;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.common.util.StringUtil;
-import cn.com.higinet.tms.manager.modules.rule.service.RuleService;
 import cn.com.higinet.tms.manager.modules.tran.TransCommon;
 import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 
@@ -46,9 +45,9 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
  */
 @Service("ruleService35")
 @Transactional
-public class RuleServiceImpl implements RuleService {
+public class RuleService {
 
-	private static final Logger log = LoggerFactory.getLogger( RuleServiceImpl.class );
+	private static final Logger log = LoggerFactory.getLogger( RuleService.class );
 
 	@Autowired
 	@Qualifier("onlineDataSource")
