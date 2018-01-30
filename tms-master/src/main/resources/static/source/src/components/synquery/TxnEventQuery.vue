@@ -5,26 +5,26 @@
         <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm" :rules="queryRules"
                  :inline="true">
           <el-form-item label="流水号:" prop="txncode">
-            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+            <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
           </el-form-item>
           <el-form-item label="客户号:" prop="userid">
-            <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+            <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
           </el-form-item>
           <el-form-item label="客户名称:" prop="username">
-            <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+            <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
           </el-form-item>
           <el-form-item label="IP地址:" prop="ipaddr">
-            <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+            <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
           </el-form-item>
           <el-form-item label="设备信息:" prop="deviceid">
-            <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+            <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
           </el-form-item>
           <el-form-item label="会话标识:" prop="sessionid">
-            <el-input v-model="queryShowForm.sessionid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+            <el-input v-model="queryShowForm.sessionid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
           </el-form-item>
           <el-form-item label="监控操作:" prop="txntype">
             <div @click="openTxnTypedialog" >
-              <el-input v-model="queryShowForm.txntype" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
+              <el-input v-model="queryShowForm.txntype" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
             </div>
           </el-form-item>
           <el-form-item label="处置方式:" prop="disposal">
