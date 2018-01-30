@@ -24,7 +24,7 @@
 		<RollingFile name="RollingFileInfo" fileName="./logs/${appname}.log" filePattern="./logs/$${date:yyyy-MM-dd}/${appname}-%d{yyyy-MM-dd}-%i.log">
 			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
 			<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
-			<PatternLayout pattern="${pattern}" />
+			<PatternLayout charset="GB18030" pattern="${pattern}" />
 			<Policies>
 				<TimeBasedTriggeringPolicy modulate="true" interval="1" />
 				<SizeBasedTriggeringPolicy size="200 KB" />
