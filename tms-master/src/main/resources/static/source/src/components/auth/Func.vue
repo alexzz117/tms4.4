@@ -70,12 +70,24 @@
                            :disabled="funcFormReadonly"></el-checkbox>
             </el-form-item>
             <el-form-item label="是否菜单" v-bind:class="{hidden:funcFormVisible.menu}">
-              <el-radio v-model="funcForm.menu" label="1" :disabled="funcFormReadonly">是</el-radio>
-              <el-radio v-model="funcForm.menu" label="0" :disabled="funcFormReadonly">否</el-radio>
+              <el-switch
+                v-model="funcForm.menu"
+                active-text="是"
+                inactive-text="否"
+                active-value="1"
+                inactive-value="0"
+                :disabled="funcFormReadonly">
+              </el-switch>
             </el-form-item>
             <el-form-item label="状态" v-bind:class="{hidden:funcFormVisible.flag}">
-              <el-radio v-model="funcForm.flag" label="1" :disabled="funcFormReadonly">正常</el-radio>
-              <el-radio v-model="funcForm.flag" label="0" :disabled="funcFormReadonly">停用</el-radio>
+              <el-switch
+                v-model="funcForm.flag"
+                active-text="正常"
+                inactive-text="停用"
+                active-value="1"
+                inactive-value="0"
+                :disabled="funcFormReadonly">
+              </el-switch>
             </el-form-item>
             <el-form-item label="顺序" prop="onum" v-bind:class="{hidden:funcFormVisible.onum}">
               <el-input v-model="funcForm.onum" auto-complete="off" :readonly="funcFormReadonly"></el-input>
