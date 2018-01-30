@@ -61,7 +61,7 @@
     <div style="margin-bottom: 10px; text-align: left; height: 30px;">
       <div style="float:right">
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
-        <el-button type="primary" @click="searchData">搜索</el-button>
+        <el-button type="primary" class="el-icon-search" @click="searchData">查询</el-button>
       </div>
       <div style="float:right; padding-right: 15px;">
         <el-date-picker
@@ -94,7 +94,7 @@
         <el-table-column  prop="txntime" label="交易时间" min-width="135" align="left" :formatter="formatter"/>
         <el-table-column  prop="txnname" label="监控操作" min-width="90" align="left"/>
         <el-table-column  prop="disposal" label="处置方式" min-width="80" align="left"/>
-        <el-table-column  prop="iscorrect" label="处置结果" min-width="80" align="left" :formatter="renderIsCorrect"/>
+       <!-- <el-table-column  prop="iscorrect" label="处置结果" min-width="80" align="left" :formatter="renderIsCorrect"/>-->
         <el-table-column  prop="psstatus" label="处理状态" min-width="80" :formatter="formatter"/>
         <el-table-column  prop="assign_name" label="分派人" min-width="80" align="left"/>
         <el-table-column  prop="oper_name" label="处理人" min-width="80" align="left"/>

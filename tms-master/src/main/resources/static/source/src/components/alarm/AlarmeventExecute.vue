@@ -140,7 +140,7 @@
     <div style="margin-bottom: 10px; text-align: left; height: 30px;">
       <div style="float:right">
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
-        <el-button type="primary" @click="searchData">搜索</el-button>
+        <el-button type="primary" class="el-icon-search" @click="searchData">查询</el-button>
       </div>
       <div style="float:right; padding-right: 15px;">
 
