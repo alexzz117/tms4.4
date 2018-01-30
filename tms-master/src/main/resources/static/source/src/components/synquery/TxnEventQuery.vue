@@ -143,7 +143,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
-          <el-button type="primary" @click="searchData">搜索</el-button>
+          <el-button type="primary" class="el-icon-search" @click="searchData">查询</el-button>
         </el-form-item>
       </el-form>
     </div>
