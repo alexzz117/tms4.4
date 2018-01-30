@@ -96,8 +96,14 @@
           </el-select>
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;" :style="formItemStyle">
-          <el-radio v-model="userDialogForm.flag" label="1">正常</el-radio>
-          <el-radio v-model="userDialogForm.flag" label="2">停用</el-radio>
+          <el-switch
+            v-model="userDialogForm.flag"
+            active-text="正常"
+            inactive-text="停用"
+            active-value="1"
+            inactive-value="0"
+            :disabled="formReadonly">
+          </el-switch>
         </el-form-item>
         <el-form-item label="证件类型" :label-width="formLabelWidth" prop="credentialtype" style="text-align: left;" :style="formItemStyle">
           <el-select v-model="userDialogForm.credentialtype" clearable placeholder="证件类型" :style="formItemContentStyle">
