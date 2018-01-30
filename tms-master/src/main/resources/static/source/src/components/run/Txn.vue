@@ -280,6 +280,19 @@
       },
       addFunc () {
         this.$refs.trandef.addFormVisible = true
+        let cNodes = this.$refs.tree.getCurrentNode().children
+        if (cNodes === undefined || cNodes.length === 0) {
+          this.$refs.trandef.addFormOrder = 1
+        } else {
+          let index = 0
+          for (let i in cNodes) {
+            let node = cNodes[i]
+            if (node.onum > index) {
+              index = node.onum
+            }
+          }
+          this.$refs.trandef.addFormOrder = index + 1
+        }
       },
       delFunc () {
         let data = this.$refs.tree.getCurrentNode()

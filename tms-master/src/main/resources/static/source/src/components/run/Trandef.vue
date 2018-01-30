@@ -30,6 +30,7 @@
         formLabelWidth: '120px',
         editVisible: true,
         addFormVisible: false,
+        addFormOrder: '1',
         rules: {
           a: ''
         }
@@ -130,7 +131,7 @@
               traindate: '',
               op: 'add', // 操作的类型：add：添加；mod：编辑
               tab_desc: '', // 名称
-              show_order: '0', // 顺序
+              show_order: self.addFormOrder, // 顺序
               txn_type: '0', // 交易类型
               txnid: '', // 交易识别标识
               tab_disposal: '', // 处置策略
