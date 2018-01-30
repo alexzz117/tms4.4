@@ -239,7 +239,7 @@
       </el-tree>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
+        <el-button @click="txntypeDialogVisible = false" size="large">关闭</el-button>
       </div>
     </el-dialog>
 
