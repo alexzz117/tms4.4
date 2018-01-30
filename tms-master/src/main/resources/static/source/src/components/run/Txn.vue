@@ -1,13 +1,13 @@
 <template>
   <div>
-    <section class="toolbar" v-show="!readonly">
-      <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
-      </el-button>
-      <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
-      </el-button>
-    </section>
     <el-row :gutter="20">
-      <el-col :span="6" style="height: 700px;">
+      <el-col :span="6" style="min-height: 400px;max-height: 700px;">
+        <section class="toolbar" v-show="!readonly">
+          <el-button plain class="el-icon-plus" @click="addFunc" :disabled="toolBtn.addBtn" style="margin-left: 5px;">新建
+          </el-button>
+          <el-button plain class="el-icon-delete" @click="delFunc" :disabled="toolBtn.delBtn" style="margin-left: 0px;">删除
+          </el-button>
+        </section>
         <section class="section scroll">
           <el-tree :data="treeData" node-key="id" ref="tree"
                    :props="defaultProps"
@@ -20,7 +20,7 @@
           </el-tree>
         </section>
       </el-col>
-      <el-col :span="18" style="height: 700px;">
+      <el-col :span="18" style="min-height: 400px;max-height: 700px;">
         <section class="section">
           <el-tabs v-model="activeName" @tab-click="handleClick" ref="tab">
             <el-tab-pane label="交易定义" name="trandef" style="padding-left: 10px;">
