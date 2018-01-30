@@ -3,7 +3,9 @@ package cn.com.higinet.tms.manager.modules.query.controller;
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.base.entity.common.RequestModel;
+import cn.com.higinet.tms.manager.common.DBConstant;
 import cn.com.higinet.tms.manager.common.ManagerConstants;
+import cn.com.higinet.tms.manager.common.util.CmcStringUtil;
 import cn.com.higinet.tms.manager.modules.query.service.AlarmEventQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping(ManagerConstants.URI_PREFIX + "/query/alarmEvent/")
@@ -28,9 +31,9 @@ public class AlarmEventQueryController {
     @RequestMapping(value = "/result", method = RequestMethod.POST)
     public Model showQueryResultAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
-
-        String loginOperatorId = "5E21165E21F442BE9D6B772AA25502E2"; // TODO 先写死一个调试
-        reqs.put("loginOperatorId", loginOperatorId);
+        Map<String, Object> operator = (Map<String, Object>) request.getSession().getAttribute( ManagerConstants.SESSION_KEY_OPERATOR );
+        String operId = CmcStringUtil.objToString( operator.get( DBConstant.CMC_OPERATOR_OPERATOR_ID ) );
+        reqs.put("loginOperatorId", operId);
         model.setPage(alarmEventQueryService.queryAlarmEventData(reqs));
 
         return model;
