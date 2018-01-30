@@ -139,7 +139,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="流水号:" prop="txncode">
-          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
