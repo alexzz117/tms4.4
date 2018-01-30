@@ -47,17 +47,6 @@
 
           </el-select>
         </el-form-item>
-        <el-form-item label="操作状态:" prop="txnstatus">
-          <el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in txnstatusList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="时间范围:" prop="queryDate">
           <el-date-picker
             v-model="queryShowForm.queryDate"
@@ -66,35 +55,6 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期">
           </el-date-picker>
-        </el-form-item>
-        <el-form-item label="地理位置:" prop="countrycode">
-          <el-select v-model="queryShowForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in countrycodeList"
-              :key="item.countrycode"
-              :label="item.countryname"
-              :value="item.countrycode">
-            </el-option>
-          </el-select>
-          <el-select v-model="queryShowForm.regioncode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in regioncodeList"
-              :key="item.regioncode"
-              :label="item.regionname"
-              :value="item.regioncode">
-            </el-option>
-          </el-select>
-          <el-select v-model="queryShowForm.citycode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in citycodeList"
-              :key="item.citycode"
-              :label="item.cityname"
-              :value="item.citycode">
-            </el-option>
-          </el-select>
         </el-form-item>
       </el-form>
     </transition>
@@ -256,15 +216,7 @@
     mounted: function () {
       this.$nextTick(function () {
         let self = this
-        this.initSelectData().then(function () {
-          ajax.post({
-            url: '/monitor/alarm/get_all_country',
-            param: {},
-            success: function (data) {
-              self.countrycodeList = data.row
-            }
-          })
-        }).then(this.sel())
+        this.initSelectData().then(this.sel())
         // this.getData()
       })
     },
@@ -448,7 +400,6 @@
         return [start, end]
       },
       initSelectData () {
-        this.txnstatusList = dictCode.getCodeItems('tms.common.txnstatus')
         let self = this
         this.selTree()
         ajax.post({
@@ -603,11 +554,7 @@
           txntypeShow: '',
           disposal: '',
           iscorrect: '',
-          txnstatus: '',
           psstatus: '',
-          countrycode: '',
-          regioncode: '',
-          citycode: '',
           queryDate: this.initDateRange()
         },
         queryForm: {
@@ -620,11 +567,7 @@
           txntypeShow: '',
           disposal: '',
           iscorrect: '',
-          txnstatus: '',
           psstatus: '',
-          countrycode: '',
-          regioncode: '',
-          citycode: '',
           queryDate: this.initDateRange()
         },
         queryRules: {
@@ -634,35 +577,10 @@
         },
         // 下拉框
         disposalList: [],
-        iscorrectList: iscorrectList,
-        txnstatusList: [],
-        countrycodeList: [],
-        regioncodeList: [],
-        citycodeList: []
+        iscorrectList: iscorrectList
       }
     },
-    watch: {
-      'queryShowForm.countrycode': function (val) {
-        let self = this
-        ajax.post({
-          url: '/monitor/alarm/get_region_by_country',
-          param: {country: val},
-          success: function (data) {
-            self.regioncodeList = data.row
-          }
-        })
-      },
-      'queryShowForm.regioncode': function (val) {
-        let self = this
-        ajax.post({
-          url: '/monitor/alarm/get_city_by_region',
-          param: {region: val},
-          success: function (data) {
-            self.citycodeList = data.row
-          }
-        })
-      }
-    },
+    watch: {},
     components: {
       'txn-detail': TxnDetail
     }
