@@ -63,7 +63,7 @@ public class LogService {
 			sql += " and log.OPERATOR_ID= :OPERATOR_ID";
 		}
 		if(conds.get("operator_name")!=null && !"".equals(conds.get("operator_name"))){
-			sql +=" and oper.REAL_NAME = '"+conds.get("operator_name")+"' ";
+			sql +=" and oper.REAL_NAME like '%"+conds.get("operator_name")+"%' ";
 		}
 		if(conds.get("operate_time")!=null && !"".equals(conds.get("operate_time"))){
 			String start_time = conds.get("operate_time").toString();
