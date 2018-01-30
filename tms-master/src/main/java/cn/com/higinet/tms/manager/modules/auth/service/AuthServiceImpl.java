@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cn.com.higinet.tms.base.entity.common.RequestModel;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.common.util.AuthDataBusUtil;
 import cn.com.higinet.tms.manager.dao.Order;
@@ -1366,7 +1366,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 * @param methodName
 	 */
 
-	@Transactional("tmp")
+	@Transactional
 	public void doApply( Object[] args, String methodName ) {
 		MethodConfig mc = ParseCacheConfigXml.getInstance().getMethod( methodName );
 		if( mc == null ) {
@@ -1413,7 +1413,7 @@ public class AuthServiceImpl extends ApplicationObjectSupport implements AuthSer
 	 * @param refuseInfo
 	 * @param authorStatus
 	 */
-	@Transactional("tmp")
+	@Transactional
 	public void doAuth( Object[] args ) {
 		Map<String, String> arg = (Map<String, String>) args[0];
 		String authIds = MapUtil.getString( arg, "AUTH_IDS" ); // 授权信息Id，多个Id用逗号隔开

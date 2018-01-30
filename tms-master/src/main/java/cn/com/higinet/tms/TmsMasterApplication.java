@@ -4,11 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+import cn.com.higinet.tms.common.elasticsearch.EnableElasticSearch;
+
 @SpringBootApplication
 //@EnableJdbcHttpSession(maxInactiveIntervalInSeconds = 1800)
 @EnableDiscoveryClient
 //@EnableZuulProxy
-//@EnableElasticSearch
+@EnableElasticSearch
 //@EnableKafka
 public class TmsMasterApplication {
 	public static void main( String[] args ) {

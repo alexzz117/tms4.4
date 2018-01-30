@@ -47,7 +47,7 @@ import cn.com.higinet.tms.manager.modules.tran.service.TransDefService;
 @Transactional
 public class RuleService {
 
-	private static final Logger log = LoggerFactory.getLogger( RuleService.class );
+	private static final Logger logger = LoggerFactory.getLogger( RuleService.class );
 
 	@Autowired
 	@Qualifier("onlineDataSource")
@@ -223,13 +223,10 @@ public class RuleService {
 		if( modList != null && modList.size() > 0 ) {
 			// 初始化缓存
 			cache_init.init( new data_source( dynamicDataSource ) );
-
 			for( Map<String, Object> map : modList ) {
 				checkCond( map );// 校验条件有效性
-
 				// 校验动作名称不能重复
 				checkDuplicateRuleName( map );
-
 				rmap = modRule( map );
 			}
 		}
@@ -238,11 +235,9 @@ public class RuleService {
 		if( validYList != null && validYList.size() > 0 ) {
 			// 初始化缓存
 			cache_init.init( new data_source( dynamicDataSource ) );
-
 			for( Map<String, Object> map : validYList ) {
 				// 校验条件是否有效
 				checkCond( map );
-
 				rmap = modRule( map );
 			}
 		}
@@ -342,7 +337,7 @@ public class RuleService {
 				isTrue = web_tool.compile_expr( rule_txn, rule_cond, error );
 			}
 			catch( Exception e ) {
-				log.error( e.getMessage(), e );
+				logger.error( e.getMessage(), e );
 				throw new TmsMgrServiceException( "条件表达式不合法，由于" + "条件[" + rule_shortdesc + "]" + e.getLocalizedMessage() );
 			}
 			// 不正确弹出错误信息
@@ -419,20 +414,10 @@ public class RuleService {
 		return dynamicSimpleDao.retrieve( "TMS_COM_RULE", MapWrap.map( DBConstant.TMS_COM_RULE_RULE_ID, ruleId ).getMap() );
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.com.higinet.tms35.manage.rule.service.RuleService#getRuleId()
-	 */
 	public String getRuleId() {
 		return sequenceService.getSequenceIdToString( DBConstant.SEQ_TMS_COM_RULE_ID );
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.com.higinet.tms35.manage.rule.service.RuleService#auditRule(java.lang.String, java.lang.String, boolean)
-	 */
 	// TODO 规则授权需要修改
 	// 规则授权
 	@Transactional
