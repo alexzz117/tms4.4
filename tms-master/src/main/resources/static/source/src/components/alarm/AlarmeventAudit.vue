@@ -105,6 +105,7 @@
       </div>
       <div style="float:right; padding-right: 15px;">
         <el-date-picker
+          v-show="!queryFormShow"
           v-model="queryShowForm.queryDate"
           type="datetimerange"
           range-separator="至"
