@@ -63,18 +63,18 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="操作状态:" prop="txnstatus">
-          <el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable>
-            <el-option
-              v-for="item in txnstatusList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+        <!--<el-form-item label="操作状态:" prop="txnstatus">-->
+          <!--<el-select v-model="queryShowForm.txnstatus" class="alarm-event-query-form-item" placeholder="请选择"-->
+                     <!--clearable>-->
+            <!--<el-option-->
+              <!--v-for="item in txnstatusList"-->
+              <!--:key="item.value"-->
+              <!--:label="item.label"-->
+              <!--:value="item.value">-->
+            <!--</el-option>-->
 
-          </el-select>
-        </el-form-item>
+          <!--</el-select>-->
+        <!--</el-form-item>-->
 
         <el-form-item label="处理状态:" prop="psstatus">
           <el-select v-model="queryShowForm.psstatus" class="alarm-event-query-form-item" placeholder="请选择"
@@ -99,40 +99,40 @@
           </el-date-picker>
         </el-form-item>
 
-        <el-form-item label="地理位置:" prop="countrycode">
-          <el-select v-model="queryShowForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in countrycodeList"
-              :key="item.countrycode"
-              :label="item.countryname"
-              :value="item.countrycode">
-            </el-option>
+        <!--<el-form-item label="地理位置:" prop="countrycode">-->
+          <!--<el-select v-model="queryShowForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择"-->
+                     <!--clearable filterable>-->
+            <!--<el-option-->
+              <!--v-for="item in countrycodeList"-->
+              <!--:key="item.countrycode"-->
+              <!--:label="item.countryname"-->
+              <!--:value="item.countrycode">-->
+            <!--</el-option>-->
 
-          </el-select>
+          <!--</el-select>-->
 
-          <el-select v-model="queryShowForm.regioncode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in regioncodeList"
-              :key="item.regioncode"
-              :label="item.regionname"
-              :value="item.regioncode">
-            </el-option>
+          <!--<el-select v-model="queryShowForm.regioncode" class="alarm-event-query-form-item" placeholder="请选择"-->
+                     <!--clearable filterable>-->
+            <!--<el-option-->
+              <!--v-for="item in regioncodeList"-->
+              <!--:key="item.regioncode"-->
+              <!--:label="item.regionname"-->
+              <!--:value="item.regioncode">-->
+            <!--</el-option>-->
 
-          </el-select>
+          <!--</el-select>-->
 
-          <el-select v-model="queryShowForm.citycode" class="alarm-event-query-form-item" placeholder="请选择"
-                     clearable filterable>
-            <el-option
-              v-for="item in citycodeList"
-              :key="item.citycode"
-              :label="item.cityname"
-              :value="item.citycode">
-            </el-option>
+          <!--<el-select v-model="queryShowForm.citycode" class="alarm-event-query-form-item" placeholder="请选择"-->
+                     <!--clearable filterable>-->
+            <!--<el-option-->
+              <!--v-for="item in citycodeList"-->
+              <!--:key="item.citycode"-->
+              <!--:label="item.cityname"-->
+              <!--:value="item.citycode">-->
+            <!--</el-option>-->
 
-          </el-select>
-        </el-form-item>
+          <!--</el-select>-->
+        <!--</el-form-item>-->
       </el-form>
 
     </transition>
@@ -174,7 +174,8 @@
         <el-table-column prop="username" label="客户名称" width="80"/>
         <el-table-column prop="txntime" label="交易时间" width="135" :formatter="formatter"/>
         <el-table-column prop="txnname" label="监控操作" width="100"/>
-        <el-table-column prop="disposal" label="处置结果" width="80"/>
+        <el-table-column prop="disposal" label="处置方式" width="140" align="left"/>
+        <el-table-column prop="iscorrect" label="处置结果" width="140" align="left" :formatter="formatter"/>
         <el-table-column prop="assign_name" label="分派人" width="80"/>
         <el-table-column prop="assigntime" label="分派时间" width="135" :formatter="formatter"/>
         <el-table-column prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
@@ -574,6 +575,15 @@
           case 'assigntime':
             return dictCode.rendDatetime(cellValue)
             break;
+          case 'iscorrect': {
+            for (let item of iscorrectList) {
+              if (item.value === cellValue) {
+                return item.label
+              }
+            }
+            return ''
+            break
+          }
           default:
             return cellValue
             break;

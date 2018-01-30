@@ -29,7 +29,7 @@
       </el-tabs>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="infoDialogVisible = false" size="large">取 消</el-button>
+        <el-button @click="infoDialogVisible = false" size="large">关 闭</el-button>
       </div>
     </el-dialog>
   </div>

@@ -42,7 +42,7 @@
       <el-button class="el-icon-back" type="primary" @click="back()">返回</el-button>
       <div style="float:right">
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
-        <el-button type="primary" @click="searchData">搜索</el-button>
+        <el-button type="primary" @click="searchData" icon="el-icon-search">查询</el-button>
       </div>
       <div style="float:right; padding-right: 15px;">
 

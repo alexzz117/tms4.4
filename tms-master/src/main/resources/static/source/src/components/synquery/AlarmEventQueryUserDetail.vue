@@ -4,6 +4,10 @@
       无信息记录
     </div>
     <div v-show="hasUser">
+      <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
+               :inline="true" style="text-align: left" v-show="queryFormShow" >
+
+      </el-form>
       <el-row>
         <el-col :span="6">用户ID:</el-col>
         <el-col :span="6">{{detailData.userid}}&nbsp</el-col>

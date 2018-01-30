@@ -30,9 +30,15 @@ let defaultOption = {
   loading: true,
   success: function (data) {},
   error: function (data) {
+    let message = ''
+    if(data.error && Array.isArray(data.error)){
+      message = data.error.join(',')
+    } else {
+      message = data.error
+    }
     vue.$message({
       showClose: true,
-      message: data.error,
+      message: message,
       type: 'error'
     });
   },

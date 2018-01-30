@@ -53,8 +53,23 @@
           </template>
         </el-table-column>
         <el-table-column prop="role_name" label="角色名称" align="left" width="180"></el-table-column>
-        <el-table-column prop="flag" label="状态" align="left" width="180" :formatter="formatter"></el-table-column>
+
         <el-table-column prop="info" label="描述信息" align="left" :show-overflow-tooltip="showOverflow"></el-table-column>
+
+        <el-table-column label="状态" align="left" width="180">
+
+          <template slot-scope="scope">
+            <!--{{scope.row.flag}} -->
+            <el-switch
+              v-model="scope.row.flag"
+              :active-value="'1'"
+              :inactive-value="'0'"
+              :disabled="flagBtnDisabled"
+              @change="flagChange(scope.row)">
+            </el-switch>
+
+          </template>
+        </el-table-column>
       </el-table>
       <el-pagination style="margin-top: 10px; text-align: right;"
                      @size-change="handleSizeChange"
@@ -73,8 +88,13 @@
           <el-input v-model="roleDialogform.role_name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;">
-          <el-radio v-model="roleDialogform.flag" label="1">正常</el-radio>
-          <el-radio v-model="roleDialogform.flag" label="0">停用</el-radio>
+          <el-switch
+            v-model="roleDialogform.flag"
+            :active-value="'1'"
+            :inactive-value="'0'">
+          </el-switch>
+          <!--<el-radio v-model="roleDialogform.flag" label="1">正常</el-radio>-->
+          <!--<el-radio v-model="roleDialogform.flag" label="0">停用</el-radio>-->
         </el-form-item>
         <el-form-item label="描述信息" :label-width="formLabelWidth" prop="info">
           <el-input type="textarea" v-model="roleDialogform.info"></el-input>
@@ -119,6 +139,38 @@
       this.sel()
     },
     methods: {
+      flagChange (row) {
+        let jsonData = {}
+        this.flagBtnDisabled = true
+        let self = this
+        let message = '编辑成功'
+        if (row.flag === '1') {
+          message = '已启用'
+        } else {
+          message = '已停用'
+        }
+
+        ajax.post({
+          url: '/role/mod',
+          param: row,
+          success: function (data) {
+            // self.getData()
+            self.flagBtnDisabled = false
+            self.$message.success(message)
+          },
+          error: function (data) {
+            if (data && data.error && typeof (data.error) === 'object' && data.error.length > 0) {
+              self.$message.error(data.error.join('|'))
+            } else {
+              self.$message.error(data.error)
+            }
+            self.flagBtnDisabled = false
+          },
+          fail: function () {
+            self.flagBtnDisabled = false
+          }
+        })
+      },
       handleSizeChange(val) {
         this.sel({
           pageindex:this.pageindex,
@@ -370,6 +422,7 @@
         })
       }
       return {
+        flagBtnDisabled:false,
         inline: true,
         roleForm: {
           role_name:''

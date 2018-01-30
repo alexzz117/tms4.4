@@ -174,6 +174,7 @@
         }
       },
       updatePassword () {
+        let self = this
         let param = Object.assign({}, this.passwordDialogform, {
           old_password: util.crypt.md5(this.passwordDialogform.old_pwd),
           new_password: util.crypt.md5(this.passwordDialogform.new_pwd)
@@ -186,6 +187,12 @@
               type: 'success',
               message: '修改成功'
             })
+            self.passwordDialogform = {
+              old_pwd: "",
+                new_pwd: "",
+                r_new_pwd: "",
+            }
+            self.updPassDialogVisible = false
           }
         })
       },
@@ -199,7 +206,6 @@
         })
       },
       logout () {
-        debugger
         this.$router.push({ name: 'login'})
         ajax.post({
           url: '/logout'
