@@ -4,8 +4,12 @@
       <el-tab-pane label="采集方式定义" name="appList">
         <dfp-app-list></dfp-app-list>
       </el-tab-pane>
-      <el-tab-pane label="属性定义" name="proList">配置管理</el-tab-pane>
-      <el-tab-pane label="采集方式属性定义" name="appProList">角色管理</el-tab-pane>
+      <el-tab-pane label="属性定义" name="proList">
+        <dfp-pro-list></dfp-pro-list>
+      </el-tab-pane>
+      <el-tab-pane label="采集方式属性定义" name="appProList">
+        <dfp-app-pro-list></dfp-app-pro-list>
+      </el-tab-pane>
     </el-tabs>
 
   </div>
@@ -13,6 +17,8 @@
 
 <script>
   import DfpAppList from '@/components/system/DfpAppList'
+  import DfpProList from '@/components/system/DfpProList'
+  import DfpAppProList from '@/components/system/DfpAppProList'
 
   export default {
     computed: {
@@ -33,7 +39,9 @@
       }
     },
     components: {
-      'dfp-app-list': DfpAppList
+      'dfp-app-list': DfpAppList,
+      'dfp-pro-list': DfpProList,
+      'dfp-app-pro-list': DfpAppProList
     }
   }
 </script>
