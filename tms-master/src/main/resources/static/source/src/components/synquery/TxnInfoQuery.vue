@@ -1,13 +1,13 @@
 <template>
   <div>
     <!-- 操作信息 -->
-    <el-row>
+    <el-row class="info-item">
       <el-col v-for="item in showFields" :key="item.fd_name" :span="12">
-        <el-col :span="10" tag="label" class="item-label">
-          {{item.name}}:
+        <el-col :span="12" tag="label" class="info-item-label">
+          {{item.name}}
         </el-col>
-        <el-col :span="14" tag="label" class="item-value">
-          {{item.fd_value}}
+        <el-col :span="12" tag="label" class="info-item-value">
+          {{item.fd_value}}&nbsp
         </el-col>
       </el-col>
     </el-row>
@@ -99,11 +99,22 @@
   }
 </script>
 <style>
-  .item-label {
-    text-align: right;
+  .info-item {
+    border-left: thin solid;
+    border-top: thin solid;
+   }
+
+  .info-item-label {
+    padding: 0px 8px;
+    text-align: left;
+    border-right: thin solid;
+    border-bottom: thin solid;
   }
 
-  .item-value {
+  .info-item-value {
+    padding: 0px 8px;
     text-align: left;
+    border-right: thin solid;
+    border-bottom: thin solid;
   }
 </style>
