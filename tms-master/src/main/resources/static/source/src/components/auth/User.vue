@@ -10,7 +10,7 @@
             <el-form label-position="right" label-width="80px" :model="userForm"
                      :inline="inline" class="toolbar-form">
               <el-form-item label="用户名" prop="login_name">
-                <el-input v-model="userForm.login_name"></el-input>
+                <el-input v-model="userForm.login_name" clearable></el-input>
               </el-form-item>
               <!--<el-form-item label="姓名" prop="real_name">
                 <el-input v-model="userForm.real_name"></el-input>
