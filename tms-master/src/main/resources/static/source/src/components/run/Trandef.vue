@@ -143,7 +143,7 @@
               par_chann: parChann,
               txnffname: nodeInfo.tab_desc, // 上级交易
               modelused: '0', // 模型状态
-              is_enable: '0' // 有效性
+              is_enable: '1' // 有效性
             }
           }
         }, 100) // 每隔100秒执行一次
