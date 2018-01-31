@@ -127,7 +127,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="关联代码集" prop="code" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmCodeVisible}">
+            <el-form-item label="关联代码集" prop="code" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmCodeVisible}" :required="!tmCodeVisible">
               <el-select v-model="tmForm.code" placeholder="请选择">
                 <el-option
                   v-for="item in tmCodeList"
@@ -1016,7 +1016,7 @@
             tab_name: self.txnId
           },
           success: function (data) {
-            self.enableStoreFd = data.enableStoreFd // 存储字段
+            self.enableStoreFd = data.enablestorefd // 存储字段
           },
           fail: function (e) {
             if (e.response.data.message) {
@@ -1157,6 +1157,7 @@
                   self.$message.success('创建成功')
                 }
                 self.initTmForm()
+                self.getTmFdNameList()
                 self.tmDialogVisible = false
               },
               fail: function (e) {
@@ -1186,6 +1187,7 @@
             success: function (data) {
               self.$message.success('删除成功。')
               self.initTmForm()
+              self.getTmFdNameList()
             },
             fail: function (e) {
               if (e.response.data.message) {
@@ -1463,6 +1465,7 @@
                 }
                 self.tableDialogVisible = false
                 self.initTableForm()
+                self.getTmFdNameList()
               },
               fail: function (e) {
                 if (e.response.data.message) {
@@ -1505,6 +1508,7 @@
             success: function (data) {
               self.$message.success('删除成功')
               self.initTableForm()
+              self.getTmFdNameList()
             },
             fail: function (e) {
               if (e.response.data.message) {
@@ -1579,6 +1583,7 @@
                   self.$message.success('编辑成功。')
                 }
                 self.initTableForm()
+                self.getTmFdNameList()
                 self.tableInfoDialogVisible = false
               },
               fail: function (e) {
