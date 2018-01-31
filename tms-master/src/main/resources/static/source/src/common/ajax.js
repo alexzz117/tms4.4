@@ -2,12 +2,15 @@ import axios from 'axios'
 import util from '@/common/util'
 
 import Vue from 'vue'
-import { Loading,Message } from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
+// import { Loading,Message } from 'element-ui'
+// import 'element-ui/lib/theme-chalk/index.css'
+//
+//
+// Vue.prototype.$ELEMENT = { size: 'small' }
+// // Vue.use(Message)
+// Vue.use(Loading)
 
-Vue.prototype.$ELEMENT = { size: 'small' }
-Vue.use(Message)
-Vue.use(Loading)
+
 let vue = new Vue({})
 
 var config = {
@@ -27,7 +30,7 @@ let defaultOption = {
   param: {},
   model: modelDef.manager,
   toLowerCase: true,
-  loading: true,
+  loading: false,
   success: function (data) {},
   error: function (data) {
     let message = ''
@@ -36,9 +39,15 @@ let defaultOption = {
     } else {
       message = data.error
     }
+    let finalMessage = ''
+    if(Array.isArray(message)) {
+      finalMessage = message.join(',')
+    } else {
+      finalMessage = message
+    }
     vue.$message({
       showClose: true,
-      message: message,
+      message: finalMessage,
       type: 'error'
     });
   },
@@ -50,9 +59,15 @@ let defaultOption = {
     } else {
       message = error.message
     }
+    let finalMessage = ''
+    if(Array.isArray(message)) {
+      finalMessage = message.join(',')
+    } else {
+      finalMessage = message
+    }
     vue.$message({
       showClose: true,
-      message: message,
+      message: finalMessage,
       type: 'error'
     });
   }
