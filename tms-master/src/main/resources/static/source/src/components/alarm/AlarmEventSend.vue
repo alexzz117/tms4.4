@@ -132,6 +132,7 @@
     </transition>
 
     <div style="margin-bottom: 10px; text-align: left; height: 30px;">
+      <el-button type="primary" @click="openDialog()">分派</el-button>
       <div style="float:right">
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
         <el-button type="primary" class="el-icon-search" @click="searchData">查询</el-button>
@@ -154,13 +155,15 @@
       <!--   数据列表  -->
       <el-table
         :data="tableData"
-        style="width: 100%" tooltip-effect="dark" :cell-style="tableRowClass">
-        <!--<el-table-column type="selection" width="40" align="left" />-->
-        <el-table-column fixed="left" label="操 作" width="50" alert="center" align="left">
-          <template slot-scope="scope">
-            <el-button type="text" @click="openDialog(scope.row)" size="mini" icon="el-icon-sort" title="分派"/>
-          </template>
-        </el-table-column>
+        style="width: 100%" tooltip-effect="dark" :cell-style="tableRowClass"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="40" align="left" />
+        <!--<el-table-column fixed="left" label="操 作" width="50" alert="center" align="left">-->
+          <!--<template slot-scope="scope">-->
+            <!--<el-button type="text" @click="openDialog(scope.row)" size="mini" icon="el-icon-sort" title="分派"/>-->
+          <!--</template>-->
+        <!--</el-table-column> -->
         <el-table-column prop="txncode" label="流水号" align="left">
           <template slot-scope="scope">
             <a href="javascript:void(0)" @click="showAlarmEventInfo(scope.row)">{{scope.row.txncode}}</a>
@@ -221,9 +224,9 @@
         <el-form label-position="right" label-width="120px" :model="alarmSendForm" ref="alarmSendForm" :rules="alarmSendRules"
                  :inline="true" style="text-align: left;margin-top: 15px;">
 
-          <el-form-item v-show="oldOperIdShow" label="处理人员:" prop="old_operid">
-            <el-input v-model="alarmSendForm.old_operid" class="alarm-event-query-form-item" auto-complete="off" readonly></el-input>
-          </el-form-item>
+          <!--<el-form-item v-show="oldOperIdShow" label="处理人员:" prop="old_operid">-->
+            <!--<el-input v-model="alarmSendForm.old_operid" class="alarm-event-query-form-item" auto-complete="off" readonly></el-input>-->
+          <!--</el-form-item>-->
 
           <el-form-item label="分派人员:" prop="operid">
             <el-select v-model="alarmSendForm.operid" class="alarm-event-query-form-item" placeholder="请选择"
@@ -336,6 +339,7 @@
         currentPage: 1,
         pageSize: 10,
         total: 0,
+        selectedRows: [],
         selectedRow: {},
         tabActiveName: 'operate',
         tableData: [],
@@ -413,6 +417,9 @@
       }
     },
     methods: {
+      handleSelectionChange (rows) {
+        this.selectedRows = rows
+      },
       initDateRange () {
         let start = new Date()
         start.setHours(new Date().getHours() - 1)
@@ -501,6 +508,7 @@
         ajax.post({
           url: '/query/alarmEvent/result',
           model: ajax.model.dualaudit,
+
           param: paramsObj,
           success: function (data) {
             if (data.page) {
@@ -626,9 +634,14 @@
       openDialog(row) {
         let self = this
         console.log(row)
+        let txncodes = []
+        for(let item of this.selectedRows) {
+          txncodes.push(item.txncode)
+        }
         let param = {
-          txn_code: row.txncode,
-          oper_id: row.oper_id
+          // txn_code: row.txncode,
+          txn_code: txncodes.join(','),
+          // oper_id: row.oper_id
         }
         this.alarmSendForm = {
           old_operid: '',
@@ -692,9 +705,13 @@
       },
       onSaveAssign () {
         var self = this
-        console.log(this.selectedRow)
+        let txncodes = []
+        for(let item of this.selectedRows) {
+          txncodes.push(item.txncode)
+        }
         var param = {
-          TXNCODES: this.selectedRow.txncode, //需要分派的流水交易
+          // TXNCODES: this.selectedRow.txncode, //需要分派的流水交易
+          TXNCODES: txncodes.join(','), //需要分派的流水交易
           OPERATER: this.alarmSendForm.operid //选中操作员
         }
         this.sendBtnDisabled = true

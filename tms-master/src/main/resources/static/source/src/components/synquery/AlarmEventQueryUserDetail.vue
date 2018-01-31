@@ -3,59 +3,159 @@
     <div v-show="!hasUser">
       无信息记录
     </div>
-    <div v-show="hasUser">
-      <el-form label-position="right" label-width="120px" :model="queryShowForm" ref="queryShowForm"
-               :inline="true" style="text-align: left" v-show="queryFormShow" >
+    <div v-show="hasUser" class="info-item">
+      <el-row>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            用户ID:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.userid}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            用户名:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.username}}&nbsp
+          </el-col>
+        </el-col>
+      </el-row>
 
-      </el-form>
       <el-row>
-        <el-col :span="6">用户ID:</el-col>
-        <el-col :span="6">{{detailData.userid}}&nbsp</el-col>
-        <el-col :span="6">用户名:</el-col>
-        <el-col :span="6">{{detailData.username}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            客户姓名:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.cusname}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            证件号码:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.certno}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
+
       <el-row>
-        <el-col :span="6">客户姓名:</el-col>
-        <el-col :span="6">{{detailData.cusname}}&nbsp</el-col>
-        <el-col :span="6">证件号码:</el-col>
-        <el-col :span="6">{{detailData.certno}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            证件类型:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.certtype|renderCerttype}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            手机号码:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.cellphoneno}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
+
       <el-row>
-        <el-col :span="6">证件类型:</el-col>
-        <el-col :span="6">{{detailData.certtype|renderCerttype}}&nbsp</el-col>
-        <el-col :span="6">手机号码:</el-col>
-        <el-col :span="6">{{detailData.cellphoneno}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            渠道用户开户行:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.opennode}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            开户时间:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.opentime|renderDateTime}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
+
       <el-row>
-        <el-col :span="6">渠道用户开户行:</el-col>
-        <el-col :span="6">{{detailData.opennode}}&nbsp</el-col>
-        <el-col :span="6">开户时间:</el-col>
-        <el-col :span="6">{{detailData.opentime|renderDateTime}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            用户类型:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.acctype}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            性别:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.sex|renderSex}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
+
       <el-row>
-        <el-col :span="6">用户类型:</el-col>
-        <el-col :span="6">{{detailData.acctype}}&nbsp</el-col>
-        <el-col :span="6">性别:</el-col>
-        <el-col :span="6">{{detailData.sex|renderSex}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            出生日期:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.birthdate |renderDateTime}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            累计分值:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.sumscore}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
+
       <el-row>
-        <el-col :span="6">出生日期:</el-col>
-        <el-col :span="6">{{detailData.birthdate |renderDateTime}}&nbsp</el-col>
-        <el-col :span="6">累计分值:</el-col>
-        <el-col :span="6">{{detailData.sumscore}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            条件类型:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.risktype}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            风险分值:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.riskscore}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
+
       <el-row>
-        <el-col :span="6">条件类型:</el-col>
-        <el-col :span="6">{{detailData.risktype}}&nbsp</el-col>
-        <el-col :span="6">风险分值:</el-col>
-        <el-col :span="6">{{detailData.riskscore}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            连续无风险次数:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.norisknum}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            开户城市:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.opennodecity}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
-      <el-row>
-        <el-col :span="6">连续无风险次数:</el-col>
-        <el-col :span="6">{{detailData.norisknum}}&nbsp</el-col>
-        <el-col :span="6">开户城市:</el-col>
-        <el-col :span="6">{{detailData.opennodecity}}&nbsp</el-col>
-      </el-row>
+
     </div>
   </div>
 </template>
@@ -142,5 +242,22 @@
   }
 </script>
 <style>
+  .info-item {
+    border-left: thin solid;
+    border-top: thin solid;
+  }
 
+  .info-item-label {
+    padding: 0px 8px;
+    text-align: left;
+    border-right: thin solid;
+    border-bottom: thin solid;
+  }
+
+  .info-item-value {
+    padding: 0px 8px;
+    text-align: left;
+    border-right: thin solid;
+    border-bottom: thin solid;
+  }
 </style>

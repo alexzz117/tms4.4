@@ -16,7 +16,7 @@
                     placeholder="请输入密码" @keyup.enter.native="pressKey"></el-input>
         </el-form-item>
         <el-form-item label="">
-          <el-checkbox v-model="checked">记住密码</el-checkbox>
+          <el-checkbox v-model="checked">记住用户名</el-checkbox>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('loginForm')" style="width: 100%">登录</el-button>
@@ -49,6 +49,16 @@
         checked: true
       }
     },
+    mounted: function () {
+      this.$nextTick(function () {
+        if(window.Storage && window.localStorage && window.localStorage instanceof Storage){
+          let savedUserName = localStorage.getItem('loginUserName')
+          if(savedUserName) {
+            this.loginForm.username = savedUserName
+          }
+        }
+      })
+    },
     methods: {
       submitForm(formName) {
         var self = this
@@ -74,6 +84,13 @@
           param: param,
           success: function (data) {
             sessionStorage.setItem('userName', self.loginForm.username)
+            if(window.Storage && window.localStorage && window.localStorage instanceof Storage){
+              if(self.checked) {
+                localStorage.setItem('loginUserName', self.loginForm.username)
+              } else {
+                localStorage.removeItem('loginUserName')
+              }
+            }
             self.$router.push({ name: 'main'})
           }
         })

@@ -33,8 +33,8 @@
               {{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown" style="float: none">
-              <el-dropdown-item command="openDialog"><span class="el-icon-setting"></span> 修改密码</el-dropdown-item>
-              <el-dropdown-item command="logout"><span class="el-icon-circle-close"></span> 退出</el-dropdown-item>
+              <el-dropdown-item command="openDialog"><span class="el-icon-setting" style="color: #3a8ee6;"></span> 修改密码</el-dropdown-item>
+              <el-dropdown-item command="logout"><span class="el-icon-circle-close" style="color: #3a8ee6;"></span> 退出</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>

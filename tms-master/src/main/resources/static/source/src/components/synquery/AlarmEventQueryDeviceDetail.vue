@@ -3,20 +3,46 @@
     <div v-show="!hasData">
       无信息记录
     </div>
-    <div v-show="hasData">
-      <el-row>
+    <div v-show="hasData" class="info-item">
 
-        <el-col :span="6">设备标识:</el-col>
-        <el-col :span="6">{{detailData.device_id}}&nbsp</el-col>
-        <el-col :span="6">渠道代码:</el-col>
-        <el-col :span="6">{{detailData.app_id}}&nbsp</el-col>
-      </el-row>
       <el-row>
-        <el-col :span="6">创建时间:</el-col>
-        <el-col :span="6">{{detailData.create_time|renderDateTime}}&nbsp</el-col>
-        <el-col :span="6">最后使用时间:</el-col>
-        <el-col :span="6">{{detailData.lastmodified|renderDateTime}}&nbsp</el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            设备标识:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.device_id}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            渠道代码:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.app_id}}&nbsp
+          </el-col>
+        </el-col>
       </el-row>
+
+      <el-row>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            创建时间:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.create_time|renderDateTime}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            最后使用时间:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.lastmodified|renderDateTime}}&nbsp
+          </el-col>
+        </el-col>
+      </el-row>
+
     </div>
   </div>
 </template>
@@ -88,5 +114,22 @@
   }
 </script>
 <style>
+  .info-item {
+    border-left: thin solid;
+    border-top: thin solid;
+  }
 
+  .info-item-label {
+    padding: 0px 8px;
+    text-align: left;
+    border-right: thin solid;
+    border-bottom: thin solid;
+  }
+
+  .info-item-value {
+    padding: 0px 8px;
+    text-align: left;
+    border-right: thin solid;
+    border-bottom: thin solid;
+  }
 </style>
