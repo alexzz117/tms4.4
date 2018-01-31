@@ -377,28 +377,63 @@ public class TransDefService {
 	 */
 	private void checkTxnAttrs(String tab_name) {
 
-		StringBuffer sb = new StringBuffer();
-		sb.append("select rfd.*, ftab.*, ru.*, st.*, fd.* , sw.*");
-		sb.append(" from tms_com_tab tab");
-		sb.append(" left join tms_com_reffd rfd on rfd.tab_name = tab.tab_name");
-		sb.append(" left join tms_com_reftab ftab on ftab.tab_name = tab.tab_name");
-		sb.append(" left join tms_com_rule ru on ru.rule_txn = tab.tab_name");
-		sb.append(" left join tms_com_strategy sw on sw.st_txn = tab.tab_name");
-		sb.append(" left join tms_com_stat st on st.stat_txn = tab.tab_name");
-		sb.append(" left join tms_com_fd fd on fd.tab_name = tab.tab_name");
-		sb.append(" where tab.tab_name = ?");
+//		StringBuffer sb = new StringBuffer();
+//		sb.append("select rfd.*, ftab.*, ru.*, st.*, fd.* , sw.*");
+//		sb.append(" from tms_com_tab tab"); 										// 交易模型表
+//		sb.append(" left join tms_com_reffd rfd on rfd.tab_name = tab.tab_name"); 	// 交易模型引用表字段
+//		sb.append(" left join tms_com_reftab ftab on ftab.tab_name = tab.tab_name");// 交易模型引用表
+//		sb.append(" left join tms_com_rule ru on ru.rule_txn = tab.tab_name");		// 交易规则表
+//		sb.append(" left join tms_com_strategy sw on sw.st_txn = tab.tab_name");	// 交易策略表
+//		sb.append(" left join tms_com_stat st on st.stat_txn = tab.tab_name");		// 交易统计表
+//		sb.append(" left join tms_com_fd fd on fd.tab_name = tab.tab_name");		// 交易模型字段表
+//		sb.append(" where tab.tab_name = ?");
 
-		List<Map<String, Object>> num = dynamicSimpleDao.queryForList(sb.toString(), tab_name);
+		String first = "select ref.* from tms_com_tab tab";
+		String last = " where tab.tab_name = ?";
 
-		if (num.size() > 1) {
-			throw new TmsMgrServiceException("该交易下有属性,请先删除属性");
-		} else if (num.size() == 1) {
-			Set<Entry<String, Object>> set = num.get(0).entrySet();
+		StringBuffer fd = new StringBuffer();
+		fd.append(first);
+		fd.append(" left join tms_com_fd ref on ref.tab_name = tab.tab_name");		// 交易模型字段表
+		fd.append(last);
+		List<Map<String, Object>> fdList = dynamicSimpleDao.queryForList(fd.toString(), tab_name);
+		throwTxnAttrsMessage(fdList,"模型字段表");
+		StringBuffer ftab = new StringBuffer();
+		ftab.append(first);
+		ftab.append(" left join tms_com_reftab ref on ref.tab_name = tab.tab_name");// 交易模型引用表
+		ftab.append(last);
+		List<Map<String, Object>> ftabList = dynamicSimpleDao.queryForList(ftab.toString(), tab_name);
+		throwTxnAttrsMessage(ftabList,"模型引用表");
+		StringBuffer st = new StringBuffer();
+		st.append(first);
+		st.append(" left join tms_com_stat ref on ref.stat_txn = tab.tab_name");		// 交易统计表
+		st.append(last);
+		List<Map<String, Object>> stList = dynamicSimpleDao.queryForList(st.toString(), tab_name);
+		throwTxnAttrsMessage(stList,"模型统计");
+		StringBuffer ru = new StringBuffer();
+		ru.append(first);
+		ru.append(" left join tms_com_rule ref on ref.rule_txn = tab.tab_name");		// 交易规则表
+		ru.append(last);
+		List<Map<String, Object>> ruList = dynamicSimpleDao.queryForList(ru.toString(), tab_name);
+		throwTxnAttrsMessage(ruList,"模型规则");
+
+	}
+
+	/**
+	 * 抛出错误信息
+	 * @param list 列表
+	 * @param name 错误位置名称
+	 * @return 是否已抛出错误信息
+	 */
+	private void throwTxnAttrsMessage(List<Map<String, Object>> list, String name) {
+		if (list.size() > 1) {
+			throw new TmsMgrServiceException("该交易下有"+name+",请先删除"+name);
+		} else if (list.size() == 1) {
+			Set<Entry<String, Object>> set = list.get(0).entrySet();
 			for (Map.Entry<String, Object> col_entry : set) {
 				// Object c = col_entry.getValue();
 				// if (StringUtil.isNotEmpty((String)col_entry.getValue())){
 				if (col_entry.getValue() != null) {
-					throw new TmsMgrServiceException("该交易下有属性,请先删除属性");
+					throw new TmsMgrServiceException("该交易下有"+name+",请先删除"+name);
 				}
 			}
 		}
