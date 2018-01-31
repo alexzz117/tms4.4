@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.consumer.traffic;
+package cn.com.higinet.tms.consumer.traffic.queue;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;

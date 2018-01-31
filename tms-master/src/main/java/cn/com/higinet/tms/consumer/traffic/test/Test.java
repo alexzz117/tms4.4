@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import cn.com.higinet.tms.base.entity.TrafficData;
-import cn.com.higinet.tms.consumer.traffic.TrafficQueue;
+import cn.com.higinet.tms.consumer.traffic.queue.TrafficQueue;
 
 @Controller
 @RequestMapping(value = "/esOpt")

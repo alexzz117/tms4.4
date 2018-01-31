@@ -14,6 +14,9 @@ import cn.com.higinet.tms.base.entity.Traffic;
 import cn.com.higinet.tms.base.entity.TrafficData;
 import cn.com.higinet.tms.base.entity.online.tms_run_rule_action_hit;
 import cn.com.higinet.tms.base.entity.online.tms_run_ruletrig;
+import cn.com.higinet.tms.consumer.traffic.queue.RuleActionHitQueue;
+import cn.com.higinet.tms.consumer.traffic.queue.RuleTrigQueue;
+import cn.com.higinet.tms.consumer.traffic.queue.TrafficQueue;
 
 @Component
 public class TrafficConsumer {
@@ -35,12 +38,11 @@ public class TrafficConsumer {
 		if( traffic == null ) return;
 
 		TrafficData trafficData = traffic.getTrafficData();
-		if( trafficData != null ) trafficQueue.put( trafficData );
-
 		List<tms_run_ruletrig> ruletrigs = traffic.getRuletrigs();
-		ruleTrigQueue.put( ruletrigs );
-
 		List<tms_run_rule_action_hit> ruleActionHits = traffic.getRuleActionHits();
-		ruleActionHitQueue.put( ruleActionHits );
+
+		if( trafficData != null ) trafficQueue.put( trafficData );
+		if( ruletrigs != null ) ruleTrigQueue.put( ruletrigs );
+		if( ruleActionHits != null ) ruleActionHitQueue.put( ruleActionHits );
 	}
 }
