@@ -119,7 +119,7 @@ public class EsAdapter<T> implements DisposableBean {
 					logs = new StringBuffer();
 					logMap.put( executionId, logs );
 				}
-				logs.append( "数据开始提交：" + list.size() );
+				logs.append( request.requests().get( 0 ).index() + "数据开始提交：" + list.size() );
 
 				listener.before( executionId, list );
 			}
@@ -212,8 +212,8 @@ public class EsAdapter<T> implements DisposableBean {
 				list.add( JSON.parseObject( json, classz ) );
 			}
 		}
-		page.setTotalRecord(hits.getTotalHits());
-		page.setTotalPage((hits.getTotalHits()-1)/pageSize+1);
+		page.setTotalRecord( hits.getTotalHits() );
+		page.setTotalPage( (hits.getTotalHits() - 1) / pageSize + 1 );
 		page.setDataList( list );
 		return page;
 	}

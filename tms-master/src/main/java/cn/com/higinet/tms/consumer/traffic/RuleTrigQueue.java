@@ -13,49 +13,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import cn.com.higinet.tms.base.entity.TrafficData;
+import cn.com.higinet.tms.base.entity.online.tms_run_ruletrig;
 import cn.com.higinet.tms.common.elasticsearch.EsAdapter;
 import cn.com.higinet.tms.common.elasticsearch.EsListener;
 
 @Component
-public class TrafficQueue implements DisposableBean {
+public class RuleTrigQueue implements DisposableBean {
 
-	private static final Logger logger = LoggerFactory.getLogger( TrafficQueue.class );
+	private static final Logger logger = LoggerFactory.getLogger( RuleTrigQueue.class );
 
-	private BlockingQueue<TrafficData> queue;
+	private BlockingQueue<tms_run_ruletrig> queue;
 
-	@Value("${elasticsearch.trafficData.indexName}")
-	private String trafficDataIndexName; //TrafficData ES索引名
+	@Value("${elasticsearch.ruleTrig.indexName}")
+	private String esIndexName; //ES索引名
 
-	@Value("${elasticsearch.trafficData.queueCapacity:50000}")
+	@Value("${elasticsearch.ruleTrig.queueCapacity:50000}")
 	private int queueCapacity; //队列最大堆积数量，当超过时，put操作将堵塞
 
 	@Autowired
-	private EsAdapter<TrafficData> esAdapter;
+	private EsAdapter<tms_run_ruletrig> esAdapter;
 
 	@PostConstruct
 	private void init() {
 		//初始化traffic数据队列
-		queue = new LinkedBlockingQueue<TrafficData>( queueCapacity );
+		queue = new LinkedBlockingQueue<tms_run_ruletrig>( queueCapacity );
 
-		esAdapter.setListener( new EsListener<TrafficData>() {
+		esAdapter.setListener( new EsListener<tms_run_ruletrig>() {
 			@Override
-			public void before( Long executionId, List<TrafficData> allList ) {
+			public void before( Long executionId, List<tms_run_ruletrig> allList ) {
 
 			}
 
 			@Override
-			public void onSuccess( Long executionId, List<TrafficData> sucList ) {
+			public void onSuccess( Long executionId, List<tms_run_ruletrig> sucList ) {
 
 			}
 
 			@Override
-			public void onError( Long executionId, List<TrafficData> failIdList ) {
+			public void onError( Long executionId, List<tms_run_ruletrig> failIdList ) {
 
 			}
 
 			@Override
-			public void after( Long executionId, List<TrafficData> allList ) {
+			public void after( Long executionId, List<tms_run_ruletrig> allList ) {
 
 			}
 		} );
@@ -75,15 +75,21 @@ public class TrafficQueue implements DisposableBean {
 		thread.start();
 	}
 
-	public void put( TrafficData tarfficData ) throws Exception {
-		queue.put( tarfficData );
+	public void put( tms_run_ruletrig ruleTrig ) throws Exception {
+		queue.put( ruleTrig );
+	}
+
+	public void put( List<tms_run_ruletrig> objects ) throws Exception {
+		if( objects == null ) return;
+		for( tms_run_ruletrig ruleTrig : objects ) {
+			queue.put( ruleTrig );
+		}
 	}
 
 	public void take() throws Exception {
 		while( true ) {
-			//TrafficData data = queue.poll( 200, TimeUnit.MILLISECONDS );
-			TrafficData data = queue.take();
-			if( data != null ) esAdapter.batchSubmit( trafficDataIndexName, data );
+			tms_run_ruletrig data = queue.take();
+			if( data != null ) esAdapter.batchSubmit( esIndexName, data );
 		}
 	}
 

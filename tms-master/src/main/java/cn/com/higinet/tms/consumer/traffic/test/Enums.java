@@ -1,4 +1,4 @@
-package cn.com.higinet.tms.consumer.traffic;
+package cn.com.higinet.tms.consumer.traffic.test;
 import java.util.Random;
 
 public class  Enums {
