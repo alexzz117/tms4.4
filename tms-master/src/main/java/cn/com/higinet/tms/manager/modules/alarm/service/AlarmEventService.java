@@ -690,18 +690,18 @@ public class AlarmEventService {
 		if (list == null || list.isEmpty()) {
 			throw new TmsMgrServiceException("没有拥有[报警事件处理]权限的人员, 请设置.");
 		}
-		String operId = MapUtil.getString(cond, "OPERID");// 当前交易的处理人员
+//		String operId = MapUtil.getString(cond, "OPERID");// 当前交易的处理人员
 		String sql = "select OPERATOR_ID, sum(ASSIGN_NUMBER) ASSIGN_NUMBER, sum(PROCESS_NUMBER) PROCESS_NUMBER, "
 				+ "sum(UNPROCESS_NUMBER) UNPROCESS_NUMBER from TMS_MGR_ALARM_OPERATOR_STAT group by OPERATOR_ID order by assign_number,unprocess_number";
 		List<Map<String, Object>> statList = offlineSimpleDao.queryForList(sql);
 		for (Map<String, Object> operMap : list) {
 			String operatorId = MapUtil.getString(operMap, "OPERATOR_ID");
-			if (operId.equals(operatorId)) {
-				// 将当前交易处理人员设置为无效
-				operMap.put("ISENABLE", 0);
-			} else {
+//			if (operId.equals(operatorId)) {
+//				// 将当前交易处理人员设置为无效
+//				operMap.put("ISENABLE", 0);
+//			} else {
 				operMap.put("ISENABLE", 1);
-			}
+//			}
 			boolean hasStat = false;
 			if (statList != null && !statList.isEmpty()) {
 				for (Map<String, Object> statMap : statList) {

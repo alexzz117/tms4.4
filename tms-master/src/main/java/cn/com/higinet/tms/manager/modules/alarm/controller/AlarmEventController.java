@@ -254,7 +254,7 @@ public class AlarmEventController {
 	public Model alarmAssignAction(@RequestBody RequestModel modelMap) {
 		Model model = new Model();
 		Map<String, Object> cond = new HashMap<String, Object>();
-		cond.put("OPERID", modelMap.getString("oper_id"));
+//		cond.put("OPERID", modelMap.getString("oper_id"));
 		//报警事件处理人员工作量
 		List<Map<String, Object>> operCapacityList = alarmEventService.getAlarmAssignOperCapacity(cond);
 		//有报警事件处理权限的操作员
