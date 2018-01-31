@@ -60,8 +60,8 @@ import com.alibaba.fastjson.JSONObject;
 import cn.com.higinet.tms.base.util.Clockz;
 import cn.com.higinet.tms.base.util.Stringz;
 
-@Scope("prototype") //使用多实例模式
 @Component
+@Scope("prototype") //使用多实例模式
 public class EsAdapter<T> implements DisposableBean {
 
 	private static final Logger logger = LoggerFactory.getLogger( EsAdapter.class );
