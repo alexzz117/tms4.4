@@ -31,10 +31,9 @@ public class Traffic {
 				for( Field field : TrafficData.class.getDeclaredFields() ) {
 					if( field.getModifiers() >= 16 ) continue;
 					field.setAccessible( true );
-					String key = field.getName();
-					Object value = _tarffic.get( key.toUpperCase() );
+					String key = field.getName().toUpperCase(); //将实体属性名转成大写
+					Object value = _tarffic.get( key ); //在Map中获取值
 					field.set( trafficData, value );
-
 				}
 			}
 			catch( Exception e ) {
