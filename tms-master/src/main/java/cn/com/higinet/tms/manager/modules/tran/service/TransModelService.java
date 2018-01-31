@@ -209,7 +209,8 @@ public class TransModelService {
 			sb.append( "UNION " );
 			sb.append( sb1 );
 		}
-		return sb.append( " ORDER BY IS_SYS, TXN_ORDER" ).toString();
+		return sb.append( " ORDER BY FD_NAME" ).toString();
+//		return sb.append( " ORDER BY IS_SYS, TXN_ORDER" ).toString();
 	}
 
 	public List<Map<String, Object>> getTranModelsRef( String txnid ) {
