@@ -22,37 +22,37 @@
         <el-input v-model="tranDefForm.op" auto-complete="off"></el-input>
       </el-form-item>
       <el-row>
-        <el-col :span="12">
+        <el-col :span="12" class="form-item">
           <el-form-item label="名称" prop="tab_desc">
             <el-input v-model="tranDefForm.tab_desc" auto-complete="off" :readonly="formReadonly"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12" class="form-item">
           <el-form-item label="顺序" prop="show_order">
             <el-input v-model="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly" :maxlength="4"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">
+        <el-col :span="12" class="form-item">
           <el-form-item label="交易类型">
             <el-radio v-model="tranDefForm.txn_type" label="0" :disabled="formReadonly">交易组</el-radio>
             <el-radio v-model="tranDefForm.txn_type" label="1" :disabled="formReadonly">交易</el-radio>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12" class="form-item">
           <el-form-item label="交易识别标识" prop="txnid" v-bind:class="{hidden:txnIdVisible}">
             <el-input v-model="tranDefForm.txnid" auto-complete="off" :readonly="formReadonly"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="12">
+        <el-col :span="12" class="form-item">
           <el-form-item label="处置策略" :label-width="formLabelWidth" prop="tab_disposal">
             <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly"></AllPickSelect>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12" class="form-item">
           <el-form-item label="渠道名称" prop="chann">
             <el-select v-model="tranDefForm.chann" placeholder="请选择" :disabled="formReadonly||channVisible">
               <el-option
@@ -64,12 +64,12 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12"class="form-item">
           <el-form-item label="上级交易" prop="txnffname">
             <el-input v-model="tranDefForm.txnffname" auto-complete="off" readonly="readonly"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12"class="form-item">
           <el-form-item label="模型状态" prop="modelused" v-bind:class="{hidden:modelusedVisible}">
             <el-select v-model="tranDefForm.modelused" placeholder="请选择" :disabled="formReadonly">
               <el-option
@@ -81,7 +81,7 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12"class="form-item">
           <el-form-item label="有效性">
             <el-switch
               v-model="tranDefForm.is_enable"
@@ -279,5 +279,7 @@
 </script>
 
 <style>
-
+.form-item{
+  padding-right: 20px;
+}
 </style>
