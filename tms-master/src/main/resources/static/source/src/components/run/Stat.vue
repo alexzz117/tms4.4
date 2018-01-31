@@ -62,7 +62,7 @@
       <!--<el-button plain class="el-icon-view" :disabled="notSelectOne" @click="openDialog('view')">查看</el-button>-->
       <el-button plain class="el-icon-plus" :disabled="readonlyParent" @click="openDialog('add')">新建</el-button>
       <!--<el-button plain class="el-icon-edit" :disabled="notSelectOne || isExpand" @click="openDialog('edit')">编辑</el-button>-->
-      <!--<el-button plain class="el-icon-delete" :disabled="notSelectOne || isExpand" @click="delData">删除</el-button>-->
+      <el-button plain class="el-icon-delete" :disabled="!hasSelectRow || readonlyParent" @click="delData" >删除</el-button>
       <!--<el-button plain class="el-icon-circle-check" :disabled="notSelectOne || isExpand">启用</el-button>-->
       <!--<el-button plain class="el-icon-remove" :disabled="notSelectOne || isExpand">停用</el-button>-->
       <!--<el-button plain class="el-icon-share" :disabled="notSelectOne || isExpand">引用点</el-button>-->
@@ -85,21 +85,22 @@
         style="width: 100%"
         @selection-change="handleSelectionChange">
 
+        <el-table-column type="selection" width="55" align="left"></el-table-column>
         <el-table-column
           label="操作"
-          width="100">
+          width="80">
           <template slot-scope="scope">
 
             <el-button v-if="!readonlyParent" type="text" size="small" icon="el-icon-edit" title="编辑" @click="openDialog('edit', scope.row)"></el-button>
             <el-button v-if="readonlyParent" type="text" size="small" icon="el-icon-view" title="查看" @click="openDialog('edit', scope.row)"></el-button>
-            <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)" :disabled="readonlyParent"></el-button>
+            <!--<el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)" :disabled="readonlyParent"></el-button>-->
             <el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>
 
           </template>
         </el-table-column>
 
-        <!--<el-table-column type="selection" width="55" align="left"></el-table-column>-->
-        <el-table-column prop="stat_name" label="统计名称" align="left" width="70"></el-table-column>
+
+        <!--<el-table-column prop="stat_name" label="统计名称" align="left" width="70"></el-table-column>-->
         <el-table-column prop="stat_name" label="统计名称" align="left" width="70"></el-table-column>
         <el-table-column prop="stat_desc" label="统计描述" align="left"></el-table-column>
         <el-table-column label="统计引用对象" align="left" width="120">
@@ -336,6 +337,9 @@
       isVisibilityParent () { return this.isVisibility },
       notSelectOne () {
         return this.selectedRows.length !== 1
+      },
+      hasSelectRow () {
+        return this.selectedRows.length > 0
       },
       // // 下面是控制表单项显示，隐藏的
       formStatCondInName () {
@@ -737,7 +741,8 @@
           type: 'warning'
         }).then(() => {
           let jsonData = {}
-          jsonData.del = [row]
+          jsonData.del = this.selectedRows
+          // jsonData.del = [row]
           let finalJsonData = {}
           finalJsonData.postData = jsonData
           finalJsonData.txnId = this.txnIdParent

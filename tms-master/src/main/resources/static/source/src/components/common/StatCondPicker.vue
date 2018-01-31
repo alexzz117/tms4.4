@@ -106,13 +106,13 @@
 
       <div>
         <el-form-item label="条件表达式:" :label-width="formLabelWidth" prop="stat_cond_value">
-          <el-input type="textarea" v-model="statCondInDictDialogForm.stat_cond_value" ref="statCondValue" :style="textareaContentStyle"></el-input>
+          <el-input type="textarea" v-model="statCondInDictDialogForm.stat_cond_value" ref="statCondValue" :style="textareaContentStyle" :rows="5"></el-input>
         </el-form-item>
       </div>
 
       <div>
         <el-form-item label="解释:" :label-width="formLabelWidth" prop="stat_cond_in" >
-          <el-input type="textarea" v-model="statCondInDictDialogForm.stat_cond_in" ref="statCondIn" :style="textareaContentStyle"></el-input>
+          <el-input type="textarea" v-model="statCondInDictDialogForm.stat_cond_in" ref="statCondIn" :style="textareaContentStyle" :rows="5"></el-input>
         </el-form-item>
       </div>
 
@@ -139,7 +139,7 @@
       </el-tree>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="statFnDialogVisible = false" size="large">取 消</el-button>
+        <el-button @click="statFnDialogVisible = false" size="large">关 闭</el-button>
       </div>
     </el-dialog>
   </el-dialog>

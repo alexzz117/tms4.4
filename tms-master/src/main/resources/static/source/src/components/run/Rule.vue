@@ -51,6 +51,7 @@
     <div style="margin-bottom: 10px;text-align: left ">
 
       <el-button plain class="el-icon-plus" @click="openDialog('add')" :disabled="readonlyParent">新建</el-button>
+      <el-button plain class="el-icon-delete" @click="delData" :disabled="readonlyParent || !hasSelectRow">删除</el-button>
       <div style="float:right">
         <el-input v-model="queryShowForm.rule_shortdesc" placeholder="规则名称" class="rule-query-form-item" auto-complete="off" clearable>
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -62,18 +63,20 @@
       <el-table
         ref="dataTable"
         :data="tableDataShow"
-        style="width: 100%">
+        style="width: 100%"
+        @selection-change="handleSelectionChange">
 
+        <el-table-column type="selection" width="55" align="left"></el-table-column>
         <el-table-column
           label="操作"
-          width="120">
+          width="100">
           <template slot-scope="scope">
 
             <el-button v-if="readonlyParent" type="text" size="small" icon="el-icon-view" title="查看"  @click="openDialog('edit', scope.row)"></el-button>
             <el-button v-if="!readonlyParent" type="text" size="small" icon="el-icon-edit" title="编辑"  @click="openDialog('edit', scope.row)"></el-button>
 
             <el-button type="text" size="small" icon="el-icon-document" title="复制" @click="copy(scope.row)" :disabled="readonlyParent"></el-button>
-            <el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)" :disabled="readonlyParent"></el-button>
+            <!--<el-button type="text" size="small" icon="el-icon-delete" title="删除" @click="delData(scope.row)" :disabled="readonlyParent"></el-button>-->
             <!--<el-button type="text" size="small" icon="el-icon-location-outline" title="引用点" @click="openRefsDialog(scope.row)"></el-button>-->
 
           </template>
@@ -440,6 +443,9 @@
       txnIdParent () {
         return this.txnId
       },
+      hasSelectRow () {
+        return this.selectedRows.length > 0
+      },
       isVisibilityParent () { return this.isVisibility },
       // tableDataShow 用于表格数据的前台检索
       tableDataShow () {
@@ -542,9 +548,12 @@
           disposal: '',
           rule_score: '',
           rule_istest: '0',
-          rule_enable: '0',
+          rule_enable: '1',
           rule_desc: ''
         }
+      },
+      handleSelectionChange(rows) {
+        this.selectedRows = rows
       },
       initActionDialogForm () {
         return {
@@ -722,7 +731,8 @@
           type: 'warning'
         }).then(() => {
           let jsonData = {}
-          jsonData.del = [row]
+          jsonData.del = this.selectedRows
+          // jsonData.del = [row]
           let finalJsonData = {}
           finalJsonData.postData = jsonData
           finalJsonData.txnId = this.txnIdParent
@@ -959,6 +969,9 @@
       ruleCondInValueCallBack (value) {
         this.dialogForm.rule_cond = value.stat_cond_value
         this.dialogForm.rule_cond_in = value.stat_cond_in
+
+        this.$refs.dialogForm.validateField('rule_cond_in', (valid) => {
+        })
       },
       acCondInValueCallBack (value) {
         this.actionDialogForm.ac_cond = value.stat_cond_value
