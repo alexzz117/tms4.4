@@ -101,8 +101,7 @@
             active-text="正常"
             inactive-text="停用"
             active-value="1"
-            inactive-value="0"
-            :disabled="formReadonly">
+            inactive-value="0">
           </el-switch>
         </el-form-item>
         <el-form-item label="证件类型" :label-width="formLabelWidth" prop="credentialtype" style="text-align: left;" :style="formItemStyle">
