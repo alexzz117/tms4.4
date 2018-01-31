@@ -16,7 +16,6 @@ import cn.com.higinet.tms.common.event.EventBus;
 import cn.com.higinet.tms.common.event.EventContext;
 import cn.com.higinet.tms.event.Params;
 import cn.com.higinet.tms.event.Topics;
-import cn.com.higinet.tms.event.modules.kafka.KafkaTopics;
 import cn.com.higinet.tms35.comm.MapUtil;
 import cn.com.higinet.tms35.comm.NotErrorException;
 import cn.com.higinet.tms35.comm.StaticParameters;
@@ -685,7 +684,7 @@ public final class run_env extends run_time {
 					ruleActionHit.setRuleId((long) r.ruleid);
 					rs.add(ruleActionHit);
 				});
-				traffic.setRuleActionHit(rs);
+				traffic.setRuleActionHits(rs);
 			}
 		}
 		traffic.setTarffic(trafficdata.list2map(m_rf));
