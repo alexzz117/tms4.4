@@ -293,7 +293,7 @@
           error: function (data) {
             self.uploadForm = new FormData()
             // alert(data.error)
-            self.$message(data.error)
+            self.$message.error(data.error)
             self.progressReset()
             try {
               window.clearInterval(getProgressTimer)
@@ -302,7 +302,7 @@
           fail: function (err) {
             self.uploadForm = new FormData()
             // alert('导入文件发生错误')
-            self.$message('导入文件发生错误')
+            self.$message.error('导入文件发生错误')
             console.log(err)
             self.progressReset()
             try {
@@ -330,13 +330,13 @@
             self.mobileProgress = mobileProgress
             if (!util.isEmpty(errorInfo)) {
               // alert(errorInfo)
-              self.$message(errorInfo)
+              self.$message.error(errorInfo)
               console.log('clear timer')
               window.clearInterval(getProgressTimer)
             }
             self.timeCount++
             if (self.timeCount === 30 && IPProgress === 0 && cityProgress === 0 && cardProgress === 0 && mobileProgress === 0) {
-              self.$message('导入文件发生错误')
+              self.$message.error('导入文件发生错误')
               window.clearInterval(getProgressTimer)
             }
 
