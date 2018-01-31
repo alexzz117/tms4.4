@@ -87,10 +87,14 @@ public class EsAdapter<T> implements DisposableBean {
 	@Autowired
 	private EsConfig esConfig;
 
+	//异步线程池，用于执行自定义监听函数
+	@Autowired
+	EsListenerTaskExecutor taskExecutor;
+
 	//用于存储近期时间内的提交数据
 	private Map<String, T> dataMap = new LinkedHashMap<String, T>( 50000 );
-
-	Map<Long, StringBuffer> logMap = new LinkedHashMap<Long, StringBuffer>();
+	//用于存储提交批次日志
+	Map<Long, StringBuffer> logMap = new LinkedHashMap<Long, StringBuffer>( 1000 );
 
 	//批量处理器
 	private BulkProcessor bulkProcessor;
@@ -121,7 +125,14 @@ public class EsAdapter<T> implements DisposableBean {
 				}
 				logs.append( request.requests().get( 0 ).index() + "数据开始提交：" + list.size() );
 
-				listener.before( executionId, list );
+				//异步线程池执行自定义监听函数
+				if( listener != null ) taskExecutor.execute( new Runnable() {
+					@Override
+					public void run() {
+						listener.before( executionId, list );
+					}
+				} );
+
 			}
 
 			/**
@@ -153,14 +164,35 @@ public class EsAdapter<T> implements DisposableBean {
 				StringBuffer logs = logMap.get( executionId );
 				if( sucList.size() > 0 ) {
 					logs.append( "，成功：" + sucList.size() );
-					listener.onSuccess( executionId, sucList );
+
+					//异步线程池执行自定义监听函数
+					if( listener != null ) taskExecutor.execute( new Runnable() {
+						@Override
+						public void run() {
+							listener.onSuccess( executionId, sucList );
+						}
+					} );
+
 				}
 				if( failList.size() > 0 ) {
 					logs.append( "，失败：" + failList.size() );
-					listener.onError( executionId, failList );
+
+					//异步线程池执行自定义监听函数
+					if( listener != null ) taskExecutor.execute( new Runnable() {
+						@Override
+						public void run() {
+							listener.onError( executionId, failList );
+						}
+					} );
 				}
 
-				listener.after( executionId, allList );//完毕时
+				//异步线程池执行自定义监听函数
+				if( listener != null ) taskExecutor.execute( new Runnable() {
+					@Override
+					public void run() {
+						listener.after( executionId, allList );//完毕时
+					}
+				} );
 				logs.append( "，耗时：" + Clockz.stop( "Listener-" + executionId ) );
 				logger.info( logs.toString() );
 			}
@@ -174,13 +206,25 @@ public class EsAdapter<T> implements DisposableBean {
 				for( DocWriteRequest<?> docWriteRequest : request.requests() ) {
 					allList.add( dataMap.get( docWriteRequest.id() ) );
 				}
-				listener.onError( executionId, allList ); //错误时
-				listener.after( executionId, allList );//完毕时
-
 				StringBuffer logs = logMap.get( executionId );
 				logs.append( "，失败：" + allList.size() );
 				logs.append( "，耗时：" + Clockz.stop( "Listener-" + executionId ) );
 				logger.info( logs.toString() );
+
+				//异步线程池执行自定义监听函数
+				if( listener != null ) taskExecutor.execute( new Runnable() {
+					@Override
+					public void run() {
+						listener.onError( executionId, allList ); //错误时
+					}
+				} );
+
+				if( listener != null ) taskExecutor.execute( new Runnable() {
+					@Override
+					public void run() {
+						listener.after( executionId, allList );//完毕时
+					}
+				} );
 
 			}
 

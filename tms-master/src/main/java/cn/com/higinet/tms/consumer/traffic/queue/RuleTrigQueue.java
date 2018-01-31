@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import cn.com.higinet.tms.base.entity.online.tms_run_ruletrig;
 import cn.com.higinet.tms.common.elasticsearch.EsAdapter;
-import cn.com.higinet.tms.common.elasticsearch.EsListener;
 
 @Component
 public class RuleTrigQueue implements DisposableBean {
@@ -37,28 +36,6 @@ public class RuleTrigQueue implements DisposableBean {
 	private void init() {
 		//初始化traffic数据队列
 		queue = new LinkedBlockingQueue<tms_run_ruletrig>( queueCapacity );
-
-		esAdapter.setListener( new EsListener<tms_run_ruletrig>() {
-			@Override
-			public void before( Long executionId, List<tms_run_ruletrig> allList ) {
-
-			}
-
-			@Override
-			public void onSuccess( Long executionId, List<tms_run_ruletrig> sucList ) {
-
-			}
-
-			@Override
-			public void onError( Long executionId, List<tms_run_ruletrig> failIdList ) {
-
-			}
-
-			@Override
-			public void after( Long executionId, List<tms_run_ruletrig> allList ) {
-
-			}
-		} );
 
 		Thread thread = new Thread( new Runnable() {
 			@Override
