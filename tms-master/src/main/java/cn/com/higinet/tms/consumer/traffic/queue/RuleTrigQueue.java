@@ -33,7 +33,7 @@ public class RuleTrigQueue implements DisposableBean {
 	private EsAdapter<tms_run_ruletrig> esAdapter;
 
 	@PostConstruct
-	private void init() {
+	private void init() throws Exception {
 		//初始化traffic数据队列
 		queue = new LinkedBlockingQueue<tms_run_ruletrig>( queueCapacity );
 
