@@ -3,10 +3,10 @@
     <!-- 操作信息 -->
     <el-row class="info-item">
       <el-col v-for="item in showFields" :key="item.fd_name" :span="12">
-        <el-col :span="12" tag="label" class="info-item-label">
+        <el-col :span="9" tag="label" class="info-item-label">
           {{item.name}}
         </el-col>
-        <el-col :span="12" tag="label" class="info-item-value">
+        <el-col :span="15" tag="label" class="info-item-value">
           {{item.fd_value}}&nbsp
         </el-col>
       </el-col>
@@ -63,6 +63,22 @@
             let info = data.row[0]
             let list = []
             let showFields = data.showfields
+            let firstFieldNameList = ['TXNCODE', 'USERID', 'CREATETIME', 'FINISHTIME', 'TXNSTATUS', 'TXNID', 'TXNTYPE', 'ISRISK', 'DEVICEID', 'IPADDR',
+              'COUNTRYCODE', 'REGIONCODE', 'CITYCODE', 'CHANCODE', 'M_NUM53', 'M_NUM23', 'SESSIONID', 'ISEVAL', 'HITRULENUM', 'TRIGRULENUM', 'DISPOSAL',
+              'CONFIRMRISK', 'MODELID', 'PSSTATUS', 'BATCHNO']
+            let firstFieldList = []
+            for (let j in firstFieldNameList) {
+              let fieldName = firstFieldNameList[j]
+              for (let k in showFields) {
+                let field = showFields[k]
+                if (field.fd_name === fieldName) {
+                  firstFieldList.push(field)
+                  showFields.splice(Number(k), 1)
+                  break
+                }
+              }
+            }
+            showFields = firstFieldList.concat(showFields)
             for (let i in showFields) {
               let item = showFields[i]
               let fdValue = ''
