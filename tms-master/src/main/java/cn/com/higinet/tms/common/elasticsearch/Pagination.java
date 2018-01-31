@@ -8,9 +8,9 @@ private int pageSize; // 每页显示多少条记录
     
     private int pageNo; //当前第几页数据
     
-    private int totalRecord; // 一共多少条记录
+    private long totalRecord; // 一共多少条记录
     
-    private int totalPage; // 一共多少页记录
+    private long totalPage; // 一共多少页记录
     
     private List<T> dataList; //要显示的数据
     
@@ -18,7 +18,7 @@ private int pageSize; // 每页显示多少条记录
         
     }
 
-    public Pagination(int pageSize, int currentPage, int totalRecord, int totalPage,
+    public Pagination(int pageSize, int currentPage, long totalRecord, long totalPage,
             List<T> dataList) {
         super();
         this.pageSize = pageSize;
@@ -44,11 +44,11 @@ private int pageSize; // 每页显示多少条记录
         this.pageNo = pageNo;
     }
 
-    public int getTotalRecord() {
+    public long getTotalRecord() {
         return totalRecord;
     }
 
-    public void setTotalRecord(int totalRecord) {
+    public void setTotalRecord(long totalRecord) {
         this.totalPage = this.totalRecord / this.pageSize;
         if(this.totalRecord % this.pageSize !=0){
             this.totalPage = this.totalPage + 1;
@@ -56,11 +56,11 @@ private int pageSize; // 每页显示多少条记录
         this.totalRecord = totalRecord;
     }
 
-    public int getTotalPage() {
+    public long getTotalPage() {
         return totalPage;
     }
 
-    public void setTotalPage(int totalPage) {
+    public void setTotalPage(long totalPage) {
         this.totalPage = totalPage;
     }
 

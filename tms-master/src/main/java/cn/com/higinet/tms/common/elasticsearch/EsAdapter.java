@@ -212,6 +212,8 @@ public class EsAdapter<T> implements DisposableBean {
 				list.add( JSON.parseObject( json, classz ) );
 			}
 		}
+		page.setTotalRecord(hits.getTotalHits());
+		page.setTotalPage((hits.getTotalHits()-1)/pageSize+1);
 		page.setDataList( list );
 		return page;
 	}
