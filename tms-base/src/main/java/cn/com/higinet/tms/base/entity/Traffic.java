@@ -14,7 +14,7 @@ public class Traffic {
 
 	private Map<String, Object> tarffic;
 	private List<tms_run_ruletrig> ruletrigs;
-	private List<tms_run_rule_action_hit> ruleActionHit;
+	private List<tms_run_rule_action_hit> ruleActionHits;
 
 	private TrafficData trafficData;
 
