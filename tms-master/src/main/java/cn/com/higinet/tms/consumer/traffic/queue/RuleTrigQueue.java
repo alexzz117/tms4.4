@@ -64,7 +64,10 @@ public class RuleTrigQueue implements DisposableBean {
 			@Override
 			public void run() {
 				try {
-					take();
+					while( true ) {
+						tms_run_ruletrig data = queue.take();
+						if( data != null ) esAdapter.batchSubmit( esIndexName, data );
+					}
 				}
 				catch( Exception e ) {
 					logger.error( e.getMessage(), e );
@@ -83,13 +86,6 @@ public class RuleTrigQueue implements DisposableBean {
 		if( objects == null ) return;
 		for( tms_run_ruletrig ruleTrig : objects ) {
 			queue.put( ruleTrig );
-		}
-	}
-
-	public void take() throws Exception {
-		while( true ) {
-			tms_run_ruletrig data = queue.take();
-			if( data != null ) esAdapter.batchSubmit( esIndexName, data );
 		}
 	}
 

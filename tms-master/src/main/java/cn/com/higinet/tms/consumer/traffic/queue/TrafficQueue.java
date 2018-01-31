@@ -64,7 +64,11 @@ public class TrafficQueue implements DisposableBean {
 			@Override
 			public void run() {
 				try {
-					take();
+					while( true ) {
+						//TrafficData data = queue.poll( 200, TimeUnit.MILLISECONDS );
+						TrafficData data = queue.take();
+						if( data != null ) esAdapter.batchSubmit( trafficDataIndexName, data );
+					}
 				}
 				catch( Exception e ) {
 					logger.error( e.getMessage(), e );
@@ -77,14 +81,6 @@ public class TrafficQueue implements DisposableBean {
 
 	public void put( TrafficData tarfficData ) throws Exception {
 		queue.put( tarfficData );
-	}
-
-	public void take() throws Exception {
-		while( true ) {
-			//TrafficData data = queue.poll( 200, TimeUnit.MILLISECONDS );
-			TrafficData data = queue.take();
-			if( data != null ) esAdapter.batchSubmit( trafficDataIndexName, data );
-		}
 	}
 
 	/**

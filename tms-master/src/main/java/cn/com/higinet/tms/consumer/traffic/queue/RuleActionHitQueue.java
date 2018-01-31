@@ -21,7 +21,7 @@ import cn.com.higinet.tms.common.elasticsearch.EsListener;
 public class RuleActionHitQueue implements DisposableBean {
 
 	private static final Logger logger = LoggerFactory.getLogger( RuleActionHitQueue.class );
-	
+
 	private BlockingQueue<tms_run_rule_action_hit> queue;
 
 	@Value("${elasticsearch.ruleActionHit.indexName}")
@@ -64,7 +64,10 @@ public class RuleActionHitQueue implements DisposableBean {
 			@Override
 			public void run() {
 				try {
-					take();
+					while( true ) {
+						tms_run_rule_action_hit data = queue.take();
+						if( data != null ) esAdapter.batchSubmit( esIndexName, data );
+					}
 				}
 				catch( Exception e ) {
 					logger.error( e.getMessage(), e );
@@ -78,18 +81,11 @@ public class RuleActionHitQueue implements DisposableBean {
 	public void put( tms_run_rule_action_hit object ) throws Exception {
 		queue.put( object );
 	}
-	
+
 	public void put( List<tms_run_rule_action_hit> objects ) throws Exception {
 		if( objects == null ) return;
 		for( tms_run_rule_action_hit item : objects ) {
 			queue.put( item );
-		}
-	}
-
-	public void take() throws Exception {
-		while( true ) {
-			tms_run_rule_action_hit data = queue.take();
-			if( data != null ) esAdapter.batchSubmit( esIndexName, data );
 		}
 	}
 
