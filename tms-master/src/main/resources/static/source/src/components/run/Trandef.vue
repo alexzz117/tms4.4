@@ -3,7 +3,11 @@
     <trandefForm ref="infoForm" :editVisible="editVisible" :readonly="readonly"
                  v-on:listenToReloadPage="reloadPage"></trandefForm>
     <!-- Form -->
-    <el-dialog title="新建交易" :visible.sync="addFormVisible" @open="resetForm" @close="resetValidate" :close-on-click-modal="false">
+    <el-dialog title="新建交易" :visible.sync="addFormVisible"
+               width="800px"
+               @open="resetForm"
+               @close="resetValidate"
+               :close-on-click-modal="false">
       <trandefForm ref="addForm" :editVisible="false" :readonly="readonly"
                    v-on:listenToCloseDialog="syncDialogVisible"
                    v-on:listenToReloadPage="reloadPage"></trandefForm>
