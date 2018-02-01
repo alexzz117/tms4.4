@@ -33,6 +33,7 @@ import Log from '@/components/system/Log'
 import DeviceFingerPrint from '@/components/system/DeviceFingerPrint'
 import Time from '@/components/system/Time'
 import ZkAdmin from '@/components/system/ZkAdmin'
+import Channel from '@/components/system/Channel'
 
 import TxnEventQuery from '@/components/synquery/TxnEventQuery'
 import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
@@ -217,6 +218,11 @@ export default new Router({
           path: 'zkAdmin_vue',
           name: 'zkAdmin',
           component: ZkAdmin
+        },
+        {
+          path: 'channel_vue',
+          name: 'channel',
+          component: Channel
         }
         // ,
         // {
