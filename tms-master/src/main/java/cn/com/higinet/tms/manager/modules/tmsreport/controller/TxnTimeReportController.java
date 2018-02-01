@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.tmsreport.service.TxnTimeReportService;
@@ -29,7 +30,7 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 @RestController("txnTimeReportController")
-@RequestMapping("/report/txnTime")
+@RequestMapping(ManagerConstants.URI_PREFIX +  "/report/txnTime")
 public class TxnTimeReportController {
 	
 	@Autowired
@@ -76,7 +77,8 @@ public class TxnTimeReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/export", method=RequestMethod.GET)
-	public void exportListAction(@RequestBody Map<String, String> reqs,HttpServletRequest request,HttpServletResponse response){
+	//public void exportListAction(@RequestBody Map<String, String> reqs,HttpServletRequest request,HttpServletResponse response){
+	public void exportListAction(Map<String, String> reqs, HttpServletResponse response){
 		List<Map<String, Object>>  txnTimeList = txnTimeReportService.exportList(reqs);
 		String titles [] = {"交易名称"};
 		String colum [] = {"TXNNAME","RISK_EVAL_NUMBER","RISK_EVAL_RUNTIME_AVG","RISK_EVAL_RUNTIME_MAX","RISK_EVAL_RUNTIME_MIN",
