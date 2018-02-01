@@ -103,7 +103,7 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/export", method=RequestMethod.GET)
-	public void exportListAction(@RequestBody Map<String, String> reqs, HttpServletResponse response){
+	public void exportListAction(Map<String, String> reqs, HttpServletResponse response){
 		List<Map<String, Object>>  txnList = txnReportService.exportList(reqs);
 		String titles [] = {"交易名称","交易总数"};
 		List<String> colum = new ArrayList<String>();
