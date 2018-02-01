@@ -26,7 +26,6 @@
         <el-tab-pane label="会话信息" name="session" v-if="getTabItemShow('session')">
         </el-tab-pane>
       </el-tabs>
-
       <div slot="footer" class="dialog-footer">
         <el-button @click="infoDialogVisible = false" size="large">关 闭</el-button>
       </div>
