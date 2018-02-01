@@ -209,12 +209,12 @@ export default new Router({
           component: Time
         },
         {
-          path: 'dfp',
+          path: 'dfp_vue',
           name: 'dfp',
           component: DeviceFingerPrint
         },
         {
-          path: 'zkAdmin',
+          path: 'zkAdmin_vue',
           name: 'zkAdmin',
           component: ZkAdmin
         }
