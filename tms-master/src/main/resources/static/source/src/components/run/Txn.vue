@@ -97,6 +97,11 @@
       // 功能树渲染方法
       renderContent (h, { node, data, store }) {
         if (node.data.enable === 0) { // 功能节点状态禁用
+          // 子节点同时停用
+          let children = node.data.children
+          for (let i in children) {
+            children[i].enable = 0
+          }
           return (<span class="el-tree-node__label disabledFlag">{node.label}</span>)
         } else { // 功能节点状态正常
           return (<span class="el-tree-node__label">{node.label}</span>)
