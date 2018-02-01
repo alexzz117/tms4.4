@@ -153,8 +153,16 @@ function get (opt) {
     })
 }
 
+function syncGet (opt){
+  let option = {}
+  Object.assign(option, defaultOption, opt)
+  var sendUrl = config.prefix + option.model + option.url
+  window.location.href = sendUrl
+}
+
 export default {
   post: post,
   get: get,
+  syncGet: syncGet,
   model: modelDef
 }
