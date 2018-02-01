@@ -801,11 +801,13 @@
         self.activeName = '1'
         ajax.post({
           url: '/tranmdl/query', // 临时库
+          toLowerCase: false,
           param: {
             tab_name: self.txnId
           },
-          success: function (data) {
-            var tranModelList = data.txnfds
+          success: function (result) {
+            let data = util.toggleObjKey(result)
+            var tranModelList = self.formatterResultList(result.txnfds)
             if (tranModelList) {
               self.tranModelList = tranModelList  // 交易模型列表
               let expendNodeKey = []
@@ -847,15 +849,16 @@
           }
         })
       },
-      initTmForm () { // 初始化记忆模型表格
+      initTmForm () { // 初始化交易模型表格
         var self = this
         ajax.post({
           url: '/tranmdl/query', // 临时库
+          toLowerCase: false,
           param: {
             tab_name: self.txnId
           },
-          success: function (data) {
-            var tranModelList = data.txnfds
+          success: function (result) {
+            var tranModelList = self.formatterResultList(result.txnfds)
             if (tranModelList) {
               self.tranModelList = tranModelList  // 交易模型列表
             }
@@ -867,15 +870,18 @@
           }
         })
       },
-      initTableForm () { // 初始化交易模型引用表格
+      initTableForm () { // 初始化交易模型引用表格·
         var self = this
         ajax.post({
           url: '/tranmdl/query', // 临时库
+          toLowerCase: false,
           param: {
             tab_name: self.txnId
           },
-          success: function (data) {
-            var tableObj = self.tableDataFormat(data.txn_ref_tab, data.txn_ref_fds)
+          success: function (result) {
+            let data = util.toggleObjKey(result)
+            let txnRefTab = self.formatterResultList(result.txn_ref_tab)
+            var tableObj = self.tableDataFormat(txnRefTab, data.txn_ref_fds)
             self.tableList = tableObj.tableList
             self.enableStoreFd = data.enablestorefd // 可用存储字段
             self.allStoreFd = data.allstorefd       // 所有的存储字段
@@ -1665,6 +1671,18 @@
           stat_cond_value: this.tableInfoForm.src_expr,
           stat_cond_in: this.tableInfoForm.src_expr_in
         })
+      },
+      formatterResultList (list) {
+        let resultList = []
+        for (let i in list) {
+          let item = list[i]
+          let result = {}
+          for (let key in item) {
+            result[key] = util.toggleObjKey(item[key])
+          }
+          resultList.push(result)
+        }
+        return resultList
       }
     },
     components: {
