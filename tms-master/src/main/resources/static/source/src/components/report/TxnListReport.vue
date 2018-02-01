@@ -549,8 +549,8 @@
       exportFunc () {
         let params = this.searchForm
         console.info(params)
-        let url = '/context/manager/report/txn/export?' + util.serializeObj(params)
-        window.open(url)
+        let url = './report/txn/export?' + util.serializeObj(params)
+        window.location.href = url
       },
       printFunc () {
         alert('打印')
