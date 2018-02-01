@@ -19,6 +19,7 @@ var config = {
 }
 
 let modelDef = {
+  none: '/',
   manager: '/manager',
   dualaudit: '/dualaudit/manager',
   timer: '',

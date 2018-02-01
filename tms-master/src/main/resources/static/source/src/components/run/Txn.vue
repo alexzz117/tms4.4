@@ -54,7 +54,6 @@
     <!--</el-container>-->
   <!--</el-container>-->
 </template>
-
 <script>
   import Trandef from '@/components/run/Trandef'
   import Tranmdl from '@/components/run/Tranmdl'

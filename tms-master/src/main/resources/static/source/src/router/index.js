@@ -32,6 +32,7 @@ import Ipaddr from '@/components/system/Ipaddr'
 import Log from '@/components/system/Log'
 import DeviceFingerPrint from '@/components/system/DeviceFingerPrint'
 import Time from '@/components/system/Time'
+import ZkAdmin from '@/components/system/ZkAdmin'
 
 import TxnEventQuery from '@/components/synquery/TxnEventQuery'
 import AlarmEventQuery from '@/components/synquery/AlarmEventQuery'
@@ -211,6 +212,11 @@ export default new Router({
           path: 'dfp',
           name: 'dfp',
           component: DeviceFingerPrint
+        },
+        {
+          path: 'zkAdmin',
+          name: 'zkAdmin',
+          component: ZkAdmin
         }
         // ,
         // {
