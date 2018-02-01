@@ -96,46 +96,45 @@
           </div>
         </el-collapse-item>
         <el-collapse-item title="交易报警信息列表" name="table">
-          <el-table
-            :data="tableData"
-            style="width: 100%">
-            <el-table-column
-              prop="txnname"
-              label="交易名称"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="交易总数"
-              width="150">
-            </el-table-column>
-            <el-table-column v-for="column in tableColumns" :label="column.dp_name" :key="column.dp_code" align="center">
-              <el-table-column
-                :prop="connectString(column.dp_code, '_rate')"
-                label="总数"
-                width="120">
+          <template slot="title">
+            <div style="margin:10px;text-align: left ">
+              <span style="margin-right: 10px">交易报警信息列表</span>
+              <el-button plain class="el-icon-plus" @click.stop="exportFunc">导出</el-button>
+              <el-button plain class="el-icon-plus" @click.stop="printFunc">打印</el-button>
+            </div>
+          </template>
+          <div>
+            <el-table :data="tableData" style="width: 100%">
+              <el-table-column prop="txnname" label="交易名称" width="150"/>
+              <el-table-column prop="txnnumber" label="交易总数" width="150"/>
+              <el-table-column v-for="column in tableColumns" :label="column.dp_name" :key="column.dp_code" align="center">
+                <el-table-column
+                  :prop="connectString(column.dp_code, '_rate')"
+                  label="总数"
+                  width="120">
+                </el-table-column>
+                <el-table-column
+                  :prop="connectString(column.dp_code, '_fraudrate')"
+                  label="欺诈数"
+                  width="120">
+                </el-table-column>
+                <el-table-column
+                  :prop="connectString(column.dp_code, '_nonfraudrate')"
+                  label="非欺诈数"
+                  width="120">
+                </el-table-column>
               </el-table-column>
-              <el-table-column
-                :prop="connectString(column.dp_code, '_fraudrate')"
-                label="欺诈数"
-                width="120">
-              </el-table-column>
-              <el-table-column
-                :prop="connectString(column.dp_code, '_nonfraudrate')"
-                label="非欺诈数"
-                width="120">
-              </el-table-column>
-            </el-table-column>
-          </el-table>
-          <el-pagination style="margin-top: 10px; text-align: right;"
-                         :current-page="currentPage"
-                         @size-change="handleSizeChange"
-                         @current-change="handleCurrentChange"
-                         :page-sizes="[10, 25, 50, 100]"
-                         :page-size="pageSize"
-                         layout="total, sizes, prev, pager, next, jumper"
-                         :total="total">
-          </el-pagination>
+            </el-table>
+          </div>
+          <!--<el-pagination style="margin-top: 10px; text-align: right;"-->
+                         <!--:current-page="currentPage"-->
+                         <!--@size-change="handleSizeChange"-->
+                         <!--@current-change="handleCurrentChange"-->
+                         <!--:page-sizes="[10, 25, 50, 100]"-->
+                         <!--:page-size="pageSize"-->
+                         <!--layout="total, sizes, prev, pager, next, jumper"-->
+                         <!--:total="total">-->
+          <!--</el-pagination>-->
         </el-collapse-item>
       </el-collapse>
     </el-row>
@@ -174,7 +173,7 @@
         },
         expendKey: ['T'], // 默认展开的功能节点id
         treeData: [],
-        activeNames: ['search', 'chart', 'table'],   // 显示的折叠面板
+        activeNames: ['chart', 'table'],   // 显示的折叠面板
         tableColumns: [],     // 表格表头
         tableData: [],        // 表格数据
         currentPage: 1,       // 当前页码
@@ -302,7 +301,7 @@
       },
       selTable () {
         let self = this
-        let params = Object.assign(self.searchForm, self.filterForm)
+        let params = Object.assign({}, self.searchForm, self.filterForm)
         ajax.post({
           url: '/report/txn/list',
           param: params,
@@ -546,11 +545,20 @@
           }
         }
         return resultList
+      },
+      exportFunc () {
+        let params = this.searchForm
+        console.info(params)
+        let url = '/context/manager/report/txn/export?' + util.serializeObj(params)
+        window.open(url)
+      },
+      printFunc () {
+        alert('打印')
       }
     }
   }
 </script>
-<style>
+<style scoped>
   .alarm-event-query-form-item{
     width: 200px;
   }
