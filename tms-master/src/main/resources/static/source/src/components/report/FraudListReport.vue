@@ -50,77 +50,91 @@
           </el-form>
         </el-collapse-item>
         <el-collapse-item title="欺诈报警信息展示图" name="chart">
-          <el-form :inline="true" ref="searchForm" :model="searchForm" label-width="80px">
-            <el-form-item label="欺诈类型:" prop="fdType">
-              <div @click="openTxnTypedialog" >
-                <el-input v-model="searchForm.txnids" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
-              </div>
+          <el-form :inline="true" ref="filterForm" :model="filterForm" label-width="80px">
+            <el-form-item label="欺诈类型:">
+              <el-select multiple v-model="filterForm.fdType" class="alarm-event-query-form-item" placeholder="请选择">
+                <el-option v-for="item in qzTypeList"
+                           :key="item.dp_code"
+                           :label="item.dp_name"
+                           :value="item.dp_code">
+                </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="处置类型:" prop="ps">
-              <div @click="openTxnTypedialog" >
-                <el-input v-model="searchForm.txnids" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
-              </div>
+            <el-form-item label="处置类型">
+              <el-select multiple v-model="filterForm.ps" class="alarm-event-query-form-item" placeholder="请选择">
+                <el-option v-for="item in tableColumns"
+                           :key="item.dp_code"
+                           :label="item.dp_name"
+                           :value="item.dp_code">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="filterFunc">搜索</el-button>
             </el-form-item>
           </el-form>
-          <div id="myChart" :style="{width: '300px', height: '300px'}"></div>
+          <div id="chartdiv" style="width: 100%;height:400px;"></div>
         </el-collapse-item>
         <el-collapse-item title="欺诈报警信息列表" name="table">
+          <template slot="title">
+            <div style="margin:10px;text-align: left ">
+              <span style="margin-right: 10px">交易报警信息列表</span>
+              <el-button plain class="el-icon-plus" @click.stop="exportFunc">导出</el-button>
+              <el-button plain class="el-icon-plus" @click.stop="printFunc">打印</el-button>
+            </div>
+          </template>
+          <div>
           <el-table
             :data="tableData"
             style="width: 100%">
-            <el-table-column
-              prop="txnname"
-              label="欺诈类型"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="放行"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="页面提醒"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="人工认证"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="人工审核"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="阻断"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="挂起"
-              width="150">
-            </el-table-column>
-            <el-table-column
-              prop="txnnumber"
-              label="短信提醒"
-              width="150">
+            <el-table-column prop="txnname" label="欺诈类型"  width="150"></el-table-column>
+            <el-table-column v-for="column in tableColumns" :label="column.dp_name" :key="column.dp_code" align="center">
+              <el-table-column
+                :prop="connectString(column.dp_code, '_rate')"
+                label="总数"
+                width="120">
+              </el-table-column>
+              <el-table-column
+                :prop="connectString(column.dp_code, '_fraudrate')"
+                label="欺诈数"
+                width="120">
+              </el-table-column>
+              <el-table-column
+                :prop="connectString(column.dp_code, '_nonfraudrate')"
+                label="非欺诈数"
+                width="120">
+              </el-table-column>
             </el-table-column>
           </el-table>
-          <el-pagination style="margin-top: 10px; text-align: right;"
-                         :current-page="currentPage"
-                         @size-change="handleSizeChange"
-                         @current-change="handleCurrentChange"
-                         :page-sizes="[10, 25, 50, 100]"
-                         :page-size="pageSize"
-                         layout="total, sizes, prev, pager, next, jumper"
-                         :total="total">
-          </el-pagination>
+          </div>
+          <!--<el-pagination style="margin-top: 10px; text-align: right;"-->
+                         <!--:current-page="currentPage"-->
+                         <!--@size-change="handleSizeChange"-->
+                         <!--@current-change="handleCurrentChange"-->
+                         <!--:page-sizes="[10, 25, 50, 100]"-->
+                         <!--:page-size="pageSize"-->
+                         <!--layout="total, sizes, prev, pager, next, jumper"-->
+                         <!--:total="total">-->
+          <!--</el-pagination>-->
         </el-collapse-item>
       </el-collapse>
     </el-row>
+    <el-dialog title="交易名称" :visible.sync="txntypeDialogVisible" width="400px">
+      <el-tree :data="treeData" node-key="id" ref="tree"
+               show-checkbox
+               :props="defaultTreeProps"
+               :highlight-current=true
+               :default-expanded-keys="expendKey"
+               :expand-on-click-node="false"
+               :render-content="renderContent"
+               @check-change="handleCheckChange"
+               style="overflow-y: auto;">
+      </el-tree>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -128,6 +142,8 @@
   import util from '@/common/util'
   import dictCode from '@/common/dictCode'
   import check from '@/common/check'
+  import reportEcharts from '@/common/reportEcharts'
+  let myChart // 图标对象
 
   export default {
     data () {
@@ -150,6 +166,7 @@
         countryCodeList: [],  // 地理位置信息列表
         regionCodeList: [],   // 地理位置信息列表
         cityCodeList: [],     // 地理位置信息列表
+        qzTypeList: [],  // 欺诈类型
         searchForm: {
           txnids: '',         // 交易名称
           duraSeparator: [new Date(), new Date()],  // 日期范围
@@ -157,19 +174,16 @@
           endTime: '',        // 结束日期
           countrycode: '',    // 国家
           regioncode: '',     // 省份
-          citycode: ''        // 城市
+          citycode: '',        // 城市
+          target: '_FRAUDNUMBER'
         },
         filterForm: {
           ps: 'PS01',
-          target: '_NUM',
-          tops: 10
+          fdType: ''
         }
       }
     },
     created () {
-      this.selTree()
-      this.selTableColumn()
-      this.selTable()
     },
     mounted: function () {
       this.$nextTick(function () {
@@ -181,19 +195,38 @@
             self.countryCodeList = data.row
           }
         })
+        myChart = this.$echarts.init(document.getElementById('chartdiv'))
+        this.selTree()
+        this.selTableColumn()
+        this.selTable()
       })
     },
     watch: {
       'searchForm.duraSeparator': function (val) {
         let self = this
-        let startTime = ''
-        let endTime = ''
-        if (val && val.length === 2) {
-          startTime = val[0].getTime()
-          endTime = val[1].getTime()
+        let datePickerType = self.datePickerType
+        switch (datePickerType) {
+          case 'daterange':
+            if (val && val.length === 2) {
+              this.searchForm.startTime = util.renderDate(val[0].getTime())
+              this.searchForm.endTime = util.renderDate(val[1].getTime())
+            }
+            break
+          case 'month':
+            let monthDate = new Date(val)
+            let monthStr = monthDate.getMonth() + 1
+            if (monthStr < 10) {
+              monthStr = '0' + monthStr
+            }
+            this.searchForm.monthDate = monthDate.getFullYear().toString() + monthStr
+            break
+          case 'year':
+            let yearDate = new Date(val)
+            this.searchForm.yearDate = yearDate.getFullYear().toString()
+            break
+          default:
+            break
         }
-        this.searchForm.startTime = startTime
-        this.searchForm.endTime = endTime
       },
       'searchForm.countrycode': function (val) {
         let self = this
@@ -227,8 +260,7 @@
         this.total = data.page.total
       },
       handleSizeChange (val) {
-        this.currentPage = 1
-        this.pageSize = val
+        this.currentPage = val
         this.selTable()
       },
       handleCurrentChange (val) {
@@ -253,21 +285,22 @@
           params: params,
           success: function (data) {
             self.bindGridData(data)
-            self.drawLine(data)
+            self.getChart()
           }
         })
       },
       searchFunc () {
-        let self = this
-        let params = Object.assign(self.searchForm, self.filterForm)
-        console.info(params)
-        self.selTable()
+        this.selTable()
       },
       openTxnTypedialog () {
         this.txntypeDialogVisible = true
       },
       reportTypeChange (val) {
         let self = this
+        self.searchForm.startTime = ''
+        self.searchForm.endTime = ''
+        self.searchForm.monthDate = ''
+        self.searchForm.yearDate = ''
         switch (val) {
           case 'dayreport' :
             self.datePickerType = 'daterange'
@@ -357,15 +390,17 @@
       connectString (code1, code2) {
         return (code1 + code2).toLowerCase()
       },
-      drawLine (data) {
-        // 基于准备好的dom，初始化echarts实例
-        let myChart = this.$echarts.init(document.getElementById('myChart'))
-        myChart.showLoading({
-          text: '正在努力的读取数据中...'
-        })
+      getChart () {
+        let self = this
+        // 使用刚指定的配置项和数据显示图表。
+        let option = self.getOptionV()
+        myChart.setOption(option)
+      },
+      getOptionV () {
+        let list = self.tableData
         // 处置
-        let cfPs = '1'
-        let cfPsT = '1'
+        let cfPs = self.filterForm.ps
+        let cfPsT = self.getPsText(cfPs)
         // 数据类型
         // var cf_target = ['_FRAUDNUMBER'];
         // var cf_target_t = ['欺诈数'];
@@ -373,10 +408,7 @@
         let cfFdType = '1'
         let cfFdTypeT = '1'
         // 数据集合
-        let gList = []
-        if (data) {
-          gList = data.slice(0)
-        }
+        let gList = list
         // alert(cf_ps_t+'---'+cf_fdType_t);
         let opLegendData = [] // 显示数据类型
         let opXData = []  // xAxis显示列
@@ -425,9 +457,52 @@
         option.op_legend_data = opLegendData
         option.op_x_data = opXData
         option.op_series = opSeries
-        myChart.hideLoading()
-        myChart.clear()
-        myChart.setOption(option)
+        option.chartID = 'chartdiv'
+        return reportEcharts.GenOption(option)
+      },
+      getPsText () {
+        let resultList = []
+        let valueList = this.filterForm.ps
+        let list = this.tableColumns
+        for (let i in valueList) {
+          let value = valueList[i]
+          for (let j in list) {
+            let item = list[j]
+            if (value === item.dp_code) {
+              resultList.push(item.dp_name)
+              break
+            }
+          }
+        }
+        return resultList
+      },
+      getTargetText () {
+        let resultList = []
+        let valueList = this.filterForm.target
+        let list = this.targetList
+        for (let i in valueList) {
+          let value = valueList[i]
+          for (let j in list) {
+            let item = list[j]
+            if (value === item.value) {
+              resultList.push(item.label)
+              break
+            }
+          }
+        }
+        return resultList
+      },
+      exportFunc () {
+        let params = this.searchForm
+        console.info(params)
+        let url = '/report/fraud/export?' + util.serializeObj(params)
+        ajax.syncGet({
+          url: url
+        })
+        // window.location.href = url
+      },
+      printFunc () {
+        alert('打印')
       }
     }
   }
