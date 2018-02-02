@@ -74,11 +74,12 @@ public class EsAdapter<T> implements DisposableBean {
 	private int commitNum;
 
 	//批量提交数据量大小，单位为M
-	@Value("${elasticsearch.commit.bytesize}")
+	@Value("${elasticsearch.commit.byteSize}")
 	private int byteSizeValue;
 
 	//并发请求允许同时积累新的批量执行请求,0代表着只有一个单一的请求将被允许执行 默认为1
-	private int concurrentRequests = 1;
+	@Value("${elasticsearch.commit.concurrentRequests}")
+	private int concurrentRequests;
 
 	//数据刷新时间
 	@Value("${elasticsearch.flush.second}")
