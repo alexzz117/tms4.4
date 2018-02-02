@@ -92,9 +92,24 @@ public class EsAdapter<T> implements DisposableBean {
 	EsListenerTaskExecutor taskExecutor;
 
 	//用于存储近期时间内的提交数据
-	private Map<String, T> dataMap = new LinkedHashMap<String, T>( 50000 );
+	private Map<String, T> dataMap = new LinkedHashMap<String, T>() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected boolean removeEldestEntry( Map.Entry<String, T> eldest ) {
+			return size() > 50000;
+		}
+
+	};
 	//用于存储提交批次日志
-	Map<Long, StringBuffer> logMap = new LinkedHashMap<Long, StringBuffer>( 1000 );
+	Map<Long, StringBuffer> logMap = new LinkedHashMap<Long, StringBuffer>() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected boolean removeEldestEntry( Map.Entry<Long, StringBuffer> eldest ) {
+			return size() > 1000;
+		}
+	};
 
 	//批量处理器
 	private BulkProcessor bulkProcessor;
@@ -423,7 +438,7 @@ public class EsAdapter<T> implements DisposableBean {
 			for( T data : dataList ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( data );
 				String primaryKeyValue = jsonObject.getString( primaryKeyName );
-				dataMap.put( primaryKeyValue, data );
+				//dataMap.put( primaryKeyValue, data );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, primaryKeyValue ).source( jsonObject ) );
 			}
 		}
@@ -442,7 +457,7 @@ public class EsAdapter<T> implements DisposableBean {
 			}
 			JSONObject jsonObject = (JSONObject) JSONObject.toJSON( data );
 			String primaryKeyValue = jsonObject.getString( primaryKeyName );
-			dataMap.put( primaryKeyValue, data );
+			//dataMap.put( primaryKeyValue, data );
 			bulkProcessor.add( new IndexRequest( indexName, indexName, primaryKeyValue ).source( jsonObject ) );
 		}
 		catch( Exception e ) {
