@@ -292,6 +292,9 @@
       searchFunc () {
         this.selTable()
       },
+      filterFunc () {
+        this.getChart()
+      },
       openTxnTypedialog () {
         this.txntypeDialogVisible = true
       },
