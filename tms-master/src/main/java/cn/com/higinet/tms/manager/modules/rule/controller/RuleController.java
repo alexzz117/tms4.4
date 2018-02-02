@@ -61,7 +61,7 @@ public class RuleController {
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
 	public Model listRuleAction( @RequestBody Map<String, Object> reqs ) {
 		Model model = new Model();
-		model.setRow( ruleService35.listRule( reqs ) );
+		model.setPage( ruleService35.listRule( reqs ) );
 		return model;
 	}
 

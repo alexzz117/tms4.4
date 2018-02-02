@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.manager.dao.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,11 +80,11 @@ public class RuleService {
 	@Autowired
 	private AcService scService;
 
-	public List<Map<String, Object>> listRule( Map<String, Object> input ) {
+	public Page<Map<String, Object>> listRule(Map<String, Object> input ) {
 		String txnId = MapUtil.getString( input, DBConstant.TMS_COM_RULE_RULE_TXN );
 		String type = MapUtil.getString( input, "type" );
 		String rule_sql = "";
-		List<Map<String, Object>> rule_list = null;
+		Page<Map<String, Object>> rule_list = null;
 
 		// 策略规则
 		if( "1".equals( type ) ) {
@@ -101,7 +103,7 @@ public class RuleService {
 			sqlConds.put( "stId", st_id );
 			List<Map<String, Object>> oc_list = onlineSimpleDao.queryForList( rule_sql, sqlConds );
 			List<Map<String, Object>> tmp_list = offlineSimpleDao.queryForList( rule_sql, sqlConds );
-			rule_list = new ArrayList<Map<String, Object>>();
+			rule_list = new Page<>();
 
 			if( oc_list == null || oc_list.size() == 0 || oc_list == null || oc_list.size() == 0 ) return rule_list;
 
@@ -111,7 +113,7 @@ public class RuleService {
 				for( Map<String, Object> map3 : oc_list ) {
 					String o_rule_id = MapUtil.getString( map3, DBConstant.TMS_COM_RULE_RULE_ID );
 					if( t_rule_id.equals( o_rule_id ) ) {
-						rule_list.add( map2 );
+						rule_list.getList().add( map2 );
 					}
 				}
 			}
@@ -122,10 +124,12 @@ public class RuleService {
 			rule_sql = "SELECT R.*,(SELECT COUNT(1) FROM TMS_COM_RULE_ACTION RA WHERE R.RULE_ID=RA.RULE_ID)  ACTION_COUNT FROM TMS_COM_RULE R LEFT JOIN TMS_COM_DISPOSAL C ON R.DISPOSAL=C.DP_CODE WHERE RULE_TXN=:txnId ORDER BY C.RULE_ORDER ,R.RULE_SCORE ,R.RULE_TIMESTAMP DESC ";
 			Map<String, Object> sqlConds = new HashMap<String, Object>();
 			sqlConds.put( "txnId", txnId );
-			rule_list = dynamicSimpleDao.queryForList( rule_sql, sqlConds );
+			sqlConds.putAll(input);
+//			rule_list = dynamicSimpleDao.queryForList( rule_sql, sqlConds );
+			rule_list = dynamicSimpleDao.pageQuery( rule_sql, sqlConds , new Order());
 		}
 
-		for( Map<String, Object> map : rule_list ) {
+		for( Map<String, Object> map : rule_list.getList() ) {
 			map.put( "RULE_ORDER_VIEW", MapUtil.getString( map, DBConstant.TMS_COM_RULE_RULE_EVAL_TYPE ) + "_" + MapUtil.getString( map, DBConstant.TMS_COM_RULE_RULE_DISPOSAL ) + "_" + MapUtil.getString( map, DBConstant.TMS_COM_RULE_RULE_RULE_ORDER ) );
 		}
 
