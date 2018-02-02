@@ -400,6 +400,7 @@
         myChart.setOption(option)
       },
       getOptionV () {
+        let self = this
         let list = self.tableData
         // 处置
         let cfPs = self.filterForm.ps
@@ -417,8 +418,8 @@
         let opXData = []  // xAxis显示列
         let opSeries = []  // 数据
 
-        let cfPsTArr = cfPsT.split(',')
-        let cfPsArr = cfPs.split(',')
+        let cfPsTArr = cfPsT
+        let cfPsArr = cfPs
         let cfTargetTArr = ['欺诈数']
         let cfTargetArr = ['_FRAUDNUMBER']
 
@@ -473,22 +474,6 @@
             let item = list[j]
             if (value === item.dp_code) {
               resultList.push(item.dp_name)
-              break
-            }
-          }
-        }
-        return resultList
-      },
-      getTargetText () {
-        let resultList = []
-        let valueList = this.filterForm.target
-        let list = this.targetList
-        for (let i in valueList) {
-          let value = valueList[i]
-          for (let j in list) {
-            let item = list[j]
-            if (value === item.value) {
-              resultList.push(item.label)
               break
             }
           }
