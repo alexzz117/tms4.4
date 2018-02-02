@@ -664,6 +664,7 @@
         ajax.post({
           url: '/stat/list',
           param: paramsObj,
+          loading:true,
           success: function (data) {
             // if (data.row) {
               self.bindGridData(data)
@@ -750,6 +751,7 @@
 
           ajax.post({
             url: '/stat/save',
+            loading:true,
             param: finalJsonData,
             success: function (data) {
               self.getData()
@@ -779,6 +781,7 @@
 
         ajax.post({
           url: '/stat/save',
+          loading:true,
           param: finalJsonData,
           success: function (data) {
             // self.getData()
@@ -905,6 +908,7 @@
             ajax.post({
               url: '/stat/save',
               param: finalJsonData,
+              loading:true,
               success: function (data) {
                 self.getData()
                 self.$message.success(message)
@@ -1366,6 +1370,7 @@
         var option = {
           url: '/stat/refTree',
           param: params,
+          loading:true,
           success: function (data) {
             if (data.list && data.list.length > 0) {
               data.row = data.list

@@ -80,6 +80,9 @@
     data() {
       var self = this
       var checkSame = function (rule, value, callback) {
+        if(self.passwordDialogform.r_new_pwd == '') {
+          callback()
+        }
         if (self.passwordDialogform.new_pwd !== self.passwordDialogform.r_new_pwd) {
           return callback(new Error('两次输入的新密码不一致'));
         }
@@ -108,11 +111,7 @@
         closeOnClickModal: false,
         formLabelWidth: '100px',
         updPassDialogVisible: false,
-        passwordDialogform: {
-          old_pwd: "",
-          new_pwd: "",
-          r_new_pwd: "",
-        },
+        passwordDialogform: this.initFormData(),
         rules: {
           old_pwd: [
             { required: true, message: '请输入旧密码', trigger: 'blur' },
@@ -136,6 +135,13 @@
       };
     },
     methods: {
+      initFormData () {
+        return {
+          old_pwd: "",
+          new_pwd: "",
+          r_new_pwd: "",
+        }
+      },
       handleSelect(key, keyPath) {
         let pathArr = key.split('-')
         let menu = {}
@@ -164,6 +170,11 @@
         switch (command)
         {
           case 'openDialog':
+            this.passwordDialogform = this.initFormData()
+            if(this.$refs['passwordDialogform']){
+              this.$refs['passwordDialogform'].clearValidate()
+            }
+
             return this.updPassDialogVisible = true
             break;
           case 'logout':
@@ -187,11 +198,7 @@
               type: 'success',
               message: '修改成功'
             })
-            self.passwordDialogform = {
-              old_pwd: "",
-                new_pwd: "",
-                r_new_pwd: "",
-            }
+            self.passwordDialogform = this.initFormData()
             self.updPassDialogVisible = false
           }
         })

@@ -113,6 +113,17 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <el-pagination style="margin-top: 10px; text-align: right;"
+                     :current-page="currentPage"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :page-sizes="[10, 25, 50, 100]"
+                     :page-size="pageSize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total"
+      >
+      </el-pagination>
     </section>
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="900px" :close-on-click-modal="false">
 
@@ -409,6 +420,9 @@
         disposalList: [],
         evalTypeList: [],
         ruleEnableList: [],
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
 
         // 下面是动作列表
         actionTableData: [],
@@ -552,6 +566,16 @@
           rule_desc: ''
         }
       },
+      handleSizeChange (val) {
+        // console.log(`每页 ${val} 条`)
+        this.currentPage = 1
+        this.pageSize = val
+        this.getData()
+      },
+      handleCurrentChange (val) {
+        this.currentPage = val
+        this.getData()
+      },
       handleSelectionChange(rows) {
         this.selectedRows = rows
       },
@@ -568,17 +592,30 @@
       getData () {
         let self = this
         // TODO  type st_id 怎么取值 原来系统看是 undefined
+        console.log(this.currentPage)
+        console.log(this.pageSize)
         ajax.post({
           url: '/rule/list',
+          loading:true,
           param: {
             RULE_TXN: this.txnIdParent,
+            pageindex: this.currentPage,
+            pagesize: this.pageSize,
             type: 0,
             st_id: ''
           },
           success: function (data) {
-            self.tableData = data.row
+            self.bindGridData(data)
+            // self.tableData = data.row
           }
         })
+      },
+      bindGridData (data) {
+        this.tableData = data.page.list
+        // 加上这个会出现页码之间来回跳的问题
+        // this.currentPage = data.page.index
+        this.pageSize = data.page.size
+        this.total = data.page.total
       },
       reloadData () {
         let self = this
@@ -657,6 +694,7 @@
 
           ajax.post({
             url: '/rule/save',
+            loading:true,
             param: finalJsonData,
             success: function (data) {
               self.getData()
@@ -706,6 +744,7 @@
 
           ajax.post({
             url: '/action/save',
+            loading:true,
             param: finalJsonData,
             success: function (data) {
               self.getActionData()
@@ -740,6 +779,7 @@
 
           ajax.post({
             url: '/rule/save',
+            loading:true,
             param: finalJsonData,
             success: function (data) {
               self.getData()
@@ -770,6 +810,7 @@
 
           ajax.post({
             url: '/action/save',
+            loading:true,
             param: finalJsonData,
             success: function (data) {
               self.getActionData()
@@ -782,6 +823,7 @@
         let self = this
         ajax.post({
           url: '/strategy/refList',
+          loading:true,
           param: {
             RULE_ID: row.rule_id
           },
@@ -811,6 +853,7 @@
         let self = this
         ajax.post({
           url: '/rule/save',
+          loading:true,
           param: finalJsonData,
           success: function (data) {
             self.ruleEnableBtnDisabled = false
@@ -856,6 +899,7 @@
 
         ajax.post({
           url: '/action/save',
+          loading:true,
           param: finalJsonData,
           success: function (data) {
             // self.getData()
@@ -903,6 +947,7 @@
 
             ajax.post({
               url: '/rule/save',
+              loading:true,
               param: finalJsonData,
               success: function (data) {
                 self.getData()
@@ -1009,6 +1054,7 @@
         let self = this
         ajax.post({
           url: '/action/list',
+          loading:true,
           param: {
             rule_id: ruleId
           },
@@ -1059,6 +1105,7 @@
 
             ajax.post({
               url: '/action/save',
+              loading:true,
               param: finalJsonData,
               success: function (data) {
                 self.getActionData()

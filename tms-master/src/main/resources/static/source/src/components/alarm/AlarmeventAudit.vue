@@ -13,12 +13,12 @@
         <el-form-item label="客户名称:" prop="username">
           <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
         </el-form-item>
-        <el-form-item label="设备标识:" prop="deviceid">
-          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
-        <el-form-item label="IP地址:" prop="ipaddr">
-          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
-        </el-form-item>
+        <!--<el-form-item label="设备标识:" prop="deviceid">-->
+          <!--<el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="IP地址:" prop="ipaddr">-->
+          <!--<el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>-->
+        <!--</el-form-item>-->
         <el-form-item label="监控交易:" prop="txntypeShow">
           <div @click="openTxnTypedialog" >
             <el-input v-model="queryShowForm.txntypeShow" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>

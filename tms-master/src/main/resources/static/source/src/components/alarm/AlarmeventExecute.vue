@@ -20,15 +20,15 @@
                     :maxlength="32"></el-input>
         </el-form-item>
 
-        <el-form-item label="设备标识:" prop="deviceid">
-          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" clearable
-                    :maxlength="32"></el-input>
-        </el-form-item>
+        <!--<el-form-item label="设备标识:" prop="deviceid">-->
+          <!--<el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" clearable-->
+                    <!--:maxlength="32"></el-input>-->
+        <!--</el-form-item>-->
 
-        <el-form-item label="IP地址:" prop="ipaddr">
-          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" clearable
-                    :maxlength="32"></el-input>
-        </el-form-item>
+        <!--<el-form-item label="IP地址:" prop="ipaddr">-->
+          <!--<el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" clearable-->
+                    <!--:maxlength="32"></el-input>-->
+        <!--</el-form-item>-->
 
         <el-form-item label="监控交易:" prop="txntypeShow">
           <div @click="openTxnTypedialog">
@@ -165,17 +165,17 @@
             <el-button type="text" @click="openDialog(scope.row)" title="处理" icon="el-icon-edit-outline"/>
           </template>
         </el-table-column>
-        <el-table-column prop="txncode" label="流水号" align="left">
+        <el-table-column prop="txncode" label="流水号" width="240" align="left">
           <template slot-scope="scope">
             <a href="javascript:void(0)" @click="showAlarmEventInfo(scope.row)">{{scope.row.txncode}}</a>
           </template>
         </el-table-column>
-        <el-table-column prop="userid" label="客户号" width="120"/>
-        <el-table-column prop="username" label="客户名称" width="80"/>
+        <el-table-column prop="userid" label="客户号" width="150"/>
+        <el-table-column prop="username" label="客户名称" width="120"/>
         <el-table-column prop="txntime" label="交易时间" width="135" :formatter="formatter"/>
-        <el-table-column prop="txnname" label="监控操作" width="100"/>
+        <el-table-column prop="txnname" label="监控操作"/>
         <el-table-column prop="disposal" label="处置方式" width="140" align="left"/>
-        <el-table-column prop="iscorrect" label="处置结果" width="140" align="left" :formatter="formatter"/>
+        <el-table-column prop="iscorrect" label="处置结果" width="80" align="left" :formatter="formatter"/>
         <el-table-column prop="assign_name" label="分派人" width="80"/>
         <el-table-column prop="assigntime" label="分派时间" width="135" :formatter="formatter"/>
         <el-table-column prop="psstatus" label="处理状态" width="80" :formatter="formatter"/>
@@ -559,7 +559,8 @@
           conpareTime = row.m_audittime
         }
         if (conpareTime != null && 1 * currenttime - 1 * conpareTime > 1 * timeout) {
-          return {'background-color': '#f56c6c'}
+          // return {'background-color': '#f56c6c'}
+          return {'color': '#f56c6c'}
           // return 'red-row'
         }
       },
@@ -631,6 +632,7 @@
 
         ajax.post({
           url: '/query/alarmEvent/result',
+          loading:true,
           model: ajax.model.dualaudit,
           param: paramsObj,
           success: function (data) {
@@ -735,6 +737,9 @@
 
       openTxnTypedialog() {
         this.txntypeDialogVisible = true
+        if(this.$refs['executeForm']) {
+          this.$refs['executeForm'].clearValidate()
+        }
       },
       showAlarmEventInfo(row) {
         this.selectedRow = row
@@ -771,9 +776,13 @@
         let self = this
         ajax.post({
           url: '/alarmevent/process',
+          loading:true,
           param: {TXN_CODE: TXN_CODE},
           success: function (data) {
             self.listDialogVisible = true
+            if(self.$refs['executeForm']) {
+              self.$refs['executeForm'].clearValidate()
+            }
             if (data.list) {
               self.actionData = data.list
             }
@@ -825,6 +834,7 @@
           jsonData.psActs = acIds.join(',')
           ajax.post({
             url: '/alarmevent/delPsAct',
+            loading:true,
             param: jsonData,
             success: function (data) {
               self.getActionData(self.selectedRow.txncode)
@@ -882,6 +892,7 @@
 
             ajax.post({
               url: url,
+              loading:true,
               param: submitParam,
               success: function (data) {
                 self.getActionData(self.selectedRow.txncode)
@@ -919,6 +930,7 @@
             param = util.toggleObjKey(param, 'upper')
             ajax.post({
               url: '/alarmevent/saveProcess',
+              loading:true,
               param: param,
               success: function (data) {
                 self.$message({

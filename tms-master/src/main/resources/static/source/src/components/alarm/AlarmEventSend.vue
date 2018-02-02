@@ -17,13 +17,13 @@
           <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
 
-        <el-form-item label="设备标识:" prop="deviceid">
-          <el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
-        </el-form-item>
+        <!--<el-form-item label="设备标识:" prop="deviceid">-->
+          <!--<el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>-->
+        <!--</el-form-item>-->
 
-        <el-form-item label="IP地址:" prop="ipaddr">
-          <el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
-        </el-form-item>
+        <!--<el-form-item label="IP地址:" prop="ipaddr">-->
+          <!--<el-input v-model="queryShowForm.ipaddr" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>-->
+        <!--</el-form-item>-->
 
         <el-form-item label="监控操作:" prop="txntypeShow">
           <div @click="openTxnTypedialog" >
@@ -132,7 +132,7 @@
     </transition>
 
     <div style="margin-bottom: 10px; text-align: left; height: 30px;">
-      <el-button type="primary" @click="openDialog()">分派</el-button>
+      <el-button plain icon="el-icon-sort" @click="openDialog()">分派</el-button>
       <div style="float:right">
         <el-button type="primary" @click="queryFormShow = !queryFormShow">更多</el-button>
         <el-button type="primary" class="el-icon-search" @click="searchData">查询</el-button>
@@ -164,7 +164,7 @@
             <!--<el-button type="text" @click="openDialog(scope.row)" size="mini" icon="el-icon-sort" title="分派"/>-->
           <!--</template>-->
         <!--</el-table-column> -->
-        <el-table-column prop="txncode" label="流水号" align="left">
+        <el-table-column prop="txncode" label="流水号" width="240" align="left">
           <template slot-scope="scope">
             <a href="javascript:void(0)" @click="showAlarmEventInfo(scope.row)">{{scope.row.txncode}}</a>
           </template>
@@ -172,9 +172,9 @@
         <el-table-column prop="userid" label="客户号" width="150" align="left"/>
         <el-table-column prop="username" label="客户名称" width="120" align="left"/>
         <el-table-column prop="txntime" label="交易时间" width="150" align="left" :formatter="formatter"/>
-        <el-table-column prop="txnname" label="监控操作" width="100" align="left"/>
+        <el-table-column prop="txnname" label="监控操作" align="left"/>
         <el-table-column prop="disposal" label="处置方式" width="140" align="left"/>
-        <el-table-column prop="iscorrect" label="处置结果" width="140" align="left" :formatter="formatter"/>
+        <el-table-column prop="iscorrect" label="处置结果" width="80" align="left" :formatter="formatter"/>
         <el-table-column prop="psstatus" label="处理状态" width="80" align="left" :formatter="formatter"/>
         <el-table-column prop="oper_name" label="处理人" width="100"  align="left"/>
       </el-table>
@@ -348,7 +348,7 @@
         disposalList: [],
         iscorrectList: iscorrectList,
         txnstatusList: [],
-        psstatusList: [],
+        psstatusList: [{label:'未分派', value:'00'},{label:'待处理', value:'02'}],
         countrycodeList: [],
         regioncodeList: [],
         citycodeList: []
@@ -441,7 +441,8 @@
           conpareTime = row.m_audittime
         }
         if(conpareTime != null && 1*currenttime-1*conpareTime>1*timeout) {
-          return {'background-color': '#f56c6c'}
+          // return {'background-color': '#f56c6c'}
+          return {'color': '#f56c6c'}
           // return 'red-row'
         }
       },
@@ -470,7 +471,7 @@
       },
       initSelectData () {
         this.txnstatusList = dictCode.getCodeItems('tms.common.txnstatus')
-        this.psstatusList = dictCode.getCodeItems('tms.alarm.process.status')
+        // this.psstatusList = dictCode.getCodeItems('tms.alarm.process.status')
         let self = this
         this.selTree()
         ajax.post({
@@ -508,7 +509,7 @@
         ajax.post({
           url: '/query/alarmEvent/result',
           model: ajax.model.dualaudit,
-
+          loading:true,
           param: paramsObj,
           success: function (data) {
             if (data.page) {
@@ -651,6 +652,7 @@
         this.sendBtnDisabled = false
         ajax.post({
           url: '/alarmevent/assign',
+          loading:true,
           param: param,
           success: function (data) {
 
@@ -717,6 +719,7 @@
         this.sendBtnDisabled = true
         ajax.post({
           url: '/alarmevent/onsaveAssign',
+          loading:true,
           param: param,
           success: function (data) {
             this.sendBtnDisabled = false
@@ -741,6 +744,7 @@
     width: 200px;
   }
   .red-row{
-    background-color: red;
+    color: red;
+    /*background-color: red;*/
   }
 </style>
