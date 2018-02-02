@@ -438,7 +438,7 @@ public class EsAdapter<T> implements DisposableBean {
 			for( T data : dataList ) {
 				JSONObject jsonObject = (JSONObject) JSONObject.toJSON( data );
 				String primaryKeyValue = jsonObject.getString( primaryKeyName );
-				//dataMap.put( primaryKeyValue, data );
+				dataMap.put( primaryKeyValue, data );
 				bulkProcessor.add( new IndexRequest( indexName, indexName, primaryKeyValue ).source( jsonObject ) );
 			}
 		}
@@ -457,7 +457,7 @@ public class EsAdapter<T> implements DisposableBean {
 			}
 			JSONObject jsonObject = (JSONObject) JSONObject.toJSON( data );
 			String primaryKeyValue = jsonObject.getString( primaryKeyName );
-			//dataMap.put( primaryKeyValue, data );
+			dataMap.put( primaryKeyValue, data );
 			bulkProcessor.add( new IndexRequest( indexName, indexName, primaryKeyValue ).source( jsonObject ) );
 		}
 		catch( Exception e ) {
