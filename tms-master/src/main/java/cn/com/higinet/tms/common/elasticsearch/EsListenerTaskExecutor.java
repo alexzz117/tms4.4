@@ -2,8 +2,6 @@ package cn.com.higinet.tms.common.elasticsearch;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +13,9 @@ public class EsListenerTaskExecutor {
 
 	private ThreadPoolTaskExecutor executor;
 
-	@PostConstruct
 	private void init() {
 		executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize( 0 );
+		executor.setCorePoolSize( 1 );
 		executor.setMaxPoolSize( 4 );
 		executor.setQueueCapacity( 16 );
 		executor.setKeepAliveSeconds( 60 );

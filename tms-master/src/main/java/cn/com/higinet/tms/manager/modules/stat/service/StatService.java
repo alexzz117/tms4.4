@@ -11,8 +11,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import cn.com.higinet.tms.base.entity.common.Page;
-import cn.com.higinet.tms.manager.dao.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +19,11 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import cn.com.higinet.tms.engine.comm.web_tool;
 import cn.com.higinet.tms.engine.core.cache.db_cache;
 import cn.com.higinet.tms.engine.core.cache.db_stat;
+import cn.com.higinet.tms.manager.dao.Order;
 import cn.com.higinet.tms.manager.dao.SimpleDao;
 import cn.com.higinet.tms.manager.dao.SqlMap;
 import cn.com.higinet.tms.manager.dao.util.MapWrap;
@@ -122,9 +122,6 @@ public class StatService {
 		return offlineSimpleDao.retrieve( "TMS_COM_STAT", MapWrap.map( DBConstant.TMS_COM_STAT_STAT_ID, Long.parseLong( statId ) ).getMap() );
 	}
 
-	/* (non-Javadoc)
-	 * @see cn.com.higinet.tms35.manage.stat.service.StatService#codeList(java.lang.String[])
-	 */
 	public List<Map<String, Object>> codeList( String category_id, String[] conds ) {
 		String sql = "SELECT * FROM CMC_CODE_CATEGORY WHERE CATEGORY_ID = ?";
 		List<Map<String, Object>> categoryList = offlineSimpleDao.queryForList( sql, category_id );
