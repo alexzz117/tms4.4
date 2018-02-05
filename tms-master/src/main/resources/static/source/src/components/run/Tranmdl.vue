@@ -85,24 +85,24 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="属性名称" prop="name">
-              <el-input v-model="tmForm.name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+              <el-input v-model="tmForm.name" :disabled="tmFormReadOnly" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="属性代码" prop="ref_name">
-              <el-input v-model="tmForm.ref_name" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+              <el-input v-model="tmForm.ref_name" :disabled="tmFormReadOnly" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="数据来源" prop="src_id">
-              <el-input v-model="tmForm.src_id" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+              <el-input v-model="tmForm.src_id" :disabled="tmFormReadOnly" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="类型" prop="type">
-              <el-select v-model="tmForm.type" :disabled="tmFormReadOnly" placeholder="请选择" @change="tmTypeChange">
+              <el-select v-model="tmForm.type" :disabled="tmFormReadOnly" placeholder="请选择" @change="tmTypeChange" clearable>
                 <el-option
                   v-for="item in tmTypeList"
                   :key="item.value"
@@ -116,7 +116,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="存储字段" prop="fd_name">
-              <el-select v-model="tmForm.fd_name" :disabled="tmFormReadOnly" placeholder="请选择">
+              <el-select v-model="tmForm.fd_name" :disabled="tmFormReadOnly" placeholder="请选择" clearable>
                 <el-option
                   v-for="item in tmFdNameList"
                   :key="item.fd_name"
@@ -128,7 +128,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="关联代码集" prop="code" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmCodeVisible}" :required="!tmCodeVisible">
-              <el-select v-model="tmForm.code" placeholder="请选择">
+              <el-select v-model="tmForm.code" placeholder="请选择" clearable>
                 <el-option
                   v-for="item in tmCodeList"
                   :key="item.category_id"
@@ -140,7 +140,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="处理函数" prop="genesisrul" :disabled="tmFormReadOnly" v-bind:class="{hidden:tmFuncVisible}">
-              <el-select v-model="tmForm.genesisrul" placeholder="请选择" @change="genesisRulChange">
+              <el-select v-model="tmForm.genesisrul" placeholder="请选择" @change="genesisRulChange" clearable>
                 <el-option
                   v-for="item in tmFuncList"
                   :key="item.value"
@@ -154,17 +154,17 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="处理函数参数1" prop="params1" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(1)}">
-              <el-input v-model="tmForm.params1" auto-complete="off"></el-input>
+              <el-input v-model="tmForm.params1" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="处理函数参数2" prop="params2" :disabled="tmFormReadOnly" v-bind:class="{hidden:paramsVisible(2)}">
-              <el-input v-model="tmForm.params2" auto-complete="off"></el-input>
+              <el-input v-model="tmForm.params2" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="默认值"  prop="src_default" :disabled="tmFormReadOnly">
-              <el-select v-if="tmForm.type.toUpperCase() === 'CODE'" v-model="tmForm.src_default" placeholder="请选择">
+              <el-select v-if="tmForm.type.toUpperCase() === 'CODE'" v-model="tmForm.src_default" placeholder="请选择" clearable>
                 <el-option
                   v-for="item in codeDefaultList"
                   :key="item.value"
@@ -172,7 +172,7 @@
                   :value="item.value">
                 </el-option>
               </el-select>
-              <el-input v-else v-model="tmForm.src_default" :disabled="tmFormReadOnly" auto-complete="off"></el-input>
+              <el-input v-else v-model="tmForm.src_default" :disabled="tmFormReadOnly" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -200,7 +200,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="引用表" prop="ref_tab_name">
-              <el-select v-model="tableForm.ref_tab_name" :disabled="tableFormReadOnly" @change="refTableNameChange" placeholder="请选择">
+              <el-select v-model="tableForm.ref_tab_name" :disabled="tableFormReadOnly" @change="refTableNameChange" placeholder="请选择" clearable>
                 <el-option
                   v-for="item in canRefTab"
                   :key="item.tab_name"
@@ -212,14 +212,14 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="引用描述" prop="ref_desc">
-              <el-input v-model="tableForm.ref_desc" :readonly="tableFormReadOnly" auto-complete="off"></el-input>
+              <el-input v-model="tableForm.ref_desc" :readonly="tableFormReadOnly" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="引用字段" prop="src_expr">
-              <el-select v-model="tableForm.src_expr" :disabled="tableFormReadOnly" placeholder="请选择">
+              <el-select v-model="tableForm.src_expr" :disabled="tableFormReadOnly" placeholder="请选择" clearable>
                 <el-option
                   v-for="item in canRefFd"
                   :key="item.fd_name"
@@ -259,7 +259,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="数据来源" prop="ref_fd_name">
-              <el-select v-model="tableInfoForm.ref_fd_name" :disabled="tableInfoFormReadOnly" @change="canRefTabFdChange" placeholder="请选择">
+              <el-select v-model="tableInfoForm.ref_fd_name" :disabled="tableInfoFormReadOnly" @change="canRefTabFdChange" placeholder="请选择" clearable>
                 <el-option
                   v-for="item in canRefTabFdList"
                   :key="item.fd_name"
@@ -271,20 +271,20 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="属性名称" prop="ref_desc">
-              <el-input v-model="tableInfoForm.ref_desc" :readonly="tableInfoFormReadOnly" auto-complete="off"></el-input>
+              <el-input v-model="tableInfoForm.ref_desc" :readonly="tableInfoFormReadOnly" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="属性代码" prop="ref_name">
-              <el-input v-model="tableInfoForm.ref_name" :readonly="tableInfoFormReadOnly" auto-complete="off"></el-input>
+              <el-input v-model="tableInfoForm.ref_name" :readonly="tableInfoFormReadOnly" auto-complete="off" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="条件" prop="src_cond_in">
               <div @dblclick="showStatCondDialog">
-                <el-input v-model="tableInfoForm.src_cond_in" :readonly="true" auto-complete="off"></el-input>
+                <el-input v-model="tableInfoForm.src_cond_in" :readonly="true" auto-complete="off" clearable></el-input>
               </div>
             </el-form-item>
           </el-col>
@@ -293,13 +293,13 @@
           <el-col :span="12">
             <el-form-item label="表达式" prop="src_expr_in">
               <div @dblclick="showSrcExprDialog">
-                <el-input v-model="tableInfoForm.src_expr_in" :readonly="true" auto-complete="off"></el-input>
+                <el-input v-model="tableInfoForm.src_expr_in" :readonly="true" auto-complete="off" clearable></el-input>
               </div>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="存储字段" prop="storecolumn">
-              <el-select v-model="tableInfoForm.storecolumn" :disabled="tableInfoFormReadOnly" placeholder="请选择">
+              <el-select v-model="tableInfoForm.storecolumn" :disabled="tableInfoFormReadOnly" placeholder="请选择" clearable>
                 <el-option
                   v-for="item in storeColumnList"
                   :key="item.fd_name"
@@ -801,6 +801,7 @@
         self.activeName = '1'
         ajax.post({
           url: '/tranmdl/query', // 临时库
+          loading: true,
           toLowerCase: false,
           param: {
             tab_name: self.txnId
@@ -853,6 +854,7 @@
         var self = this
         ajax.post({
           url: '/tranmdl/query', // 临时库
+          loading: true,
           toLowerCase: false,
           param: {
             tab_name: self.txnId
@@ -874,6 +876,7 @@
         var self = this
         ajax.post({
           url: '/tranmdl/query', // 临时库
+          loading: true,
           toLowerCase: false,
           param: {
             tab_name: self.txnId
@@ -1153,6 +1156,7 @@
             jsonData[op] = [row]
             ajax.post({
               url: '/tranmdl/saveModel',
+              loading: true,
               param: {
                 postData: jsonData
               },
@@ -1187,6 +1191,7 @@
           let jsonData = {'del': [row]}
           ajax.post({
             url: '/tranmdl/saveModel',
+            loading: true,
             param: {
               postData: jsonData
             },
@@ -1460,6 +1465,7 @@
             jsonData[op] = [row]
             ajax.post({
               url: '/tranmdl/saveModelRefTab',
+              loading: true,
               param: {
                 postData: jsonData
               },
@@ -1510,6 +1516,7 @@
           }
           ajax.post({
             url: url,
+            loading: true,
             param: param,
             success: function (data) {
               self.$message.success('删除成功')
@@ -1579,6 +1586,7 @@
             jsonData[op] = [row]
             ajax.post({
               url: '/tranmdl/saveModelRefFd',
+              loading: true,
               param: {
                 postData: jsonData
               },

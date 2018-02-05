@@ -241,6 +241,7 @@
           if (valid) {
             ajax.post({
               url: '/trandef/save',
+              loading: true,
               param: params,
               success: function (data) {
                 if (data.success) {

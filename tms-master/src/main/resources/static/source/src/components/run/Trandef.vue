@@ -71,6 +71,7 @@
         self.$refs['infoForm'].resetForm()
         ajax.post({
           url: '/trandef/edit_prepare',
+          loading: true,
           param: {
             tab_name: self.txnId
           },
@@ -183,6 +184,7 @@
         }).then(() => {
           ajax.post({
             url: '/trandef/save',
+            loading: true,
             param: param,
             success: function (data) {
               if (data.success) {
