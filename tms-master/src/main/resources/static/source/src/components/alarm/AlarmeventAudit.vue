@@ -5,13 +5,13 @@
                :inline="true" style="text-align: left" v-show="queryFormShow" >
 
         <el-form-item label="流水号:" prop="txncode">
-          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.txncode" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
         <el-form-item label="客户号:" prop="userid">
-          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.userid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
         <el-form-item label="客户名称:" prop="username">
-          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>
+          <el-input v-model="queryShowForm.username" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32" clearable></el-input>
         </el-form-item>
         <!--<el-form-item label="设备标识:" prop="deviceid">-->
           <!--<el-input v-model="queryShowForm.deviceid" class="alarm-event-query-form-item" auto-complete="off" :maxlength="32"></el-input>-->
@@ -21,10 +21,10 @@
         <!--</el-form-item>-->
         <el-form-item label="监控交易:" prop="txntypeShow">
           <div @click="openTxnTypedialog" >
-            <el-input v-model="queryShowForm.txntypeShow" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
+            <el-input v-model="queryShowForm.txntypeShow" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
           </div>
         </el-form-item>
-        <el-form-item label="处置方式:" prop="disposal">
+       <!-- <el-form-item label="处置方式:" prop="disposal">
           <el-select v-model="queryShowForm.disposal" class="alarm-event-query-form-item" placeholder="请选择"
                      clearable>
             <el-option
@@ -46,7 +46,7 @@
             </el-option>
 
           </el-select>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="时间范围:" prop="queryDate">
           <el-date-picker
             v-model="queryShowForm.queryDate"
@@ -86,7 +86,7 @@
         </el-table-column>
         <el-table-column  prop="txncode" label="流水号" width="235" align="left" class-name="link-item">
           <template slot-scope="scope">
-            <a @click="queryTxnInfo(scope.row)">{{ scope.row.txncode }}</a>
+            <a @click="queryTxnInfo(scope.row)"  href="javascript:void(0)">{{ scope.row.txncode }}</a>
           </template>
         </el-table-column>
         <el-table-column  prop="userid" label="客户号" width="120" align="left"/>
@@ -589,10 +589,6 @@
 <style>
   .alarm-event-query-form-item{
     width: 200px;
-  }
-  tbody .link-item:hover {
-    color: #FFA000;
-    cursor: pointer;
   }
 </style>
 
