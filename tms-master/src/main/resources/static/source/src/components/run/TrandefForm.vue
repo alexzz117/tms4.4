@@ -24,12 +24,12 @@
       <el-row>
         <el-col :span="12" class="form-item">
           <el-form-item label="名称" prop="tab_desc">
-            <el-input v-model="tranDefForm.tab_desc" auto-complete="off" :readonly="formReadonly"></el-input>
+            <el-input v-model="tranDefForm.tab_desc" auto-complete="off" :readonly="formReadonly" clearable></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12" class="form-item">
           <el-form-item label="顺序" prop="show_order">
-            <el-input v-model="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly" :maxlength="4"></el-input>
+            <el-input v-model="tranDefForm.show_order" auto-complete="off" :readonly="formReadonly" :maxlength="4" clearable></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -42,19 +42,19 @@
         </el-col>
         <el-col :span="12" class="form-item">
           <el-form-item label="交易识别标识" prop="txnid" v-bind:class="{hidden:txnIdVisible}">
-            <el-input v-model="tranDefForm.txnid" auto-complete="off" :readonly="formReadonly"></el-input>
+            <el-input v-model="tranDefForm.txnid" auto-complete="off" :readonly="formReadonly" clearable></el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12" class="form-item">
           <el-form-item label="处置策略" :label-width="formLabelWidth" prop="tab_disposal">
-            <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly"></AllPickSelect>
+            <AllPickSelect :dataList="tabDisposalList" @dataChange="addStatParamDataChange" :selectedList="selectedList" :disabled="formReadonly" clearable></AllPickSelect>
           </el-form-item>
         </el-col>
         <el-col :span="12" class="form-item">
           <el-form-item label="渠道名称" prop="chann">
-            <el-select v-model="tranDefForm.chann" placeholder="请选择" :disabled="formReadonly||channVisible">
+            <el-select v-model="tranDefForm.chann" placeholder="请选择" :disabled="formReadonly||channVisible" clearable>
               <el-option
                 v-for="item in channelList"
                 :key="item.channelid"
@@ -71,7 +71,7 @@
         </el-col>
         <el-col :span="12"class="form-item">
           <el-form-item label="模型状态" prop="modelused" v-bind:class="{hidden:modelusedVisible}">
-            <el-select v-model="tranDefForm.modelused" placeholder="请选择" :disabled="formReadonly">
+            <el-select v-model="tranDefForm.modelused" placeholder="请选择" :disabled="formReadonly" clearable>
               <el-option
                 v-for="item in modelUsedList"
                 :key="item.value"
