@@ -271,6 +271,7 @@
         var self = this
         ajax.post({
           url: '/func/tree',
+          loading: true,
           param: {},
           success: function (data) {
             if (data.list) {
@@ -487,6 +488,7 @@
         }).then(() => {
           ajax.post({
             url: '/func/del',
+            loading: true,
             param: {
               funcId: selectNode.data.id,
               rf: 'json'
@@ -527,6 +529,7 @@
             }
             ajax.post({
               url: url,
+              loading: true,
               param: self.funcForm,
               success: function (data) {
                 self.$message.success(opStr + '成功')
