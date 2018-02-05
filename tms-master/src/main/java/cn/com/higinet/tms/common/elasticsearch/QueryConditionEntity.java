@@ -8,7 +8,8 @@ public class QueryConditionEntity {
 	private String name;
 
 	/**
-	 * 起始值 说明：queryType=OTHER时，字段值放到startValue中,当queryType=ORDERBY时，字段值为ASC 或者 DESC
+	 * 起始值 说明：queryType=OTHER时，字段值放到startValue中,当queryType=ORDERBY时，字段值为ASC 或者 DESC，
+	 * 如果startMark为IN多个值用英文逗号隔开例如:aa,bb
 	 */
 	private Object startValue;
 
@@ -18,7 +19,7 @@ public class QueryConditionEntity {
 	private Object endValue;
 
 	/**
-	 * 起始查询符号 说明：LIKE模糊匹配 LIKE_前缀查询，EQ精确查询，GTE大于等于，GT大于
+	 * 起始查询符号 说明：LIKE模糊匹配 LIKE_前缀查询，EQ精确查询，GTE大于等于，GT大于,IN 包含
 	 */
 	private ConditionMarkEnum startMark;
 

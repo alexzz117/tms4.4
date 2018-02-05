@@ -40,6 +40,7 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -248,7 +249,7 @@ public class EsAdapter<T> implements DisposableBean {
 				//设置回退策略，当请求执行错误时，可进行回退操作,执行错误后延迟100MS，重试三次后执行回退
 				.setBackoffPolicy( BackoffPolicy.exponentialBackoff( TimeValue.timeValueMillis( 100 ), 3 ) ).setConcurrentRequests( concurrentRequests ).build();
 	}
-
+	
 	/**
 	 * @param indexName
 	 * @param pageSize
@@ -318,6 +319,14 @@ public class EsAdapter<T> implements DisposableBean {
 				}
 				else if( ConditionMarkEnum.LTE.equals( condition.getStartMark() ) ) {
 					searchRequestBuilder.setQuery( QueryBuilders.rangeQuery( condition.getName() ).lte( condition.getStartValue() ) );
+				}
+				else if( ConditionMarkEnum.IN.equals( condition.getStartMark() ) ) {
+					String[] conditionArray = condition.getStartValue().toString().split(",");
+					BoolQueryBuilder queryBuilder =  QueryBuilders.boolQuery();
+					for(int k=0;k<conditionArray.length;k++){
+						queryBuilder.should(QueryBuilders.termQuery(condition.getName(),conditionArray[k]));
+					}
+					searchRequestBuilder.setQuery(queryBuilder);
 				}
 			}
 			else if( ConditionMarkEnum.ORDERBY.equals( condition.getQueryType() ) ) {
