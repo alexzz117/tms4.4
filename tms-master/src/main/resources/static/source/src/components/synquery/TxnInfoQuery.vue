@@ -55,6 +55,7 @@
         self.infoList = {}
         ajax.post({
           url: '/query/alarmEvent/operateDetail',
+          loading: true,
           param: {
             txncode: row.txncode,
             txnTypeShowFields: row.txntype
