@@ -1,8 +1,13 @@
 package cn.com.higinet.tms.manager.modules.zookeeper.controller;
 
+import java.util.Collections;
 import java.util.List;
 
+import cn.com.higinet.tms.manager.common.ManagerConstants;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -19,7 +24,7 @@ import cn.com.higinet.tms.base.util.Stringz;
 import cn.com.higinet.tms.manager.modules.zookeeper.model.ZkNode;
 
 @RestController
-@RequestMapping("/zookeeper")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/zookeeper")
 @RefreshScope
 public class ZookeeperController {
 
@@ -38,15 +43,21 @@ public class ZookeeperController {
 	@RequestMapping(value = "/list", method = RequestMethod.POST)
 	public Model list( @RequestBody ZkNode indata ) throws Exception {
 		String path = "";
-		if( Stringz.isEmpty( indata.getPath() ) ) path = this.getRootPath();
+		boolean isRoot = Stringz.isEmpty( indata.getPath());
+		if( isRoot ) path = this.getRootPath();
 		else path = indata.getPath();
 
 		List<ZkNode> nodeList = Lists.newArrayList();
 		for( String name : curator.getChildren().forPath( path ) ) {
 			ZkNode node = new ZkNode();
+			String currPath = path + "/" + name;
+			List<String> childrenPaths = curator.getChildren().forPath( currPath );
+
+			node.setLeaf(CollectionUtils.isEmpty(childrenPaths));
 			node.setLabel( name );
-			node.setPath( (path + "/" + name) );
+			node.setPath( currPath );
 			node.setValue( new String( curator.getData().forPath( node.getPath() ) ) );
+			node.setRoot(isRoot);
 			nodeList.add( node );
 		}
 		return new Model().setRow( nodeList );
@@ -75,17 +86,28 @@ public class ZookeeperController {
 		if( curator.checkExists().forPath( indata.getPath() ) == null ) {
 			curator.create().forPath( indata.getPath() );
 		}
-		if( Stringz.isNotEmpty( indata.getValue() ) ) {
-			curator.setData().forPath( indata.getPath(), indata.getValue().getBytes() );
+		if(StringUtils.equals(indata.getType(), "node")) {
+			String subPath = indata.getPath() + "/foo";
+			curator.create().forPath( subPath );
+			curator.setData().forPath( subPath, "bar".getBytes() );
+		} else {
+			if( Stringz.isNotEmpty( indata.getValue() ) ) {
+				curator.setData().forPath( indata.getPath(), indata.getValue().getBytes() );
+			}
 		}
+
 		return new Model();
 	}
 
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	public Model delete( @RequestBody ZkNode indata ) throws Exception {
 		if( Stringz.isEmpty( indata.getPath() ) ) new Model().addError( "path is empty" );
+
 		if( curator.checkExists().forPath( indata.getPath() ) != null ) {
-			curator.delete().forPath( indata.getPath() );
+			Stat stat = new Stat();
+			System.out.println();stat.getVersion();
+			curator.delete().deletingChildrenIfNeeded().forPath(indata.getPath());
+//			curator.delete().forPath( indata.getPath() );
 			return new Model();
 		}
 		else {
