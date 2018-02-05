@@ -293,6 +293,7 @@
         let self = this
         ajax.post({
           url: '/report/txn/getPS',
+          loading: true,
           params: {},
           success: function (data) {
             self.tableColumns = data.list
@@ -304,6 +305,7 @@
         let params = Object.assign({}, self.searchForm, self.filterForm)
         ajax.post({
           url: '/report/txn/list',
+          loading: true,
           param: params,
           success: function (data) {
             self.bindGridData(data)
