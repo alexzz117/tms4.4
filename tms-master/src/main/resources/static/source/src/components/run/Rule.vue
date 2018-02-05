@@ -677,6 +677,10 @@
         if (this.readonlyParent) {
           return
         }
+        console.log('row')
+        console.log(row)
+
+
         this.$confirm('确定复制?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

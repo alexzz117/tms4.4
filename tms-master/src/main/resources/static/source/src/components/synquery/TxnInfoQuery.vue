@@ -114,7 +114,7 @@
     }
   }
 </script>
-<style>
+<style scoped>
   .info-item {
     border-left: thin solid;
     border-top: thin solid;
