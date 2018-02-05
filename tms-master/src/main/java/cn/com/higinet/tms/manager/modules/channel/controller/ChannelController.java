@@ -6,19 +6,19 @@
 package cn.com.higinet.tms.manager.modules.channel.controller;
 
 import cn.com.higinet.tms.base.entity.common.Model;
+import cn.com.higinet.tms.base.entity.common.RequestModel;
 import cn.com.higinet.tms.manager.common.ManagerConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ApplicationObjectSupport;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 import cn.com.higinet.tms.manager.modules.channel.service.ChannelService;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 渠道控制类
@@ -58,10 +58,10 @@ public class ChannelController extends ApplicationObjectSupport {
      * @return
      */
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Model addChannelAction(@RequestParam Map<String, Object> reqs) {
+    public Model addChannelAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
         Map<String, Object> result = channelService.insertChannel(reqs);
-        model.addAttribute(result);
+        model.putAll(result);
         return model;
     }
 
@@ -72,10 +72,10 @@ public class ChannelController extends ApplicationObjectSupport {
      * @return
      */
     @RequestMapping(value = "/getChannel", method = RequestMethod.POST)
-    public Model getChannelAction(@RequestParam Map<String, Object> reqs) {
+    public Model getChannelAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
         Map<String, Object> result = channelService.getChannelInfo(reqs);
-        model.addAttribute(result);
+        model.addAttribute("info",result);
         return model;
     }
 
@@ -86,10 +86,10 @@ public class ChannelController extends ApplicationObjectSupport {
      * @return
      */
     @RequestMapping(value = "/mod", method = RequestMethod.POST)
-    public Model modChannelAction(@RequestParam Map<String, Object> reqs) {
+    public Model modChannelAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
         Map<String, Object> result = channelService.updateChannel(reqs);
-        model.addAttribute(result);
+        model.putAll(result);
         return model;
     }
 
@@ -100,10 +100,10 @@ public class ChannelController extends ApplicationObjectSupport {
      * @return
      */
     @RequestMapping(value = "/del", method = RequestMethod.POST)
-    public Model delChannelAction(@RequestParam Map<String, Object> reqs) {
+    public Model delChannelAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
         Map<String, Object> result = channelService.deleteChannel(reqs);
-        model.addAttribute(result);
+        model.putAll(result);
         return model;
     }
 }
