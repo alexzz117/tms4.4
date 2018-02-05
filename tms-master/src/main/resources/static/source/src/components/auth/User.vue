@@ -80,10 +80,10 @@
     <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="900px" :close-on-click-modal="false">
       <el-form :model="userDialogForm" :rules="rules" ref="userDialogForm" :inline="true">
         <el-form-item label="用户名" :label-width="formLabelWidth" prop="login_name" :style="formItemStyle">
-          <el-input v-model="userDialogForm.login_name" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="userDialogForm.login_name" auto-complete="off" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="姓名" :label-width="formLabelWidth" prop="real_name" :style="formItemStyle">
-          <el-input v-model="userDialogForm.real_name" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="userDialogForm.real_name" auto-complete="off" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="角色" :label-width="formLabelWidth" prop="role" style="text-align: left;" :style="formItemStyle">
           <el-select v-model="userDialogForm.role" clearable placeholder="角色" :style="formItemContentStyle">
@@ -115,28 +115,28 @@
           </el-select>
         </el-form-item>
         <el-form-item label="证件号码" :label-width="formLabelWidth" prop="credentialnum" :style="formItemStyle">
-          <el-input v-model="userDialogForm.credentialnum" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="userDialogForm.credentialnum" auto-complete="off" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="固定电话" :label-width="formLabelWidth" prop="phone" :style="formItemStyle">
-          <el-input v-model="userDialogForm.phone" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="userDialogForm.phone" auto-complete="off" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="移动电话" :label-width="formLabelWidth" prop="mobile" :style="formItemStyle">
-          <el-input v-model="userDialogForm.mobile" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="userDialogForm.mobile" auto-complete="off" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="电子邮件" :label-width="formLabelWidth" prop="email" :style="formItemStyle">
-          <el-input v-model="userDialogForm.email" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="userDialogForm.email" auto-complete="off" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="通讯地址" :label-width="formLabelWidth" prop="address" :style="formItemStyle">
-          <el-input v-model="userDialogForm.address" auto-complete="off" :style="formItemContentStyle"></el-input>
+          <el-input v-model="userDialogForm.address" auto-complete="off" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="登录失败次数" :label-width="formLabelWidth" prop="failed_login_attempts" :style="formItemStyle" v-if="userDialogForm.operator_id !==''">
-          <el-input v-model="userDialogForm.failed_login_attempts" auto-complete="off" :style="formItemContentStyle" :readonly="true"></el-input>
+          <el-input v-model="userDialogForm.failed_login_attempts" auto-complete="off" :style="formItemContentStyle" :readonly="true" clearable></el-input>
         </el-form-item>
         <el-form-item label="锁定次数" :label-width="formLabelWidth" prop="lockout" :style="formItemStyle" v-if="userDialogForm.operator_id !==''">
-          <el-input v-model="userDialogForm.lockout" auto-complete="off" :style="formItemContentStyle" :readonly="true"></el-input>
+          <el-input v-model="userDialogForm.lockout" auto-complete="off" :style="formItemContentStyle" :readonly="true" clearable></el-input>
         </el-form-item>
         <el-form-item label="备注信息" :label-width="formLabelWidth" prop="memo" :style="formItemStyle">
-          <el-input type="textarea" v-model="userDialogForm.memo" :style="formItemContentStyle"></el-input>
+          <el-input type="textarea" v-model="userDialogForm.memo" :style="formItemContentStyle" clearable></el-input>
         </el-form-item>
         <el-form-item label="密码1" :label-width="formLabelWidth" prop="repwd" style="display: none" :style="formItemStyle">
           <el-input v-model="userDialogForm.repwd" auto-complete="off" :style="formItemContentStyle"></el-input>
@@ -227,6 +227,7 @@
         var self = this
         ajax.post({
           url: '/operator/list',
+          loading: true,
           param: {
             login_name: this.userForm.login_name,
             real_name: this.userForm.real_name,
@@ -254,6 +255,7 @@
           this.dialogTitle = '编辑用户'
           ajax.post({
             url: '/operator/get',
+            loading: true,
             param: {operatorId: row.operator_id},
             success: function (data) {
               var info = data.row
@@ -311,6 +313,7 @@
         var self = this
         ajax.post({
           url: '/operator/add',
+          loading: true,
           param: this.userDialogForm,
           success: function (data) {
             self.$message.success('创建成功。')
@@ -328,6 +331,7 @@
         var self = this
         ajax.post({
           url: '/operator/mod',
+          loading: true,
           param: this.userDialogForm,
           success: function (data) {
             self.$message.success('编辑成功。')
@@ -350,6 +354,7 @@
         }).then(() => {
           ajax.post({
             url: '/operator/del',
+            loading: true,
             param: [row.operator_id],
             success: function (data) {
               self.$message.success('删除成功。')
@@ -373,6 +378,7 @@
         }).then(() => {
           ajax.post({
             url: '/operator/reset',
+            loading: true,
             param: {
               operatorId: row.operator_id,
               loginName: row.login_name,
@@ -399,6 +405,7 @@
         }).then(() => {
           ajax.post({
             url: '/operator/resetLoginFailedAttempts',
+            loading: true,
             param: {
               operatorId: row.operator_id
             },
