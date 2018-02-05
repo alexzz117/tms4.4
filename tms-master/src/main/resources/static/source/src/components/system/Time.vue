@@ -287,6 +287,7 @@
         var self = this
         ajax.post({
           url: '/timer/add',
+          loading: true,
           model: ajax.model.timer,
           param: this.timerDialogForm,
           success: function (data) {
@@ -303,6 +304,7 @@
         var self = this;
         ajax.post({
           url: '/timer/update',
+          loading: true,
           model: ajax.model.timer,
           param: this.timerForm,
           success: function (data) {
@@ -327,6 +329,7 @@
         }).then(() => {
           ajax.post({
             url: '/timer/delete',
+            loading: true,
             model: ajax.model.timer,
             param: row,
             success: function (data) {
