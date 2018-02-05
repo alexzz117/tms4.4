@@ -100,18 +100,19 @@ public class ZookeeperController {
 	}
 
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
-	public Model delete( @RequestBody ZkNode indata ) throws Exception {
-		if( Stringz.isEmpty( indata.getPath() ) ) new Model().addError( "path is empty" );
-
-		if( curator.checkExists().forPath( indata.getPath() ) != null ) {
+	public Model delete( @RequestBody List<ZkNode> indata ) throws Exception {
+		for(ZkNode zkNode : indata) {
+			if( Stringz.isEmpty( zkNode.getPath() ) ){
+				new Model().addError( "path is empty" );
+			}
+			if( curator.checkExists().forPath( zkNode.getPath() ) == null ){
+				return new Model().addError( "节点不存在" );
+			}
+		}
+		for(ZkNode zkNode : indata) {
 			Stat stat = new Stat();
-			System.out.println();stat.getVersion();
-			curator.delete().deletingChildrenIfNeeded().forPath(indata.getPath());
-//			curator.delete().forPath( indata.getPath() );
-			return new Model();
+			curator.delete().deletingChildrenIfNeeded().forPath(zkNode.getPath());
 		}
-		else {
-			return new Model().addError( "节点不存在" );
-		}
+		return new Model();
 	}
 }
