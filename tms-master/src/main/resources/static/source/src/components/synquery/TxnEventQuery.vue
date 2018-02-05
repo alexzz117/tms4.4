@@ -430,6 +430,7 @@
         }, self.queryShowForm)
         ajax.post({
           url: '/query/tnxEvent/result',
+          loading: true,
           param: param,
           success: function (data) {
             if (data.success === true) {
