@@ -6,11 +6,11 @@
           <el-form :inline="true" ref="searchForm" :model="searchForm" label-width="80px">
             <el-form-item label="交易名称:" prop="txnIds">
               <div @click="openTxnTypedialog" >
-                <el-input v-model="searchForm.txnIds" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
+                <el-input v-model="searchForm.txnIds" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
               </div>
             </el-form-item>
             <el-form-item label="报表类型">
-              <el-select v-model="searchForm.reporttype" class="alarm-event-query-form-item" placeholder="请选择" @change="reportTypeChange">
+              <el-select v-model="searchForm.reporttype" class="alarm-event-query-form-item" placeholder="请选择" @change="reportTypeChange" clearable>
                 <el-option v-for="item in reportTypeList"
                   :key="item.value"
                   :label="item.label"
@@ -19,7 +19,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="日期范围">
-              <el-date-picker v-model="searchForm.duraSeparator"
+              <el-date-picker v-model="searchForm.duraSeparator" clearable
                 :type="datePickerType"
                 :editable="false"
                 range-separator="至"
@@ -80,7 +80,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="排名设置">
-                <el-select v-model="filterForm.tops" class="alarm-event-query-form-item" placeholder="请选择" @change="reportTypeChange">
+                <el-select v-model="filterForm.tops" class="alarm-event-query-form-item" placeholder="请选择" @change="reportTypeChange" clearable>
                   <el-option v-for="item in topList"
                              :key="item.value"
                              :label="item.label"
