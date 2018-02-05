@@ -530,7 +530,7 @@
         vTxncode: '',
         pageindex: 1,
         pagesize: 10,
-        total: 100,
+        total: 0,
         datatypeOptions: [],
         selectedRow: {},      // 表选中的行
         showItem: ['operate', 'strategy', 'count', 'user', 'handle', 'device', 'deviceFinger'],
