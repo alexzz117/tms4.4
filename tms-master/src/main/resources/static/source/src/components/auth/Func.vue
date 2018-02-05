@@ -138,7 +138,7 @@
       // 功能顺序重复校验
       var checkFunctionOnum = (rule, value, callback) => {
         var self = this
-        if (!(/^(0|[1-9]\d{0,3})$/.test(value))) {
+        if (!(/^(0|[1-9]\d{0,1})$/.test(value))) {
           return callback(new Error('[顺序]必须为小于100的正整数'))
         }
         var currentNode = self.$refs.tree.currentNode.node
