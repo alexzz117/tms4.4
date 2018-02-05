@@ -25,14 +25,14 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" width="500px" @close="resetForm">
       <el-form :model="channelForm" :rules="rules" ref="channelForm" label-width="120px">
         <el-form-item label="渠道编号" prop="channelid">
-          <el-input v-model="channelForm.channelid" auto-complete="off" :disabled="!addFlag">
+          <el-input v-model="channelForm.channelid" auto-complete="off" :disabled="!addFlag" clearable>
           </el-input>
         </el-form-item>
         <el-form-item label="渠道名称" prop="channelname">
-          <el-input v-model="channelForm.channelname" auto-complete="off"></el-input>
+          <el-input v-model="channelForm.channelname" auto-complete="off" clearable></el-input>
         </el-form-item>
         <el-form-item label="顺序" prop="orderby">
-          <el-input v-model="channelForm.orderby" auto-complete="off"></el-input>
+          <el-input v-model="channelForm.orderby" auto-complete="off" clearable></el-input>
         </el-form-item>
         <div>
           <el-form-item label="">
@@ -159,7 +159,8 @@
         let self = this
         ajax.post({
           url: '/channel/list',
-          param: {},
+          loading: true,
+          // param: {},
           success: function (data) {
             self.channelData = data.list
           },
@@ -187,15 +188,15 @@
         this.rules.channelid[0].required = true
       },
       editChannel (row) {
-        let self =this
+        let self = this
         self.dialogVisible = true
         self.dialogTitle = '编辑渠道'
         self.channelForm.op = 'mod'
         self.rules.channelid[0].required = false
         ajax.post({
           url: '/channel/getChannel',
-          // param: {channelid: row.channelid},
-          param: row,
+          loading: true,
+          param: {channelid: row.channelid},
           success: function (data) {
             self.channelForm = data.info
           }
@@ -216,6 +217,7 @@
             }
             ajax.post({
               url: url,
+              loading: true,
               param: self.channelForm,
               success: function (data) {
                 switch (data.result) {
@@ -258,6 +260,7 @@
         }).then(() => {
           ajax.post({
             url: '/channel/del',
+            loading: true,
             param: {channelid: row.channelid},
             success: function (data) {
               self.$message.success('删除成功。')

@@ -114,6 +114,7 @@
         }
         ajax.post({
           url: '/log/list',
+          loading: true,
           param: {
             operator_name: self.logForm.operator_name,
             operate_func: self.logForm.operate_func,
