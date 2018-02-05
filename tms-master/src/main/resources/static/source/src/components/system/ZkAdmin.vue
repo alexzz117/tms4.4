@@ -23,32 +23,49 @@
         </section>
       </el-col>
       <el-col :span="18" style="min-height: 400px;max-height: 700px;">
-        <section class="table">
-          <el-table
-            :data="tableData"
-            style="width: 100%"
-            @selection-change="tableSelectionChange">
+        <section class="table" >
+          <div v-show="showRight">
 
-            <el-table-column
-              align="left"
-              type="selection"
-              width="55">
-            </el-table-column>
+            <div style="margin-bottom: 10px;text-align: left ">
+              <el-button plain class="el-icon-plus" @click="addPropNode">新建</el-button>
+              <el-button plain class="el-icon-delete" @click="delPropData" :disabled="this.selectedTableData.length === 0">删除</el-button>
+            </div>
 
-            <el-table-column prop="label" label="Name" align="left"></el-table-column>
-            <el-table-column prop="value" label="Value" align="left"></el-table-column>
+            <el-table
+              :data="tableData"
+              style="width: 100%"
+              @selection-change="tableSelectionChange">
 
-          </el-table>
+              <el-table-column
+                align="left"
+                type="selection"
+                width="55">
+              </el-table-column>
+
+              <el-table-column
+                label="操作"
+                width="50">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" icon="el-icon-edit" title="编辑" @click="editPropNode(scope.row)"></el-button>
+                </template>
+              </el-table-column>
+
+              <el-table-column prop="label" label="Name" align="left"></el-table-column>
+              <el-table-column prop="value" label="Value" align="left"></el-table-column>
+
+            </el-table>
+          </div>
+
         </section>
       </el-col>
     </el-row>
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" width="330px">
       <el-form :model="dialogForm" :rules="rules" ref="dialogForm" style="text-align: left" :inline="true">
-        <el-form-item label="Name:" prop="label">
-          <el-input v-model="dialogForm.label" auto-complete="off" :maxlength="50"></el-input>
+        <el-form-item label="Name:" :label-width="formLabelWidth" prop="label">
+          <el-input v-model="dialogForm.label" auto-complete="off"  :maxlength="50" :readonly="dialogType === 'propEdit'"></el-input>
         </el-form-item>
-        <el-form-item v-show="dialogType === 'prop'" label="Value:" :label-width="formLabelWidth" prop="value">
+        <el-form-item v-show="dialogType === 'prop' || dialogType === 'propEdit'" label="Value:" :label-width="formLabelWidth" prop="value">
           <el-input v-model="dialogForm.value" auto-complete="off"></el-input>
         </el-form-item>
         <div>
@@ -73,11 +90,18 @@
       },
       canNotDel(){
         return this.selectedTreeData.length !== 1 || this.selectedTreeData[0].root
+      },
+      showRight () {
+        if(this.selectedNode){
+          return true
+        } else {
+          return false
+        }
       }
     },
     data () {
       return {
-        formLabelWidth: '130px',
+        formLabelWidth: '60px',
         dialogTitle:'',
         dialogVisible:false,
         dialogType:'',
@@ -95,6 +119,7 @@
           children: 'children',
           isLeaf: 'leaf'
         },
+        selectedNode:null,
         tableData:[],
         selectedTableData:[],
         selectedTreeData:[],
@@ -119,6 +144,17 @@
         this.dialogVisible = true
         this.dialogType = 'node'
       },
+      addPropNode(){
+        this.dialogForm = this.initDialogForm()
+        this.dialogVisible = true
+        this.dialogType = 'prop'
+      },
+      editPropNode(row){
+        Object.assign(this.dialogForm, row)
+
+        this.dialogVisible = true
+        this.dialogType = 'propEdit'
+      },
       delNode(){
         if(this.selectedTreeData[0].isRoot) {
           return
@@ -132,9 +168,9 @@
           ajax.post({
             url: '/zookeeper/delete',
             loading: true,
-            param: {
+            param: [{
               path: this.selectedTreeData[0].path
-            },
+            }],
             success: function (data) {
               self.$message.success('删除成功')
 
@@ -152,16 +188,53 @@
           })
         })
       },
+      delPropData(){
+        let self = this
+        this.$confirm('确定删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let params = []
+          for(let item of this.selectedTableData) {
+            params.push({
+              path: item.path
+            })
+          }
+          ajax.post({
+            url: '/zookeeper/delete',
+            loading: true,
+            param: params,
+            success: function (data) {
+              self.$message.success('删除成功')
+              let tableDataTemp = []
+              for(let item of self.tableData) {
+                let needDel = false
+                for(let delItem of params) {
+                  if(item.path === delItem.path) {
+                    needDel = true
+                  }
+                }
+                if(!needDel) {
+                  tableDataTemp.push(item)
+                }
+              }
+
+              self.tableData = tableDataTemp
+            }
+          })
+        })
+      },
       submitForm(formName){
         let self = this
-        if(this.dialogType === 'node') {
-          this.$refs[formName].validate((valid) => {
-            if (valid) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            if(this.dialogType === 'node') {
               let path = this.selectedTreeData[0].path + "/" + this.dialogForm.label
               let params = {
                 label: this.dialogForm.label,
                 path: path,
-                type: 'node'
+                type: this.dialogType
               }
               ajax.post({
                 url: '/zookeeper/set',
@@ -181,13 +254,40 @@
                   self.$message.success('新建成功')
                 }
               })
+            } else {
+              let path = this.selectedNode.path + "/" + this.dialogForm.label
+              let params = {
+                label: this.dialogForm.label,
+                value: this.dialogForm.value,
+                path: path,
+                type: this.dialogType
+              }
+              ajax.post({
+                url: '/zookeeper/set',
+                loading:true,
+                param: params,
+                success: function (data) {
+                  self.dialogVisible = false
+                  if(self.dialogType === 'prop') {
+                    self.tableData.push({label:params.label, path:params.path, value: params.value})
+                    self.$message.success('新建成功')
+                  } else {
+                    for(let item of self.tableData) {
+                      if(item.path === path){
+                        item.value = params.value
+                        break
+                      }
+                    }
+                    self.$message.success('编辑成功')
+                  }
+                }
+              })
             }
-          })
-        } else {
-
-        }
+          }
+        })
       },
       nodeClick(data){
+        this.selectedNode = data
         this.tableData = data.valueList
       },
       treeCheckChange(data, checked, indeterminate) {
