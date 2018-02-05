@@ -85,7 +85,7 @@
     <el-dialog :title="dialogTitle" :visible.sync="roleDialogVisible" width="35%" :close-on-click-modal="closeOnClickModal">
       <el-form :model="roleDialogform" :rules="rules" ref="roleDialogform">
         <el-form-item label="角色名称" :label-width="formLabelWidth" prop="role_name">
-          <el-input v-model="roleDialogform.role_name" auto-complete="off"></el-input>
+          <el-input v-model="roleDialogform.role_name" auto-complete="off" clearable></el-input>
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth" style="text-align: left;">
           <el-switch
@@ -152,6 +152,7 @@
 
         ajax.post({
           url: '/role/mod',
+          loading: true,
           param: row,
           success: function (data) {
             // self.getData()
@@ -244,6 +245,7 @@
         var self = this
         ajax.post({
           url: '/role/add',
+          loading: true,
           param: this.roleDialogform,
           success: function (data) {
             self.$message({
@@ -255,7 +257,7 @@
           }
         })
       },
-      del() {
+      del () {
         var self = this
 //        var data = this.multipleSelection[0]
         var data = this.selectedRow
@@ -265,19 +267,20 @@
           type: 'warning'
         }).then(() => {
           ajax.post({
-          url: '/role/del',
-          param: {
-            roleid: data.role_id
-          },
-          success: function (data) {
-            self.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            self.sel()
-          }
-        })
-      }).catch(() => {})
+            url: '/role/del',
+            loading: true,
+            param: {
+              roleid: data.role_id
+            },
+            success: function (data) {
+              self.$message({
+                type: 'success',
+                message: '删除成功'
+              })
+              self.sel()
+            }
+          })
+        }).catch(() => {})
       },
       sel(pageinfo) {
         var self = this;
@@ -296,6 +299,7 @@
 
         ajax.post({
           url: '/role/list',
+          loading: true,
           param: param,
           success: function (data) {
             if (data.page) {
@@ -308,6 +312,7 @@
         var self = this;
         ajax.post({
           url: '/role/mod',
+          loading: true,
           param: this.roleDialogform,
           success: function (data) {
             self.$message({
