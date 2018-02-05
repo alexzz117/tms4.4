@@ -49,8 +49,6 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle( HttpServletRequest request, HttpServletResponse response, Object handler ) throws ServletException, IOException {
 
-		if(true) return true;
-		
 		String self = (String) request.getAttribute( "forward" );
 		if( !CmcStringUtil.isEmpty( self ) && "self".equals( self ) ) {
 			return true;

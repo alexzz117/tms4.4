@@ -39,8 +39,6 @@ public class DualAuditInterceptor extends HandlerInterceptorAdapter {
 	 */
 	public boolean preHandle( HttpServletRequest request, HttpServletResponse response, Object handler ) throws ServletException, IOException {
 		
-		if(true) return true;
-		
 		String dblc = request.getRequestURL().toString();
 
 		String self = (String) request.getAttribute( "forward" );
