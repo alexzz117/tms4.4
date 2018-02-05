@@ -39,7 +39,7 @@ public class TrafficConsumer {
 
 		TrafficData trafficData = traffic.getTrafficData();
 		List<tms_run_ruletrig> ruletrigs = traffic.getRuletrigs();
-		List<tms_run_rule_action_hit> ruleActionHits = traffic.getRuleActionHits();
+		List<tms_run_rule_action_hit> ruleActionHits = traffic.getRuleActionHit();
 
 		if( trafficData != null ) trafficQueue.put( trafficData );
 		if( ruletrigs != null ) ruleTrigQueue.put( ruletrigs );
