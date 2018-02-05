@@ -311,6 +311,7 @@
         }
         ajax.post({
           url: '/alarmevent/auditList',
+          loading: true,
           param: param,
           success: function (data) {
             if (data.page) {
@@ -325,7 +326,7 @@
         this.pagesize = data.page.size
         this.total = data.page.total
       },
-      //报警事件审核弹窗
+      // 报警事件审核弹窗
       openDialog(index, row){
         var self = this
         this.listDialogVisible = true
@@ -333,6 +334,7 @@
         this.vTxncode = TXN_CODE
         ajax.post({
           url: '/alarmevent/audit',
+          loading: true,
           param: {TXN_CODE: TXN_CODE},
           success: function (data) {
             console.log(data)
@@ -362,8 +364,8 @@
         })
         self.activeNames = ['1', '2']
       },
-      //报警事件审核提交
-      onSaveAudit(formName){
+      // 报警事件审核提交
+      onSaveAudit (formName) {
         var self = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -373,6 +375,7 @@
             }, this.auditForm)
             ajax.post({
               url: '/alarmevent/saveAudit',
+              loading: true,
               param: param,
               success: function (data) {
                 self.$message({
