@@ -143,6 +143,7 @@
   import dictCode from '@/common/dictCode'
   import check from '@/common/check'
   import reportEcharts from '@/common/reportEcharts'
+  import reportPrint from '@/common/reportPrint'
   let myChart // 图标对象
 
   export default {
@@ -250,24 +251,24 @@
       }
     },
     methods: {
-      handleChange (val) {
+      handleChange(val) {
         console.log(val)
       },
-      bindGridData (data) {
+      bindGridData(data) {
         this.tableData = data.page.list
         // this.currentPage = data.page.index
         this.pageSize = data.page.size
         this.total = data.page.total
       },
-      handleSizeChange (val) {
+      handleSizeChange(val) {
         this.currentPage = val
         this.selTable()
       },
-      handleCurrentChange (val) {
+      handleCurrentChange(val) {
         this.currentPage = val
         this.selTable()
       },
-      selTableColumn () {
+      selTableColumn() {
         let self = this
         ajax.post({
           url: '/report/txn/getPS',
@@ -277,7 +278,7 @@
           }
         })
       },
-      selTable () {
+      selTable() {
         let self = this
         let params = Object.assign(self.searchForm, self.filterForm)
         ajax.post({
@@ -289,16 +290,16 @@
           }
         })
       },
-      searchFunc () {
+      searchFunc() {
         this.selTable()
       },
-      filterFunc () {
+      filterFunc() {
         this.getChart()
       },
-      openTxnTypedialog () {
+      openTxnTypedialog() {
         this.txntypeDialogVisible = true
       },
-      reportTypeChange (val) {
+      reportTypeChange(val) {
         let self = this
         self.searchForm.startTime = ''
         self.searchForm.endTime = ''
@@ -319,7 +320,7 @@
         }
         console.info(val)
       },
-      handleCheckChange (data, checked, indeterminate) {
+      handleCheckChange(data, checked, indeterminate) {
         let checkedArr = this.$refs.tree.getCheckedNodes()
         let checkedStrArr = []
         let checkedStrKeyArr = []
@@ -330,15 +331,23 @@
         this.searchForm.txnids = checkedStrKeyArr.join(',')
       },
       // 功能树渲染方法
-      renderContent (h, { node, data, store }) {
+      renderContent(h, {node, data, store}) {
         if (node.data.enable === 0) { // 功能节点状态禁用
-          return (<span class="el-tree-node__label disabledFlag">{node.label}</span>)
+          return ( < span
+        class
+          = "el-tree-node__label disabledFlag" > {node.label
+        }<
+          /span>)
         } else { // 功能节点状态正常
-          return (<span class="el-tree-node__label">{node.label}</span>)
+          return ( < span
+        class
+          = "el-tree-node__label" > {node.label
+        }<
+          /span>)
         }
       },
       // 查询树结构
-      selTree () {
+      selTree() {
         var self = this
         var option = {
           url: '/trandef/query',
@@ -351,7 +360,7 @@
         ajax.post(option)
       },
       // 把功能节点列表格式化为树形Json结构
-      formatTreeData (list, rootNodes) {
+      formatTreeData(list, rootNodes) {
         var tree = []
         // 如果根节点数组不存在，则取fid不存在或为空字符的节点为父节点
         if (rootNodes === undefined || rootNodes.length === 0) {
@@ -376,7 +385,7 @@
         }
 
         // 递归查询节点的子节点
-        function getChildren (list, id) {
+        function getChildren(list, id) {
           var childs = []
           for (var i in list) {
             var node = list[i]
@@ -388,18 +397,19 @@
           }
           return childs
         }
+
         return tree  // 返回树结构Json
       },
-      connectString (code1, code2) {
+      connectString(code1, code2) {
         return (code1 + code2).toLowerCase()
       },
-      getChart () {
+      getChart() {
         let self = this
         // 使用刚指定的配置项和数据显示图表。
         let option = self.getOptionV()
         myChart.setOption(option)
       },
-      getOptionV () {
+      getOptionV() {
         let self = this
         let list = self.tableData
         // 处置
@@ -429,7 +439,8 @@
           if ((i + 1) % 2 === 0) {
             opXData[i] = '\n' + opXData[i]
           }
-        };
+        }
+        ;
         for (let i = 0; i < cfPsTArr.length; i++) {
           for (let j = 0; j < cfTargetTArr.length; j++) {
             opLegendData.push(cfPsTArr[i])
@@ -464,7 +475,7 @@
         option.chartID = 'chartdiv'
         return reportEcharts.GenOption(option)
       },
-      getPsText () {
+      getPsText() {
         let resultList = []
         let valueList = this.filterForm.ps
         let list = this.tableColumns
@@ -480,6 +491,53 @@
         }
         return resultList
       },
+      getQueryDataRange () {
+        let searchForm = this.searchForm
+        let duraSeparator = searchForm.duraSeparator
+        if (duraSeparator && duraSeparator.length === 2) {
+          return searchForm.startTime + '至' + searchForm.endTime
+        } else {
+          return ''
+        }
+      },
+      getLocation () {
+        let location = ''
+        let searchForm = this.searchForm
+        let countryCode = searchForm.countrycode
+        if (countryCode) {
+          let countryCodeList = this.countryCodeList
+          let regionCode = searchForm.regioncode
+          let countryName = regionCode
+          for (let i in countryCodeList) {
+            if (countryCodeList[i].countrycode === countryCode) {
+              countryName = countryCodeList[i].countryname
+            }
+          }
+          location += countryName
+          if (regionCode) {
+            let regionCodeList = this.regionCodeList
+            let cityCode = searchForm.citycode
+            let regionName = regionCode
+            for (let i in regionCodeList) {
+              if (regionCodeList[i].regioncode === regionCode) {
+                regionName = regionCodeList[i].regionname
+              }
+            }
+            location = location + '-' + regionName
+            if (cityCode) {
+              let cityCodeList = this.cityCodeList
+              let cityName = cityCode
+              for (let i in cityCodeList) {
+                if (cityCodeList[i].citycode === cityCode) {
+                  cityName = cityCodeList[i].cityname
+                }
+              }
+              location = location + '-' + cityName
+            }
+          }
+        }
+        return location
+      },
       exportFunc () {
         let params = this.searchForm
         console.info(params)
@@ -489,8 +547,60 @@
         })
         // window.location.href = url
       },
+      getQzText () {
+        let resultList = []
+        return resultList
+      },
       printFunc () {
-        alert('打印')
+        let searchForm = this.searchForm
+        let filterForm = this.filterForm
+        let option = {}
+        option.queryBox = {
+          queryTitle: '欺诈报警信息查询', // 查询标题
+          queryForm: [{         // 查询条件
+            label: '交易名称',
+            value: searchForm.txnIds
+          }, {
+            label: '日期范围',
+            value: this.getQueryDataRange()
+          }, {
+            label: '地区名称',
+            value: this.getLocation()
+          }]
+        }
+        option.chartBox = {
+          chartTitle: '欺诈报警信息展示图', // 图表标题
+          chartForm: [
+            {
+              label: '欺诈类型',
+              value: this.getQzText()
+            }, {         // 图表筛选条件
+              label: '处置类型',
+              value: this.getPsText()
+            }],
+          chartUrl: myChart.getDataURL()        // 图表地址
+        }
+        option.tablebBox = {
+          tableTitle: '欺诈报警信息列表', // 表格标题
+          columns: [],
+          tableData: []        // 表格数据
+        }
+        let tableColumns = this.tableColumns
+        let columns = [{name: '欺诈类型', dataIndex: 'regionname'}]
+        for (let i in tableColumns) {
+          let tableColumn = tableColumns[i]
+          columns.push({            // 表格表头
+            name: tableColumn.dp_name,
+            dataIndex: null,
+            items: [{name: '总数', dataIndex: this.connectString(tableColumn.dp_code, '_rate')},
+              {name: '欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_fraudrate')},
+              {name: '非欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_nonfraudrate')}]
+          })
+        }
+        option.tablebBox.columns = columns
+        option.tablebBox.tableData = this.tableData
+        console.log(option)
+        reportPrint.ReportPrint(option)
       }
     }
   }
