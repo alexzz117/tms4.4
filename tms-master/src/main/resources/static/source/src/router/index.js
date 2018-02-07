@@ -43,6 +43,7 @@ import RuleListReport from '@/components/report/RuleListReport'
 import AreaListReport from '@/components/report/AreaListReport'
 import DateListReport from '@/components/report/DateListReport'
 import ReportTxnTimeList from '@/components/report/ReportTxnTimeList'
+import FraudListReport from '@/components/report/FraudListReport'
 // import Dashboard from '@/components/Dashboard'
 
 import NotFoundComponent from '@/components/NotFoundComponent'
@@ -201,7 +202,11 @@ export default new Router({
           path: 'areaListReport_vue',
           name: 'areaListReport',
           component: AreaListReport
-        },{
+        }, {
+          path: 'fraudListReport_vue',
+          name: 'fraudListReport',
+          component: FraudListReport
+        }, {
           path: 'dateListReport_vue',
           name: 'dateListReport',
           component: DateListReport
