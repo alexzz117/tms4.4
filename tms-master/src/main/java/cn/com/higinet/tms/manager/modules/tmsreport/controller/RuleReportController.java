@@ -86,7 +86,7 @@ public class RuleReportController {
 	 * @return
 	 */
 	@RequestMapping(value = "/export", method = RequestMethod.GET)
-	public void exportListAction( @RequestBody Map<String, String> reqs, HttpServletResponse response ) {
+	public void exportListAction(Map<String, String> reqs, HttpServletResponse response ) {
 		decodeForRequestParamMap( reqs, new String[] {
 				"ruleName"
 		}, null );
