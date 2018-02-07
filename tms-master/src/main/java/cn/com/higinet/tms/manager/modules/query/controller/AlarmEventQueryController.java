@@ -77,7 +77,7 @@ public class AlarmEventQueryController {
     }
 
     @RequestMapping(value = "/deviceFingerDetail", method = RequestMethod.POST)
-    public Model showQuerydeviceFingerDetailAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
+    public Model showQueryDeviceFingerDetailAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
         Model model = new Model();
 
         model.setPage(alarmEventQueryService.queryAlarmEventdeviceFingerDetail(reqs));
@@ -85,7 +85,14 @@ public class AlarmEventQueryController {
         return model;
     }
 
+    @RequestMapping(value = "/sessionDetail", method = RequestMethod.POST)
+    public Model showQuerySessionDetailAction(@RequestBody RequestModel reqs, HttpServletRequest request) {
+        Model model = new Model();
 
+        model.setRow(alarmEventQueryService.queryAlarmEventSessionDetail(reqs));
+
+        return model;
+    }
 
 
 
