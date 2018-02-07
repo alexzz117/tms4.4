@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.entity.common.Page;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.common.util.CalendarUtil;
 import cn.com.higinet.tms.manager.modules.common.util.MapUtil;
 import cn.com.higinet.tms.manager.modules.tmsreport.common.ReportConstant;
@@ -32,13 +33,14 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 @RestController("fraudReportController")
-@RequestMapping("/report/fraud")
+@RequestMapping(ManagerConstants.URI_PREFIX + "/report/fraud")
 public class FraudReportController {
 	
 	@Autowired
 	private FraudReportService fraudReportService ;
 	@Autowired
 	private DisposalService disposalService;
+	
 
 	/**
 	 * 转向按日期汇总交易信息报表页面
