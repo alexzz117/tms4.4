@@ -6,7 +6,7 @@ import util from '@/common/util'
  * @param options
  */
 function reportPrint (options) {
-  var opts =  util.extend({
+  var opts = util.extend({
     queryBox: {
       queryTitle: '查询标题', // 查询标题
       queryForm: [{         // 查询条件
