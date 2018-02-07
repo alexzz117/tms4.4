@@ -151,6 +151,7 @@ public class AlarmEventService {
 				sb.append(", ");
 			sb.append("ISCORRECT = :ISCORRECT");
 		}
+		cond.put("TXN_CODE", cond.get("TXNCODE"));
 		sb.append(" where TXNCODE = :TXN_CODE");
 		sql += sb.toString();
 		offlineSimpleDao.executeUpdate(sql, cond);
