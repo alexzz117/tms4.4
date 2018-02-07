@@ -1,9 +1,10 @@
 package cn.com.higinet.tms.manager.modules.zookeeper.controller;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import cn.com.higinet.tms.manager.common.ManagerConstants;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -15,12 +16,16 @@ import org.springframework.cloud.zookeeper.config.ZookeeperConfigProperties;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.common.collect.Lists;
 
 import cn.com.higinet.tms.base.entity.common.Model;
 import cn.com.higinet.tms.base.util.Stringz;
+import cn.com.higinet.tms.manager.common.ManagerConstants;
 import cn.com.higinet.tms.manager.modules.zookeeper.model.ZkNode;
 
 @RestController
@@ -113,6 +118,13 @@ public class ZookeeperController {
 			Stat stat = new Stat();
 			curator.delete().deletingChildrenIfNeeded().forPath(zkNode.getPath());
 		}
+		return new Model();
+	}
+	
+	@RequestMapping(value = "/import", method = RequestMethod.POST)
+	public Model importThread( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
+		MultipartHttpServletRequest multipartrequest = (MultipartHttpServletRequest) request;
+		MultipartFile zkFile = multipartrequest.getFile( "zkFile" );
 		return new Model();
 	}
 }
