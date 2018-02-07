@@ -1,10 +1,12 @@
+import util from '@/common/util'
+
 /**
  * 运行报表打印
  * @author wsy 2018-2-6
  * @param options
  */
 function reportPrint (options) {
-  var opts = {
+  var opts =  util.extend({
     queryBox: {
       queryTitle: '查询标题', // 查询标题
       queryForm: [{         // 查询条件
@@ -29,11 +31,9 @@ function reportPrint (options) {
       tableData: []        // 表格数据
     },
     minWidth: 960,
-    width: 960
-  };
-  if (options) {
-    opts = options
-  }
+    width: window.innerWidth,
+    height: window.innerHeight
+  }, options);
 
   // var noPrintType = ['empty', 'hidden'];
   var printHtml = [
@@ -65,16 +65,8 @@ function reportPrint (options) {
       if (opts.chartBox.chartForm) {
         _printFormForTBody(opts.chartBox.chartForm, tmp, false, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ');
       }
-      if (opts.chartBox.chartDiv) {
-        // modChartWidth(opts.width - 45);
-        var chartHtml;
-        if (opts.chartBox.chartUrl) {
-        // alert('--'+myChart.getDataURL()+'--');
-          chartHtml = '<img src=\"' + op.chartBox.chartUrl + '\" >';
-        } else {
-          chartHtml = $('#' + opts.chartBox.chartDiv).html();
-        }
-        // alert(chartHtml);
+      if (opts.chartBox.chartUrl) {
+        var chartHtml = '<img src=\"' + opts.chartBox.chartUrl + '\" >';
         chartHtml = chartHtml.replace('&amp;', '&').replace(/<param name=\"play\"[^<]+>/i, '');
         tmp.push('<tr><td align="center">' + chartHtml + '</td></tr>');
         // modChartWidth(chartBox.container.width());
@@ -82,7 +74,7 @@ function reportPrint (options) {
     }
     if (opts.tablebBox) {
       var columns = opts.tablebBox.columns;
-      tmp.push('<table class="table"><caption class="title">opts.tablebBox.tableTitle</caption><thead><tr>');
+      tmp.push('<table class="table"><caption class="title">' + opts.tablebBox.tableTitle + '</caption><thead><tr>');
       var tr_items = '<tr>';
       for (var r = 0; r < columns.length; r++) {
         var column = columns[r];
@@ -165,10 +157,11 @@ function reportPrint (options) {
   }
 
   function _print () {
+    console.info(window)
     if (opts.width < opts.minWidth) {
       opts.width = opts.minWidth;
     }
-    var win = window.open('', 'win1', 'width=' + opts.width + ',height=600,location=no,menubar=yes,toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no');
+    var win = window.open('', 'win1', 'width=' + opts.width + ',height=' + opts.height + ',location=no,menubar=yes,toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no');
     var out = win.document;
     out.writeln(printHtml.join(''));
     out.close();
