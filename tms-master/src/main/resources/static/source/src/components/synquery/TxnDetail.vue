@@ -24,6 +24,7 @@
           <alarm-event-query-device-finger-detail ref="deviceFingerDetail" :showItem="selectedRow"></alarm-event-query-device-finger-detail>
         </el-tab-pane>
         <el-tab-pane label="会话信息" name="session" v-if="getTabItemShow('session')">
+          <alarm-event-query-session-detail ref="sessionDetail" :showItem="selectedRow"></alarm-event-query-session-detail>
         </el-tab-pane>
       </el-tabs>
       <div slot="footer" class="dialog-footer">
@@ -39,6 +40,7 @@
   import AlarmEventQueryUserDetail from '@/components/synquery/AlarmEventQueryUserDetail'
   import AlarmEventQueryDeviceDetail from '@/components/synquery/AlarmEventQueryDeviceDetail'
   import AlarmEventQueryDeviceFingerDetail from '@/components/synquery/AlarmEventQueryDeviceFingerDetail'
+  import AlarmEventQuerySessionDetail from '@/components/synquery/AlarmEventQuerySessionDetail'
   import TxnStatQuery from '@/components/synquery/TxnStatQuery'
   import TxnInfoQuery from '@/components/synquery/TxnInfoQuery'
 
@@ -61,7 +63,8 @@
           user: true,
           handle: true,
           device: true,
-          deviceFinger: true
+          deviceFinger: true,
+          session: true
         }
       }
     },
@@ -163,6 +166,16 @@
             }
             break
           }
+          case 'session': {
+            if (this.firstActive.session) {
+              let self = this
+              setTimeout(function () {
+                self.$refs.sessionDetail.loadData(self.selectedRow)
+                self.firstActive.session = false
+              }, 200)
+            }
+            break
+          }
           default: {
           }
         }
@@ -183,6 +196,7 @@
       'alarm-event-query-user-detail': AlarmEventQueryUserDetail,
       'alarm-event-query-device-detail': AlarmEventQueryDeviceDetail,
       'alarm-event-query-device-finger-detail': AlarmEventQueryDeviceFingerDetail,
+      'alarm-event-query-session-detail': AlarmEventQuerySessionDetail,
       'txn-stat-query': TxnStatQuery,
       'txn-info-query': TxnInfoQuery
     }
