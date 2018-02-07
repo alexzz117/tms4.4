@@ -4,9 +4,9 @@
       <el-collapse v-model="activeNames" @change="handleChange">
         <el-collapse-item title="交易运行效率查询" name="search">
           <el-form :inline="true" ref="searchForm" :model="searchForm" label-width="80px">
-            <el-form-item label="交易名称:" prop="txnids">
+            <el-form-item label="交易名称:" prop="txnIds">
               <div @click="openTxnTypedialog" >
-                <el-input v-model="searchForm.txnids" class="alarm-event-query-form-item" auto-complete="off" readonly ></el-input>
+                <el-input v-model="searchForm.txnIds" class="alarm-event-query-form-item" auto-complete="off" readonly clearable></el-input>
               </div>
             </el-form-item>
             <el-form-item label="日期范围">
@@ -24,8 +24,32 @@
           </el-form>
         </el-collapse-item>
         <el-collapse-item title="交易运行效率展示图" name="chart">
-          <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
-          <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>
+          <div>
+            <el-form :inline="true" ref="filterForm" :model="filterForm" label-width="80px">
+              <el-form-item label="监控指标">
+                <el-select  v-model="filterForm.target" class="alarm-event-query-form-item" placeholder="请选择" @change="reportTypeChange">
+                  <el-option v-for="item in targetList"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="排名设置">
+                <el-select v-model="filterForm.tops" class="alarm-event-query-form-item" placeholder="请选择" @change="reportTypeChange" clearable>
+                  <el-option v-for="item in topList"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="filterFunc">搜索</el-button>
+              </el-form-item>
+            </el-form>
+            <div id="chartdiv" style="width: 100%;height:400px;"></div>
+          </div>
         </el-collapse-item>
         <el-collapse-item title="交易运行效率列表" name="table">
           <template slot="title">
@@ -149,7 +173,22 @@
 
       </el-collapse>
     </el-row>
+    <el-dialog title="交易名称" :visible.sync="txntypeDialogVisible" width="400px">
+      <el-tree :data="treeData" node-key="id" ref="tree"
+               show-checkbox
+               :props="defaultTreeProps"
+               :highlight-current=true
+               :default-expanded-keys="expendKey"
+               :expand-on-click-node="false"
+               :render-content="renderContent"
+               @check-change="handleCheckChange"
+               style="overflow-y: auto;">
+      </el-tree>
 
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
+      </div>
+    </el-dialog>
    
   </div>
 </template>
@@ -158,6 +197,8 @@
   import util from '@/common/util'
   import dictCode from '@/common/dictCode'
   import check from '@/common/check'
+  import reportEcharts from '@/common/reportEcharts'
+  let myChart // 图标对象
 
   export default {
     data () {
@@ -179,24 +220,29 @@
         countryCodeList: [],  // 地理位置信息列表
         regionCodeList: [],   // 地理位置信息列表
         cityCodeList: [],     // 地理位置信息列表
+        targetList: [{label: '调用次数', value: '_NUMBER'}, {label: '平均时间', value: '_RUNTIME_AVG'}, {label: '最大时间', value: '_RUNTIME_MAX'}, {label: '最小时间', value: '_RUNTIME_MIN'}
+        , {label: '平均TPM', value: '_TPM_AVG'}
+        , {label: '最大TPM', value: '_TPM_MAX'}
+        , {label: '最小TPM', value: '_TPM_MIN'}],   // 监控指标下拉列表
+        topList: [{label: '前5名', value: '5'}, {label: '前10名', value: '10'}, {label: '前20名', value: '20'}, {label: '前30名', value: '30'}], // 排名设置下拉列表
         searchForm: {
-          txnids: '',         // 交易名称
+          txnIds: '',         // 交易名称
           reporttype: 'dayreport', // 报表类型
           duraSeparator: [new Date(), new Date()],  // 日期范围
           startTime: '',      // 开始日期
           endTime: '',        // 结束日期
-          countrycode: '',    // 国家
-          regioncode: '',     // 省份
-          citycode: ''        // 城市
         },
         filterForm: {
-          ps: 'PS01',
-          target: '_NUM',
+          target: '_NUMBER',
           tops: 10
         }
       }
     },
     created () {
+      
+    },
+    mounted: function () {
+      myChart = this.$echarts.init(document.getElementById('chartdiv'))
       this.selTree()
       this.selTable()
     },
@@ -237,12 +283,18 @@
       selTable () {
         let self = this
         let params = Object.assign(self.searchForm, self.filterForm)
+
+        console.log(params);
+
+
         ajax.post({
           url: '/report/txnTime/list',
-          params: params,
+          loading: true,
+          param: params,
           success: function (data) {
-            console.log(data)
-            self.bindGridData(data)
+            
+            self.bindGridData(data);
+            self.getChart();
           }
         })
       },
@@ -263,6 +315,330 @@
         let params = Object.assign(self.searchForm, self.filterForm)
         console.info(params)
         self.selTable()
+      },
+      filterFunc () {
+        this.getChart()
+      },
+      getChart () {
+        let self = this
+        // 使用刚指定的配置项和数据显示图表。
+        let option = self.getOptionV();
+        myChart.setOption(option);
+      },
+      getOptionV () {
+        let self = this
+        let list = self.tableData
+        // var cf_txn = chartForm.getItem('txn').val();
+        // var cf_txn_t = chartForm.getItem('txn').getText();
+        // 处置
+       
+        // 数据类型
+        var cf_target = self.filterForm.target
+
+        
+
+
+
+        var cf_target_t = self.getTargetText(cf_target)
+
+        console.log(cf_target_t);
+
+
+        // 排名
+        var cf_tops = self.filterForm.tops
+
+        var g_list = list
+
+
+        var op_legend_data = [] // 显示数据类型
+        var op_x_data = []      // xAxis显示列
+        var op_series = []      // 数据
+
+        
+        var cf_target_t_arr = cf_target_t
+        var cf_target_arr = cf_target
+
+        // [{label: '调用次数', value: '_NUMBER'}, {label: '平均时间', value: '_RUNTIME_AVG'}, {label: '最大时间', value: '_RUNTIME_MAX'}, {label: '最小时间', value: '_RUNTIME_MIN'}
+        // , {label: '平均TPM', value: '_TPM_AVG'}
+        // , {label: '最大TPM', value: '_TPM_MAX'}
+        // , {label: '最小TPM', value: '_TPM_MIN'}]
+
+        // risk_cfm_number
+        // 
+        // 
+        // 
+        // 
+        // 
+
+        // 
+        // 
+        // 
+        // 
+        // 
+        // risk_eval_tpm_min
+
+        // [{label: '调用次数', value: '_NUMBER'}, {label: '平均时间', value: ''}, {label: '最大时间', value: ''}, {label: '最小时间', value: ''}
+        // , {label: '平均TPM', value: ''}
+        // , {label: '最大TPM', value: ''}
+        // , {label: '最小TPM', value: ''}]
+         
+              
+
+
+        for (var i = 0; i < 2; i++) {
+          for (var j = 0; j < cf_target_t_arr.length; j++) {
+            if (i == 0) {
+              op_legend_data.push("风险评估");
+            } else {
+              op_legend_data.push("交易确认");
+            }
+            var series
+            console.log(cf_target_arr[j]);
+            if (cf_target_arr[j] == "_NUMBER") {
+              console.log();
+
+              if (i == 0) {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_cfm_number",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              } else {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_eval_number",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              }
+            }
+
+            if (cf_target_arr[j] == "_RUNTIME_AVG") {
+
+              if (i == 0) {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_cfm_runtime_avg",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              } else {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_eval_runtime_avg",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              }
+            }
+
+            if (cf_target_arr[j] == "_RUNTIME_MAX") {
+
+              if (i == 0) {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_cfm_runtime_max",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              } else {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_eval_runtime_max",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              }
+            }
+
+            if (cf_target_arr[j] == "_RUNTIME_MIN") {
+
+              if (i == 0) {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_cfm_runtime_min",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              } else {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_eval_runtime_min",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              }
+            }
+
+            if (cf_target_arr[j] == "_TPM_AVG") {
+
+              if (i == 0) {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_cfm_tpm_avg",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              } else {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_eval_tpm_avg",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              }
+            }
+
+            if (cf_target_arr[j] == "_TPM_MAX") {
+
+              if (i == 0) {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_cfm_tpm_max",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              } else {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_eval_tpm_max",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              }
+            }
+
+             if (cf_target_arr[j] == "_TPM_MIN") {
+
+              if (i == 0) {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_cfm_tpm_min",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              } else {
+                
+                series = { name: cf_target_t_arr[j],
+                    ps: "risk_eval_tpm_min",
+                    itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
+                    type: 'bar',
+                    // stack: '处置',
+                    data: []
+                }
+              }
+            }
+            if (series != undefined) {
+              op_series.push(series)
+            }
+            
+          }
+        }
+      
+        console.log(op_series);
+
+        
+        
+        // // 排序，从大到小
+        // g_list.sort(function (a, b) {
+        //   var al = 0
+        //   var bl = 0
+        //   // 如果包含总数，直接利用总是排序
+        //   if (cf_target_arr.indexOf('_NUMBER') > -1) {
+        //     al = al + parseInt(a[cf_ps_arr[i] + '_NUMBER'])
+        //     bl = bl + parseInt(b[cf_ps_arr[i] + '_NUMBER'])
+        //   } else {
+        //     // 不包含总数，利用其他所有数据合排序
+        //     for (var j = 0; j < cf_target_arr.length; j++) {
+        //       al = al + parseInt(a[cf_ps_arr[i] + cf_target_arr[j]])
+        //       bl = bl + parseInt(b[cf_ps_arr[i] + cf_target_arr[j]])
+        //     }
+        //   }
+        //   // alert(bl + '--' + al)
+        //   return bl - al
+        // })
+
+        var g_index = 1
+        for (var i = 0; i < g_list.length; i++) {
+          if (op_x_data.length >= cf_tops) {
+            break
+          } else {
+            if (g_list[i]['txnid'] === 'REPORTTXNTOTAL') {
+              continue
+            }
+            if ((g_index) % 2 === 0) {
+              op_x_data.push('\n' + g_list[i]['txnname'])
+            } else {
+              op_x_data.push(g_list[i]['txnname'])
+            }
+            for (var j = 0; j < op_series.length; j++) {
+              var list_v = g_list[i][op_series[j].ps.toLowerCase()]
+              if (list_v != null) {
+                op_series[j].data.push(list_v)
+              }
+            }
+            g_index++
+          }
+        }
+        var option = {}
+        option.op_legend_data = op_legend_data
+        option.op_x_data = op_x_data
+        option.op_series = op_series
+        option.chartID = 'chartdiv'
+
+
+
+        
+        return reportEcharts.GenOption(option)
+      },
+      getTargetText () {
+        let resultList = []
+        //let valueList = this.filterForm.target
+        resultList.push(this.filterForm.target);
+
+
+        // let list = this.targetList
+        // for (let i in valueList) {
+
+
+
+        //   let value = valueList[i]
+        //   for (let j in list) {
+        //     let item = list[j]
+        //     if (value === item.value) {
+        //       resultList.push(item.label)
+        //       break
+        //     }
+        //   }
+        // }
+        return resultList
       },
       openTxnTypedialog () {
         this.txntypeDialogVisible = true
@@ -292,7 +668,7 @@
           checkedStrArr.push(item.tab_desc)
           checkedStrKeyArr.push(item.tab_name)
         }
-        this.searchForm.txnids = checkedStrKeyArr.join(',')
+        this.searchForm.txnIds = checkedStrKeyArr.join(',')
       },
       // 功能树渲染方法
       renderContent (h, { node, data, store }) {
