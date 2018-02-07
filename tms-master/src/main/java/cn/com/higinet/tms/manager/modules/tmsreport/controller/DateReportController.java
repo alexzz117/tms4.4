@@ -81,7 +81,7 @@ public class DateReportController {
 	 * 导出列表数据
 	 */
 	@RequestMapping(value="/export", method=RequestMethod.GET)
-	public void exportListAction(@RequestBody Map<String, String> reqs,HttpServletRequest request,HttpServletResponse response){
+	public void exportListAction(Map<String, String> reqs, HttpServletResponse response){
 		List<Map<String, Object>>  dateList = dateReportService.exportList(reqs);
 		String titles [] = {"日 期","交易总数"};
 		//String colum [] = {"ALERTDATE","TXNNUMBER"};
