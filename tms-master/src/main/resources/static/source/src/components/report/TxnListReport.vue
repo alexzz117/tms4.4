@@ -160,6 +160,7 @@
   import ajax from '@/common/ajax'
   import util from '@/common/util'
   import reportEcharts from '@/common/reportEcharts'
+  import reportPrint from '@/common/reportPrint'
   let myChart // 图标对象
 
   export default {
@@ -558,7 +559,117 @@
         // window.location.href = url
       },
       printFunc () {
-        alert('打印')
+        let searchForm = this.searchForm
+        let filterForm = this.filterForm
+        let option = {}
+        option.queryBox = {
+          queryTitle: '交易报警信息查询', // 查询标题
+          queryForm: [{         // 查询条件
+            label: '交易名称',
+            value: searchForm.txnIds
+          }, {
+            label: '报表类型',
+            value: this.getReportTypeName(searchForm.reporttype)
+          }, {
+            label: '日期范围',
+            value: this.getQueryDataRange()
+          }, {
+            label: '地区名称',
+            value: this.getLocation()
+          }]
+        }
+        option.chartBox = {
+          chartTitle: '交易报警信息展示图', // 图表标题
+          chartForm: [{         // 图表筛选条件
+            label: '处置类型',
+            value: this.getPsText()
+          }, {
+            label: '监控指标',
+            value: this.getTargetText()
+          }, {
+            label: '排名设置',
+            value: filterForm.tops
+          }],
+          chartUrl: myChart.getDataURL()        // 图表地址
+        }
+        option.tablebBox = {
+          tableTitle: '交易报警信息列表', // 表格标题
+          columns: [],
+          tableData: []        // 表格数据
+        }
+        let tableColumns = this.tableColumns
+        let columns = [{name: '交易名称', dataIndex: 'txnname'},
+          {name: '交易总数', dataIndex: 'txnnumber'}]
+        for (let i in tableColumns) {
+          let tableColumn = tableColumns[i]
+          columns.push({            // 表格表头
+            name: tableColumn.dp_name,
+            dataIndex: null,
+            items: [{name: '总数', dataIndex: this.connectString(tableColumn.dp_code, '_rate')},
+              {name: '欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_fraudrate')},
+              {name: '非欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_nonfraudrate')}]
+          })
+        }
+        option.tablebBox.columns = columns
+        option.tablebBox.tableData = this.tableData
+        reportPrint.ReportPrint(option)
+      },
+      getReportTypeName (value) {
+        let list = this.reportTypeList
+        for (let i in list) {
+          let item = list[i]
+          if (item.value === value) {
+            return item.label
+          }
+        }
+        return value
+      },
+      getQueryDataRange () {
+        let searchForm = this.searchForm
+        let duraSeparator = searchForm.duraSeparator
+        if (duraSeparator && duraSeparator.length === 2) {
+          return searchForm.startTime + '至' + searchForm.endTime
+        } else {
+          return ''
+        }
+      },
+      getLocation () {
+        let location = ''
+        let searchForm = this.searchForm
+        let countryCode = searchForm.countrycode
+        if (countryCode) {
+          let countryCodeList = this.countryCodeList
+          let regionCode = searchForm.regioncode
+          let countryName = regionCode
+          for (let i in countryCodeList) {
+            if (countryCodeList[i].countrycode === countryCode) {
+              countryName = countryCodeList[i].countryname
+            }
+          }
+          location += countryName
+          if (regionCode) {
+            let regionCodeList = this.regionCodeList
+            let cityCode = searchForm.citycode
+            let regionName = regionCode
+            for (let i in regionCodeList) {
+              if (regionCodeList[i].regioncode === regionCode) {
+                regionName = regionCodeList[i].regionname
+              }
+            }
+            location = location + '-' + regionName
+            if (cityCode) {
+              let cityCodeList = this.cityCodeList
+              let cityName = cityCode
+              for (let i in cityCodeList) {
+                if (cityCodeList[i].citycode === cityCode) {
+                  cityName = cityCodeList[i].cityname
+                }
+              }
+              location = location + '-' + cityName
+            }
+          }
+        }
+        return location
       }
     }
   }
