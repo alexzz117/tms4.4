@@ -57,7 +57,9 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="规则名称">
-                <el-input></el-input>
+                <div @click="openRuleTree">
+                  <el-input v-model="filterForm.ruleNameStr" readonly></el-input>
+                </div>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="searchFunc">搜索</el-button>
@@ -113,6 +115,7 @@
         <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
       </div>
     </el-dialog>
+    <txn_rule ref="txnTree" v-on:listenToSubmit="getRuleName"></txn_rule>
   </div>
 </template>
 <script>
@@ -120,7 +123,9 @@
   import util from '@/common/util'
   import reportEcharts from '@/common/reportEcharts'
   import reportPrint from '@/common/reportPrint'
-  let myChart // 图标对象
+  import TxnRuleTree from '@/components/report/TxnRuleTree'
+
+  let myChart // 图表对象
 
   export default {
     data () {
@@ -157,6 +162,7 @@
         },
         filterForm: {
           ruleNameSelect: [],
+          ruleNameStr: '',
           target: 'TRIGGERNUM',
           tops: '10'
         }
@@ -465,9 +471,20 @@
           return ''
         }
       },
-      renderPercent(row, column, cellValue) {
+      renderPercent (row, column, cellValue) {
         return cellValue + '%'
+      },
+      getRuleName (data) {
+        this.filterForm.ruleNameStr = data.name.join(',')
+        this.filterForm.ruleNameSelect = data.value
+      },
+      openRuleTree () {
+        let data = this.filterForm.ruleNameSelect
+        this.$refs['txnTree'].open(data)
       }
+    },
+    components: {
+      'txn_rule': TxnRuleTree
     }
   }
 </script>
