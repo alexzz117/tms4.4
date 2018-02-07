@@ -51,7 +51,7 @@ public class TxnTimeReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/list", method=RequestMethod.POST)
-	public Model listReportAction(@RequestBody Map<String, String> reqs,HttpServletRequest request){
+	public Model listReportAction(@RequestBody Map<String, String> reqs){
 		Model model = new Model();
 		Page<Map<String, Object>>  page = txnTimeReportService.listTxnTimeReport(reqs);
 		model.setPage(page);
