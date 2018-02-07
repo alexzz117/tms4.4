@@ -80,9 +80,9 @@
               <el-table-column prop="txnname" label="监控交易名称"/>
               <el-table-column prop="triggernum" label="交易执行次数"/>
               <el-table-column prop="hitnum" label="规则命中数"/>
-              <el-table-column prop="hitrate" label="规则命中率"/>
-              <el-table-column prop="triggerrate" label="交易执行占比"/>
-              <el-table-column prop="hitnumrate" label="命中占比"/>
+              <el-table-column prop="hitrate" label="规则命中率" :formatter="renderPercent"/>
+              <el-table-column prop="triggerrate" label="交易执行占比" :formatter="renderPercent"/>
+              <el-table-column prop="hitnumrate" label="命中占比" :formatter="renderPercent"/>
             </el-table>
           </div>
           <el-pagination style="margin-top: 10px; text-align: right;"
@@ -464,6 +464,9 @@
         } else {
           return ''
         }
+      },
+      renderPercent(row, column, cellValue) {
+        return cellValue + '%'
       }
     }
   }
