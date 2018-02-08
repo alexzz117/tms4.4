@@ -5,6 +5,8 @@
         <section class="toolbar">
           <el-button plain class="el-icon-plus" @click="addNode" style="margin-left: 5px;" :disabled="!selectOneNode">新建
           </el-button>
+          <el-button plain class="el-icon-upload2" @click="importNode" style="margin-left: 5px;" :disabled="!selectOneNode">导入
+          </el-button>
           <el-button plain class="el-icon-delete" @click="delNode" style="margin-left: 0px;" :disabled="canNotDel">删除
           </el-button>
         </section>
@@ -74,8 +76,35 @@
             <el-button @click="dialogVisible = false" size="large">取 消</el-button>
           </el-form-item>
         </div>
-
       </el-form>
+    </el-dialog>
+
+    <el-dialog :title="uploadDialogTitle" :visible.sync="uploadDialogVisible" :close-on-click-modal="false" width="400px">
+      <h3>正在导入的节点路径为<span style="color: red;">{{uploadDialogTips}}</span></h3>
+          <el-upload
+            ref="importFile"
+            accept=".properties"
+            name="importFileInput"
+            drag
+            :action=uploadAction
+            :limit=1
+            :multiple="false"
+            :auto-upload="false"
+            :before-upload="importFile"
+            :on-success="importFileFinish"
+            :on-error="importFileFinish">
+
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text"><em>导入配置文件</em></div>
+            <div class="el-upload__tip" slot="tip">请导入properties文件</div>
+          </el-upload>
+
+        <div>
+          <!--<el-form-item label=" " :label-width="formLabelWidth">-->
+            <el-button type="primary" @click="submitUploadForm" size="large">保 存</el-button>
+            <el-button @click="uploadDialogVisible = false" size="large">取 消</el-button>
+          <!--</el-form-item>-->
+        </div>
     </el-dialog>
 
   </div>
@@ -103,12 +132,17 @@
       return {
         formLabelWidth: '60px',
         dialogTitle:'',
+        uploadDialogTitle:'导入配置',
+        uploadAction :'/zookeeper/import',
+        uploadDialogVisible:false,
+        uploadDialogTips:'',
         dialogVisible:false,
         dialogType:'',
         dialogForm:{
           label:'',
           value:''
         },
+        uploadForm: new FormData(),
         rules:{
           label:[
             { required: true, message: '请输入Name', trigger: 'blur' }
@@ -137,6 +171,78 @@
         return {
           label:'',
           value:''
+        }
+      },
+      importNode(){
+        this.uploadDialogTips = this.selectedTreeData[0].path
+        this.uploadForm = new FormData()
+        this.uploadDialogVisible = true
+      },
+      importFile(file){
+        this.uploadForm.append('zkFile', file)
+        this.$refs.importFile.abort()
+        return false
+      },
+      importFileFinish(){
+
+      },
+      submitUploadForm(){
+        let self = this
+        this.uploadForm = new FormData()
+
+        let importFileExist = false
+        let importFileName = ''
+
+        try {
+          let importFileFiles = this.$refs.importFile.$data.uploadFiles
+
+          if (importFileFiles && importFileFiles[0]) {
+            importFileExist = true
+            importFileName = importFileFiles[0].name
+          }
+
+          if (!importFileExist) {
+            this.$message.info('请选择配置文件')
+            return
+          }
+          if (!importFileName.endsWith('.properties')) {
+            this.$message.info('配置文件必须为properties文件')
+            return
+          }
+
+          this.$refs.importFile.submit()
+
+          this.uploadForm.append('rootPath', this.uploadDialogTips)
+          ajax.post({
+            url: '/zookeeper/import',
+            loading:true,
+            param: self.uploadForm,
+            success: function (data) {
+              self.uploadForm = new FormData()
+              self.uploadDialogVisible = false
+              self.$message({
+                message: '导入成功',
+                type:'success',
+                duration:1000,
+                onClose: function(){
+                  window.location.reload()
+                }
+              });
+
+            },
+            error: function (data) {
+              self.uploadForm = new FormData()
+              self.$message.error(data.error)
+            },
+            fail: function (err) {
+              self.uploadForm = new FormData()
+              self.$message.error('导入文件发生错误')
+              console.log(err)
+            }
+          })
+
+        } catch (e) {
+          console.log(e)
         }
       },
       addNode(){
@@ -184,6 +290,7 @@
               self.treeParentMap.get(self.selectedTreeData[0].path).subList = subListTemp
               self.$refs['tree'].updateKeyChildren(self.treeParentMap.get(self.selectedTreeData[0].path).path, subListTemp)
               self.selectedTreeData = []
+              self.tableData = []
             }
           })
         })

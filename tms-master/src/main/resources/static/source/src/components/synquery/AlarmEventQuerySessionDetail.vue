@@ -27,7 +27,45 @@
       <el-row>
         <el-col :span="12">
           <el-col :span="9" tag="label" class="info-item-label">
-            MAXSCORE:
+            设备标识:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.deviceid}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            IP地址:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.ipaddr}}&nbsp
+          </el-col>
+        </el-col>
+      </el-row>
+
+      <el-row>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            互联网服务提供商:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.ispcode}}&nbsp
+          </el-col>
+        </el-col>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            地理位置:
+          </el-col>
+          <el-col :span="15" tag="label" class="info-item-value">
+            {{detailData.location}}&nbsp
+          </el-col>
+        </el-col>
+      </el-row>
+
+      <el-row>
+        <el-col :span="12">
+          <el-col :span="9" tag="label" class="info-item-label">
+            最大分值:
           </el-col>
           <el-col :span="15" tag="label" class="info-item-value">
             {{detailData.maxscore}}&nbsp
@@ -35,7 +73,7 @@
         </el-col>
         <el-col :span="12">
           <el-col :span="9" tag="label" class="info-item-label">
-            SUMSCORE:
+            累计分值:
           </el-col>
           <el-col :span="15" tag="label" class="info-item-value">
             {{detailData.sumscore}}&nbsp
