@@ -44,14 +44,15 @@
         if (params && util.isArray(params) && params.length > 0) {
           defaultCheckKey = params
         }
+        this.defaultCheckKey = defaultCheckKey
         this.init(defaultCheckKey)
       },
-      init (defaultCheckKey) {
+      init () {
         let self = this
         ajax.post({
           url: '/trandef/queryRuleTree',
+          loading: true,
           success: function (data) {
-            self.defaultCheckKey = defaultCheckKey
             self.treeData = self.formatTreeData(data.list)
           }
         })
