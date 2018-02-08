@@ -205,9 +205,9 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/getRegion", method=RequestMethod.POST)
-	public Model getAllRegion(@RequestBody String countryCode){
+	public Model getAllRegion(@RequestBody Map<String, String> reqs){
 		Model model = new Model();
-		model.set("regList", txnReportService.getAllRegion(countryCode));
+		model.set("regList", txnReportService.getAllRegion(reqs.get("countryCode")));
 		//根据国家代码获取所有省份列表
 		return model;
 	}
@@ -217,8 +217,9 @@ public class TxnReportController {
 	 * @return
 	 */
 	@RequestMapping(value="/getCity", method=RequestMethod.POST)
-	public Model getAllCity(@RequestBody String regionCode ){
+	public Model getAllCity(@RequestBody Map<String, String> reqs){
 		Model model = new Model();
+		String regionCode = reqs.get("regionCode");
 		if(regionCode.length() == 1){
 			regionCode = "0" + regionCode;
 		}
