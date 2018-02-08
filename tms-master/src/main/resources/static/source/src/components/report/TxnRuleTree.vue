@@ -51,9 +51,8 @@
         ajax.post({
           url: '/trandef/queryRuleTree',
           success: function (data) {
-            self.formatTreeData(data.list).then(function () {
-              self.defaultCheckKey = defaultCheckKey
-            })
+            self.defaultCheckKey = defaultCheckKey
+            self.treeData = self.formatTreeData(data.list)
           }
         })
       },
@@ -94,10 +93,7 @@
           }
           return childs
         }
-        this.treeData = tree  // 返回树结构Json
-        return new Promise(function (resolve, reject) {
-          resolve()
-        })
+        return tree  // 返回树结构Json
       },
       // 功能树渲染方法
       renderContent (h, { node, data, store }) {
