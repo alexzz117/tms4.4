@@ -190,7 +190,7 @@ public class AlarmEventQueryService {
 
     public List<Map<String, Object>> queryAlarmEventSessionDetail(RequestModel requestModel) {
 
-        String sql = "select CONCAT(FROM_UNIXTIME(s.finishtime / 1000, '%Y-%m-%d'), ' ', '00:00:00') operate_time, FROM_UNIXTIME(s.starttime / 1000, '%Y-%m-%d %H:%i:%s') session_start_time, FROM_UNIXTIME(s.finishtime / 1000, '%Y-%m-%d %H:%i:%s') session_end_time, TMS_RUN_SESSION.*, concat(ifnull((select country.countryname from TMS_COUNTRY country where s.countrycode = country.countrycode), '未知'), '-', ifnull((select region.regionname from TMS_REGION region where s.regioncode = region.regioncode), '未知'), '-', ifnull((select city.cityname from TMS_CITY city where s.citycode = city.citycode), '未知')) LOCATION from TMS_RUN_SESSION s where sessionid = :sessionid";
+        String sql = "select CONCAT(FROM_UNIXTIME(TMS_RUN_SESSION.finishtime / 1000, '%Y-%m-%d'), ' ', '00:00:00') operate_time, FROM_UNIXTIME(TMS_RUN_SESSION.starttime / 1000, '%Y-%m-%d %H:%i:%s') session_start_time, FROM_UNIXTIME(TMS_RUN_SESSION.finishtime / 1000, '%Y-%m-%d %H:%i:%s') session_end_time, TMS_RUN_SESSION.*, concat(ifnull((select country.countryname from TMS_COUNTRY country where TMS_RUN_SESSION.countrycode = country.countrycode), '未知'), '-', ifnull((select region.regionname from TMS_REGION region where TMS_RUN_SESSION.regioncode = region.regioncode), '未知'), '-', ifnull((select city.cityname from TMS_CITY city where TMS_RUN_SESSION.citycode = city.citycode), '未知')) LOCATION from TMS_RUN_SESSION where sessionid = :sessionid";
 
         //获取country真实表名
         String tableNameSql = "select concat('', case t.SUCC_COUNT when 0 then '_N' else (select case c.IS_SUFFIX when 0 then '' when 1 then '_N' else '_N' end TAB_NAME from (select a.IS_SUFFIX from TMS_MGR_IPLOG a where a.IPLOG_ID=(select max(b.IPLOG_ID) from TMS_MGR_IPLOG b where b.OPERATE_RESULT=1)) c) end) TAB_NAME from (select count(*) SUCC_COUNT from TMS_MGR_IPLOG where OPERATE_RESULT=1) t";
@@ -204,7 +204,7 @@ public class AlarmEventQueryService {
         sql = sql.replaceAll("TMS_REGION", regionTableName);
         sql = sql.replaceAll("TMS_CITY", cityTableName);
 
-        List<Map<String, Object>> list = onlineSimpleDao.queryForList(sql, requestModel);
+        List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql, requestModel);
         return list;
     }
 

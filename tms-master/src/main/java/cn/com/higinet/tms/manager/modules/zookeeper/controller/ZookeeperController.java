@@ -2,6 +2,8 @@ package cn.com.higinet.tms.manager.modules.zookeeper.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -89,7 +91,8 @@ public class ZookeeperController {
 	@RequestMapping(value = "/set", method = RequestMethod.POST)
 	public Model set( @RequestBody ZkNode indata ) throws Exception {
 		if( curator.checkExists().forPath( indata.getPath() ) == null ) {
-			curator.create().forPath( indata.getPath() );
+//			curator.create().forPath( indata.getPath() );
+			curator.createContainers(indata.getPath());
 		}
 		if(StringUtils.equals(indata.getType(), "node")) {
 			String subPath = indata.getPath() + "/foo";
@@ -122,9 +125,31 @@ public class ZookeeperController {
 	}
 	
 	@RequestMapping(value = "/import", method = RequestMethod.POST)
-	public Model importThread( @RequestParam Map<String, String> reqs, HttpServletRequest request ) {
-		MultipartHttpServletRequest multipartrequest = (MultipartHttpServletRequest) request;
-		MultipartFile zkFile = multipartrequest.getFile( "zkFile" );
+	public Model importThread( String rootPath, MultipartFile zkFile, HttpServletRequest request ) {
+		String fileName = zkFile.getOriginalFilename();
+
+		Properties pps = new Properties();
+		try{
+			pps.load(zkFile.getInputStream());
+
+			Set<String> propNameSet = pps.stringPropertyNames();
+			for(String propName : propNameSet) {
+				String value = pps.getProperty(propName);
+				String path = rootPath + "/" + propName.replaceAll("\\.", "/");
+				ZkNode zkNode = new ZkNode();
+				zkNode.setPath(path);
+				zkNode.setType("prop");
+				zkNode.setValue(value);
+
+				Model model = set(zkNode);
+				System.out.println(model);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
 		return new Model();
 	}
+
 }
