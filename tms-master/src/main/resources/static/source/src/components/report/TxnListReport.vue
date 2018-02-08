@@ -211,10 +211,10 @@
       this.$nextTick(function () {
         let self = this
         ajax.post({
-          url: '/monitor/alarm/get_all_country',
+          url: '/report/txn/getCountry',
           param: {},
           success: function (data) {
-            self.countryCodeList = data.row
+            self.countryCodeList = data.countrylist
           }
         })
         // this.searchForm.duraSeparator = [new Date(), new Date()]
@@ -253,21 +253,23 @@
       },
       'searchForm.countrycode': function (val) {
         let self = this
+        self.searchForm.regioncode = ''
         ajax.post({
-          url: '/monitor/alarm/get_region_by_country',
-          param: {country: val},
+          url: '/report/txn/getRegion',
+          param: {countryCode: val},
           success: function (data) {
-            self.regionCodeList = data.row
+            self.regionCodeList = data.reglist
           }
         })
       },
       'searchForm.regioncode': function (val) {
         let self = this
+        self.searchForm.citycode = ''
         ajax.post({
-          url: '/monitor/alarm/get_city_by_region',
-          param: {region: val},
+          url: '/report/txn/getCity',
+          param: {regionCode: val},
           success: function (data) {
-            self.cityCodeList = data.row
+            self.cityCodeList = data.citylist
           }
         })
       }
