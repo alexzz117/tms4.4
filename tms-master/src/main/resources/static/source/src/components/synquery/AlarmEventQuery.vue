@@ -333,6 +333,7 @@
     watch: {
       'queryShowForm.countrycode': function (val) {
         let self = this
+        self.searchForm.regioncode = ''
         ajax.post({
           url: '/monitor/alarm/get_region_by_country',
           param: {country: val},
@@ -343,6 +344,7 @@
       },
       'queryShowForm.regioncode': function (val) {
         let self = this
+        self.searchForm.citycode = ''
         ajax.post({
           url: '/monitor/alarm/get_city_by_region',
           param: {region: val},
