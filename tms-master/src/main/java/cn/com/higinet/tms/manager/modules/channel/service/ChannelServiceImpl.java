@@ -139,6 +139,11 @@ public class ChannelServiceImpl extends ApplicationObjectSupport implements Chan
     public Map<String, Object> deleteChannel(RequestModel requestModel) {
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            List<Map<String, Object>> tabs = offlineSimpleDao.queryForList("SELECT * FROM  `tms_com_tab` where CHANN =:channelid", requestModel);
+            if (tabs.size() > 0) {
+                resultMap.put("result", "has");
+                return resultMap;
+            }
             int result = offlineSimpleDao.delete("TMS_DP_CHANNEL", requestModel);
             if (result > 0) {
                 resultMap.put("result", "success");
