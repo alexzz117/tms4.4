@@ -138,7 +138,7 @@
         },
         expendKey: ['T'], // 默认展开的功能节点id
         treeData: [],
-        activeNames: ['search', 'chart', 'table'],   // 显示的折叠面板
+        activeNames: ['chart', 'table'],   // 显示的折叠面板
         queryTitle: '规则报警信息查询',
         chartTitle: '规则报警信息展示图',
         tableTitle: '规则报警信息列表',
