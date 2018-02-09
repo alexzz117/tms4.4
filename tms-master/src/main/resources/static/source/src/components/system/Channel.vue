@@ -14,7 +14,7 @@
         <el-table-column label="操作" width="80px">
           <template slot-scope="scope">
             <el-button type="text" icon="el-icon-edit" title="编辑" @click="editChannel(scope.row)"></el-button>
-            <el-button type="text" icon="el-icon-delete" title="删除" @click="delChannel(scope.row)"></el-button>
+            <el-button v-show="scope.row.num === 0" type="text" icon="el-icon-delete" title="删除" @click="delChannel(scope.row)"></el-button>
           </template>
         </el-table-column>
         <el-table-column prop="channelid" label="渠道编号" align="left"></el-table-column>
