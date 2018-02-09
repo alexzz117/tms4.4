@@ -41,7 +41,7 @@ public class ChannelServiceImpl extends ApplicationObjectSupport implements Chan
      * @return
      */
     public List<Map<String, Object>> queryAllChannel() {
-        String sql = "SELECT * FROM TMS_DP_CHANNEL";
+        String sql = "SELECT ch.* ,(SELECT COUNT(ta.TAB_NAME) FROM  TMS_COM_TAB ta where ta.CHANN = ch.CHANNELID) num FROM  TMS_DP_CHANNEL ch";
         List<Map<String, Object>> list = offlineSimpleDao.queryForList(sql);
         return list;
     }
