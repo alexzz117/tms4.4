@@ -18,7 +18,7 @@
                 end-placeholder="结束日期">
               </el-date-picker>
             </el-form-item>
-            <el-form-item label="地区名称:" prop="countrycode">
+            <el-form-item label="地理位置:" prop="countrycode">
               <el-select v-model="searchForm.countrycode" class="alarm-event-query-form-item" placeholder="请选择" clearable filterable>
                 <el-option
                   v-for="item in countryCodeList"
@@ -54,9 +54,9 @@
             <el-form-item label="欺诈类型:">
               <el-select multiple v-model="filterForm.fdType" class="alarm-event-query-form-item" placeholder="请选择">
                 <el-option v-for="item in qzTypeList"
-                           :key="item.dp_code"
-                           :label="item.dp_name"
-                           :value="item.dp_code">
+                           :key="item"
+                           :label="item"
+                           :value="item">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -87,20 +87,20 @@
           <el-table
             :data="tableData"
             style="width: 100%">
-            <el-table-column prop="txnname" label="欺诈类型"  width="150"></el-table-column>
+            <el-table-column prop="fraudtype" label="欺诈类型"  width="150"></el-table-column>
             <el-table-column v-for="column in tableColumns" :label="column.dp_name" :key="column.dp_code" align="center">
               <el-table-column
-                :prop="connectString(column.dp_code, '_rate')"
+                :prop="connectString(column.dp_code, '_num')"
                 label="总数"
                 width="120">
               </el-table-column>
               <el-table-column
-                :prop="connectString(column.dp_code, '_fraudrate')"
+                :prop="connectString(column.dp_code, '_fraudnumber')"
                 label="欺诈数"
                 width="120">
               </el-table-column>
               <el-table-column
-                :prop="connectString(column.dp_code, '_nonfraudrate')"
+                :prop="connectString(column.dp_code, '_nonfraudnumber')"
                 label="非欺诈数"
                 width="120">
               </el-table-column>
@@ -140,8 +140,6 @@
 <script>
   import ajax from '@/common/ajax'
   import util from '@/common/util'
-  import dictCode from '@/common/dictCode'
-  import check from '@/common/check'
   import reportEcharts from '@/common/reportEcharts'
   import reportPrint from '@/common/reportPrint'
   let myChart // 图标对象
@@ -163,7 +161,6 @@
         currentPage: 1,       // 当前页码
         pageSize: 10,         // 分页显示条目
         total: 0,             // 表格记录总条数
-        reportTypeList: [{label: '日报', value: 'dayreport'}, {label: '月报', value: 'monthreport'}, {label: '年报', value: 'yearreport'}],
         countryCodeList: [],  // 地理位置信息列表
         regionCodeList: [],   // 地理位置信息列表
         cityCodeList: [],     // 地理位置信息列表
@@ -287,6 +284,10 @@
           success: function (data) {
             self.bindGridData(data)
             self.getChart()
+
+            for (let item in data.page.list) {
+              self.qzTypeList.push(item['FRAUDTYPE'])
+            }
           }
         })
       },
@@ -333,17 +334,9 @@
       // 功能树渲染方法
       renderContent(h, {node, data, store}) {
         if (node.data.enable === 0) { // 功能节点状态禁用
-          return ( < span
-        class
-          = "el-tree-node__label disabledFlag" > {node.label
-        }<
-          /span>)
+          return ( < span class= "el-tree-node__label disabledFlag" > {node.label}</span>)
         } else { // 功能节点状态正常
-          return ( < span
-        class
-          = "el-tree-node__label" > {node.label
-        }<
-          /span>)
+          return ( < span class= "el-tree-node__label" > {node.label}</span>)
         }
       },
       // 查询树结构
@@ -415,12 +408,9 @@
         // 处置
         let cfPs = self.filterForm.ps
         let cfPsT = self.getPsText(cfPs)
-        // 数据类型
-        // var cf_target = ['_FRAUDNUMBER'];
-        // var cf_target_t = ['欺诈数'];
         // 欺诈列表
-        let cfFdType = '1'
-        let cfFdTypeT = '1'
+        let cfFdType = self.filterForm.fdType
+        let cfFdTypeT = self.getQzText(cfFdType)
         // 数据集合
         let gList = list
         // alert(cf_ps_t+'---'+cf_fdType_t);
@@ -433,8 +423,8 @@
         let cfTargetTArr = ['欺诈数']
         let cfTargetArr = ['_FRAUDNUMBER']
 
-        opXData = cfFdTypeT.split(',')
-        let cfFdTypeArr = cfFdType.split(',')
+        opXData = cfFdTypeT
+        let cfFdTypeArr = cfFdTypeT
         for (let i = 0; i < opXData.length; i++) {
           if ((i + 1) % 2 === 0) {
             opXData[i] = '\n' + opXData[i]
@@ -473,6 +463,7 @@
         option.op_x_data = opXData
         option.op_series = opSeries
         option.chartID = 'chartdiv'
+        console.log(option)
         return reportEcharts.GenOption(option)
       },
       getPsText() {
@@ -586,15 +577,15 @@
           tableData: []        // 表格数据
         }
         let tableColumns = this.tableColumns
-        let columns = [{name: '欺诈类型', dataIndex: 'regionname'}]
+        let columns = [{name: '欺诈类型', dataIndex: 'fraudtype'}]
         for (let i in tableColumns) {
           let tableColumn = tableColumns[i]
           columns.push({            // 表格表头
             name: tableColumn.dp_name,
             dataIndex: null,
-            items: [{name: '总数', dataIndex: this.connectString(tableColumn.dp_code, '_rate')},
-              {name: '欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_fraudrate')},
-              {name: '非欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_nonfraudrate')}]
+            items: [{name: '总数', dataIndex: this.connectString(tableColumn.dp_code, 'num')},
+              {name: '欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_fraudnumber')},
+              {name: '非欺诈数', dataIndex: this.connectString(tableColumn.dp_code, '_nonfraudnumber')}]
           })
         }
         option.tablebBox.columns = columns
