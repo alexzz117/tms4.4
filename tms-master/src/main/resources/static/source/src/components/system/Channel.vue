@@ -263,7 +263,20 @@
             loading: true,
             param: {channelid: row.channelid},
             success: function (data) {
-              self.$message.success('删除成功。')
+              switch (data.result) {
+                case 'sucess':
+                  self.$message.success('删除成功')
+                  break
+                case 'has':
+                  self.$message.info('渠道被交易使用，不允许删除')
+                  break
+                case 'failed':
+                  self.$message.error('删除失败')
+                  break
+                default :
+                  self.$message.error('删除异常')
+              }
+
               self.selChannel()
             },
             fail: function (e) {
