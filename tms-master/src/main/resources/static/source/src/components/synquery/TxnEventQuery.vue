@@ -456,7 +456,7 @@
             }, this.queryShowForm)
             this.getTxnEventTableData(params)
           } else {
-            this.$message('查询条件不符合规则，请按提示重新输入')
+            // this.$message('查询条件不符合规则，请按提示重新输入')
             return false
           }
         })
