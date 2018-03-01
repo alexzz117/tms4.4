@@ -165,7 +165,7 @@ public class AlarmEventQueryService {
     }
 
     public List<Map<String, Object>> queryAlarmEventHandleDetail(RequestModel requestModel) {
-        String sql = "select ps.ps_id, co.login_name as ps_opername, ps.ps_type, ps.ps_result, ps.ps_info, ps.ps_time from TMS_MGR_ALARM_PROCESS ps inner join CMC_OPERATOR co on ps.ps_operid = co.operator_id where 1 = 1";
+        String sql = "select ps.ps_id, co.login_name as ps_opername, ps.ps_type, ps.ps_result, ps.ps_info, ps.ps_time from TMS_MGR_ALARM_PROCESS ps left join CMC_OPERATOR co on ps.ps_operid = co.operator_id where 1 = 1";
 
         sql += " and ps.txn_code = :txncode";
 
