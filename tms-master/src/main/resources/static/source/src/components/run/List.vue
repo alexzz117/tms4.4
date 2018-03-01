@@ -330,7 +330,7 @@
 //        var datatype = this.multipleSelection[0].datatype
         var rosterid = this.selectedRow.rosterid
         var datatype = this.selectedRow.datatype
-        this.$router.push({ name: 'valuelist', params: { rosterid: rosterid, datatype: datatype}})
+        this.$router.push({ name: 'valuelist', query: { rosterid: rosterid, datatype: datatype}})
       },
       importList() {
         this.fileList = []
@@ -444,7 +444,7 @@
         gridData: [],
         pageindex: 1,
         pagesize: 10,
-        total: 100,
+        total: 0,
         listDialogVisible: false,
         listDialogform: {
           rostername: "",

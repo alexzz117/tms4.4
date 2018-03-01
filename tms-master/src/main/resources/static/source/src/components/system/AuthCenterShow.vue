@@ -42,7 +42,14 @@
           param: {},
           success: function (data) {
             if (data.page) {
-              self.tableData = data.page.list
+              let tableList = data.page.list
+              let tableListTemp = []
+              for(let item of tableList) {
+                if(item.modelname !== '交易策略') {
+                  tableListTemp.push(item)
+                }
+              }
+              self.tableData = tableListTemp
             }
           }
         })

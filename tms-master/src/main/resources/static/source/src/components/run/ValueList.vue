@@ -132,7 +132,7 @@
       },
       openDialog(flag) {
         this.flag = flag
-        this.dialogTitle = `名单值管理->${this.title}`
+        this.dialogTitle = `名单值管理`
         if (flag === 'edit') {
 //          var length = this.multipleSelection.length
 //          if (length !== 1) {
@@ -197,10 +197,11 @@
       getList(cb) {
         self = this
         var param = {
-          rosterid: this.$router.history.current.params.rosterid
+          rosterid: this.$router.history.current.query.rosterid
         }
         ajax.post({
           url: '/mgr/get',
+          loading:true,
           param: param,
           success: function (data) {
             self.listData = data.row
@@ -324,6 +325,13 @@
       constrast() {
 //        var rosterValue = this.multipleSelection[0]
         var rosterValue = this.selectedRow
+        if(!this.valuecurrentRow.rosterid) {
+          this.$message({
+            type: 'info',
+            message: '请选择转换名单'
+          })
+          return
+        }
         ajax.post({
           url: '/mgr/changevalue',
           param: {
@@ -445,7 +453,7 @@
         gridData: [],
         pageindex: 1,
         pagesize: 10,
-        total: 100,
+        total: 0,
         valueListDialogVisible: false,
         valueListDialogform: {
           rostervalue: "",

@@ -38,6 +38,16 @@
           <el-table-column prop="prop_comment" label="属性说明" align="left" ></el-table-column>
         </el-table>
 
+        <el-pagination style="margin-top: 10px; text-align: right;"
+                       :current-page="currentPage"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :page-sizes="[10, 25, 50, 100]"
+                       :page-size="pageSize"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+
       </section>
 
       <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" width="600px">
@@ -401,18 +411,30 @@
       },
       getData() {
         let self = this
-        let paramsObj = {}
+        let paramsObj = {
+          pageindex: this.currentPage,
+          pagesize: this.pageSize
+        }
         ajax.post({
           url: '/dfp/appProList',
+          loading:true,
           param: paramsObj,
           success: function (data) {
-            if (data.row && data.row.length > 0) {
-              self.tableData = data.row
+            if (data.page) {
+              self.bindGridData(data)
+              // self.tableData = data.row
               self.appIdList = data.applist
               self.propIdList = data.prolist
             }
           }
         })
+      },
+      bindGridData (data) {
+        this.tableData = data.page.list
+        // 加上这个会出现页码之间来回跳的问题
+        // this.currentPage = data.page.index
+        this.pageSize = data.page.size
+        this.total = data.page.total
       },
       delData (row) {
         this.$confirm('确定删除?', '提示', {

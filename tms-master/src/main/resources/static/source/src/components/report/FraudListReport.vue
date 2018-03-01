@@ -596,7 +596,7 @@
     }
   }
 </script>
-<style>
+<style scoped>
   .alarm-event-query-form-item{
     width: 200px;
   }

@@ -512,7 +512,8 @@
         currentPage: 1,
         pageSize: 10,
         total: 0,
-        selectedRows: []
+        selectedRows: [],
+        selectedRow: []
       }
     },
     props: ['txnId', 'isVisibility', 'readonly'],
@@ -804,6 +805,7 @@
       // 打开表单弹窗 其中view暂时去掉了
       openDialog(dialogType, row) {
         this.dialogType = dialogType
+        this.selectedRow = row
         let self = this
         if (dialogType === 'edit') {
           this.allPickCollapse = false // 编辑时多选为隐藏多的标签
@@ -823,7 +825,10 @@
               // self.statParamInitList = self.selectedRows[0].stat_param.split(',')
             }
             self.dialogForm.fn_param = row.fn_param
+            Object.assign(self.dialogForm, self.selectRowNum2Str(row))
             // self.dialogForm.fn_param = self.selectedRows[0].fn_param
+
+
           }, 300)
         } else if (dialogType === 'add') {
           this.allPickCollapse = true // 新增时多选为隐藏多的标签
@@ -851,6 +856,7 @@
           }, 300)
           Object.assign(this.dialogForm, this.selectRowNum2Str(this.selectedRows[0]))
         }
+        // this.fnChangeEvent()
         this.dialogVisible = true
         this.dialogOpenHandle()
         setTimeout(function () {
@@ -858,11 +864,11 @@
             self.$refs['dialogForm'].clearValidate()
           }
         }, 100)
+
       },
       openRefsDialog(row) {
-
         this.selTree(row)
-        this.refsDialogVisible = true
+
       },
       // 下拉获取的码值时字符串，真实数据是数字，要转一下才好用
       selectRowNum2Str(row) {
@@ -1014,8 +1020,9 @@
       getCanUseStorageFdByDataType (datatype, effect) {
         var sfdItems = []
         var enableStoreFds = this.enableStoreFd
-        if (!effect) {
-          var srows = this.selectedRows
+        // if (!effect) {
+        if (this.dialogType === 'edit') {
+          var srows = [this.selectedRow]
           if (srows && srows.length > 0) {
             var srow = srows[0];
             if (srow && srow.storecolumn) {
@@ -1028,6 +1035,9 @@
           }
         }
         sfdItems = sfdItems.concat(this.getEnableStorageFdByDataType(datatype, enableStoreFds))
+
+
+
         return sfdItems
       },
       // 根据数据类型获取可用存储字段
@@ -1376,6 +1386,7 @@
               data.row = data.list
               self.treeList = (data.row)
               self.refsTreeData = self.formatTreeData(data.row)
+              self.refsDialogVisible = true
               // self.expendNodesByLevel(1)
             }
           }

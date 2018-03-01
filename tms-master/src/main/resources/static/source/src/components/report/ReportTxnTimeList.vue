@@ -66,7 +66,7 @@
             <el-table-column
               prop="txnname"
               label="交易名称"
-              width="150" 
+              width="150"
               align="center">
             </el-table-column>
             <el-table-column label="风险评估" align="center">
@@ -189,7 +189,7 @@
         <el-button @click="txntypeDialogVisible = false" size="large">取 消</el-button>
       </div>
     </el-dialog>
-   
+
   </div>
 </template>
 <script>
@@ -239,14 +239,14 @@
       }
     },
     created () {
-      
+
     },
     mounted: function () {
       myChart = this.$echarts.init(document.getElementById('chartdiv'))
       this.selTree()
       this.selTable()
     },
-    
+
     watch: {
       'searchForm.duraSeparator': function (val) {
         let self = this
@@ -292,7 +292,7 @@
           loading: true,
           param: params,
           success: function (data) {
-            
+
             self.bindGridData(data);
             self.getChart();
           }
@@ -331,59 +331,26 @@
         // var cf_txn = chartForm.getItem('txn').val();
         // var cf_txn_t = chartForm.getItem('txn').getText();
         // 处置
-       
+
         // 数据类型
         var cf_target = self.filterForm.target
-
-        
-
-
-
         var cf_target_t = self.getTargetText(cf_target)
-
-        console.log(cf_target_t);
-
 
         // 排名
         var cf_tops = self.filterForm.tops
 
         var g_list = list
 
+        console.log('g_list');
+        console.log(g_list);
+
 
         var op_legend_data = [] // 显示数据类型
         var op_x_data = []      // xAxis显示列
         var op_series = []      // 数据
 
-        
         var cf_target_t_arr = cf_target_t
-        var cf_target_arr = cf_target
-
-        // [{label: '调用次数', value: '_NUMBER'}, {label: '平均时间', value: '_RUNTIME_AVG'}, {label: '最大时间', value: '_RUNTIME_MAX'}, {label: '最小时间', value: '_RUNTIME_MIN'}
-        // , {label: '平均TPM', value: '_TPM_AVG'}
-        // , {label: '最大TPM', value: '_TPM_MAX'}
-        // , {label: '最小TPM', value: '_TPM_MIN'}]
-
-        // risk_cfm_number
-        // 
-        // 
-        // 
-        // 
-        // 
-
-        // 
-        // 
-        // 
-        // 
-        // 
-        // risk_eval_tpm_min
-
-        // [{label: '调用次数', value: '_NUMBER'}, {label: '平均时间', value: ''}, {label: '最大时间', value: ''}, {label: '最小时间', value: ''}
-        // , {label: '平均TPM', value: ''}
-        // , {label: '最大TPM', value: ''}
-        // , {label: '最小TPM', value: ''}]
-         
-              
-
+        var cf_target_arr = [cf_target]
 
         for (var i = 0; i < 2; i++) {
           for (var j = 0; j < cf_target_t_arr.length; j++) {
@@ -393,12 +360,13 @@
               op_legend_data.push("交易确认");
             }
             var series
+            console.log('cf_target_arr[j]');
             console.log(cf_target_arr[j]);
             if (cf_target_arr[j] == "_NUMBER") {
-              console.log();
+              console.log('_NUMBER');
 
               if (i == 0) {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_cfm_number",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -407,7 +375,7 @@
                     data: []
                 }
               } else {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_eval_number",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -421,7 +389,7 @@
             if (cf_target_arr[j] == "_RUNTIME_AVG") {
 
               if (i == 0) {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_cfm_runtime_avg",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -430,7 +398,7 @@
                     data: []
                 }
               } else {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_eval_runtime_avg",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -444,7 +412,7 @@
             if (cf_target_arr[j] == "_RUNTIME_MAX") {
 
               if (i == 0) {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_cfm_runtime_max",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -453,7 +421,7 @@
                     data: []
                 }
               } else {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_eval_runtime_max",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -467,7 +435,7 @@
             if (cf_target_arr[j] == "_RUNTIME_MIN") {
 
               if (i == 0) {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_cfm_runtime_min",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -476,7 +444,7 @@
                     data: []
                 }
               } else {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_eval_runtime_min",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -490,7 +458,7 @@
             if (cf_target_arr[j] == "_TPM_AVG") {
 
               if (i == 0) {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_cfm_tpm_avg",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -499,7 +467,7 @@
                     data: []
                 }
               } else {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_eval_tpm_avg",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -513,7 +481,7 @@
             if (cf_target_arr[j] == "_TPM_MAX") {
 
               if (i == 0) {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_cfm_tpm_max",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -522,7 +490,7 @@
                     data: []
                 }
               } else {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_eval_tpm_max",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -533,10 +501,10 @@
               }
             }
 
-             if (cf_target_arr[j] == "_TPM_MIN") {
+            if (cf_target_arr[j] == "_TPM_MIN") {
 
               if (i == 0) {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_cfm_tpm_min",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -545,7 +513,7 @@
                     data: []
                 }
               } else {
-                
+
                 series = { name: cf_target_t_arr[j],
                     ps: "risk_eval_tpm_min",
                     itemStyle: {normal: {label: {show: true, position: 'insideRight'}}},
@@ -558,14 +526,15 @@
             if (series != undefined) {
               op_series.push(series)
             }
-            
+
           }
         }
-      
+
+        console.log('op_series');
         console.log(op_series);
 
-        
-        
+
+
         // // 排序，从大到小
         // g_list.sort(function (a, b) {
         //   var al = 0
@@ -607,15 +576,16 @@
             g_index++
           }
         }
+
+        console.log('op_series')
+        console.log(op_series)
+
         var option = {}
         option.op_legend_data = op_legend_data
         option.op_x_data = op_x_data
         option.op_series = op_series
         option.chartID = 'chartdiv'
 
-
-
-        
         return reportEcharts.GenOption(option)
       },
       getTargetText () {
@@ -737,7 +707,7 @@
     }
   }
 </script>
-<style>
+<style scoped>
   .alarm-event-query-form-item{
     width: 200px;
   }

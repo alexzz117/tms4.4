@@ -163,7 +163,8 @@
       },
       bindGridData (data) {
         this.tableData = data.page.list
-        this.currentPage = data.page.index
+        // 加上这个会出现页码之间来回跳的问题
+        // this.currentPage = data.page.index
         this.pageSize = data.page.size
         this.total = data.page.total
       },
