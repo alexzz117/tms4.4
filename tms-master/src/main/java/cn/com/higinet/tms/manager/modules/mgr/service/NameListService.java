@@ -498,6 +498,7 @@ public class NameListService {
 		Map<String, Object> conds = new HashMap<String, Object>();
 		String rosterValueId = String.valueOf(req.get( "rostervalueid" ));
 		conds.put( "ROSTERVALUEID", rosterValueId );
+		conds.put( "ROSTERID", String.valueOf(req.get( "rosteridold" )) );
 
 		Map<String, Object> updateMap = new HashMap<String, Object>();
 		String rosterId = (String) req.get( "rosterid" );

@@ -21,6 +21,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -169,6 +170,17 @@ public class DfpService {
 	}
 
 	/**
+	 * 方法描述:查询属性列表
+	 * @param reqs
+	 * @return
+	 */
+	public Page<Map<String, Object>> proListPage(Map<String, Object> reqs ) {
+		String sql = "select * from TMS_DFP_PROPERTY";
+		return dynamicSimpleDao.pageQuery(sql, reqs, new Order().asc( "PROP_ID" ).asc( "PROP_NAME" ));
+//		return dynamicSimpleDao.listAll( "TMS_DFP_PROPERTY",  );
+	}
+
+	/**
 	* 方法描述:保存属性
 	* @param formList
 	* @return
@@ -239,6 +251,11 @@ public class DfpService {
 	public List<Map<String, Object>> appProList( Map<String, Object> reqs ) {
 		String sql = "SELECT AP.*,P.PROP_NAME,P.PROP_TYPE,P.PROP_COMMENT,A.APP_NAME FROM TMS_DFP_APP_PROPERTIES AP,TMS_DFP_PROPERTY P,TMS_DFP_APPLICATION A WHERE AP.PROP_ID=P.PROP_ID AND AP.APP_ID=A.APP_ID ORDER BY AP.APP_ID ASC,P.PROP_ID ASC";
 		return dynamicSimpleDao.queryForList( sql );
+	}
+
+	public Page<Map<String, Object>> appProListPage( Map<String, Object> reqs ) {
+		String sql = "SELECT AP.*,P.PROP_NAME,P.PROP_TYPE,P.PROP_COMMENT,A.APP_NAME FROM TMS_DFP_APP_PROPERTIES AP,TMS_DFP_PROPERTY P,TMS_DFP_APPLICATION A WHERE AP.PROP_ID=P.PROP_ID AND AP.APP_ID=A.APP_ID ORDER BY AP.APP_ID ASC,P.PROP_ID ASC";
+		return dynamicSimpleDao.pageQuery( sql, reqs, new Order());
 	}
 
 	/**

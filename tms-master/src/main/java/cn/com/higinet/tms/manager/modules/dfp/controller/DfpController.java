@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.com.higinet.tms.base.entity.common.Page;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,8 +103,8 @@ public class DfpController {
 	@RequestMapping(value = "/proList", method = RequestMethod.POST)
 	public Model listProAction( @RequestBody Map<String, Object> reqs ) {
 		Model model = new Model();
-		List<Map<String, Object>> statList = dfpService.proList( reqs );
-		model.setRow( statList );
+		Page<Map<String, Object>> statList = dfpService.proListPage( reqs );
+		model.setPage( statList );
 		return model;
 	}
 
@@ -147,8 +148,8 @@ public class DfpController {
 	@RequestMapping(value = "/appProList", method = RequestMethod.POST)
 	public Model listAppProAction( @RequestBody Map<String, Object> reqs ) {
 		Model model = new Model();
-		List<Map<String, Object>> statList = dfpService.appProList( reqs );
-		model.setRow( statList );
+		Page<Map<String, Object>> statList = dfpService.appProListPage( reqs );
+		model.setPage( statList );
 		model.set( "appList", dfpService.appList( reqs ) );
 		model.set( "proList", dfpService.proList( reqs ) );
 		return model;
