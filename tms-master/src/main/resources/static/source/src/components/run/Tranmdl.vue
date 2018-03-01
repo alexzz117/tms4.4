@@ -390,7 +390,7 @@
         let self = this
         let dataType = self.tmForm.type
         let enableStoreFd = self.enableStoreFd
-        let fdName = self.tmForm.fd_name
+        let fdName = self.tmForm.old_fd_name
         return self.getFdNameList(dataType, enableStoreFd, fdName)
       },
       codeDefaultList () { // 默认值
@@ -464,7 +464,7 @@
           }
         }
         let enableStoreFd = self.enableStoreFd
-        let fdName = self.tableInfoForm.storecolumn
+        let fdName = self.tableInfoForm.old_storecolumn
         if (dataType !== '' && enableStoreFd.length > 0) {
           return self.getFdNameList(dataType, enableStoreFd, fdName)
         } else {
@@ -636,6 +636,7 @@
           ref_name: '',
           src_id: '',
           type: '',
+          old_fd_name: '',
           fd_name: '',
           code: '',
           src_default: '',
@@ -686,6 +687,7 @@
           src_cond_in: '',
           src_expr: '',
           src_expr_in: '',
+          old_storecolumn: '',
           storecolumn: '',
           tab_desc: ''
         },
@@ -1098,6 +1100,7 @@
           src_id: row.src_id,
           type: row.type,
           fd_name: row.fd_name,
+          old_fd_name: row.fd_name,
           code: row.code,
           src_default: row.src_default,
           genesisrul: genesisrul
@@ -1408,6 +1411,7 @@
             src_expr: info.src_expr,
             src_expr_in: info.src_expr_in,
             storecolumn: info.storecolumn,
+            old_storecolumn: info.storecolumn,
             tab_desc: info.tab_desc
           }
           this.selectTableInfoRows = [info]
