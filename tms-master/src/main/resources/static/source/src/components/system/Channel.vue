@@ -264,7 +264,7 @@
             param: {channelid: row.channelid},
             success: function (data) {
               switch (data.result) {
-                case 'sucess':
+                case 'success':
                   self.$message.success('删除成功')
                   break
                 case 'has':
