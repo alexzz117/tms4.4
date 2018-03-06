@@ -7,24 +7,23 @@ import org.apache.kafka.common.serialization.Serializer;
 import cn.com.higinet.tms.base.entity.TrafficData;
 import cn.com.higinet.tms.base.util.Kryoz;
 
-public class KafkaEncode implements Serializer<TrafficData> {
+public class KafkaEncode implements Serializer<Object> {
 
 	@Override
 	public void configure( Map<String, ?> configs, boolean isKey ) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public byte[] serialize( String topic, TrafficData data ) {
+	public byte[] serialize( String topic, Object data ) {
 		return Kryoz.toBytes( data );
 	}
 
 	@Override
 	public void close() {
 		// TODO Auto-generated method stub
-		
-	}
 
+	}
 
 }

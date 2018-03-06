@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import cn.com.higinet.tms.base.entity.Traffic;
 import cn.com.higinet.tms.base.entity.TrafficData;
 
 @Component
@@ -25,7 +26,7 @@ public class Producer {
 	ExecutorService executorService;
 
 	@Autowired
-	private KafkaTemplate<String, TrafficData> kafkaTemplate;
+	private KafkaTemplate<String, Traffic> kafkaTemplate;
 
 	@PostConstruct
 	public void init() {
@@ -33,21 +34,24 @@ public class Producer {
 	}
 
 	//每秒10000条
-	@Scheduled(fixedRate = 300)
+	@Scheduled(fixedRate = 1000)
 	private void executeTask() throws Exception {
 		executorService.execute( new Runnable() {
 			@Override
 			public void run() {
 				for( int i = 0; i < 20000; i++ ) {
-					TrafficData tarffic = createData();
-					ListenableFuture<SendResult<String, TrafficData>> result = kafkaTemplate.send( "traffic", tarffic.getTxnCode(), tarffic );
-					try {
+					Traffic traffic = new Traffic();
+					TrafficData trafficData = createData();
+					traffic.setTrafficData( trafficData );
+					kafkaTemplate.send( "traffic", trafficData.getTxnCode(), traffic );
+					//ListenableFuture<SendResult<String, Traffic>> result = kafkaTemplate.send( "traffic", trafficData.getTxnCode(), traffic );
+					/*try {
 						logger.info( result.get().getProducerRecord().key() + ", " + result.get().getProducerRecord().topic() + ", " + result.get().getProducerRecord().partition() );
 					}
 					catch( InterruptedException | ExecutionException e ) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
+					}*/
 				}
 			}
 
@@ -63,7 +67,7 @@ public class Producer {
 		data.setCounTryCode( "5044啊啊啊啊啊啊啊大大大大大大撒大" );
 		data.setRegionCode( "5044110000啊啊啊啊啊啊啊大大大" );
 		data.setCityCode( "5044110000啊啊啊啊啊啊啊大大大大大大撒大苏打" );
-		data.setIspCode( "" );
+		data.setIspCode( "504411000050441100005044110000" );
 		data.setCreateTime( 1513040400000L );
 		data.setFinishTime( 1513040400000L );
 		data.setTxnStatus( 1 );
@@ -73,7 +77,7 @@ public class Producer {
 		data.setConfirmRisk( "1啊啊啊啊啊啊啊大大大大大大撒大苏打似的啊啊啊啊啊啊啊大大大" );
 		data.setIsEval( "1啊啊啊啊啊啊啊大大大大大大撒大苏打似的啊啊啊啊啊啊啊大大大大大" );
 		data.setModelId( "102啊啊啊啊啊啊啊大大大大大大撒大苏打似的啊啊啊啊啊啊啊大大大大" );
-		data.setText1( "北京三里屯啊啊啊啊啊啊啊大大大大大大撒大苏打似的" );
+		//data.setText1(Enums.random(NameEnum.class).toString());
 		data.setText2( "北京西城区啊啊啊啊啊啊啊大大大大大大撒大苏打似的啊啊啊啊啊啊啊大大大大大大撒大苏" );
 		data.setText3( "啊啊啊啊啊啊啊大大大大大大撒大苏打似的啊啊啊啊啊" );
 		data.setText5( "北京三里屯啊啊啊啊啊啊啊大大大大" );
