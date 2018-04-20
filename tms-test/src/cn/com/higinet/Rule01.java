@@ -35,7 +35,7 @@ public class Rule01 extends Rule {
 	    transaction.setCstNo("20181939911965");
 	    
 	    //参数是。交易定义的 交易识别标识 来发送
-		transaction.setTransType("SFSRC001");
+		transaction.setTransType("netbank_auth");
 		transaction.setChannelType("CH02");
 		String time = sdf.format(new Date());
 		
